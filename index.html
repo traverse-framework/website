@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traverse — Contract-Driven Runtime for Portable Business Capabilities</title>
+  <meta name="description" content="Traverse is a contract-driven Rust and WASM runtime for discovering, validating, and composing portable business capabilities across browser, edge, cloud, and AI pipeline.">
+  <meta property="og:title" content="Traverse — Contract-Driven Portable Capability Runtime">
+  <meta property="og:description" content="A contract-driven Rust and WASM runtime for discovering, validating, and composing portable business capabilities.">
+  <meta property="og:url" content="https://traverse-framework.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FAFAFA;
+      --fg: #0D0D0D;
+      --mid: #6B6B6B;
+      --accent: #E8510A;
+      --border: #E5E5E5;
+      --code-bg: #1A1A2E;
+      --code-fg: #E8F4F8;
+      --display: 'Space Grotesk', sans-serif;
+      --body: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 4rem;
+      position: sticky;
+      top: 0;
+      background: rgba(250, 250, 250, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--fg);
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--mid);
+      align-items: center;
+    }
+
+    .nav-links a:hover { color: var(--fg); }
+
+    .nav-cta {
+      background: var(--fg);
+      color: var(--bg) !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.82rem;
+      transition: background 0.15s;
+    }
+
+    .nav-cta:hover { background: var(--accent) !important; }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      min-height: calc(100vh - 65px);
+      padding: 5rem 4rem;
+      gap: 4rem;
+    }
+
+    .hero-content { max-width: 560px; }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.75rem;
+      color: var(--fg);
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--mid);
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--fg);
+      color: var(--bg);
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: -0.01em;
+      transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover { background: var(--accent); }
+
+    .btn-secondary {
+      border: 1.5px solid var(--border);
+      color: var(--mid);
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-family: var(--display);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: var(--fg); color: var(--fg); }
+
+    /* GRAPH CANVAS */
+    .hero-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    canvas#graph {
+      width: 100%;
+      max-width: 560px;
+      height: 480px;
+      border-radius: 16px;
+    }
+
+    /* SECTION SHARED */
+    section {
+      padding: 6rem 4rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      color: var(--mid);
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* PROBLEM SECTION */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .problem-heading {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .problem-body {
+      font-size: 1rem;
+      color: var(--mid);
+      line-height: 1.8;
+    }
+
+    .problem-body p { margin-bottom: 1rem; }
+    .problem-body p:last-child { margin-bottom: 0; }
+
+    .problem-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .problem-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .problem-num {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 500;
+      padding-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .problem-card-title {
+      font-family: var(--display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.01em;
+    }
+
+    .problem-card-body {
+      font-size: 0.85rem;
+      color: var(--mid);
+      line-height: 1.6;
+    }
+
+    /* PRINCIPLES */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .principle {
+      border-top: 2px solid var(--border);
+      padding-top: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .principle:hover { border-color: var(--accent); }
+
+    .principle-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .principle h3 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .principle p {
+      font-size: 0.88rem;
+      color: var(--mid);
+      line-height: 1.7;
+    }
+
+    /* CODE BLOCK */
+    .code-section {
+      background: var(--code-bg);
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      margin-top: 2.5rem;
+      overflow-x: auto;
+    }
+
+    .code-section pre {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--code-fg);
+    }
+
+    .code-comment { color: #5D7B8A; }
+    .code-key { color: #79C8E2; }
+    .code-val { color: #C9F0A4; }
+    .code-str { color: #F2C97D; }
+
+    /* LINEAGE SECTION */
+    .lineage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .lineage-content h2 {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .lineage-content p {
+      font-size: 0.95rem;
+      color: var(--mid);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .lineage-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .lineage-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .lineage-link:hover { border-color: var(--fg); transform: translateX(4px); }
+
+    .lineage-link-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--fg);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .lineage-link-meta { flex: 1; }
+    .lineage-link-title { font-weight: 500; font-size: 0.88rem; margin-bottom: 0.15rem; }
+    .lineage-link-sub { font-size: 0.78rem; color: var(--mid); }
+
+    .lineage-arrow { color: var(--mid); font-size: 0.8rem; }
+
+    /* STATUS BADGE */
+    .status-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FFF3EC;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 0.85rem;
+      border-radius: 20px;
+      margin-bottom: 1.25rem;
+      font-weight: 500;
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .status-card h3 {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .status-card p {
+      font-size: 0.88rem;
+      color: var(--mid);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+
+    .status-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .status-list li {
+      font-size: 0.82rem;
+      color: var(--mid);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--mono);
+    }
+
+    .status-list li::before {
+      content: '✓';
+      color: var(--accent);
+      font-size: 0.75rem;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 2.5rem 4rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-left {
+      font-family: var(--display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.8rem;
+      color: var(--mid);
+    }
+
+    .footer-right a:hover { color: var(--fg); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 1.25rem 2rem; }
+      .nav-links { gap: 1.5rem; }
+      .hero { grid-template-columns: 1fr; padding: 3rem 2rem; min-height: auto; gap: 2rem; }
+      .hero-visual { order: -1; }
+      canvas#graph { height: 300px; }
+      section { padding: 4rem 2rem; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .principles-grid { grid-template-columns: 1fr; }
+      .lineage-grid { grid-template-columns: 1fr; }
+      footer { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">Traverse<span>.</span></span>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#principles">Principles</a>
+      <a href="#lineage">Lineage</a>
+      <a href="https://github.com/enricopiovesan/Traverse" class="nav-cta" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Contract-Driven WASM Runtime</p>
+      <h1>Business logic that<br><em>runs anywhere.</em><br>Governed by contracts.</h1>
+      <p class="hero-desc">
+        Traverse is a contract-driven Rust and WASM runtime for discovering, validating, and composing
+        portable business capabilities across browser, edge, cloud, and AI pipeline — without rewriting
+        logic for each environment.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/enricopiovesan/Traverse" class="btn-primary" target="_blank" rel="noopener">
+          View on GitHub →
+        </a>
+        <a href="https://enricopiovesan.com/projects/" class="btn-secondary">
+          Learn more
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <canvas id="graph"></canvas>
+    </div>
+  </div>
+
+  <section id="problem">
+    <p class="section-label">The problem</p>
+    <div class="problem-grid">
+      <div>
+        <h2 class="problem-heading">The same logic.<br>Written four times.</h2>
+        <div class="problem-body">
+          <p>
+            Most distributed systems have a logic problem nobody talks about. The same business rule —
+            a pricing formula, an eligibility check, a validation step — gets implemented separately
+            for the browser, the backend, the edge, and now the AI pipeline.
+          </p>
+          <p>
+            Nobody planned it that way. It happened because the architecture made assumptions about
+            the environment before it made decisions about the behavior. Over time the copies drift.
+            The system becomes harder to reason about, harder to change, and harder to trust.
+          </p>
+          <p>
+            Traverse addresses this at the runtime level. Each business capability is packaged as a
+            self-describing WASM module governed by a contract. The same capability runs identically
+            across every target environment.
+          </p>
+        </div>
+      </div>
+      <div class="problem-cards">
+        <div class="problem-card">
+          <span class="problem-num">01</span>
+          <div>
+            <div class="problem-card-title">Logic duplicated across runtimes</div>
+            <div class="problem-card-body">Browser, backend, edge, and AI pipeline each get their own implementation. Every copy drifts differently.</div>
+          </div>
+        </div>
+        <div class="problem-card">
+          <span class="problem-num">02</span>
+          <div>
+            <div class="problem-card-title">Runtime choices become hidden architecture</div>
+            <div class="problem-card-body">Placement, transport, and orchestration decisions shape behavior but stay invisible in the system model.</div>
+          </div>
+        </div>
+        <div class="problem-card">
+          <span class="problem-num">03</span>
+          <div>
+            <div class="problem-card-title">AI agents cannot navigate what has no contracts</div>
+            <div class="problem-card-body">Agents guess at intent that was never declared. Traverse makes capabilities discoverable and their contracts machine-enforceable.</div>
+          </div>
+        </div>
+        <div class="problem-card">
+          <span class="problem-num">04</span>
+          <div>
+            <div class="problem-card-title">Evolution becomes fragmentation</div>
+            <div class="problem-card-body">Version sprawl and runtime drift make distributed systems harder to scale, reason about, and sustain.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="principles">
+    <p class="section-label">Core principles</p>
+    <h2 style="font-family: var(--display); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700; letter-spacing: -0.03em; max-width: 600px; line-height: 1.15; margin-bottom: 0.5rem;">
+      One capability. One contract. Every runtime.
+    </h2>
+    <div class="principles-grid">
+      <div class="principle">
+        <p class="principle-label">Contracts first</p>
+        <h3>Declare before you execute</h3>
+        <p>Every capability declares its preconditions, postconditions, invariants, and exception flows in machine-readable form. The runtime enforces them. Nothing executes without a verified contract.</p>
+      </div>
+      <div class="principle">
+        <p class="principle-label">Portable by design</p>
+        <h3>Runtime is a deployment decision</h3>
+        <p>Business logic is defined once, compiled to WASM, and placed where it makes sense. Browser, edge, cloud, or AI pipeline — the capability behaves identically. The environment adapts, not the logic.</p>
+      </div>
+      <div class="principle">
+        <p class="principle-label">Discoverable</p>
+        <h3>Capabilities the system can find</h3>
+        <p>Traverse maintains a registry of declared capabilities. AI agents and orchestrators discover what the system can do without reading implementation code. Composition follows contracts, not guesswork.</p>
+      </div>
+      <div class="principle">
+        <p class="principle-label">Explainable</p>
+        <h3>Decisions as queryable artifacts</h3>
+        <p>Proposals, validations, approvals, and trace artifacts stay visible and queryable. The runtime does not hide how it reached a decision. Every execution leaves an auditable trail.</p>
+      </div>
+      <div class="principle">
+        <p class="principle-label">Governed composition</p>
+        <h3>Multi-agent orchestration without chaos</h3>
+        <p>When multiple agents work against the same capability graph, contracts prevent conflicts before they happen. The orchestration layer validates composition before execution, not after.</p>
+      </div>
+      <div class="principle">
+        <p class="principle-label">Spec-first</p>
+        <h3>Implementation follows specification</h3>
+        <p>Traverse is built spec-first. Every component has an approved, versioned specification before implementation begins. The spec is the source of truth. The code is the proof.</p>
+      </div>
+    </div>
+
+    <div class="code-section">
+      <pre><span class="code-comment"># traverse.spec.toml — capability contract</span>
+
+[<span class="code-key">capability</span>]
+<span class="code-key">id</span>          = <span class="code-str">"pricing.eligibility-check"</span>
+<span class="code-key">version</span>     = <span class="code-str">"1.2.0"</span>
+<span class="code-key">runtime</span>     = <span class="code-str">"wasm32-wasi"</span>
+
+[<span class="code-key">contract</span>]
+<span class="code-key">preconditions</span>  = [<span class="code-str">"customer.tier in ['standard', 'enterprise']"</span>, <span class="code-str">"cart.total > 0"</span>]
+<span class="code-key">postconditions</span> = [<span class="code-str">"result.eligible is bool"</span>, <span class="code-str">"result.reason is string"</span>]
+<span class="code-key">invariants</span>     = [<span class="code-str">"enterprise customers never receive standard pricing"</span>]
+<span class="code-key">exceptions</span>     = [<span class="code-str">"CustomerNotFound"</span>, <span class="code-str">"CartExpired"</span>]
+
+[<span class="code-key">placement</span>]
+<span class="code-key">targets</span>     = [<span class="code-str">"browser"</span>, <span class="code-str">"edge"</span>, <span class="code-str">"cloud"</span>, <span class="code-str">"ai-pipeline"</span>]
+<span class="code-key">prefer</span>      = <span class="code-str">"edge"</span>
+<span class="code-key">fallback</span>    = <span class="code-str">"cloud"</span></pre>
+    </div>
+  </section>
+
+  <section id="lineage">
+    <p class="section-label">Lineage and context</p>
+    <div class="lineage-grid">
+      <div class="lineage-content">
+        <h2>Built on a published body of work.</h2>
+        <p>
+          Traverse is the runtime expression of ideas that began with Client-Side Microservices
+          Architecture in 2023, expanded into Universal Microservices Architecture, and crystallized
+          into Contract-Driven AI Development.
+        </p>
+        <p>
+          Each framework addressed a specific problem. CSMA asked why the browser could not be a
+          first-class execution environment. UMA asked why business logic had to be rewritten for
+          every runtime. C-DAD asked why AI agents could not navigate codebases that had no contracts.
+          Traverse is the runtime where those answers become executable.
+        </p>
+        <p>
+          Pre-implementation. Spec-governed. Personal research and development by
+          <a href="https://enricopiovesan.com" style="color: var(--fg); font-weight: 500;">Enrico Piovesan</a>.
+        </p>
+        <div class="lineage-links">
+          <a href="https://www.universalmicroservices.com" class="lineage-link" target="_blank" rel="noopener">
+            <div class="lineage-link-icon">UMA</div>
+            <div class="lineage-link-meta">
+              <div class="lineage-link-title">Universal Microservices Architecture</div>
+              <div class="lineage-link-sub">universalmicroservices.com — the model behind Traverse</div>
+            </div>
+            <span class="lineage-arrow">→</span>
+          </a>
+          <a href="https://www.amazon.com/dp/B0GTTTTQH4" class="lineage-link" target="_blank" rel="noopener">
+            <div class="lineage-link-icon" style="background: var(--accent);">BK</div>
+            <div class="lineage-link-meta">
+              <div class="lineage-link-title">Universal Microservices Architecture — Book</div>
+              <div class="lineage-link-sub">Available on Amazon — 13 chapters of runnable Rust and WASM</div>
+            </div>
+            <span class="lineage-arrow">→</span>
+          </a>
+          <a href="https://enricopiovesan.com/c-dad/" class="lineage-link" target="_blank" rel="noopener">
+            <div class="lineage-link-icon">C-D</div>
+            <div class="lineage-link-meta">
+              <div class="lineage-link-title">Contract-Driven AI Development (C-DAD)</div>
+              <div class="lineage-link-sub">The governance framework Traverse enforces at the runtime level</div>
+            </div>
+            <span class="lineage-arrow">→</span>
+          </a>
+          <a href="https://github.com/enricopiovesan/Traverse" class="lineage-link" target="_blank" rel="noopener">
+            <div class="lineage-link-icon" style="font-size: 0.9rem;">GH</div>
+            <div class="lineage-link-meta">
+              <div class="lineage-link-title">Traverse on GitHub</div>
+              <div class="lineage-link-sub">Spec, ADRs, and foundation — open and versioned</div>
+            </div>
+            <span class="lineage-arrow">→</span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="status-card">
+          <div class="status-badge">Pre-implementation</div>
+          <h3>Foundation v0.1 in progress</h3>
+          <p>
+            Traverse is being built spec-first. The specification is versioned and approved before
+            any implementation begins. This is not a shortcut — it is the only way to build a runtime
+            that stays coherent as it grows.
+          </p>
+          <p>
+            The spec, ADR process, and quality standards are in place. Implementation follows.
+          </p>
+          <ul class="status-list">
+            <li>Versioned spec — approved and merge-gated</li>
+            <li>ADR process — all decisions documented</li>
+            <li>Quality standards — defined before first commit</li>
+            <li>Rust-first and WASM-native from the ground up</li>
+            <li>Contract enforcement at the runtime level</li>
+            <li>Multi-agent orchestration support in scope</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-left">Traverse<span style="color: var(--accent)">.</span></span>
+    <div class="footer-right">
+      <a href="https://github.com/enricopiovesan/Traverse" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://enricopiovesan.com" target="_blank" rel="noopener">enricopiovesan.com</a>
+      <a href="https://www.universalmicroservices.com" target="_blank" rel="noopener">UMA</a>
+      <a href="https://enricopiovesan.com/c-dad/" target="_blank" rel="noopener">C-DAD</a>
+    </div>
+  </footer>
+
+  <script>
+    // Animated capability graph
+    const canvas = document.getElementById('graph');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const W = () => canvas.getBoundingClientRect().width;
+    const H = () => canvas.getBoundingClientRect().height;
+
+    // Node definitions — capability graph
+    const nodeLabels = [
+      'pricing.check', 'auth.validate', 'cart.total',
+      'edge', 'browser', 'cloud', 'ai-agent',
+      'contract', 'registry', 'runtime'
+    ];
+
+    const colors = {
+      capability: '#E8510A',
+      runtime: '#0D0D0D',
+      environment: '#6B6B6B',
+      core: '#1A1A2E'
+    };
+
+    const nodeTypes = [
+      'capability', 'capability', 'capability',
+      'environment', 'environment', 'environment', 'environment',
+      'core', 'core', 'runtime'
+    ];
+
+    let nodes = [];
+    let edges = [];
+    let t = 0;
+
+    function initGraph() {
+      const w = W(), h = H();
+      const cx = w / 2, cy = h / 2;
+
+      // Position nodes in a natural graph layout
+      const positions = [
+        [cx - 120, cy - 80],
+        [cx + 30, cy - 120],
+        [cx - 60, cy + 90],
+        [cx - 200, cy - 10],
+        [cx + 180, cy - 60],
+        [cx + 140, cy + 100],
+        [cx - 20, cy + 160],
+        [cx, cy - 30],
+        [cx - 80, cy + 10],
+        [cx + 60, cy + 20],
+      ];
+
+      nodes = nodeLabels.map((label, i) => ({
+        x: positions[i][0],
+        y: positions[i][1],
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: nodeTypes[i] === 'runtime' ? 10 : nodeTypes[i] === 'core' ? 8 : 6,
+        label,
+        type: nodeTypes[i],
+        pulse: Math.random() * Math.PI * 2,
+        baseX: positions[i][0],
+        baseY: positions[i][1],
+      }));
+
+      edges = [
+        [0, 7], [1, 7], [2, 7],
+        [7, 8], [7, 9],
+        [9, 3], [9, 4], [9, 5], [9, 6],
+        [8, 0], [8, 1], [8, 2],
+        [0, 2], [1, 0],
+        [3, 0], [4, 1], [5, 2], [6, 2],
+      ];
+    }
+
+    function drawGraph() {
+      const w = W(), h = H();
+      ctx.clearRect(0, 0, w, h);
+
+      t += 0.008;
+
+      // Gentle node drift
+      nodes.forEach(node => {
+        node.x = node.baseX + Math.sin(t + node.pulse) * 8;
+        node.y = node.baseY + Math.cos(t * 0.7 + node.pulse) * 6;
+      });
+
+      // Draw edges
+      edges.forEach(([a, b], i) => {
+        const na = nodes[a], nb = nodes[b];
+        const pulse = (Math.sin(t * 2 + i * 0.4) + 1) / 2;
+
+        ctx.beginPath();
+        ctx.moveTo(na.x, na.y);
+        ctx.lineTo(nb.x, nb.y);
+
+        if (na.type === 'runtime' || nb.type === 'runtime') {
+          ctx.strokeStyle = `rgba(232, 81, 10, ${0.15 + pulse * 0.25})`;
+          ctx.lineWidth = 1.5;
+        } else if (na.type === 'core' || nb.type === 'core') {
+          ctx.strokeStyle = `rgba(13, 13, 30, ${0.1 + pulse * 0.15})`;
+          ctx.lineWidth = 1;
+        } else {
+          ctx.strokeStyle = `rgba(107, 107, 107, ${0.08 + pulse * 0.1})`;
+          ctx.lineWidth = 0.75;
+        }
+        ctx.stroke();
+
+        // Animated packet along active edges
+        if ((na.type === 'runtime' || nb.type === 'runtime') && Math.sin(t * 1.5 + i) > 0.5) {
+          const progress = (t * 0.6 + i * 0.3) % 1;
+          const px = na.x + (nb.x - na.x) * progress;
+          const py = na.y + (nb.y - na.y) * progress;
+          ctx.beginPath();
+          ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(232, 81, 10, 0.7)';
+          ctx.fill();
+        }
+      });
+
+      // Draw nodes
+      nodes.forEach(node => {
+        const pulse = (Math.sin(t * 1.5 + node.pulse) + 1) / 2;
+
+        // Glow for runtime and core nodes
+        if (node.type === 'runtime' || node.type === 'capability') {
+          const glow = node.type === 'runtime' ? 20 : 12;
+          const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glow + pulse * 8);
+          const color = node.type === 'runtime' ? '232, 81, 10' : '13, 13, 30';
+          gradient.addColorStop(0, `rgba(${color}, ${0.15 + pulse * 0.1})`);
+          gradient.addColorStop(1, `rgba(${color}, 0)`);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, glow + pulse * 8, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        }
+
+        // Node circle
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.r + (node.type === 'runtime' ? pulse * 1.5 : 0), 0, Math.PI * 2);
+
+        if (node.type === 'runtime') {
+          ctx.fillStyle = colors.runtime;
+          ctx.strokeStyle = `rgba(232, 81, 10, ${0.5 + pulse * 0.5})`;
+          ctx.lineWidth = 2;
+          ctx.fill();
+          ctx.stroke();
+        } else if (node.type === 'capability') {
+          ctx.fillStyle = colors.capability;
+          ctx.fill();
+        } else if (node.type === 'core') {
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = colors.core;
+          ctx.lineWidth = 1.5;
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = '#E5E5E5';
+          ctx.lineWidth = 1;
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        // Labels
+        ctx.fillStyle = node.type === 'capability' ? 'rgba(232, 81, 10, 0.7)' : 'rgba(107, 107, 107, 0.6)';
+        ctx.font = `400 9px 'JetBrains Mono', monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(node.label, node.x, node.y + node.r + 13);
+      });
+
+      requestAnimationFrame(drawGraph);
+    }
+
+    initGraph();
+    drawGraph();
+
+    // Reinit on resize
+    window.addEventListener('resize', () => {
+      setTimeout(initGraph, 100);
+    });
+  </script>
+
+</body>
+</html>
