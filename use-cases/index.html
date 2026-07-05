@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Use Cases — Traverse Framework</title>
+  <meta name="description" content="What you can build with Traverse today: governed browser apps, MCP-backed AI agents, workflow pipelines, portable WASM business rules, and auditable AI pipelines.">
+  <link rel="canonical" href="https://traverse-framework.com/use-cases/">
+  <meta property="og:title" content="Use Cases — Traverse Framework">
+  <meta property="og:description" content="Discover what you can build with Traverse: governed browser apps, MCP AI agents, workflow pipelines, portable WASM rules.">
+  <meta property="og:url" content="https://traverse-framework.com/use-cases/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .page-hero {
+      padding: 5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero-glow {
+      position: absolute;
+      width: 600px; height: 400px;
+      top: 0; right: -100px;
+      background: radial-gradient(ellipse, rgba(232,81,10,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .usecase-section {
+      padding: 5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .usecase-section:nth-child(even) { background: var(--bg-elevated); }
+    .usecase-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .usecase-layout { grid-template-columns: 1fr; gap: 2.5rem; } }
+    .usecase-layout.reverse { direction: rtl; }
+    .usecase-layout.reverse > * { direction: ltr; }
+    @media (max-width: 900px) { .usecase-layout.reverse { direction: ltr; } }
+    .uc-num {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .uc-title { margin-bottom: 1rem; }
+    .uc-body { color: var(--fg-muted); font-size: 0.9375rem; line-height: 1.75; margin-bottom: 1.5rem; }
+    .arch-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .arch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+    }
+    .arch-node {
+      padding: 0.35rem 0.75rem;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      white-space: nowrap;
+    }
+    .arch-node.accent {
+      border-color: rgba(232,81,10,0.35);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+    .arch-arrow { color: var(--fg-subtle); flex-shrink: 0; }
+    .uc-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/" style="color:var(--fg)">Use Cases</a></li>
+      <li><a href="/examples/">Examples</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+      <li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/examples/">Examples</a><a href="/docs/">Docs</a>
+  <a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<!-- Hero -->
+<div class="page-hero">
+  <div class="page-hero-glow"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-label">Use Cases</div>
+    <h1 class="t-h1" style="max-width:20ch;margin-bottom:1rem">Apps you can build with Traverse today.</h1>
+    <p class="t-body t-muted" style="max-width:52ch">Five concrete patterns — each with an architecture diagram, code, and expected output. All of these work with v0.7.0.</p>
+    <div style="margin-top:1.75rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+      <a href="#browser-app" class="badge" style="cursor:pointer">01 Browser App</a>
+      <a href="#mcp-server" class="badge" style="cursor:pointer">02 MCP Server</a>
+      <a href="#workflows" class="badge" style="cursor:pointer">03 Workflows</a>
+      <a href="#wasm-agents" class="badge" style="cursor:pointer">04 WASM Rules</a>
+      <a href="#ai-pipeline" class="badge" style="cursor:pointer">05 AI Pipeline</a>
+    </div>
+  </div>
+</div>
+
+<!-- 01: Browser App -->
+<section class="usecase-section" id="browser-app">
+  <div class="container">
+    <div class="usecase-layout">
+      <div>
+        <div class="uc-num">01 / 05</div>
+        <h2 class="t-h2 uc-title">Browser-hosted app with governed runtime</h2>
+        <p class="uc-body">Your UI owns the interface. Traverse owns the execution. Business capabilities run inside the browser via a local adapter — the same runtime contract enforced whether you're online, offline, or at the edge.</p>
+        <p class="uc-body">The browser adapter listens on port 4174. Your app submits governed requests; the runtime discovers, validates against the contract, executes the WASM capability, and returns a structured trace.</p>
+        <div class="checklist" style="margin-bottom:1.5rem">
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Live local browser adapter</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>React demo app included (port 4173)</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Trace generation and subscription</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>State: ready → streaming → completed</div>
+        </div>
+        <a href="/docs/quickstart.html" class="btn btn-primary">Run the demo →</a>
+        <div class="uc-tags">
+          <span class="badge">Browser</span><span class="badge">Rust</span><span class="badge">WASM</span><span class="badge">v0.7.0</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div class="arch-diagram">
+          <p style="font-size:0.7rem;color:var(--fg-subtle);margin-bottom:0.75rem;font-family:var(--font-mono);letter-spacing:0.05em">ARCHITECTURE</p>
+          <div class="arch-row">
+            <span class="arch-node accent">React UI</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-node accent">browser-adapter :4174</span>
+          </div>
+          <div class="arch-row" style="padding-left:1rem">
+            <span class="arch-arrow">↓</span>
+          </div>
+          <div class="arch-row">
+            <span class="arch-node">traverse-runtime</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-node">capability registry</span>
+          </div>
+          <div class="arch-row" style="padding-left:1rem">
+            <span class="arch-arrow">↓</span>
+          </div>
+          <div class="arch-row">
+            <span class="arch-node">WASM capability</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-node accent">trace artifact</span>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-filename">browser request payload</span>
+            <span></span>
+          </div>
+          <div class="code-body">
+<pre><span class="tok-comment">// POST to browser-adapter</span>
+{
+  <span class="tok-key">"goal"</span>: <span class="tok-str">"Plan a two-day alpine expedition\n  for a four-person team."</span>,
+  <span class="tok-key">"requested_target"</span>: <span class="tok-str">"local"</span>,
+  <span class="tok-key">"caller"</span>: <span class="tok-str">"browser_demo"</span>
+}</pre>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">expected output</span></div>
+          <div class="terminal-body">
+            <div class="terminal-line"><span class="terminal-out">status: </span><span class="terminal-out accent">ready</span></div>
+            <div class="terminal-line"><span class="terminal-out">       → </span><span class="terminal-out">streaming</span></div>
+            <div class="terminal-line"><span class="terminal-out">       → </span><span class="terminal-out success">completed</span></div>
+            <div class="terminal-line"><span class="terminal-out">capabilities executed: 6</span></div>
+            <div class="terminal-line"><span class="terminal-out">events emitted: 5</span></div>
+            <div class="terminal-line"><span class="terminal-out">trace: available</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02: MCP Server -->
+<section class="usecase-section" id="mcp-server">
+  <div class="container">
+    <div class="usecase-layout reverse">
+      <div>
+        <div class="uc-num">02 / 05</div>
+        <h2 class="t-h2 uc-title">MCP server for AI capability discovery</h2>
+        <p class="uc-body">AI agents cannot navigate what has no contracts. Traverse exposes your capability registry via a Model Context Protocol stdio server — so agents discover what your system can do without reading implementation code.</p>
+        <p class="uc-body">Downstream AI clients call MCP tools; Traverse validates each call against the governing contract before execution. No guesswork. No undeclared side effects. Every capability is machine-enforceable.</p>
+        <div class="checklist" style="margin-bottom:1.5rem">
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Stdio-based MCP server (traverse-mcp)</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Agents discover capabilities by contract</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Embeddable library + CLI binary</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Governed MCP-facing surface</div>
+        </div>
+        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost">View traverse-mcp →</a>
+        <div class="uc-tags">
+          <span class="badge">MCP</span><span class="badge">AI Agents</span><span class="badge">Stdio</span><span class="badge">v0.7.0</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div class="arch-diagram">
+          <p style="font-size:0.7rem;color:var(--fg-subtle);margin-bottom:0.75rem;font-family:var(--font-mono);letter-spacing:0.05em">ARCHITECTURE</p>
+          <div class="arch-row">
+            <span class="arch-node accent">AI Client</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-node accent">MCP stdio</span>
+          </div>
+          <div class="arch-row" style="padding-left:1rem"><span class="arch-arrow">↓</span></div>
+          <div class="arch-row">
+            <span class="arch-node">traverse-mcp</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-node">contract validation</span>
+          </div>
+          <div class="arch-row" style="padding-left:1rem"><span class="arch-arrow">↓</span></div>
+          <div class="arch-row">
+            <span class="arch-node">capability registry</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-node accent">governed response</span>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-filename">mcp tool call</span>
+            <span></span>
+          </div>
+          <div class="code-body">
+<pre><span class="tok-comment">// Agent discovers available capabilities</span>
+{
+  <span class="tok-key">"method"</span>: <span class="tok-str">"tools/list"</span>
+}
+
+<span class="tok-comment">// Agent executes a governed capability</span>
+{
+  <span class="tok-key">"method"</span>: <span class="tok-str">"tools/call"</span>,
+  <span class="tok-key">"params"</span>: {
+    <span class="tok-key">"name"</span>: <span class="tok-str">"plan-expedition"</span>,
+    <span class="tok-key">"arguments"</span>: {
+      <span class="tok-key">"goal"</span>: <span class="tok-str">"Two-day alpine expedition"</span>
+    }
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03: Workflows -->
+<section class="usecase-section" id="workflows">
+  <div class="container">
+    <div class="usecase-layout">
+      <div>
+        <div class="uc-num">03 / 05</div>
+        <h2 class="t-h2 uc-title">Workflow-backed business capabilities</h2>
+        <p class="uc-body">Multi-step business flows with invisible state and no audit trail are a reliability problem. Traverse models business behavior as capabilities, events, and workflows — with deterministic graph traversal and full trace output at every step.</p>
+        <p class="uc-body">Workflows are graph-based. Each node is a governed capability. Each edge is an event. The runtime traverses deterministically: same inputs always produce the same path, the same outputs, the same trace.</p>
+        <div class="checklist" style="margin-bottom:1.5rem">
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Graph-based deterministic traversal</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Capabilities as nodes, events as edges</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Full trace output at every step</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Contract-validated composition</div>
+        </div>
+        <a href="/examples/" class="btn btn-primary">See the expedition workflow →</a>
+        <div class="uc-tags">
+          <span class="badge">Workflows</span><span class="badge">Events</span><span class="badge">Deterministic</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-filename">workflow contract (excerpt)</span>
+            <span></span>
+          </div>
+          <div class="code-body">
+<pre><span class="tok-section">[workflow]</span>
+<span class="tok-key">id</span>      = <span class="tok-str">"expedition.planning.plan-expedition"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"1.0.0"</span>
+
+<span class="tok-section">[graph]</span>
+<span class="tok-key">capabilities</span> = [
+  <span class="tok-str">"interpret-expedition-intent"</span>,
+  <span class="tok-str">"capture-expedition-objective"</span>,
+  <span class="tok-str">"assess-conditions-summary"</span>,
+  <span class="tok-str">"validate-team-readiness"</span>,
+  <span class="tok-str">"assemble-expedition-plan"</span>
+]
+
+<span class="tok-section">[events]</span>
+<span class="tok-key">emits</span> = [
+  <span class="tok-str">"expedition-intent-interpreted"</span>,
+  <span class="tok-str">"expedition-objective-captured"</span>,
+  <span class="tok-str">"conditions-summary-assessed"</span>,
+  <span class="tok-str">"team-readiness-validated"</span>,
+  <span class="tok-str">"expedition-plan-assembled"</span>
+]</pre>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">execution trace</span></div>
+          <div class="terminal-body">
+            <div class="terminal-line"><span class="terminal-out accent">[1]</span><span class="terminal-out"> interpret-expedition-intent → ✓</span></div>
+            <div class="terminal-line"><span class="terminal-out">    emit: expedition-intent-interpreted</span></div>
+            <div class="terminal-line"><span class="terminal-out accent">[2]</span><span class="terminal-out"> capture-expedition-objective → ✓</span></div>
+            <div class="terminal-line"><span class="terminal-out">    emit: expedition-objective-captured</span></div>
+            <div class="terminal-line"><span class="terminal-out accent">[3]</span><span class="terminal-out"> assess-conditions-summary → ✓</span></div>
+            <div class="terminal-line"><span class="terminal-out accent">[4]</span><span class="terminal-out"> validate-team-readiness → ✓</span></div>
+            <div class="terminal-line"><span class="terminal-out accent">[5]</span><span class="terminal-out"> assemble-expedition-plan → </span><span class="terminal-out success">completed</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04: WASM Agents -->
+<section class="usecase-section" id="wasm-agents">
+  <div class="container">
+    <div class="usecase-layout reverse">
+      <div>
+        <div class="uc-num">04 / 05</div>
+        <h2 class="t-h2 uc-title">Portable WASM business rules</h2>
+        <p class="uc-body">Pricing formulas, eligibility checks, validation rules — the same logic copy-pasted across four environments. With Traverse, you write it once, compile to WASM, declare the contract, and place it anywhere.</p>
+        <p class="uc-body">The same binary runs in the browser, at the edge, in the cloud, or inside an AI pipeline. The contract defines the placement strategy. The runtime enforces it. The behavior is identical everywhere.</p>
+        <div class="checklist" style="margin-bottom:1.5rem">
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Single WASM binary, multiple targets</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Preferred target + fallback strategy</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Identical behavior across environments</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>No unsafe code · wasm32-wasi target</div>
+        </div>
+        <a href="/docs/concepts.html#placement" class="btn btn-ghost">Read about placement →</a>
+        <div class="uc-tags">
+          <span class="badge">WASM</span><span class="badge">Portable</span><span class="badge">Multi-target</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-filename">multi-target placement contract</span>
+            <span></span>
+          </div>
+          <div class="code-body">
+<pre><span class="tok-section">[capability]</span>
+<span class="tok-key">id</span>      = <span class="tok-str">"pricing.eligibility-check"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"1.2.0"</span>
+<span class="tok-key">runtime</span> = <span class="tok-str">"wasm32-wasi"</span>
+
+<span class="tok-section">[placement]</span>
+<span class="tok-key">targets</span>  = [
+  <span class="tok-str">"browser"</span>,
+  <span class="tok-str">"edge"</span>,
+  <span class="tok-str">"cloud"</span>,
+  <span class="tok-str">"ai-pipeline"</span>
+]
+<span class="tok-key">prefer</span>   = <span class="tok-str">"edge"</span>
+<span class="tok-key">fallback</span> = <span class="tok-str">"cloud"</span>
+
+<span class="tok-section">[constraints]</span>
+<span class="tok-key">network_access</span>     = <span class="tok-str">"forbidden"</span>
+<span class="tok-key">filesystem_access</span>  = <span class="tok-str">"none"</span>
+<span class="tok-key">host_api_access</span>    = <span class="tok-str">"none"</span></pre>
+          </div>
+        </div>
+        <div class="arch-diagram">
+          <p style="font-size:0.7rem;color:var(--fg-subtle);margin-bottom:0.75rem;font-family:var(--font-mono);letter-spacing:0.05em">SAME BINARY → EVERY TARGET</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+            <div class="arch-node" style="text-align:center">🌐 Browser</div>
+            <div class="arch-node" style="text-align:center">⚡ Edge</div>
+            <div class="arch-node" style="text-align:center">☁ Cloud</div>
+            <div class="arch-node accent" style="text-align:center">🤖 AI Pipeline</div>
+          </div>
+          <div style="margin-top:0.75rem;text-align:center;font-family:var(--font-mono);font-size:0.72rem;color:var(--fg-subtle)">identical output · deterministic · governed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05: AI Pipeline -->
+<section class="usecase-section" id="ai-pipeline" style="border-bottom:none">
+  <div class="container">
+    <div class="usecase-layout">
+      <div>
+        <div class="uc-num">05 / 05</div>
+        <h2 class="t-h2 uc-title">Auditable AI pipelines</h2>
+        <p class="uc-body">AI decisions with no record of what ran or why are a liability. Traverse wraps every AI-facing capability in a contract. Every execution produces a structured trace artifact — queryable, auditable, and reproducible.</p>
+        <p class="uc-body">Agents operate on declared contracts, not inferred APIs. The trace records: which capability was selected, why, what inputs were validated, what events were emitted, and what the final output was. Nothing is hidden.</p>
+        <div class="checklist" style="margin-bottom:1.5rem">
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Every decision backed by a contract</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Structured trace artifact per execution</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Discovery, selection, and execution path recorded</div>
+          <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Compatible with multi-agent orchestration</div>
+        </div>
+        <a href="/docs/concepts.html#traces" class="btn btn-ghost">Learn about traces →</a>
+        <div class="uc-tags">
+          <span class="badge">AI Pipeline</span><span class="badge">Audit</span><span class="badge">Traceability</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-filename">trace artifact (structured JSON)</span>
+            <span></span>
+          </div>
+          <div class="code-body">
+<pre>{
+  <span class="tok-key">"trace_id"</span>: <span class="tok-str">"trv_8f2a1c..."</span>,
+  <span class="tok-key">"capability"</span>: <span class="tok-str">"plan-expedition"</span>,
+  <span class="tok-key">"version"</span>: <span class="tok-str">"1.0.0"</span>,
+  <span class="tok-key">"status"</span>: <span class="tok-str">"completed"</span>,
+  <span class="tok-key">"placement"</span>: <span class="tok-str">"local"</span>,
+  <span class="tok-key">"discovery"</span>: {
+    <span class="tok-key">"candidates"</span>: <span class="tok-num">1</span>,
+    <span class="tok-key">"selected"</span>: <span class="tok-str">"plan-expedition"</span>,
+    <span class="tok-key">"reason"</span>: <span class="tok-str">"contract match · preferred target"</span>
+  },
+  <span class="tok-key">"execution"</span>: {
+    <span class="tok-key">"steps"</span>: <span class="tok-num">5</span>,
+    <span class="tok-key">"events_emitted"</span>: <span class="tok-num">5</span>,
+    <span class="tok-key">"duration_ms"</span>: <span class="tok-num">142</span>
+  },
+  <span class="tok-key">"contract_validated"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"preconditions_met"</span>: <span class="tok-bool">true</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <h2 class="t-h2" style="text-align:center;margin-bottom:0.75rem">Ready to build?</h2>
+    <p class="t-body t-muted" style="text-align:center;max-width:42ch;margin:0 auto 2rem">Run the expedition example in under 5 minutes. Browser demo, CLI, and trace output — step by step.</p>
+    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart →</a>
+      <a href="/examples/" class="btn btn-ghost btn-lg">See examples</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li><li><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li></ul></div>
+      <div><div class="footer-col-title">Ecosystem</div><ul class="footer-links"><li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li><li><a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener">Book</a></li><li><a href="https://enricopiovesan.com" target="_blank" rel="noopener">Enrico Piovesan</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span><div class="footer-social"><a href="https://github.com/traverse-framework" target="_blank" rel="noopener" aria-label="GitHub"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a></div></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

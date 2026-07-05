@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examples — Traverse Framework</title>
+  <meta name="description" content="Traverse examples: the expedition planning domain with 6 capabilities, 5 events, and 1 workflow. Fully governed, traceable, and runnable.">
+  <link rel="canonical" href="https://traverse-framework.com/examples/">
+  <meta property="og:title" content="Examples — Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/examples/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .page-hero { padding: 5rem 0 4rem; border-bottom: 1px solid var(--border); background: var(--bg-elevated); position: relative; overflow: hidden; }
+    .page-hero-glow { position: absolute; width: 600px; height: 400px; top: 0; right: -100px; background: radial-gradient(ellipse, rgba(232,81,10,0.06) 0%, transparent 70%); pointer-events: none; }
+
+    /* Capability graph visual */
+    .cap-graph {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 2.5rem 0;
+    }
+    @media (max-width: 640px) { .cap-graph { grid-template-columns: 1fr 1fr; } }
+    .cap-node {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .cap-node:hover { border-color: rgba(232,81,10,0.3); }
+    .cap-node.workflow {
+      grid-column: 1 / -1;
+      border-color: rgba(232,81,10,0.3);
+      background: var(--accent-dim);
+    }
+    .cap-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 0.4rem; }
+    .cap-desc { font-size: 0.8rem; color: var(--fg-muted); line-height: 1.5; }
+    .cap-event { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-subtle); margin-top: 0.5rem; }
+
+    /* Flow arrow */
+    .flow-arrow { text-align: center; color: var(--fg-subtle); font-family: var(--font-mono); font-size: 0.8rem; margin: 0.5rem 0; }
+
+    /* Step sections */
+    .example-section { padding: 4rem 0; border-bottom: 1px solid var(--border); }
+    .example-section:nth-child(even) { background: var(--bg-elevated); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/examples/" style="color:var(--fg)">Examples</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+      <li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/examples/">Examples</a><a href="/docs/">Docs</a>
+  <a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<!-- Hero -->
+<div class="page-hero">
+  <div class="page-hero-glow"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-label">Examples</div>
+    <h1 class="t-h1" style="max-width:22ch;margin-bottom:1rem">The expedition planning domain.</h1>
+    <p class="t-body t-muted" style="max-width:54ch">A complete governed domain: 6 capabilities, 5 events, 1 workflow. Everything is contract-defined, deterministically executed, and fully traceable. Runnable today with v0.7.0.</p>
+    <div style="margin-top:1.75rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+      <span class="badge badge-success badge-dot">Runnable · v0.7.0</span>
+      <span class="badge">6 capabilities</span>
+      <span class="badge">5 events</span>
+      <span class="badge">1 workflow</span>
+    </div>
+  </div>
+</div>
+
+<!-- Domain overview -->
+<section class="example-section">
+  <div class="container">
+    <div class="section-label">Domain overview</div>
+    <h2 class="t-h2" style="margin-bottom:1rem">6 capabilities. 5 events. 1 workflow.</h2>
+    <p class="t-body t-muted" style="max-width:58ch;margin-bottom:0.5rem">
+      The expedition planning domain models a real multi-step business process. Each step is an atomic governed capability. Each transition is a typed event. The workflow composes all five into a deterministic graph.
+    </p>
+
+    <div class="cap-graph">
+      <div class="cap-node">
+        <div class="cap-id">interpret-expedition-intent</div>
+        <div class="cap-desc">Parse and structure planning goals from natural language input</div>
+        <div class="cap-event">emits → expedition-intent-interpreted</div>
+      </div>
+      <div class="cap-node">
+        <div class="cap-id">capture-expedition-objective</div>
+        <div class="cap-desc">Normalize destination, timing, and team preference data</div>
+        <div class="cap-event">emits → expedition-objective-captured</div>
+      </div>
+      <div class="cap-node">
+        <div class="cap-id">assess-conditions-summary</div>
+        <div class="cap-desc">Evaluate weather, terrain, and logistics constraints</div>
+        <div class="cap-event">emits → conditions-summary-assessed</div>
+      </div>
+      <div class="cap-node">
+        <div class="cap-id">validate-team-readiness</div>
+        <div class="cap-desc">Check team skill levels and equipment requirements</div>
+        <div class="cap-event">emits → team-readiness-validated</div>
+      </div>
+      <div class="cap-node">
+        <div class="cap-id">assemble-expedition-plan</div>
+        <div class="cap-desc">Compose the final governed plan from all validated inputs</div>
+        <div class="cap-event">emits → expedition-plan-assembled</div>
+      </div>
+      <div class="cap-node workflow">
+        <div class="cap-id" style="font-size:0.8rem">plan-expedition (workflow orchestrator)</div>
+        <div class="cap-desc">Deterministic graph traversal across all 5 atomic capabilities above. Same inputs always produce the same path.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Bundle inspect -->
+<section class="example-section">
+  <div class="container">
+    <div class="section-label">Step 1 — Inspect the bundle</div>
+    <h2 class="t-h2" style="margin-bottom:1rem">Verify the registry bundle.</h2>
+    <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">Before running anything, inspect the bundle to confirm all capabilities, events, and workflows are registered correctly.</p>
+    <div style="max-width:720px">
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">traverse-cli · bundle inspect</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- bundle inspect \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     examples/expedition/registry-bundle/manifest.json</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out accent">bundle_id:     expedition.planning.seed-bundle</span></div>
+          <div class="terminal-line"><span class="terminal-out">version:       1.0.0</span></div>
+          <div class="terminal-line"><span class="terminal-out success">capabilities:  6</span></div>
+          <div class="terminal-line"><span class="terminal-out success">events:        5</span></div>
+          <div class="terminal-line"><span class="terminal-out success">workflows:     1</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Run the demo -->
+<section class="example-section">
+  <div class="container">
+    <div class="section-label">Step 2 — Run the browser demo</div>
+    <h2 class="t-h2" style="margin-bottom:1rem">Start two terminals.</h2>
+    <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">The browser adapter listens on port 4174. The React demo connects to it on port 4173.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:900px">
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 1 — browser adapter</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     browser-adapter serve \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     --bind 127.0.0.1:4174</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out success">adapter listening on :4174</span></div>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 2 — React demo</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> node apps/react-demo/server.mjs \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     --adapter http://127.0.0.1:4174 \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     --port 4173</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out success">demo ready → http://127.0.0.1:4173</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Submit a request -->
+<section class="example-section">
+  <div class="container">
+    <div class="section-label">Step 3 — Submit a governed request</div>
+    <h2 class="t-h2" style="margin-bottom:1rem">Click "Submit approved request".</h2>
+    <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">Open <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent);background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:0.1em 0.4em">http://127.0.0.1:4173</code> and submit this payload. Watch the state machine advance in real time.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:900px;align-items:start">
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">approved request payload</span><span></span></div>
+        <div class="code-body">
+<pre>{
+  <span class="tok-key">"goal"</span>: <span class="tok-str">"Plan a two-day alpine expedition\nfor a four-person team."</span>,
+  <span class="tok-key">"requested_target"</span>: <span class="tok-str">"local"</span>,
+  <span class="tok-key">"caller"</span>: <span class="tok-str">"browser_demo"</span>
+}</pre>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">expected state transitions</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-out">status pill:</span></div>
+          <div class="terminal-line"><span class="terminal-out accent">  ready</span></div>
+          <div class="terminal-line"><span class="terminal-out">  → streaming</span></div>
+          <div class="terminal-line"><span class="terminal-out success">  → completed</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out">Runtime updates appear in</span></div>
+          <div class="terminal-line"><span class="terminal-out">ordered timeline.</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out">Trace panel shows:</span></div>
+          <div class="terminal-line"><span class="terminal-out">  · selected capability</span></div>
+          <div class="terminal-line"><span class="terminal-out">  · emitted events (5)</span></div>
+          <div class="terminal-line"><span class="terminal-out">  · final output</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Capability contract -->
+<section class="example-section">
+  <div class="container">
+    <div class="section-label">Contract anatomy</div>
+    <h2 class="t-h2" style="margin-bottom:1rem">What a capability contract looks like.</h2>
+    <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">Every capability in the expedition domain is backed by a machine-readable contract. This is what governs discovery, validation, placement, and execution.</p>
+    <div style="max-width:720px">
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">examples/expedition/capabilities/plan-expedition/contract.json (excerpt)</span><span></span></div>
+        <div class="code-body">
+<pre>{
+  <span class="tok-key">"id"</span>: <span class="tok-str">"expedition.planning.plan-expedition"</span>,
+  <span class="tok-key">"version"</span>: <span class="tok-str">"1.0.0"</span>,
+  <span class="tok-key">"lifecycle"</span>: <span class="tok-str">"active"</span>,
+  <span class="tok-key">"execution"</span>: {
+    <span class="tok-key">"binary_format"</span>: <span class="tok-str">"wasm32-wasi"</span>,
+    <span class="tok-key">"entrypoint"</span>: <span class="tok-str">"plan_expedition"</span>,
+    <span class="tok-key">"preferred_targets"</span>: [<span class="tok-str">"local"</span>],
+    <span class="tok-key">"constraints"</span>: {
+      <span class="tok-key">"host_api_access"</span>: <span class="tok-str">"none"</span>,
+      <span class="tok-key">"network_access"</span>: <span class="tok-str">"forbidden"</span>,
+      <span class="tok-key">"filesystem_access"</span>: <span class="tok-str">"none"</span>
+    }
+  },
+  <span class="tok-key">"events"</span>: {
+    <span class="tok-key">"emits"</span>: [
+      <span class="tok-str">"expedition.planning.expedition-plan-assembled"</span>
+    ]
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Next patterns -->
+<section class="example-section" style="border-bottom:none">
+  <div class="container">
+    <div class="section-label">More patterns</div>
+    <h2 class="t-h2" style="margin-bottom:2.5rem">Other things to explore.</h2>
+    <div class="grid-3">
+      <a href="/use-cases/#browser-app" class="card card-accent-hover card-link" style="text-decoration:none">
+        <div class="card-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="16" height="12" rx="2"/><line x1="1" y1="7" x2="17" y2="7"/></svg></div>
+        <h3 class="t-h3" style="margin-bottom:0.4rem">Browser-hosted runtime</h3>
+        <p class="t-body-sm t-muted">Full architecture for a UI-owned app with Traverse executing capabilities locally.</p>
+      </a>
+      <a href="/use-cases/#mcp-server" class="card card-accent-hover card-link" style="text-decoration:none">
+        <div class="card-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg></div>
+        <h3 class="t-h3" style="margin-bottom:0.4rem">MCP server for AI agents</h3>
+        <p class="t-body-sm t-muted">Expose governed capabilities to AI agents via stdio MCP.</p>
+      </a>
+      <a href="/use-cases/#wasm-agents" class="card card-accent-hover card-link" style="text-decoration:none">
+        <div class="card-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="9,2 16,6 16,12 9,16 2,12 2,6"/></svg></div>
+        <h3 class="t-h3" style="margin-bottom:0.4rem">Portable WASM rules</h3>
+        <p class="t-body-sm t-muted">Same binary in browser, edge, cloud, and AI pipeline.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <h2 class="t-h2" style="text-align:center;margin-bottom:0.75rem">Run it yourself.</h2>
+    <p class="t-body t-muted" style="text-align:center;max-width:40ch;margin:0 auto 2rem">Step-by-step quickstart guide. Under 5 minutes to your first governed execution.</p>
+    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart →</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li><li><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li></ul></div>
+      <div><div class="footer-col-title">Ecosystem</div><ul class="footer-links"><li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li><li><a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener">Book</a></li><li><a href="https://enricopiovesan.com" target="_blank" rel="noopener">Enrico Piovesan</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span><div class="footer-social"><a href="https://github.com/traverse-framework" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a></div></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

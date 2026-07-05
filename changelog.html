@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog — Traverse Framework</title>
+  <meta name="description" content="Traverse release history. See what shipped in each version — runtime, CLI, MCP server, contracts, registry, and spec governance.">
+  <link rel="canonical" href="https://traverse-framework.com/changelog.html">
+  <meta property="og:title" content="Changelog — Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/changelog.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .changelog-wrap { max-width: 760px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+    @media (max-width: 768px) { .changelog-wrap { padding: 2.5rem 1.25rem 4rem; } }
+
+    .release {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 2.5rem;
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 640px) { .release { grid-template-columns: 1fr; gap: 1rem; } }
+    .release:last-child { border-bottom: none; }
+
+    .release-meta { padding-top: 0.25rem; }
+    .release-version {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+    .release-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-subtle); margin-bottom: 0.75rem; }
+    .release-tag { margin-bottom: 0.5rem; }
+
+    .release-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+    .release-body p { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.7; margin-bottom: 1.25rem; max-width: 56ch; }
+    .release-body ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .release-body li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.875rem; color: var(--fg-muted); }
+    .release-body li::before { content: '—'; color: var(--accent); flex-shrink: 0; margin-top: 0.05em; }
+
+    .release-section-title {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 0.6rem;
+      margin-top: 1.25rem;
+    }
+    code { font-family: var(--font-mono); font-size: 0.82em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/examples/">Examples</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/changelog.html" style="color:var(--fg)">Changelog</a></li>
+      <li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/examples/">Examples</a><a href="/docs/">Docs</a>
+  <a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="changelog-wrap">
+  <div class="section-label" style="margin-bottom:1rem">Changelog</div>
+  <h1 class="t-h1" style="margin-bottom:0.75rem">Release history</h1>
+  <p class="t-body t-muted" style="max-width:50ch;margin-bottom:0.5rem">What shipped in each version of Traverse. All releases are spec-governed — every change is backed by an approved, versioned specification.</p>
+  <div style="margin-top:1rem;margin-bottom:3rem">
+    <a href="https://github.com/traverse-framework/traverse/releases" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">View all releases on GitHub →</a>
+  </div>
+
+  <!-- v0.7.0 -->
+  <div class="release">
+    <div class="release-meta">
+      <div class="release-version">v0.7.0</div>
+      <div class="release-date">2026 · current</div>
+      <div class="release-tag"><span class="badge badge-success badge-dot">Latest</span></div>
+      <div class="release-tag"><span class="badge badge-accent">Active dev</span></div>
+    </div>
+    <div class="release-body">
+      <h3>Browser adapter, MCP server, React demo</h3>
+      <p>The largest release to date. Introduces the live browser adapter, the MCP stdio server for AI agent integration, and the React demo app — all backed by the expedition planning example domain.</p>
+
+      <div class="release-section-title">What's new</div>
+      <ul>
+        <li>Live browser adapter on port 4174 — UI submits governed requests, runtime executes WASM capabilities locally</li>
+        <li>React demo app on port 4173 — connects to browser adapter, shows real-time state transitions and trace output</li>
+        <li>MCP stdio server (<code>traverse-mcp</code>) — AI agents discover and execute governed capabilities via Model Context Protocol</li>
+        <li>Expedition planning domain — 6 capabilities, 5 events, 1 workflow — fully governed and runnable</li>
+        <li>Trace generation and subscription — every execution produces a structured, queryable trace artifact</li>
+        <li>State machine: <code>ready → streaming → completed</code> with ordered runtime timeline</li>
+        <li>Release-facing documentation: quickstart, authoring guides, troubleshooting</li>
+      </ul>
+
+      <div class="release-section-title">Governing specs (9 approved)</div>
+      <ul>
+        <li>foundation-v0-1 — Core runtime, CLI, MCP surface</li>
+        <li>capability-contracts — Contract definitions and validation</li>
+        <li>event-contracts — Event contract definitions</li>
+        <li>spec-alignment-gate — CI merge gate</li>
+        <li>capability-registry — Registry behavior</li>
+        <li>runtime-request-execution — Execution model</li>
+        <li>workflow-registry-traversal — Workflow composition</li>
+        <li>expedition-example-domain — Example domain definition</li>
+        <li>expedition-example-artifacts — Example contracts and workflows</li>
+      </ul>
+
+      <div class="release-section-title">Quality</div>
+      <ul>
+        <li>100% test coverage — CI-gated, no exceptions</li>
+        <li><code>#![forbid(unsafe_code)]</code> — enforced across all crates</li>
+        <li>No unwrap, panic, or TODO in production code</li>
+        <li>SBOM generation (CycloneDX format)</li>
+        <li>ADR process — all architectural decisions documented</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- v0.5.0 -->
+  <div class="release">
+    <div class="release-meta">
+      <div class="release-version">v0.5.0</div>
+      <div class="release-date">2026 · earlier</div>
+      <div class="release-tag"><span class="badge">Stable</span></div>
+    </div>
+    <div class="release-body">
+      <h3>Release artifacts and app registration</h3>
+      <p>Introduced stable release artifacts and the app registration and validation flow through the CLI. First version with a consumer-facing bundle integration path.</p>
+
+      <div class="release-section-title">What shipped</div>
+      <ul>
+        <li>Stable release artifacts — versioned and reproducible</li>
+        <li>App registration via CLI — <code>traverse-cli bundle inspect</code></li>
+        <li>App validation through the registry bundle manifest</li>
+        <li>Consumer-facing documentation and bundle integration path</li>
+        <li>Release-facing entry path for downstream consumers</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Foundation -->
+  <div class="release">
+    <div class="release-meta">
+      <div class="release-version">v0.1.0</div>
+      <div class="release-date">2025 · foundation</div>
+      <div class="release-tag"><span class="badge">Foundation</span></div>
+    </div>
+    <div class="release-body">
+      <h3>Spec governance, runtime foundation, CLI</h3>
+      <p>Established the spec-driven development process, the core runtime crates, and the initial CLI surface. The foundation all subsequent releases are built on.</p>
+
+      <div class="release-section-title">What shipped</div>
+      <ul>
+        <li><code>traverse-runtime</code> — Core execution engine scaffolding</li>
+        <li><code>traverse-contracts</code> — Contract parsing and validation</li>
+        <li><code>traverse-registry</code> — Capability and event registry</li>
+        <li><code>traverse-cli</code> — Initial CLI: register, list, validate, run</li>
+        <li>Spec governance process — spec-first, ADR-backed, CI-gated</li>
+        <li>Rust workspace structure with <code>#![forbid(unsafe_code)]</code></li>
+        <li>First approved governing spec: foundation-v0-1</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Roadmap note -->
+  <div style="margin-top:3rem;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+    <p class="t-label" style="margin-bottom:0.75rem">In scope for future releases</p>
+    <div class="checklist">
+      <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--fg-subtle)"><circle cx="7" cy="7" r="5"/></svg>Edge executor adapter</div>
+      <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--fg-subtle)"><circle cx="7" cy="7" r="5"/></svg>Cloud executor adapter</div>
+      <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--fg-subtle)"><circle cx="7" cy="7" r="5"/></svg>Multi-agent orchestration with conflict prevention</div>
+      <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--fg-subtle)"><circle cx="7" cy="7" r="5"/></svg>AI-pipeline placement target</div>
+      <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--fg-subtle)"><circle cx="7" cy="7" r="5"/></svg>Extended trace querying and audit tooling</div>
+    </div>
+    <p style="margin-top:1rem;font-size:0.8125rem;color:var(--fg-subtle)">All roadmap items require an approved governing spec before implementation begins.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li><li><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li></ul></div>
+      <div><div class="footer-col-title">Ecosystem</div><ul class="footer-links"><li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li><li><a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener">Book</a></li><li><a href="https://enricopiovesan.com" target="_blank" rel="noopener">Enrico Piovesan</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span><div class="footer-social"><a href="https://github.com/traverse-framework" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a></div></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quickstart — Traverse Docs</title>
+  <meta name="description" content="Your first runnable Traverse flow. Browser demo, CLI commands, and expected output — step by step. Under 5 minutes.">
+  <link rel="canonical" href="https://traverse-framework.com/docs/quickstart.html">
+  <meta property="og:title" content="Quickstart — Traverse Docs">
+  <meta property="og:url" content="https://traverse-framework.com/docs/quickstart.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .step-marker {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .step-circle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,81,10,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .step-label { font-size: 0.72rem; color: var(--fg-subtle); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; }
+    .doc-step { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .doc-step:last-child { border-bottom: none; }
+    .next-steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+    @media (max-width: 640px) { .next-steps-grid { grid-template-columns: 1fr; } }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/examples/">Examples</a></li>
+      <li><a href="/docs/" style="color:var(--fg)">Docs</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+      <li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/examples/">Examples</a><a href="/docs/">Docs</a>
+  <a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="docs-layout">
+  <!-- Sidebar -->
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Getting Started</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/quickstart.html" class="active">Quickstart</a>
+        <a href="/docs/#what-can-i-build">What can I build?</a>
+        <a href="/docs/#installation">Installation</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Core Concepts</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/concepts.html#contracts">Contracts</a>
+        <a href="/docs/concepts.html#registry">Registry</a>
+        <a href="/docs/concepts.html#runtime">Runtime & Execution</a>
+        <a href="/docs/concepts.html#placement">Placement Targets</a>
+        <a href="/docs/concepts.html#traces">Trace Artifacts</a>
+        <a href="/docs/concepts.html#workflows">Workflows</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Guides</div>
+      <div class="docs-sidebar-links">
+        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">Author a Capability ↗</a>
+        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">Author an Event ↗</a>
+        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">Build a Workflow ↗</a>
+        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">Build a WASM Agent ↗</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Reference</div>
+      <div class="docs-sidebar-links">
+        <a href="/examples/">Examples</a>
+        <a href="/changelog.html">Changelog</a>
+        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="docs-content">
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem">Getting Started</div>
+      <h1 class="t-h1" style="margin-bottom:0.75rem">Quickstart</h1>
+      <p class="t-body t-muted">Your first runnable Traverse flow. Run the expedition planning example in under 5 minutes.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap">
+        <span class="badge badge-success badge-dot">v0.7.0</span>
+        <span class="badge">~5 minutes</span>
+        <span class="badge">Rust 1.94+</span>
+        <span class="badge">Node.js required</span>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">01</div>
+        <span class="step-label">Prerequisites</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Before you start</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Make sure you have these installed:</p>
+      <div class="terminal" style="max-width:580px">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">check versions</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> rustc --version</span></div>
+          <div class="terminal-line"><span class="terminal-out">rustc 1.94.0 (or higher)</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo --version</span></div>
+          <div class="terminal-line"><span class="terminal-out">cargo 1.94.0</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> node --version</span></div>
+          <div class="terminal-line"><span class="terminal-out">v20.0.0 (or higher)</span></div>
+        </div>
+      </div>
+      <p style="margin-top:1rem;font-size:0.875rem;color:var(--fg-muted)">Install Rust via <a href="https://rustup.rs" target="_blank" rel="noopener" style="color:var(--accent)">rustup.rs</a> if you don't have it.</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">02</div>
+        <span class="step-label">Clone the repo</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Clone and build</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Clone the traverse repo and run an initial build to verify everything compiles.</p>
+      <div class="terminal" style="max-width:580px">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">clone</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> git clone https://github.com/traverse-framework/traverse</span></div>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cd traverse</span></div>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo build</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out success">Compiling traverse-runtime ...</span></div>
+          <div class="terminal-line"><span class="terminal-out success">Finished in X.XXs</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">03</div>
+        <span class="step-label">Inspect the bundle</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Verify the expedition bundle</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Before running the demo, inspect the registry bundle to confirm all 6 capabilities, 5 events, and 1 workflow are registered.</p>
+      <div class="terminal" style="max-width:580px">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">bundle inspect</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- bundle inspect \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     examples/expedition/registry-bundle/manifest.json</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out accent">bundle_id:     expedition.planning.seed-bundle</span></div>
+          <div class="terminal-line"><span class="terminal-out">version:       1.0.0</span></div>
+          <div class="terminal-line"><span class="terminal-out success">capabilities:  6</span></div>
+          <div class="terminal-line"><span class="terminal-out success">events:        5</span></div>
+          <div class="terminal-line"><span class="terminal-out success">workflows:     1</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">04</div>
+        <span class="step-label">Run the browser adapter</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Start the browser adapter</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Open a terminal and start the browser adapter. It listens on port <code>4174</code> and handles all capability execution requests from the browser.</p>
+      <div class="terminal" style="max-width:580px">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 1</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     browser-adapter serve --bind 127.0.0.1:4174</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out success">adapter listening on 127.0.0.1:4174</span></div>
+          <div class="terminal-line"><span class="terminal-out">registry loaded · 6 capabilities ready</span></div>
+        </div>
+      </div>
+      <p style="margin-top:1rem;font-size:0.875rem;color:var(--fg-muted)">Leave this terminal running. Open a second one for the next step.</p>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">05</div>
+        <span class="step-label">Run the React demo</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Start the React demo</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">In a second terminal, start the React demo server. It connects to the browser adapter and serves the UI on port <code>4173</code>.</p>
+      <div class="terminal" style="max-width:580px">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 2</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> node apps/react-demo/server.mjs \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     --adapter http://127.0.0.1:4174 \</span></div>
+          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     --port 4173</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out success">demo ready → http://127.0.0.1:4173</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">06</div>
+        <span class="step-label">Submit a governed request</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Open the browser and execute</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Open <code>http://127.0.0.1:4173</code> and click <strong style="color:var(--fg)">"Submit approved request"</strong>. The runtime will execute the full expedition planning workflow.</p>
+      <div class="code-block" style="max-width:480px;margin-bottom:1.25rem">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">request payload</span><span></span></div>
+        <div class="code-body">
+<pre>{
+  <span class="tok-key">"goal"</span>: <span class="tok-str">"Plan a two-day alpine expedition\nfor a four-person team."</span>,
+  <span class="tok-key">"requested_target"</span>: <span class="tok-str">"local"</span>,
+  <span class="tok-key">"caller"</span>: <span class="tok-str">"browser_demo"</span>
+}</pre>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-bottom:1rem">You should see the status pill advance:</p>
+      <div class="terminal" style="max-width:480px">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">expected output</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-out accent">ready</span><span class="terminal-out"> → streaming → </span><span class="terminal-out success">completed</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out">Runtime updates in ordered timeline:</span></div>
+          <div class="terminal-line"><span class="terminal-out">  [1] interpret-expedition-intent ✓</span></div>
+          <div class="terminal-line"><span class="terminal-out">  [2] capture-expedition-objective ✓</span></div>
+          <div class="terminal-line"><span class="terminal-out">  [3] assess-conditions-summary ✓</span></div>
+          <div class="terminal-line"><span class="terminal-out">  [4] validate-team-readiness ✓</span></div>
+          <div class="terminal-line"><span class="terminal-out success">  [5] assemble-expedition-plan ✓</span></div>
+          <br>
+          <div class="terminal-line"><span class="terminal-out">Trace panel: capability · events · output</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div class="doc-step" style="border-bottom:none">
+      <h2 class="t-h2" style="margin-bottom:1rem">Next steps</h2>
+      <div class="next-steps-grid">
+        <a href="/docs/concepts.html" class="card card-accent-hover card-link" style="text-decoration:none">
+          <h3 class="t-h3" style="margin-bottom:0.35rem">Core Concepts →</h3>
+          <p class="t-body-sm t-muted">Understand contracts, registry, runtime, placement, and trace artifacts.</p>
+        </a>
+        <a href="/examples/" class="card card-accent-hover card-link" style="text-decoration:none">
+          <h3 class="t-h3" style="margin-bottom:0.35rem">Examples →</h3>
+          <p class="t-body-sm t-muted">Deep dive into the expedition planning domain — contracts, events, workflow graph.</p>
+        </a>
+        <a href="/use-cases/" class="card card-accent-hover card-link" style="text-decoration:none">
+          <h3 class="t-h3" style="margin-bottom:0.35rem">Use Cases →</h3>
+          <p class="t-body-sm t-muted">See what you can build: browser apps, MCP servers, WASM agents, AI pipelines.</p>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>
