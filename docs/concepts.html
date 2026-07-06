@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Core Concepts — Traverse Docs</title>
+  <title>Core Concepts: Traverse Docs</title>
   <meta name="description" content="Understand Traverse core concepts: contracts, capability registry, runtime execution model, placement targets, trace artifacts, and workflow composition.">
   <link rel="canonical" href="https://traverse-framework.com/docs/concepts.html">
-  <meta property="og:title" content="Core Concepts — Traverse Docs">
+  <meta property="og:title" content="Core Concepts: Traverse Docs">
   <meta property="og:url" content="https://traverse-framework.com/docs/concepts.html">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@enricopiovesan">
@@ -114,10 +114,10 @@
     <!-- Contracts -->
     <div class="concept-section" id="contracts">
       <h2 class="concept-h">Capability Contracts</h2>
-      <p class="concept-body">Every capability in Traverse is governed by a machine-readable contract. The contract is the source of truth — it declares what the capability does, what inputs it requires, what outputs it guarantees, and where it can run.</p>
-      <p class="concept-body">Nothing executes without a verified contract. The runtime reads the contract before placement, validates inputs against it before execution, and checks postconditions after. The contract is not documentation — it is enforcement.</p>
+      <p class="concept-body">Every capability in Traverse is governed by a machine-readable contract. The contract is the source of truth. It declares what the capability does, what inputs it requires, what outputs it guarantees, and where it can run.</p>
+      <p class="concept-body">Nothing executes without a verified contract. The runtime reads the contract before placement, validates inputs before execution, and checks postconditions after. The contract is not documentation. It is enforcement.</p>
       <div class="code-block" style="margin-bottom:1.25rem">
-        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">contract.json — anatomy</span><span></span></div>
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">contract.json: anatomy</span><span></span></div>
         <div class="code-body">
 <pre>{
   <span class="tok-comment">// Identity</span>
@@ -157,7 +157,7 @@
     <!-- Registry -->
     <div class="concept-section" id="registry">
       <h2 class="concept-h">Registry</h2>
-      <p class="concept-body">The registry is the single source of truth for what the system can do. It holds capability contracts, event contracts, and workflow definitions — all indexed and queryable at runtime.</p>
+      <p class="concept-body">The registry is the single source of truth for what the system can do. It holds capability contracts, event contracts, and workflow definitions. All of them are indexed and queryable at runtime.</p>
       <p class="concept-body">Capabilities are loaded into the registry via <strong style="color:var(--fg)">registry bundles</strong> — manifests that group related capabilities, events, and workflows into a deployable unit. The CLI validates bundles before they are registered.</p>
       <div class="terminal" style="max-width:560px;margin-bottom:1.25rem">
         <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">bundle structure</span></div>
@@ -225,7 +225,7 @@
         </div>
         <div class="target-card">
           <div class="target-name">edge</div>
-          <div class="target-desc">Runs at the network edge — low latency, close to the user.</div>
+          <div class="target-desc">Runs at the network edge. Low latency, close to the user.</div>
         </div>
         <div class="target-card">
           <div class="target-name">cloud</div>
@@ -251,7 +251,7 @@
     <div class="concept-section" id="traces">
       <h2 class="concept-h">Trace Artifacts</h2>
       <p class="concept-body">Every execution produces a structured trace artifact. The trace records every decision the runtime made: which capability was discovered, why it was selected, what inputs were validated, what events were emitted, and what the final output was.</p>
-      <p class="concept-body">Traces are queryable and auditable. For AI pipelines, they are the compliance record — proof that every action was governed by a contract.</p>
+      <p class="concept-body">Traces are queryable and auditable. For AI pipelines they are the compliance record. Proof that every action was governed by a contract.</p>
       <div class="code-block" style="margin-bottom:1.25rem">
         <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">trace artifact</span><span></span></div>
         <div class="code-body">
@@ -282,7 +282,7 @@
     <!-- Workflows -->
     <div class="concept-section" id="workflows">
       <h2 class="concept-h">Workflow Composition</h2>
-      <p class="concept-body">Workflows compose multiple capabilities into a deterministic execution graph. Each node is a governed capability. Each edge is a typed event. The runtime traverses the graph in order — same inputs, same path, every time.</p>
+      <p class="concept-body">Workflows compose multiple capabilities into a deterministic execution graph. Each node is a governed capability. Each edge is a typed event. The runtime traverses the graph in order. Same inputs, same path, every time.</p>
       <p class="concept-body">Workflow definitions declare: the participating capabilities, the events each emits, the input and output shapes, and the terminal conditions. The runtime validates the composition before any execution begins.</p>
       <div class="code-block">
         <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">workflow definition (excerpt)</span><span></span></div>

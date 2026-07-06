@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Examples — Traverse Framework</title>
+  <title>Examples: Traverse Framework</title>
   <meta name="description" content="Traverse examples: the expedition planning domain with 6 capabilities, 5 events, and 1 workflow. Fully governed, traceable, and runnable.">
   <link rel="canonical" href="https://traverse-framework.com/examples/">
-  <meta property="og:title" content="Examples — Traverse Framework">
+  <meta property="og:title" content="Examples: Traverse Framework">
   <meta property="og:url" content="https://traverse-framework.com/examples/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@enricopiovesan">
@@ -143,7 +143,7 @@
 <!-- Bundle inspect -->
 <section class="example-section">
   <div class="container">
-    <div class="section-label">Step 1 — Inspect the bundle</div>
+    <div class="section-label">Step 1: Inspect the bundle</div>
     <h2 class="t-h2" style="margin-bottom:1rem">Verify the registry bundle.</h2>
     <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">Before running anything, inspect the bundle to confirm all capabilities, events, and workflows are registered correctly.</p>
     <div style="max-width:720px">
@@ -167,12 +167,12 @@
 <!-- Run the demo -->
 <section class="example-section">
   <div class="container">
-    <div class="section-label">Step 2 — Run the browser demo</div>
+    <div class="section-label">Step 2: Run the browser demo</div>
     <h2 class="t-h2" style="margin-bottom:1rem">Start two terminals.</h2>
     <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">The browser adapter listens on port 4174. The React demo connects to it on port 4173.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:900px">
       <div class="terminal">
-        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 1 — browser adapter</span></div>
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 1: browser adapter</span></div>
         <div class="terminal-body">
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- \</span></div>
           <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     browser-adapter serve \</span></div>
@@ -182,7 +182,7 @@
         </div>
       </div>
       <div class="terminal">
-        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 2 — React demo</span></div>
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 2: React demo</span></div>
         <div class="terminal-body">
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> node apps/react-demo/server.mjs \</span></div>
           <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">     --adapter http://127.0.0.1:4174 \</span></div>
@@ -198,7 +198,7 @@
 <!-- Submit a request -->
 <section class="example-section">
   <div class="container">
-    <div class="section-label">Step 3 — Submit a governed request</div>
+    <div class="section-label">Step 3: Submit a governed request</div>
     <h2 class="t-h2" style="margin-bottom:1rem">Click "Submit approved request".</h2>
     <p class="t-body t-muted" style="max-width:54ch;margin-bottom:2rem">Open <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent);background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:0.1em 0.4em">http://127.0.0.1:4173</code> and submit this payload. Watch the state machine advance in real time.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:900px;align-items:start">

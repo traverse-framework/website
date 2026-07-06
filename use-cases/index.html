@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Use Cases — Traverse Framework</title>
+  <title>Use Cases: Traverse Framework</title>
   <meta name="description" content="What you can build with Traverse today: governed browser apps, MCP-backed AI agents, workflow pipelines, portable WASM business rules, and auditable AI pipelines.">
   <link rel="canonical" href="https://traverse-framework.com/use-cases/">
-  <meta property="og:title" content="Use Cases — Traverse Framework">
+  <meta property="og:title" content="Use Cases: Traverse Framework">
   <meta property="og:description" content="Discover what you can build with Traverse: governed browser apps, MCP AI agents, workflow pipelines, portable WASM rules.">
   <meta property="og:url" content="https://traverse-framework.com/use-cases/">
   <meta property="og:type" content="website">
@@ -144,8 +144,8 @@
       <div>
         <div class="uc-num">01 / 05</div>
         <h2 class="t-h2 uc-title">Browser-hosted app with governed runtime</h2>
-        <p class="uc-body">Your UI owns the interface. Traverse owns the execution. Business capabilities run inside the browser via a local adapter — the same runtime contract enforced whether you're online, offline, or at the edge.</p>
-        <p class="uc-body">The browser adapter listens on port 4174. Your app submits governed requests; the runtime discovers, validates against the contract, executes the WASM capability, and returns a structured trace.</p>
+        <p class="uc-body">Your UI owns the interface. Traverse owns the execution. Business capabilities run inside the browser via a local adapter with the same runtime contract enforced whether you're online, offline, or at the edge.</p>
+        <p class="uc-body">The browser adapter listens on port 4174. Your app submits governed requests. The runtime discovers the right capability, validates it against the contract, executes the WASM binary, and returns a structured trace.</p>
         <div class="checklist" style="margin-bottom:1.5rem">
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Live local browser adapter</div>
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>React demo app included (port 4173)</div>
@@ -220,8 +220,8 @@
       <div>
         <div class="uc-num">02 / 05</div>
         <h2 class="t-h2 uc-title">MCP server for AI capability discovery</h2>
-        <p class="uc-body">AI agents cannot navigate what has no contracts. Traverse exposes your capability registry via a Model Context Protocol stdio server — so agents discover what your system can do without reading implementation code.</p>
-        <p class="uc-body">Downstream AI clients call MCP tools; Traverse validates each call against the governing contract before execution. No guesswork. No undeclared side effects. Every capability is machine-enforceable.</p>
+        <p class="uc-body">AI agents cannot navigate what has no contracts. Traverse exposes your capability registry via a Model Context Protocol stdio server. Agents discover what your system can do without reading implementation code.</p>
+        <p class="uc-body">Downstream AI clients call MCP tools. Traverse validates each call against the governing contract before execution. No guesswork. No undeclared side effects.</p>
         <div class="checklist" style="margin-bottom:1.5rem">
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Stdio-based MCP server (traverse-mcp)</div>
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Agents discover capabilities by contract</div>
@@ -290,7 +290,7 @@
       <div>
         <div class="uc-num">03 / 05</div>
         <h2 class="t-h2 uc-title">Workflow-backed business capabilities</h2>
-        <p class="uc-body">Multi-step business flows with invisible state and no audit trail are a reliability problem. Traverse models business behavior as capabilities, events, and workflows — with deterministic graph traversal and full trace output at every step.</p>
+        <p class="uc-body">Multi-step business flows with invisible state and no audit trail are a reliability problem. Traverse models business behavior as capabilities, events, and workflows. Every step produces a trace. The graph traversal is deterministic.</p>
         <p class="uc-body">Workflows are graph-based. Each node is a governed capability. Each edge is an event. The runtime traverses deterministically: same inputs always produce the same path, the same outputs, the same trace.</p>
         <div class="checklist" style="margin-bottom:1.5rem">
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Graph-based deterministic traversal</div>
@@ -358,7 +358,7 @@
       <div>
         <div class="uc-num">04 / 05</div>
         <h2 class="t-h2 uc-title">Portable WASM business rules</h2>
-        <p class="uc-body">Pricing formulas, eligibility checks, validation rules — the same logic copy-pasted across four environments. With Traverse, you write it once, compile to WASM, declare the contract, and place it anywhere.</p>
+        <p class="uc-body">Pricing formulas, eligibility checks, validation rules. The same logic copy-pasted across four environments. With Traverse, you write it once, compile to WASM, declare the contract, and place it anywhere.</p>
         <p class="uc-body">The same binary runs in the browser, at the edge, in the cloud, or inside an AI pipeline. The contract defines the placement strategy. The runtime enforces it. The behavior is identical everywhere.</p>
         <div class="checklist" style="margin-bottom:1.5rem">
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Single WASM binary, multiple targets</div>
@@ -422,7 +422,7 @@
       <div>
         <div class="uc-num">05 / 05</div>
         <h2 class="t-h2 uc-title">Auditable AI pipelines</h2>
-        <p class="uc-body">AI decisions with no record of what ran or why are a liability. Traverse wraps every AI-facing capability in a contract. Every execution produces a structured trace artifact — queryable, auditable, and reproducible.</p>
+        <p class="uc-body">AI decisions with no record of what ran or why are a real liability. Traverse wraps every AI-facing capability in a contract. Every execution produces a structured trace artifact that is queryable, auditable, and reproducible.</p>
         <p class="uc-body">Agents operate on declared contracts, not inferred APIs. The trace records: which capability was selected, why, what inputs were validated, what events were emitted, and what the final output was. Nothing is hidden.</p>
         <div class="checklist" style="margin-bottom:1.5rem">
           <div class="checklist-item"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>Every decision backed by a contract</div>

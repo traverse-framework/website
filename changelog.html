@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changelog — Traverse Framework</title>
-  <meta name="description" content="Traverse release history. See what shipped in each version — runtime, CLI, MCP server, contracts, registry, and spec governance.">
+  <title>Changelog: Traverse Framework</title>
+  <meta name="description" content="Traverse release history. See what shipped in each version: runtime, CLI, MCP server, contracts, registry, and spec governance.">
   <link rel="canonical" href="https://traverse-framework.com/changelog.html">
-  <meta property="og:title" content="Changelog — Traverse Framework">
+  <meta property="og:title" content="Changelog: Traverse Framework">
   <meta property="og:url" content="https://traverse-framework.com/changelog.html">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@enricopiovesan">
@@ -111,39 +111,39 @@
     </div>
     <div class="release-body">
       <h3>Browser adapter, MCP server, React demo</h3>
-      <p>The largest release to date. Introduces the live browser adapter, the MCP stdio server for AI agent integration, and the React demo app — all backed by the expedition planning example domain.</p>
+      <p>The largest release to date. Introduces the live browser adapter, the MCP stdio server for AI agent integration, and the React demo app. All backed by the expedition planning example domain.</p>
 
       <div class="release-section-title">What's new</div>
       <ul>
-        <li>Live browser adapter on port 4174 — UI submits governed requests, runtime executes WASM capabilities locally</li>
+        <li>Live browser adapter on port 4174. UI submits governed requests, runtime executes WASM capabilities locally.</li>
         <li>React demo app on port 4173 — connects to browser adapter, shows real-time state transitions and trace output</li>
-        <li>MCP stdio server (<code>traverse-mcp</code>) — AI agents discover and execute governed capabilities via Model Context Protocol</li>
-        <li>Expedition planning domain — 6 capabilities, 5 events, 1 workflow — fully governed and runnable</li>
-        <li>Trace generation and subscription — every execution produces a structured, queryable trace artifact</li>
+        <li>MCP stdio server (<code>traverse-mcp</code>). AI agents discover and execute governed capabilities via Model Context Protocol.</li>
+        <li>Expedition planning domain with 6 capabilities, 5 events, and 1 workflow. Fully governed and runnable.</li>
+        <li>Trace generation and subscription. Every execution produces a structured, queryable trace artifact.</li>
         <li>State machine: <code>ready → streaming → completed</code> with ordered runtime timeline</li>
         <li>Release-facing documentation: quickstart, authoring guides, troubleshooting</li>
       </ul>
 
       <div class="release-section-title">Governing specs (9 approved)</div>
       <ul>
-        <li>foundation-v0-1 — Core runtime, CLI, MCP surface</li>
-        <li>capability-contracts — Contract definitions and validation</li>
-        <li>event-contracts — Event contract definitions</li>
-        <li>spec-alignment-gate — CI merge gate</li>
-        <li>capability-registry — Registry behavior</li>
-        <li>runtime-request-execution — Execution model</li>
-        <li>workflow-registry-traversal — Workflow composition</li>
-        <li>expedition-example-domain — Example domain definition</li>
-        <li>expedition-example-artifacts — Example contracts and workflows</li>
+        <li>foundation-v0-1: Core runtime, CLI, MCP surface</li>
+        <li>capability-contracts: Contract definitions and validation</li>
+        <li>event-contracts: Event contract definitions</li>
+        <li>spec-alignment-gate: CI merge gate</li>
+        <li>capability-registry: Registry behavior</li>
+        <li>runtime-request-execution: Execution model</li>
+        <li>workflow-registry-traversal: Workflow composition</li>
+        <li>expedition-example-domain: Example domain definition</li>
+        <li>expedition-example-artifacts: Example contracts and workflows</li>
       </ul>
 
       <div class="release-section-title">Quality</div>
       <ul>
-        <li>100% test coverage — CI-gated, no exceptions</li>
-        <li><code>#![forbid(unsafe_code)]</code> — enforced across all crates</li>
+        <li>100% test coverage, CI-gated with no exceptions</li>
+        <li><code>#![forbid(unsafe_code)]</code> enforced across all crates</li>
         <li>No unwrap, panic, or TODO in production code</li>
         <li>SBOM generation (CycloneDX format)</li>
-        <li>ADR process — all architectural decisions documented</li>
+        <li>ADR process in place. All architectural decisions documented.</li>
       </ul>
     </div>
   </div>
@@ -161,8 +161,8 @@
 
       <div class="release-section-title">What shipped</div>
       <ul>
-        <li>Stable release artifacts — versioned and reproducible</li>
-        <li>App registration via CLI — <code>traverse-cli bundle inspect</code></li>
+        <li>Stable release artifacts, versioned and reproducible</li>
+        <li>App registration via CLI using <code>traverse-cli bundle inspect</code></li>
         <li>App validation through the registry bundle manifest</li>
         <li>Consumer-facing documentation and bundle integration path</li>
         <li>Release-facing entry path for downstream consumers</li>
@@ -183,11 +183,11 @@
 
       <div class="release-section-title">What shipped</div>
       <ul>
-        <li><code>traverse-runtime</code> — Core execution engine scaffolding</li>
-        <li><code>traverse-contracts</code> — Contract parsing and validation</li>
-        <li><code>traverse-registry</code> — Capability and event registry</li>
-        <li><code>traverse-cli</code> — Initial CLI: register, list, validate, run</li>
-        <li>Spec governance process — spec-first, ADR-backed, CI-gated</li>
+        <li><code>traverse-runtime</code>: core execution engine scaffolding</li>
+        <li><code>traverse-contracts</code>: contract parsing and validation</li>
+        <li><code>traverse-registry</code>: capability and event registry</li>
+        <li><code>traverse-cli</code>: initial CLI with register, list, validate, and run commands</li>
+        <li>Spec governance process in place. Spec-first, ADR-backed, CI-gated.</li>
         <li>Rust workspace structure with <code>#![forbid(unsafe_code)]</code></li>
         <li>First approved governing spec: foundation-v0-1</li>
       </ul>
