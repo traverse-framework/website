@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traverse vs AI Function Calling: Contracts vs Definitions · Traverse Framework</title>
+  <meta name="description" content="Function calling gives AI agents a list of functions. Traverse gives agents contracts with preconditions, postconditions, and trace artifacts. A meaningful difference.">
+  <link rel="canonical" href="https://traverse-framework.com/compare/vs-function-calling.html">
+  <meta property="og:title" content="Traverse vs AI Function Calling: Contracts vs Definitions">
+  <meta property="og:url" content="https://traverse-framework.com/compare/vs-function-calling.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .compare-hero {
+      padding: 4.5rem 0 3.5rem;
+      position: relative;
+    }
+    .compare-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      margin-bottom: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb span { color: var(--accent); }
+    .compare-hero h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      max-width: 720px;
+    }
+    .compare-hero-lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      max-width: 600px;
+      line-height: 1.75;
+    }
+
+    .toc-aside {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .toc-aside h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: 0.75rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .toc-aside ol { margin: 0; padding-left: 1.25rem; }
+    .toc-aside li {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.35rem;
+      line-height: 1.5;
+    }
+    .toc-aside li a { color: var(--fg-muted); text-decoration: none; transition: color 0.15s; }
+    .toc-aside li a:hover { color: var(--accent); }
+
+    .content-section { margin: 3.5rem 0; }
+    .content-section h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 1rem;
+      padding-top: 1rem;
+    }
+    .content-section p {
+      color: var(--fg-muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+
+    .problem-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+      max-width: 700px;
+    }
+    .problem-list li {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .problem-list li:last-child { border-bottom: none; }
+    .problem-list .marker {
+      color: var(--fg-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .problem-list .item-body strong {
+      display: block;
+      color: var(--fg);
+      font-size: 0.92rem;
+      margin-bottom: 0.3rem;
+    }
+    .problem-list .item-body span {
+      color: var(--fg-muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .add-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+      max-width: 700px;
+    }
+    .add-list li {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .add-list li:last-child { border-bottom: none; }
+    .add-list .marker {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .add-list .item-body strong {
+      display: block;
+      color: var(--fg);
+      font-size: 0.92rem;
+      margin-bottom: 0.3rem;
+    }
+    .add-list .item-body span {
+      color: var(--fg-muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .side-by-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .sbs-panel {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .sbs-panel.traverse-panel { border-color: var(--accent); }
+    .sbs-panel-header {
+      background: var(--bg-elevated);
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--fg-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sbs-panel.traverse-panel .sbs-panel-header {
+      background: var(--accent-dim);
+      border-bottom-color: var(--accent);
+      color: var(--accent);
+    }
+    .sbs-panel-body {
+      background: var(--bg-card);
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .highlight-callout {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .highlight-callout strong { color: var(--fg); }
+
+    .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.92rem;
+    }
+    .diff-table th {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+    }
+    .diff-table th:first-child { width: 28%; }
+    .diff-table td {
+      border: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+      vertical-align: top;
+      line-height: 1.6;
+      color: var(--fg-muted);
+    }
+    .diff-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .diff-table td:first-child {
+      font-weight: 500;
+      color: var(--fg);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+    }
+    .diff-table td.highlight { color: var(--accent); }
+
+    .compare-nav {
+      display: flex;
+      gap: 1rem;
+      margin: 3rem 0;
+      flex-wrap: wrap;
+    }
+    .compare-nav a {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      text-decoration: none;
+      color: var(--fg-muted);
+      font-size: 0.88rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .compare-nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 700px) {
+      .side-by-side { grid-template-columns: 1fr; }
+      .diff-table { font-size: 0.82rem; }
+      .diff-table th, .diff-table td { padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="compare-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/compare/">Compare</a>
+      <span>/</span>
+      <span>vs AI Function Calling</span>
+    </div>
+    <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
+    <h1>Traverse vs AI Function Calling: Contracts vs Definitions</h1>
+    <p class="compare-hero-lead">Function calling gives AI agents a list of functions to invoke. Traverse gives agents contracts with preconditions, postconditions, enforcement, and trace artifacts. A meaningful difference when the function matters.</p>
+  </div>
+</section>
+
+<main class="container">
+
+  <div class="toc-aside">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#what-function-calling-solves">What function calling solves</a></li>
+      <li><a href="#problems">Problems with function calling alone</a></li>
+      <li><a href="#what-traverse-adds">What Traverse adds</a></li>
+      <li><a href="#side-by-side">Side-by-side: definition vs contract</a></li>
+      <li><a href="#together">Using them together via MCP</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <div class="content-section" id="what-function-calling-solves">
+    <h2>What function calling solves</h2>
+    <p>
+      Function calling lets LLMs invoke external tools. The model sees a list of function definitions, picks the right one, produces the arguments, and the calling code runs the function and returns the result.
+    </p>
+    <p>
+      This works well for simple integrations: look up a user record, send a notification, query a search index. The model handles intent and argument construction. Your code handles execution.
+    </p>
+    <p>
+      It is the foundation of most AI agent tooling today. It is well supported across OpenAI, Anthropic, Google, and the MCP ecosystem.
+    </p>
+  </div>
+
+  <div class="content-section" id="problems">
+    <h2>Problems with function calling alone</h2>
+    <p>
+      Function calling works. But when the function being called is a business capability with rules, preconditions, and compliance requirements, the bare function definition model has gaps.
+    </p>
+
+    <ul class="problem-list">
+      <li>
+        <span class="marker">01</span>
+        <div class="item-body">
+          <strong>No preconditions</strong>
+          <span>A function signature says what parameters to pass. It does not say what must be true before calling. The agent learns about failures by calling the function and getting an error back — often after side effects have already started.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">02</span>
+        <div class="item-body">
+          <strong>No enforcement</strong>
+          <span>If the agent passes invalid inputs, the function decides what to do. Maybe it throws. Maybe it silently accepts them. Behavior is up to the implementation. The agent cannot verify correctness before calling.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">03</span>
+        <div class="item-body">
+          <strong>No audit trail</strong>
+          <span>You know a function was called. You may have a log entry. But you do not have a structured, queryable record of the inputs, outputs, which version ran, and whether all conditions were met. Compliance teams ask for exactly this.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">04</span>
+        <div class="item-body">
+          <strong>Definitions go stale</strong>
+          <span>Function definitions in a system prompt or tool list are text. When the underlying function changes, the definition may not be updated. Agents trained or prompted on stale definitions call capabilities that have changed or no longer exist.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="content-section" id="what-traverse-adds">
+    <h2>What Traverse adds on top</h2>
+    <p>
+      Traverse does not replace function calling. It governs the capabilities that function calling invokes. The agent still calls a function. That function is now backed by a contract and a runtime that enforces it.
+    </p>
+
+    <ul class="add-list">
+      <li>
+        <span class="marker">pre</span>
+        <div class="item-body">
+          <strong>Preconditions</strong>
+          <span>The contract declares what must be true before the capability can run. The runtime checks this before execution. The agent can read the contract and know what is required before calling.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">post</span>
+        <div class="item-body">
+          <strong>Postconditions</strong>
+          <span>The contract declares what the output will look like and what must be true after execution. The runtime validates the output before returning it. The agent can trust the output shape.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">run</span>
+        <div class="item-body">
+          <strong>Runtime enforcement</strong>
+          <span>Validation happens at the runtime level, not inside the function. This is not a convention or a doc string. The capability cannot run if preconditions are unmet. Full stop.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">log</span>
+        <div class="item-body">
+          <strong>Trace artifacts</strong>
+          <span>Every execution produces a structured trace: inputs, outputs, contract version, timestamp, and result. Queryable. Replayable. Ready for compliance review without extra instrumentation.</span>
+        </div>
+      </li>
+      <li>
+        <span class="marker">ver</span>
+        <div class="item-body">
+          <strong>Versioned contracts</strong>
+          <span>The capability registry always reflects what actually runs. Agents resolve capabilities by name and version. A stale definition is a contract mismatch the registry catches at load time, not at runtime surprise.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="content-section" id="side-by-side">
+    <h2>Side-by-side: raw function definition vs Traverse contract</h2>
+    <p>The same capability — checking promotion eligibility — defined two ways.</p>
+
+    <div class="side-by-side">
+      <div class="sbs-panel">
+        <div class="sbs-panel-header">
+          <span>Raw function definition (OpenAI tool format)</span>
+        </div>
+        <div class="sbs-panel-body"><span class="tok-comment">// What the agent sees</span>
+{
+  <span class="tok-key">"name"</span>: <span class="tok-str">"check_promo_eligibility"</span>,
+  <span class="tok-key">"description"</span>: <span class="tok-str">"Check if a promo code
+    is valid for a customer"</span>,
+  <span class="tok-key">"parameters"</span>: {
+    <span class="tok-key">"type"</span>: <span class="tok-str">"object"</span>,
+    <span class="tok-key">"properties"</span>: {
+      <span class="tok-key">"customer_id"</span>: { <span class="tok-str">"type"</span>: <span class="tok-str">"string"</span> },
+      <span class="tok-key">"promo_code"</span>: { <span class="tok-str">"type"</span>: <span class="tok-str">"string"</span> },
+      <span class="tok-key">"cart_total"</span>: { <span class="tok-str">"type"</span>: <span class="tok-str">"number"</span> }
+    },
+    <span class="tok-key">"required"</span>: [<span class="tok-str">"customer_id"</span>, <span class="tok-str">"promo_code"</span>]
+  }
+}
+
+<span class="tok-comment">// What happens if cart_total is missing?
+// What must be true about customer_id?
+// What does the response look like?
+// Which version of this logic ran?
+// Was it audited?
+// Nobody knows.</span>
+        </div>
+      </div>
+
+      <div class="sbs-panel traverse-panel">
+        <div class="sbs-panel-header">
+          <span>Traverse contract</span>
+        </div>
+        <div class="sbs-panel-body"><span class="tok-section">[capability]</span>
+<span class="tok-key">name</span> = <span class="tok-str">"promotions.check-eligibility"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"2.1.0"</span>
+<span class="tok-key">placement</span> = [<span class="tok-str">"browser"</span>, <span class="tok-str">"edge"</span>, <span class="tok-str">"cloud"</span>, <span class="tok-str">"ai-pipeline"</span>]
+
+<span class="tok-section">[preconditions]</span>
+<span class="tok-comment"># Enforced before execution. Cannot be bypassed.</span>
+<span class="tok-key">customer_id</span> = <span class="tok-str">"non-empty string, max 64 chars"</span>
+<span class="tok-key">promo_code</span> = <span class="tok-str">"non-empty string, alphanumeric"</span>
+<span class="tok-key">cart_total</span> = <span class="tok-str">"float, >= 0.0"</span>
+<span class="tok-key">region</span> = <span class="tok-str">"ISO 3166-1 alpha-2"</span>
+
+<span class="tok-section">[postconditions]</span>
+<span class="tok-comment"># Enforced after execution. Output shape guaranteed.</span>
+<span class="tok-key">eligible</span> = <span class="tok-str">"boolean"</span>
+<span class="tok-key">discount_pct</span> = <span class="tok-str">"float, 0.0..100.0 when eligible"</span>
+<span class="tok-key">reason</span> = <span class="tok-str">"string when !eligible"</span>
+<span class="tok-key">expires_at</span> = <span class="tok-str">"RFC3339 timestamp"</span>
+
+<span class="tok-section">[trace]</span>
+<span class="tok-key">emit</span> = <span class="tok-bool">true</span>
+<span class="tok-comment"># Trace includes: inputs, outputs, version, timestamp,
+# precondition results, postcondition results.</span>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem">
+      The Traverse contract is not documentation. The runtime reads it and refuses to execute if any condition is unmet. The agent can load the contract and know exactly what is required before calling.
+    </p>
+  </div>
+
+  <div class="content-section" id="together">
+    <h2>Using them together via MCP</h2>
+    <p>
+      Traverse and function calling are not mutually exclusive. You can expose Traverse capabilities as MCP tools. The agent calls them through standard function calling. The capabilities just come with contracts and traces attached.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-filename">mcp-server/tools.ts</span>
+      </div>
+      <div class="code-body">
+<span class="tok-key">import</span> { TraverseRuntime } <span class="tok-key">from</span> <span class="tok-str">'@traverse-framework/runtime'</span>;
+<span class="tok-key">import</span> { McpServer } <span class="tok-key">from</span> <span class="tok-str">'@modelcontextprotocol/sdk/server/mcp.js'</span>;
+
+<span class="tok-key">const</span> runtime = <span class="tok-key">await</span> TraverseRuntime.<span class="tok-fn">init</span>({ registry: process.env.REGISTRY_URL });
+<span class="tok-key">const</span> server = <span class="tok-key">new</span> <span class="tok-fn">McpServer</span>({ name: <span class="tok-str">'traverse-capabilities'</span>, version: <span class="tok-str">'1.0.0'</span> });
+
+<span class="tok-comment">// Expose Traverse capability as an MCP tool.
+// The agent calls it like any function. The runtime enforces the contract.</span>
+server.<span class="tok-fn">tool</span>(
+  <span class="tok-str">'check-promo-eligibility'</span>,
+  <span class="tok-str">'Check promotion eligibility. Contract-enforced. Produces a trace.'</span>,
+  {
+    customer_id: z.<span class="tok-fn">string</span>(),
+    promo_code: z.<span class="tok-fn">string</span>(),
+    cart_total: z.<span class="tok-fn">number</span>(),
+    region: z.<span class="tok-fn">string</span>(),
+  },
+  <span class="tok-key">async</span> ({ customer_id, promo_code, cart_total, region }) =&gt; {
+    <span class="tok-key">const</span> result = <span class="tok-key">await</span> runtime.<span class="tok-fn">execute</span>(
+      <span class="tok-str">'promotions.check-eligibility@2.1.0'</span>,
+      { customer_id, promo_code, cart_total, region }
+    );
+
+    <span class="tok-comment">// result.trace_id links this AI call to every other system
+    // that ran this capability for the same transaction</span>
+    <span class="tok-key">return</span> {
+      content: [{ type: <span class="tok-str">'text'</span>, text: JSON.<span class="tok-fn">stringify</span>({
+        ...result.output,
+        trace_id: result.trace_id,
+      })}],
+    };
+  }
+);
+      </div>
+    </div>
+
+    <div class="highlight-callout" style="margin-top:1.5rem">
+      <strong>What the agent gets:</strong> the same function-calling interface it already knows. What your system gets: contract enforcement, versioned execution, and a trace that links every AI call to the same capability your browser and backend use.
+    </div>
+  </div>
+
+  <div class="content-section" id="verdict">
+    <h2>The verdict</h2>
+    <p>
+      Use function calling to let AI agents invoke tools. Use Traverse to ensure the tools worth invoking have enforced contracts and produce auditable traces.
+    </p>
+    <p>
+      Not every function needs a Traverse contract. A search tool, a calculator, a timezone lookup — raw function calling is fine. But pricing logic, eligibility checks, compliance validations? Those are capabilities worth governing. Traverse is built for exactly that.
+    </p>
+    <p>
+      The two compose cleanly. Expose Traverse capabilities as MCP tools. Your agent gets function calling that happens to come with enforcement and traceability baked in.
+    </p>
+  </div>
+
+  <div class="compare-nav">
+    <a href="/compare/">← All comparisons</a>
+    <a href="/compare/vs-microservices.html">Traverse vs Microservices →</a>
+    <a href="/compare/vs-serverless.html">Traverse vs Serverless →</a>
+  </div>
+
+  <div class="cta-band cta-band-glow" style="margin:3rem 0">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Give your AI agents governed capabilities.</div>
+      <div class="t-body t-muted">Contract-enforced. Traceable. Versioned.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

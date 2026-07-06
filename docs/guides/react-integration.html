@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Integration: Traverse Docs</title>
+  <meta name="description" content="Add Traverse capabilities to your React app. Connect to the browser adapter, submit governed requests, and display trace output.">
+  <link rel="canonical" href="https://traverse-framework.com/docs/guides/react-integration.html">
+  <meta property="og:title" content="React Integration: Traverse Docs">
+  <meta property="og:url" content="https://traverse-framework.com/docs/guides/react-integration.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .step-marker { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim); border: 1px solid rgba(232,81,10,0.3); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); flex-shrink: 0; }
+    .step-label { font-size: 0.72rem; color: var(--fg-muted); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; }
+    .doc-step { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .doc-step:last-child { border-bottom: none; }
+    .info-box { background: rgba(232,81,10,0.06); border: 1px solid rgba(232,81,10,0.2); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-size: 0.875rem; color: var(--fg-muted); line-height: 1.6; }
+    .info-box strong { color: var(--fg); }
+    .success-box { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-size: 0.875rem; color: var(--fg-muted); line-height: 1.6; }
+    .success-box strong { color: #86efac; }
+    .response-field { display: flex; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .response-field:last-child { border-bottom: none; }
+    .rf-key { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); width: 150px; flex-shrink: 0; }
+    .rf-desc { font-size: 0.85rem; color: var(--fg-muted); line-height: 1.5; }
+    .arch-diagram { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.25rem 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 2.2; }
+    .arch-box { display: inline-block; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 5px; padding: 0.2rem 0.65rem; color: var(--fg); }
+    .arch-box.accent { border-color: rgba(232,81,10,0.4); color: var(--accent); }
+    .arch-arrow { color: var(--fg-muted); margin: 0 0.5rem; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/" style="color:var(--fg)">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Getting Started</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/quickstart.html">Quickstart</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Core Concepts</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/concepts.html">Contracts</a>
+        <a href="/docs/architecture.html">Architecture</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Guides</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/guides/">All Guides</a>
+        <a href="/docs/guides/mcp-setup.html">MCP Setup</a>
+        <a href="/docs/guides/react-integration.html" class="active">React Integration</a>
+        <a href="/docs/guides/capability-authoring.html">Author a Capability</a>
+        <a href="/docs/guides/workflow-authoring.html">Build a Workflow</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Reference</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/cli-reference.html">CLI Reference</a>
+        <a href="/docs/troubleshooting.html">Troubleshooting</a>
+        <a href="/examples/">Examples</a>
+        <a href="/changelog.html">Changelog</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="docs-content">
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem">Guide</div>
+      <h1 class="t-h1" style="margin-bottom:0.75rem">React Integration</h1>
+      <p class="t-body t-muted">Add Traverse capabilities to your React app. You do not need to know Rust. The browser adapter handles all capability execution. Your app only needs to make HTTP requests.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap">
+        <span class="badge badge-success badge-dot">v0.7.0</span>
+        <span class="badge">~20 minutes</span>
+        <span class="badge">Node.js 18+</span>
+        <span class="badge">Rust 1.94+</span>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">01</div>
+        <span class="step-label">Start the adapter</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Start the browser adapter</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        The browser adapter is a local HTTP server. It takes requests from your React app, runs the WASM capability, and returns a structured response. Start it first, before your React dev server.
+      </p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 1 — browser adapter</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- browser-adapter serve \</span></div>
+          <div class="terminal-line"><span class="terminal-cmd">     --bind 127.0.0.1:4174 \</span></div>
+          <div class="terminal-line"><span class="terminal-cmd">     --bundle ./bundles/expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">Loading bundle: ./bundles/expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out">  plan-expedition v1.0.0 ... ok</span></div>
+          <div class="terminal-line"><span class="terminal-out">Registry ready. 1 capability loaded.</span></div>
+          <div class="terminal-line"><span class="terminal-out">Adapter listening on 127.0.0.1:4174</span></div>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">Leave this running. Open a second terminal for the next step.</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">02</div>
+        <span class="step-label">Working example</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Run the React demo</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        The repo includes a working React demo. Use it to see a complete integration before adding Traverse to your own app.
+      </p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">Terminal 2 — React demo</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> node apps/react-demo/server.mjs</span></div>
+          <div class="terminal-line"><span class="terminal-out">React demo ready at http://localhost:3000</span></div>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">Open <code>http://localhost:3000</code> in your browser. Submit the expedition form to see a live execution and trace output.</p>
+      <div class="success-box">
+        <strong>Both processes must be running.</strong> The adapter on port 4174 and the React server on port 3000. The demo shows a blank page if the adapter is not up.
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">03</div>
+        <span class="step-label">How it works</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">How the connection works</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Your React app never touches Rust or WASM directly. It talks to the browser adapter over plain HTTP. The adapter owns everything else.
+      </p>
+      <div class="arch-diagram">
+        <div><span class="arch-box">React app</span> <span class="arch-arrow">→ POST /execute →</span> <span class="arch-box accent">Browser adapter :4174</span></div>
+        <div style="margin-left:2.5rem;color:var(--fg-muted);font-size:0.75rem">JSON body: goal, requested_target, caller</div>
+        <div style="margin-left:4rem"><span class="arch-arrow">↓</span></div>
+        <div style="margin-left:4rem"><span class="arch-box">Traverse runtime</span></div>
+        <div style="margin-left:4rem"><span class="arch-arrow">↓</span></div>
+        <div style="margin-left:4rem"><span class="arch-box">WASM capability</span></div>
+        <div style="margin-left:4rem"><span class="arch-arrow">↓</span></div>
+        <div><span class="arch-box accent">Browser adapter :4174</span> <span class="arch-arrow">→ JSON response →</span> <span class="arch-box">React app</span></div>
+        <div style="margin-left:2.5rem;color:var(--fg-muted);font-size:0.75rem">status, output, trace_id, events_emitted</div>
+      </div>
+      <p class="t-body t-muted">The adapter exposes two endpoints: <code>POST /execute</code> for running capabilities and <code>GET /health</code> for liveness checks.</p>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">04</div>
+        <span class="step-label">Submit a request</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Submit a governed request from React</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Use any HTTP client. The body is a JSON object with three fields: <code>goal</code>, <code>requested_target</code>, and <code>caller</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">useTraverse.js</span></div>
+        <div class="code-body">
+<span class="tok-key">const</span> <span class="tok-fn">executeCapability</span> = <span class="tok-key">async</span> (goal) =&gt; {
+  <span class="tok-key">const</span> response = <span class="tok-key">await</span> fetch(<span class="tok-str">'http://127.0.0.1:4174/execute'</span>, {
+    method: <span class="tok-str">'POST'</span>,
+    headers: { <span class="tok-str">'Content-Type'</span>: <span class="tok-str">'application/json'</span> },
+    body: JSON.stringify({
+      goal: goal,
+      requested_target: <span class="tok-str">'local'</span>,
+      caller: <span class="tok-str">'my-react-app'</span>
+    })
+  });
+
+  <span class="tok-key">if</span> (!response.ok) {
+    <span class="tok-key">throw new</span> Error(<span class="tok-str">`Adapter error: ${response.status}`</span>);
+  }
+
+  <span class="tok-key">return</span> response.json();
+};
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">
+        The <code>goal</code> is a plain language description. The runtime matches it to the best capability in the loaded bundle. The <code>caller</code> field identifies your app in trace records.
+      </p>
+      <div class="info-box">
+        <strong>requested_target</strong> tells the runtime which placement to prefer. Use <code>local</code> in v0.7.0. Other targets (browser, edge, cloud, ai-pipeline) are specified but not yet fully implemented.
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">05</div>
+        <span class="step-label">Read the response</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Reading the response</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        A successful response is a JSON object. Check <code>status</code> first, then read <code>output</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">example response</span></div>
+        <div class="code-body">
+<span class="tok-section">{</span>
+  <span class="tok-key">"status"</span>: <span class="tok-str">"completed"</span>,
+  <span class="tok-key">"trace_id"</span>: <span class="tok-str">"trc_7f3a1b"</span>,
+  <span class="tok-key">"capability"</span>: <span class="tok-str">"plan-expedition@1.0.0"</span>,
+  <span class="tok-key">"output"</span>: <span class="tok-section">{</span>
+    <span class="tok-key">"plan"</span>: <span class="tok-str">"Day 1: Ascent to base camp at 2800m..."</span>,
+    <span class="tok-key">"equipment_list"</span>: <span class="tok-section">[<span class="tok-str">"crampons"</span>, <span class="tok-str">"ice axe"</span>, <span class="tok-str">"tent"</span>]</span>
+  <span class="tok-section">}</span>,
+  <span class="tok-key">"events_emitted"</span>: <span class="tok-section">[<span class="tok-str">"expedition.planned"</span>]</span>,
+  <span class="tok-key">"duration_ms"</span>: <span class="tok-num">143</span>
+<span class="tok-section">}</span>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin-top:1.25rem">
+        <div class="response-field">
+          <div class="rf-key">status</div>
+          <div class="rf-desc"><code>completed</code> or <code>error</code>. Always check this before reading output. On error, an <code>error</code> object is present with <code>reason</code> and <code>stage</code>.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">trace_id</div>
+          <div class="rf-desc">Unique execution ID. Store it if you want to correlate frontend events with backend traces.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">capability</div>
+          <div class="rf-desc">The ID and version of the capability that ran. Useful for logging and debugging.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">output</div>
+          <div class="rf-desc">The capability's output payload. Shape is defined by the contract's outputs schema. Will vary by capability.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">events_emitted</div>
+          <div class="rf-desc">List of event IDs published during execution. Empty array if none.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">duration_ms</div>
+          <div class="rf-desc">Total execution time in milliseconds. Useful for displaying in developer tooling.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">06</div>
+        <span class="step-label">Streaming</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Handling streaming updates</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        The adapter exposes a server-sent events stream at <code>/events</code>. Subscribe to it to receive execution lifecycle events in real time without polling.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">subscribe to event stream</span></div>
+        <div class="code-body">
+<span class="tok-key">const</span> subscribeToEvents = () =&gt; {
+  <span class="tok-key">const</span> source = <span class="tok-key">new</span> EventSource(<span class="tok-str">'http://127.0.0.1:4174/events'</span>);
+
+  source.addEventListener(<span class="tok-str">'execution'</span>, (event) =&gt; {
+    <span class="tok-key">const</span> data = JSON.parse(event.data);
+    <span class="tok-comment">// data.trace_id, data.state, data.capability</span>
+    console.log(<span class="tok-str">'State transition:'</span>, data.state);
+  });
+
+  source.addEventListener(<span class="tok-str">'error'</span>, () =&gt; {
+    source.close();
+  });
+
+  <span class="tok-key">return</span> () =&gt; source.close(); <span class="tok-comment">// cleanup</span>
+};
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">
+        Each SSE message includes the <code>trace_id</code> so you can match stream events to the response from <code>/execute</code>. Use this to show a live progress indicator during long-running capabilities.
+      </p>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">07</div>
+        <span class="step-label">Display trace data</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Displaying trace data in your UI</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        The trace data in the response gives you everything you need to build a developer-facing execution panel. Here is a minimal React component that renders the key fields.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">TracePanel.jsx</span></div>
+        <div class="code-body">
+<span class="tok-key">function</span> <span class="tok-fn">TracePanel</span>({ result }) {
+  <span class="tok-key">if</span> (!result) <span class="tok-key">return</span> <span class="tok-key">null</span>;
+
+  <span class="tok-key">return</span> (
+    &lt;div className=<span class="tok-str">"trace-panel"</span>&gt;
+      &lt;div className=<span class="tok-str">"trace-row"</span>&gt;
+        &lt;span&gt;Status&lt;/span&gt;
+        &lt;span className={result.status === <span class="tok-str">'completed'</span> ? <span class="tok-str">'success'</span> : <span class="tok-str">'error'</span>}&gt;
+          {result.status}
+        &lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div className=<span class="tok-str">"trace-row"</span>&gt;
+        &lt;span&gt;Capability&lt;/span&gt;
+        &lt;span&gt;{result.capability}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div className=<span class="tok-str">"trace-row"</span>&gt;
+        &lt;span&gt;Trace ID&lt;/span&gt;
+        &lt;code&gt;{result.trace_id}&lt;/code&gt;
+      &lt;/div&gt;
+      &lt;div className=<span class="tok-str">"trace-row"</span>&gt;
+        &lt;span&gt;Duration&lt;/span&gt;
+        &lt;span&gt;{result.duration_ms}ms&lt;/span&gt;
+      &lt;/div&gt;
+      {result.events_emitted.length &gt; 0 &amp;&amp; (
+        &lt;div className=<span class="tok-str">"trace-row"</span>&gt;
+          &lt;span&gt;Events&lt;/span&gt;
+          &lt;span&gt;{result.events_emitted.join(<span class="tok-str">', '</span>)}&lt;/span&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">
+        Show the trace panel in a collapsible section alongside your main output. It gives developers immediate visibility into what ran, which version, and how long it took.
+      </p>
+
+      <div class="success-box" style="margin-top:1.5rem">
+        <strong>No Rust required on your side.</strong> Your React app is a plain HTTP client. The browser adapter handles registry lookups, constraint evaluation, WASM execution, and event emission. You only deal with JSON.
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div style="padding-top:2rem">
+      <h2 class="t-h2" style="margin-bottom:1rem">Next steps</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <a href="/docs/troubleshooting.html#react-blank" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Troubleshooting</div>
+          <div class="t-body-sm t-muted">Blank page or connection errors? Common fixes for the React demo.</div>
+        </a>
+        <a href="/docs/architecture.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Architecture</div>
+          <div class="t-body-sm t-muted">Understand what the adapter does internally and what the trace contains.</div>
+        </a>
+        <a href="/docs/guides/mcp-setup.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">MCP Setup</div>
+          <div class="t-body-sm t-muted">Expose the same capabilities to AI agents over the MCP protocol.</div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

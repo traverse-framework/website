@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Traverse: Built on a Body of Work</title>
+  <meta name="description" content="Traverse is personal research and engineering by Enrico Piovesan. Learn about the ideas behind the runtime, the published frameworks it builds on, and who is building it.">
+  <link rel="canonical" href="https://traverse-framework.com/about.html">
+  <meta property="og:title" content="About Traverse: Built on a Body of Work">
+  <meta property="og:url" content="https://traverse-framework.com/about.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    /* Hero */
+    .about-hero {
+      padding: 5rem 0 4rem;
+      max-width: 720px;
+    }
+    .about-hero .t-h1 {
+      margin: 0.75rem 0 1.5rem;
+      line-height: 1.15;
+    }
+    .about-hero .lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      line-height: 1.7;
+      max-width: 600px;
+    }
+
+    /* Layout */
+    .about-body {
+      padding-bottom: 5rem;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 4rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .about-body { grid-template-columns: 1fr; gap: 3rem; }
+    }
+
+    /* Main prose */
+    .about-prose { display: flex; flex-direction: column; gap: 3.5rem; }
+
+    .prose-section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .prose-section h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0 0 1rem;
+      line-height: 1.3;
+    }
+    .prose-section p {
+      color: var(--fg-muted);
+      font-size: 0.975rem;
+      line-height: 1.75;
+      margin: 0 0 0.9rem;
+    }
+    .prose-section p:last-child { margin-bottom: 0; }
+
+    /* Philosophy blockquote */
+    .philosophy-block {
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-card);
+      border-radius: 0 10px 10px 0;
+      margin: 0;
+    }
+    .philosophy-block p {
+      font-size: 1.15rem !important;
+      font-weight: 500;
+      color: var(--fg) !important;
+      line-height: 1.55 !important;
+      margin: 0 !important;
+    }
+    .philosophy-block cite {
+      display: block;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--fg-subtle);
+      font-style: normal;
+    }
+
+    /* Work timeline */
+    .work-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .work-item {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .work-year {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      padding-top: 0.2rem;
+      font-weight: 500;
+    }
+    .work-content {}
+    .work-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0 0 0.35rem;
+    }
+    .work-desc {
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      line-height: 1.6;
+      margin: 0 0 0.5rem;
+    }
+    .work-link {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .work-link:hover { text-decoration: underline; }
+
+    /* Sidebar */
+    .about-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .sidebar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .sidebar-card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 1rem;
+    }
+    .sidebar-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .sidebar-stat:last-child { border-bottom: none; padding-bottom: 0; }
+    .sidebar-stat-label { color: var(--fg-muted); }
+    .sidebar-stat-value { color: var(--fg); font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+    .sidebar-links { display: flex; flex-direction: column; gap: 0.5rem; }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 7px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover { background: var(--bg-elevated); color: var(--fg); }
+    .sidebar-link-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--fg-subtle);
+    }
+
+    /* Status bar */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px var(--success);
+      animation: pulse-dot 2.5s ease infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="container">
+  <div class="about-hero">
+    <span class="section-label">About</span>
+    <h1 class="t-h1">Built from real problems.<br>Not from a whiteboard.</h1>
+    <p class="lead">Traverse is personal research turned into a runtime. It exists because the same engineering wall kept appearing in different companies, different industries, different codebases. This is the answer to that wall.</p>
+  </div>
+
+  <div class="about-body">
+    <div class="about-prose">
+
+      <div class="prose-section">
+        <div class="prose-section-label">The engineer behind it</div>
+        <h2>Years building products that kept hitting the same wall.</h2>
+        <p>Enrico Piovesan has spent years shipping products across travel platforms, payments infrastructure, automotive software, and design tools at global scale. The companies were different. The tech stacks were different. The wall was always the same.</p>
+        <p>Business logic gets written once for the environment it needs to work in right now. Then the next environment comes. A mobile app. An edge deployment. An AI pipeline. The same logic gets rewritten. Sometimes by the same team. Often not. The second version drifts from the first. The third is unrecognizable.</p>
+        <p>Teams that were there at the start could navigate it. Teams that arrived later could not. People left. The codebase became archaeology.</p>
+        <p>Traverse is what happens when you get tired of watching that pattern repeat.</p>
+      </div>
+
+      <div class="prose-section">
+        <div class="prose-section-label">Philosophy</div>
+        <blockquote class="philosophy-block">
+          <p>Software should work for users, not for the runtime it happens to run on.</p>
+          <cite>Enrico Piovesan</cite>
+        </blockquote>
+      </div>
+
+      <div class="prose-section">
+        <div class="prose-section-label">A body of work</div>
+        <h2>The questions came first. The runtime came last.</h2>
+        <p>Traverse did not start as a runtime idea. It started as a series of questions that each had to be answered before the next one could be asked. Each question became a published piece of work. The runtime is where those answers become executable.</p>
+
+        <div class="work-list" style="margin-top:1.5rem">
+
+          <div class="work-item">
+            <div class="work-year">2023</div>
+            <div class="work-content">
+              <div class="work-title">Client-Side Microservices Architecture</div>
+              <p class="work-desc">Asked why the browser was treated as a thin presentation layer when it was already a capable execution environment. Showed how microservice patterns could work entirely client-side, without a server in the loop for business logic.</p>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-year">2024</div>
+            <div class="work-content">
+              <div class="work-title">Universal Microservices Architecture (UMA)</div>
+              <p class="work-desc">Asked why business logic had to be rewritten for every runtime. Defined the architectural pattern for capabilities that run anywhere. Published as a book on Amazon: 13 chapters, with runnable Rust and WASM examples throughout.</p>
+              <a class="work-link" href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener">Read on Amazon →</a>
+              <span style="color:var(--fg-subtle);font-size:0.8rem;margin-left:0.75rem">·</span>
+              <a class="work-link" href="https://www.universalmicroservices.com/" target="_blank" rel="noopener" style="margin-left:0.75rem">universalmicroservices.com →</a>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-year">2025</div>
+            <div class="work-content">
+              <div class="work-title">Contract-Driven AI Development (C-DAD)</div>
+              <p class="work-desc">Asked why AI agents struggled to navigate codebases that had no contracts. Defined a methodology where every capability exposes a machine-readable contract that agents can read and reason about. Published as a whitepaper.</p>
+              <a class="work-link" href="/blog/" target="_blank" rel="noopener">Read the whitepaper →</a>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-year">2025</div>
+            <div class="work-content">
+              <div class="work-title">Traverse</div>
+              <p class="work-desc">The runtime where the answers to those questions become executable. WASM-based, contract-governed, trace-producing. Runs business logic in browser, edge, cloud, and AI pipelines without rewriting it. Open source, Apache 2.0.</p>
+              <a class="work-link" href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">View on GitHub →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="prose-section">
+        <div class="prose-section-label">Current status</div>
+        <h2>Shipping. Honest about what is not done yet.</h2>
+        <p>v0.7.0 is out. The core runtime, CLI, browser adapter, MCP server, and React demo all work. 9 governing specs. 100% test coverage on what ships.</p>
+        <p>Some executor targets are planned but not yet shipped. Edge and cloud adapters are next. The Python SDK is experimental and on the roadmap. The <a href="/roadmap.html" style="color:var(--accent);text-decoration:none">public roadmap</a> is honest about what is shipping now and what comes later.</p>
+        <p>This is one person building something real. Not a startup with a deck. Not a proof of concept that will never ship. The code is there. The specs are there. You can read both.</p>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="about-sidebar">
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Project status</div>
+        <div class="status-row" style="margin-bottom:1rem">
+          <div class="status-dot"></div>
+          <span>Active development</span>
+        </div>
+        <div class="sidebar-stat">
+          <span class="sidebar-stat-label">Version</span>
+          <span class="sidebar-stat-value">v0.7.0</span>
+        </div>
+        <div class="sidebar-stat">
+          <span class="sidebar-stat-label">License</span>
+          <span class="sidebar-stat-value">Apache 2.0</span>
+        </div>
+        <div class="sidebar-stat">
+          <span class="sidebar-stat-label">Test coverage</span>
+          <span class="sidebar-stat-value">100%</span>
+        </div>
+        <div class="sidebar-stat">
+          <span class="sidebar-stat-label">Governing specs</span>
+          <span class="sidebar-stat-value">9</span>
+        </div>
+        <div class="sidebar-stat">
+          <span class="sidebar-stat-label">Language</span>
+          <span class="sidebar-stat-value">Rust + WASM</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Links</div>
+        <div class="sidebar-links">
+          <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="sidebar-link">
+            <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            GitHub
+          </a>
+          <a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener" class="sidebar-link">
+            <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            universalmicroservices.com
+          </a>
+          <a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener" class="sidebar-link">
+            <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+            UMA book on Amazon
+          </a>
+          <a href="https://enricopiovesan.com" target="_blank" rel="noopener" class="sidebar-link">
+            <svg class="sidebar-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            enricopiovesan.com
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Get started</div>
+        <p style="font-size:0.875rem;color:var(--fg-muted);line-height:1.6;margin:0 0 1rem">The quickstart gets you to a running capability in under 10 minutes.</p>
+        <a href="/docs/quickstart.html" class="btn btn-primary" style="width:100%;justify-content:center">Read the quickstart</a>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li><li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

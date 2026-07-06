@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Server Setup: Traverse Docs</title>
+  <meta name="description" content="Set up the Traverse MCP stdio server so AI agents can discover and execute your governed capabilities. Step by step.">
+  <link rel="canonical" href="https://traverse-framework.com/docs/guides/mcp-setup.html">
+  <meta property="og:title" content="MCP Server Setup: Traverse Docs">
+  <meta property="og:url" content="https://traverse-framework.com/docs/guides/mcp-setup.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .step-marker { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim); border: 1px solid rgba(232,81,10,0.3); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); flex-shrink: 0; }
+    .step-label { font-size: 0.72rem; color: var(--fg-muted); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; }
+    .doc-step { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .doc-step:last-child { border-bottom: none; }
+    .response-field { display: flex; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .response-field:last-child { border-bottom: none; }
+    .rf-key { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); width: 140px; flex-shrink: 0; }
+    .rf-desc { font-size: 0.85rem; color: var(--fg-muted); line-height: 1.5; }
+    .info-box { background: rgba(232,81,10,0.06); border: 1px solid rgba(232,81,10,0.2); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-size: 0.875rem; color: var(--fg-muted); line-height: 1.6; }
+    .info-box strong { color: var(--fg); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/" style="color:var(--fg)">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Getting Started</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/quickstart.html">Quickstart</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Core Concepts</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/concepts.html">Contracts</a>
+        <a href="/docs/architecture.html">Architecture</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Guides</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/guides/">All Guides</a>
+        <a href="/docs/guides/mcp-setup.html" class="active">MCP Setup</a>
+        <a href="/docs/guides/react-integration.html">React Integration</a>
+        <a href="/docs/guides/capability-authoring.html">Author a Capability</a>
+        <a href="/docs/guides/workflow-authoring.html">Build a Workflow</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Reference</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/cli-reference.html">CLI Reference</a>
+        <a href="/docs/troubleshooting.html">Troubleshooting</a>
+        <a href="/examples/">Examples</a>
+        <a href="/changelog.html">Changelog</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="docs-content">
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem">Guide</div>
+      <h1 class="t-h1" style="margin-bottom:0.75rem">MCP Server Setup</h1>
+      <p class="t-body t-muted">Set up the Traverse MCP stdio server so AI agents can discover and call your governed capabilities as tools.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap">
+        <span class="badge badge-success badge-dot">v0.7.0</span>
+        <span class="badge">~15 minutes</span>
+        <span class="badge">Rust 1.94+</span>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">01</div>
+        <span class="step-label">Prerequisites</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Before you start</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">You need three things before starting the MCP server.</p>
+      <ul class="checklist">
+        <li class="checklist-item">Rust installed (<code>rustc --version</code> should print 1.94 or later)</li>
+        <li class="checklist-item">The Traverse repo cloned locally</li>
+        <li class="checklist-item">A bundle built and ready — run the quickstart first if you have not</li>
+      </ul>
+      <div class="info-box" style="margin-top:1.25rem">
+        <strong>New here?</strong> Complete the <a href="/docs/quickstart.html" style="color:var(--accent)">Quickstart</a> first. It walks you through building the expedition bundle that this guide uses.
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">02</div>
+        <span class="step-label">Start the server</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Start the MCP server</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        The MCP server reads from stdin and writes to stdout. It does not bind a port. Run it with <code>cargo run</code> during development.
+      </p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">start traverse-mcp</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-mcp</span></div>
+          <div class="terminal-line"><span class="terminal-out">Traverse MCP server ready (stdio)</span></div>
+          <div class="terminal-line"><span class="terminal-out">Waiting for JSON-RPC input...</span></div>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">
+        The server stays running and processes one JSON-RPC message per line. In production you hand the binary path to your MCP client and let the client manage the process.
+      </p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">03</div>
+        <span class="step-label">Client config</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Configure your MCP client</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Most MCP clients take a JSON config that maps a server name to a command. Point yours at the compiled <code>traverse-mcp</code> binary.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">mcp-config.json</span></div>
+        <div class="code-body">
+<span class="tok-section">{</span>
+  <span class="tok-key">"mcpServers"</span>: <span class="tok-section">{</span>
+    <span class="tok-key">"traverse"</span>: <span class="tok-section">{</span>
+      <span class="tok-key">"command"</span>: <span class="tok-str">"/path/to/traverse/target/debug/traverse-mcp"</span>,
+      <span class="tok-key">"args"</span>: <span class="tok-section">[]</span>,
+      <span class="tok-key">"env"</span>: <span class="tok-section">{}</span>
+    <span class="tok-section">}</span>
+  <span class="tok-section">}</span>
+<span class="tok-section">}</span>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">
+        Replace <code>/path/to/traverse</code> with the absolute path to your local repo. The binary is at <code>target/debug/traverse-mcp</code> after a dev build, or <code>target/release/traverse-mcp</code> after a release build.
+      </p>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">04</div>
+        <span class="step-label">Test</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Test with tools/list</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Send a <code>tools/list</code> request to see all capabilities the server exposes. You can pipe it directly to test without an MCP client.
+      </p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">tools/list request</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' \</span></div>
+          <div class="terminal-line"><span class="terminal-cmd">     | cargo run -p traverse-mcp</span></div>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:1rem">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">response</span></div>
+        <div class="code-body">
+<span class="tok-section">{</span>
+  <span class="tok-key">"jsonrpc"</span>: <span class="tok-str">"2.0"</span>,
+  <span class="tok-key">"id"</span>: <span class="tok-num">1</span>,
+  <span class="tok-key">"result"</span>: <span class="tok-section">{</span>
+    <span class="tok-key">"tools"</span>: <span class="tok-section">[</span>
+      <span class="tok-section">{</span>
+        <span class="tok-key">"name"</span>: <span class="tok-str">"plan-expedition"</span>,
+        <span class="tok-key">"description"</span>: <span class="tok-str">"Plan an alpine expedition for a team. Returns itinerary and equipment list."</span>,
+        <span class="tok-key">"inputSchema"</span>: <span class="tok-section">{</span>
+          <span class="tok-key">"type"</span>: <span class="tok-str">"object"</span>,
+          <span class="tok-key">"properties"</span>: <span class="tok-section">{</span>
+            <span class="tok-key">"goal"</span>: <span class="tok-section">{ <span class="tok-key">"type"</span>: <span class="tok-str">"string"</span> }</span>,
+            <span class="tok-key">"team_size"</span>: <span class="tok-section">{ <span class="tok-key">"type"</span>: <span class="tok-str">"integer"</span> }</span>,
+            <span class="tok-key">"duration_days"</span>: <span class="tok-section">{ <span class="tok-key">"type"</span>: <span class="tok-str">"integer"</span> }</span>
+          <span class="tok-section">}</span>,
+          <span class="tok-key">"required"</span>: <span class="tok-section">[<span class="tok-str">"goal"</span>, <span class="tok-str">"team_size"</span>, <span class="tok-str">"duration_days"</span>]</span>
+        <span class="tok-section">}</span>
+      <span class="tok-section">}</span>
+    <span class="tok-section">]</span>
+  <span class="tok-section">}</span>
+<span class="tok-section">}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">05</div>
+        <span class="step-label">Execute</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Execute a capability via MCP</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Use <code>tools/call</code> to invoke a capability. Pass the tool name and a JSON arguments object matching the input schema.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">tools/call request</span></div>
+        <div class="code-body">
+<span class="tok-section">{</span>
+  <span class="tok-key">"jsonrpc"</span>: <span class="tok-str">"2.0"</span>,
+  <span class="tok-key">"id"</span>: <span class="tok-num">2</span>,
+  <span class="tok-key">"method"</span>: <span class="tok-str">"tools/call"</span>,
+  <span class="tok-key">"params"</span>: <span class="tok-section">{</span>
+    <span class="tok-key">"name"</span>: <span class="tok-str">"plan-expedition"</span>,
+    <span class="tok-key">"arguments"</span>: <span class="tok-section">{</span>
+      <span class="tok-key">"goal"</span>: <span class="tok-str">"Plan a two-day alpine expedition for a four-person team."</span>,
+      <span class="tok-key">"team_size"</span>: <span class="tok-num">4</span>,
+      <span class="tok-key">"duration_days"</span>: <span class="tok-num">2</span>
+    <span class="tok-section">}</span>
+  <span class="tok-section">}</span>
+<span class="tok-section">}</span>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:1rem">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">response</span></div>
+        <div class="code-body">
+<span class="tok-section">{</span>
+  <span class="tok-key">"jsonrpc"</span>: <span class="tok-str">"2.0"</span>,
+  <span class="tok-key">"id"</span>: <span class="tok-num">2</span>,
+  <span class="tok-key">"result"</span>: <span class="tok-section">{</span>
+    <span class="tok-key">"content"</span>: <span class="tok-section">[</span>
+      <span class="tok-section">{</span>
+        <span class="tok-key">"type"</span>: <span class="tok-str">"text"</span>,
+        <span class="tok-key">"text"</span>: <span class="tok-str">"Day 1: Ascent to base camp..."</span>
+      <span class="tok-section">}</span>
+    <span class="tok-section">]</span>,
+    <span class="tok-key">"_traverse"</span>: <span class="tok-section">{</span>
+      <span class="tok-key">"trace_id"</span>: <span class="tok-str">"trc_7f3a1b"</span>,
+      <span class="tok-key">"status"</span>: <span class="tok-str">"completed"</span>,
+      <span class="tok-key">"duration_ms"</span>: <span class="tok-num">143</span>,
+      <span class="tok-key">"capability"</span>: <span class="tok-str">"plan-expedition@1.0.0"</span>,
+      <span class="tok-key">"events_emitted"</span>: <span class="tok-section">[<span class="tok-str">"expedition.planned"</span>]</span>
+    <span class="tok-section">}</span>
+  <span class="tok-section">}</span>
+<span class="tok-section">}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">06</div>
+        <span class="step-label">Response fields</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Understanding the response</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Every MCP response from Traverse includes a standard <code>content</code> block for the MCP client, plus a <code>_traverse</code> object with execution metadata.
+      </p>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.25rem">
+        <div class="response-field">
+          <div class="rf-key">content</div>
+          <div class="rf-desc">Array of MCP content blocks. Usually a single text block with the capability output. Passed directly to the AI agent.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">_traverse.trace_id</div>
+          <div class="rf-desc">Unique ID for this execution. Use it to look up the full trace record for debugging.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">_traverse.status</div>
+          <div class="rf-desc"><code>completed</code> or <code>error</code>. If error, an <code>error</code> field is also present with the reason and failing state.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">_traverse.duration_ms</div>
+          <div class="rf-desc">Total wall time for the execution in milliseconds.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">_traverse.capability</div>
+          <div class="rf-desc">The ID and version of the capability that was selected and executed.</div>
+        </div>
+        <div class="response-field">
+          <div class="rf-key">_traverse.events_emitted</div>
+          <div class="rf-desc">List of event IDs published during execution. Empty array if no events were emitted.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">07</div>
+        <span class="step-label">Claude Desktop</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Connect to Claude Desktop or other MCP clients</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Claude Desktop uses a <code>claude_desktop_config.json</code> file. The pattern is the same as the generic config above. Add a <code>traverse</code> entry under <code>mcpServers</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">~/Library/Application Support/Claude/claude_desktop_config.json</span></div>
+        <div class="code-body">
+<span class="tok-section">{</span>
+  <span class="tok-key">"mcpServers"</span>: <span class="tok-section">{</span>
+    <span class="tok-key">"traverse"</span>: <span class="tok-section">{</span>
+      <span class="tok-key">"command"</span>: <span class="tok-str">"/absolute/path/to/traverse/target/debug/traverse-mcp"</span>,
+      <span class="tok-key">"args"</span>: <span class="tok-section">[]</span>
+    <span class="tok-section">}</span>
+  <span class="tok-section">}</span>
+<span class="tok-section">}</span>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">
+        Restart Claude Desktop after editing the config. The Traverse capabilities will appear in the tools list. You can ask Claude to use them by name or just describe the goal in natural language.
+      </p>
+      <div class="info-box">
+        <strong>Path must be absolute.</strong> Relative paths do not work in Claude Desktop config. Use the full path from your filesystem root.
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div style="padding-top:2rem">
+      <h2 class="t-h2" style="margin-bottom:1rem">Next steps</h2>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem">
+        <a href="/docs/architecture.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Architecture</div>
+          <div class="t-body-sm t-muted">Understand how the runtime processes requests and what the trace contains.</div>
+        </a>
+        <a href="/docs/troubleshooting.html#mcp-no-response" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">MCP Troubleshooting</div>
+          <div class="t-body-sm t-muted">Server not responding? Common fixes for stdio connection issues.</div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

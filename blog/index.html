@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Traverse Framework</title>
+  <meta name="description" content="Writing about distributed systems, WASM, and AI governance. From the author of Traverse, a contract-driven WASM runtime.">
+  <link rel="canonical" href="https://traverse-framework.com/blog/">
+  <meta property="og:title" content="Blog — Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/blog/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .blog-hero {
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .blog-grid {
+      display: grid;
+      gap: 1.5rem;
+      padding: 3.5rem 0 5rem;
+    }
+
+    .post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: start;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .post-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .post-card-body {}
+    .post-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .post-card-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+    }
+    .post-card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0 0 0.6rem;
+      line-height: 1.35;
+    }
+    .post-card-excerpt {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .post-card-action {
+      display: flex;
+      align-items: flex-start;
+      padding-top: 0.25rem;
+    }
+    .post-card-action a {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--accent-dim);
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .post-card-action a:hover {
+      background: var(--accent-dim);
+    }
+
+    .featured-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+      border-color: var(--accent-dim);
+    }
+    .featured-card .post-card-title {
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .post-card {
+        grid-template-columns: 1fr;
+      }
+      .post-card-action {
+        padding-top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/" style="color:var(--accent)">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="blog-hero">
+  <div class="container">
+    <div class="section-label">Blog</div>
+    <h1 class="t-h1" style="max-width:640px;margin-top:1rem">Writing about distributed systems, WASM, and AI governance.</h1>
+    <p class="t-body t-muted" style="max-width:520px;margin-top:1rem">Notes from building Traverse. Ideas about contracts, portable logic, and what it means to write code that runs anywhere.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="blog-grid">
+
+    <a class="post-card featured-card" href="/blog/uma-explained.html">
+      <div class="post-card-body">
+        <div class="post-card-meta">
+          <span class="post-card-date">July 5, 2026</span>
+          <span class="badge">UMA</span>
+          <span class="badge">Architecture</span>
+        </div>
+        <h2 class="post-card-title">What Universal Microservices Architecture got right</h2>
+        <p class="post-card-excerpt">In 2023 I published a paper asking why the browser couldn't be a first-class execution environment. The answer led to something bigger. Here is what held up, what changed, and what Traverse actually ships.</p>
+      </div>
+      <div class="post-card-action"><a href="/blog/uma-explained.html">Read →</a></div>
+    </a>
+
+    <a class="post-card" href="/blog/runtime-assumptions.html">
+      <div class="post-card-body">
+        <div class="post-card-meta">
+          <span class="post-card-date">July 1, 2026</span>
+          <span class="badge">Architecture</span>
+        </div>
+        <h2 class="post-card-title">The hidden cost of runtime assumptions</h2>
+        <p class="post-card-excerpt">Every time you write "if we're on the browser, do X" you have made a runtime assumption. They seem harmless. They compound into something that makes your logic nearly untestable.</p>
+      </div>
+      <div class="post-card-action"><a href="/blog/runtime-assumptions.html">Read →</a></div>
+    </a>
+
+    <a class="post-card" href="/blog/ai-agents-need-contracts.html">
+      <div class="post-card-body">
+        <div class="post-card-meta">
+          <span class="post-card-date">June 29, 2026</span>
+          <span class="badge">AI</span>
+          <span class="badge">MCP</span>
+        </div>
+        <h2 class="post-card-title">AI agents need contracts, not just function definitions</h2>
+        <p class="post-card-excerpt">When you give an AI agent a list of functions to call, you are giving it a phone book with no descriptions. The agent knows the number but not when to call it, or what happens after.</p>
+      </div>
+      <div class="post-card-action"><a href="/blog/ai-agents-need-contracts.html">Read →</a></div>
+    </a>
+
+    <a class="post-card" href="/blog/wasm-business-logic.html">
+      <div class="post-card-body">
+        <div class="post-card-meta">
+          <span class="post-card-date">June 22, 2026</span>
+          <span class="badge">WASM</span>
+          <span class="badge">Rust</span>
+        </div>
+        <h2 class="post-card-title">What WASM actually gives you for business logic</h2>
+        <p class="post-card-excerpt">Most people think of WASM as a way to run C++ in the browser. That is a valid use. But the more interesting story is portable, sandboxed business logic that runs anywhere without recompilation.</p>
+      </div>
+      <div class="post-card-action"><a href="/blog/wasm-business-logic.html">Read →</a></div>
+    </a>
+
+    <a class="post-card" href="/blog/logic-duplication.html">
+      <div class="post-card-body">
+        <div class="post-card-meta">
+          <span class="post-card-date">June 15, 2026</span>
+          <span class="badge">Architecture</span>
+          <span class="badge">WASM</span>
+        </div>
+        <h2 class="post-card-title">Why I stopped writing the same business logic four times</h2>
+        <p class="post-card-excerpt">You build a pricing formula. It works. Then someone asks for it in the mobile app, the backend worker, and the AI pipeline. You now have four implementations. Which one is correct?</p>
+      </div>
+      <div class="post-card-action"><a href="/blog/logic-duplication.html">Read →</a></div>
+    </a>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

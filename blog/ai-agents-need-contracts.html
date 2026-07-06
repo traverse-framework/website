@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI agents need contracts, not just function definitions — Traverse Blog</title>
+  <meta name="description" content="When you give an AI agent a list of functions to call, you are giving it a phone book with no descriptions. The agent knows the number but not when to call it, or what happens after.">
+  <link rel="canonical" href="https://traverse-framework.com/blog/ai-agents-need-contracts.html">
+  <meta property="og:title" content="AI agents need contracts, not just function definitions">
+  <meta property="og:url" content="https://traverse-framework.com/blog/ai-agents-need-contracts.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .post-hero { padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); }
+    .post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose .code-block { margin: 1.75rem 0; }
+    .post-prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.75rem 0; }
+    @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    .compare-label.bad { color: #e05252; }
+    .compare-label.good { color: var(--success); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/" style="color:var(--fg)">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog/" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">June 29, 2026</span>
+      <span class="badge">AI</span>
+      <span class="badge">MCP</span>
+    </div>
+    <h1 class="t-h1">AI agents need contracts, not just function definitions</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>9 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>When you give an AI agent a list of functions to call, you are giving it a phone book with no descriptions. The agent knows the number. It does not know when to call, what to say when someone picks up, or what happens if it calls the wrong number at the wrong time.</p>
+
+      <p>Function calling works. It is genuinely useful. But it has a gap that becomes visible the moment agents start doing things that matter. In regulated industries, in financial systems, in anything that needs to be auditable, "the agent called a function and something happened" is not an acceptable record.</p>
+
+      <h2 id="current-state">The current state of AI tool use</h2>
+
+      <p>Today's function calling pattern looks like this: you define a function with a name, a description string, and a parameter schema. You pass it to the model. The model decides when to call it based on context and the description. The result comes back and the model continues.</p>
+
+      <p>This works well for read-only lookups, simple calculations, and deterministic transformations. The description gives the model enough context to make reasonable decisions most of the time.</p>
+
+      <p>"Most of the time" is the problem.</p>
+
+      <p>A description string is natural language. It is ambiguous. It does not tell the model whether the function has side effects. It does not tell the model what state must be true before calling it. It does not tell the model what the output actually guarantees. The model is reasoning from prose, and prose leaves gaps.</p>
+
+      <h2 id="what-definitions-miss">What function definitions do not tell the agent</h2>
+
+      <p>Take a function called <code>apply_discount</code>. Here is roughly what a typical function definition tells an agent:</p>
+
+      <ul>
+        <li>Name: <code>apply_discount</code></li>
+        <li>Description: "Applies a discount to an order"</li>
+        <li>Parameters: <code>order_id</code> (string), <code>discount_code</code> (string)</li>
+        <li>Returns: updated order total</li>
+      </ul>
+
+      <p>Here is what the definition does not tell the agent:</p>
+
+      <ul>
+        <li>Whether the discount has already been applied to this order (calling twice is an error)</li>
+        <li>Whether the discount code is single-use (calling it burns the code)</li>
+        <li>Whether there is a minimum order value required</li>
+        <li>What happens if the order is in a locked state</li>
+        <li>Whether the function writes to a database (it does)</li>
+        <li>What the audit requirements are for this operation</li>
+      </ul>
+
+      <p>None of that is in the function definition. The agent does not know to ask. It calls the function when "apply a discount" seems like the right move, and the preconditions are the runtime's problem.</p>
+
+      <h2 id="when-agents-guess-wrong">What happens when agents guess wrong</h2>
+
+      <p>I have seen a few patterns emerge as teams put agents into production with real function calling.</p>
+
+      <p>The most common failure is calling a function with inputs that look valid but violate an implicit precondition. The function signature accepts the inputs fine. The business logic rejects them. The agent gets a generic error message, does not understand why, and tries again with slightly different inputs. Sometimes it succeeds on a second attempt in a way that causes a duplicate operation.</p>
+
+      <p>The second pattern is sequencing errors. The agent calls operations in the wrong order because nothing in the function definitions told it about dependencies. <code>finalize_order</code> gets called before <code>confirm_inventory</code>. The system is now in a partial state that requires manual cleanup.</p>
+
+      <p>The third pattern is the audit problem. Something went wrong. You need to reconstruct what the agent decided and why. You have the function call logs but not the agent's reasoning about preconditions. You have outputs but not the guarantees the agent was relying on. The trace is incomplete.</p>
+
+      <h2 id="what-a-contract-adds">What a contract adds</h2>
+
+      <p>A contract is a machine-readable description of a capability's behavior. Not a prose description. A structured definition that a runtime can validate against before execution happens.</p>
+
+      <p>For an AI agent, a contract provides four things that a function definition cannot:</p>
+
+      <p><strong>Preconditions.</strong> Conditions that must be true before the capability can execute. The agent can check these before calling. If a precondition is not met, the agent knows not to call yet rather than calling and handling a cryptic error.</p>
+
+      <p><strong>Postconditions.</strong> Guarantees about what will be true after the capability executes. The agent can rely on these when planning subsequent steps. "After calling this, the order total will reflect the discount" is a statement the agent can reason about.</p>
+
+      <p><strong>Side effects.</strong> An explicit declaration of what the capability changes. "This capability writes to the orders table and consumes the discount code" is information an agent needs for correct sequencing and idempotency reasoning.</p>
+
+      <p><strong>Failure modes.</strong> Named failure cases with structured descriptions. Instead of parsing error strings, the agent receives a typed failure that it can match against expected cases and handle appropriately.</p>
+
+      <h2 id="mcp-fits-in">How MCP fits in</h2>
+
+      <p>The Model Context Protocol gives agents a standard way to discover and call tools at runtime. It is a good protocol. What it does not specify is what metadata those tools should carry about their behavior.</p>
+
+      <p>Traverse exposes governed capabilities as MCP tools. Each tool corresponds to a capability with a full contract. When the agent calls the tool, the Traverse runtime validates the call against the contract before executing the WASM module. The agent gets a structured response that includes postcondition confirmation and a trace ID.</p>
+
+      <div class="callout">
+        The agent does not call raw functions. It calls governed capabilities. The governance is not in the agent's prompt. It is enforced by the runtime on every execution.
+      </div>
+
+      <p>Here is the difference in practice. Same capability, two interfaces:</p>
+
+      <div class="compare-grid">
+        <div>
+          <div class="compare-label bad">Raw function definition</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-body" style="font-size:0.78rem">
+<span class="tok-comment">// What the agent sees</span>
+{
+  <span class="tok-key">"name"</span>: <span class="tok-str">"apply_discount"</span>,
+  <span class="tok-key">"description"</span>: <span class="tok-str">"Applies a discount
+    to an order"</span>,
+  <span class="tok-key">"parameters"</span>: {
+    <span class="tok-key">"order_id"</span>: <span class="tok-str">"string"</span>,
+    <span class="tok-key">"discount_code"</span>: <span class="tok-str">"string"</span>
+  }
+}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="compare-label good">Traverse contract (MCP tool)</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-body" style="font-size:0.78rem">
+<span class="tok-section">[capability]</span>
+<span class="tok-key">id</span> = <span class="tok-str">"orders.apply-discount"</span>
+
+<span class="tok-section">[contract]</span>
+<span class="tok-key">inputs</span>  = <span class="tok-str">["order_id: OrderId",
+  "discount_code: DiscountCode"]</span>
+<span class="tok-key">outputs</span> = <span class="tok-str">["updated_total: Decimal"]</span>
+
+<span class="tok-section">[contract.preconditions]</span>
+<span class="tok-key">order_status</span> = <span class="tok-str">"open"</span>
+<span class="tok-key">discount_not_applied</span> = <span class="tok-bool">true</span>
+
+<span class="tok-section">[contract.side_effects]</span>
+<span class="tok-key">writes</span>      = <span class="tok-str">["orders", "discount_uses"]</span>
+<span class="tok-key">idempotent</span>  = <span class="tok-bool">false</span>
+
+<span class="tok-section">[contract.failures]</span>
+<span class="tok-key">codes</span> = <span class="tok-str">["DISCOUNT_ALREADY_APPLIED",
+  "ORDER_LOCKED", "CODE_EXPIRED",
+  "MIN_ORDER_NOT_MET"]</span>
+
+<span class="tok-section">[traces]</span>
+<span class="tok-key">emit</span> = <span class="tok-bool">true</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p>The agent calling the Traverse capability knows the order must be open before calling. It knows the operation is not idempotent. It knows the specific failure codes to handle. It knows a trace will be emitted. None of this requires a longer prose description. It is machine-readable structure.</p>
+
+      <h2 id="regulated-industries">Why this matters for regulated industries</h2>
+
+      <p>Financial services, healthcare, insurance, legal technology. Any domain where decisions have regulatory consequences.</p>
+
+      <p>In these domains, "an AI agent made a decision" is not acceptable. What is required is: what information did the agent have, what capability did it invoke, what were the inputs, what were the outputs, what guarantees did the system make, and when did each of these things happen.</p>
+
+      <p>A Traverse trace artifact contains all of this. The capability ID, version, and contract hash. The validated inputs. The outputs and the postconditions they satisfy. The placement decision. The timestamp and duration. A cryptographic trace ID that links to the full execution record.</p>
+
+      <p>This is not primarily about compliance checkbox-ticking. It is about building AI systems you can actually debug when something goes wrong. The agent made a sequence of decisions. You need to reconstruct that sequence. Contracts and traces give you the structure to do that.</p>
+
+      <p>The alternative is parsing log files and reading prompt histories and hoping the agent's reasoning was coherent. That approach does not scale to production systems with real consequences.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#current-state">The current state of AI tool use</a></li>
+          <li><a href="#what-definitions-miss">What definitions don't tell the agent</a></li>
+          <li><a href="#when-agents-guess-wrong">When agents guess wrong</a></li>
+          <li><a href="#what-a-contract-adds">What a contract adds</a></li>
+          <li><a href="#mcp-fits-in">How MCP fits in</a></li>
+          <li><a href="#regulated-industries">Why it matters for regulated industries</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic →</a></li>
+          <li><a href="/blog/logic-duplication.html">Why I stopped writing the same logic four times →</a></li>
+          <li><a href="/blog/uma-explained.html">What Universal Microservices Architecture got right →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">C-DAD</div>
+        <p>Contract-Driven AI Development. The pattern behind governed AI capabilities in Traverse.</p>
+        <a href="/docs/" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the docs →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Govern your AI capabilities.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:520px;margin-left:auto;margin-right:auto">Traverse exposes capabilities as MCP tools with full contracts. Every AI call is validated, traced, and reconstructable.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Get started →</a>
+      <a href="/use-cases/" class="btn btn-ghost">See use cases</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traverse for Enterprise: Consistent Business Logic at Scale · Traverse Framework</title>
+  <meta name="description" content="Enterprise teams face logic duplication across dozens of teams and runtimes. Traverse gives enterprise engineering a single governed runtime for business capabilities.">
+  <link rel="canonical" href="https://traverse-framework.com/solutions/enterprise.html">
+  <meta property="og:title" content="Traverse for Enterprise: Consistent Business Logic at Scale">
+  <meta property="og:url" content="https://traverse-framework.com/solutions/enterprise.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .sol-hero {
+      padding: 5rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .sol-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 50% at 15% 50%, var(--accent-dim) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .sol-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .sol-hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .sol-hero-lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      margin-bottom: 2rem;
+    }
+    .sol-hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .stat-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      overflow: hidden;
+    }
+    .stat-item {
+      padding: 1.25rem;
+      background: var(--bg-elevated);
+    }
+    .stat-item:nth-child(1) { border-radius: 8px 0 0 0; }
+    .stat-item:nth-child(2) { border-radius: 0 8px 0 0; }
+    .stat-item:nth-child(3) { border-radius: 0 0 0 8px; }
+    .stat-item:nth-child(4) { border-radius: 0 0 8px 0; }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      line-height: 1.4;
+    }
+
+    .problems-section {
+      padding: 4rem 0;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .problem-card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.75rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .problem-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.6rem;
+      color: var(--fg);
+    }
+    .problem-card p {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+
+    .solution-section { padding: 4.5rem 0; }
+    .solution-section h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    .solution-section .lead {
+      font-size: 1.05rem;
+      color: var(--fg-muted);
+      max-width: 600px;
+      line-height: 1.75;
+      margin-bottom: 3rem;
+    }
+
+    .solution-items {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .sol-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .sol-item-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .sol-item-body h3 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.4rem;
+      color: var(--fg);
+    }
+    .sol-item-body p {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+
+    .properties-section {
+      padding: 4rem 0;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .properties-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+    .prop-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .prop-check {
+      color: var(--success);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .prop-body strong {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--fg);
+      margin-bottom: 0.25rem;
+    }
+    .prop-body span {
+      font-size: 0.83rem;
+      color: var(--fg-muted);
+      line-height: 1.55;
+    }
+
+    .highlight-callout {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .highlight-callout strong { color: var(--fg); }
+
+    .content-p {
+      color: var(--fg-muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 680px;
+      font-size: 0.97rem;
+    }
+
+    @media (max-width: 768px) {
+      .sol-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .solution-items { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="sol-hero">
+  <div class="container">
+    <div class="sol-hero-grid">
+      <div>
+        <div class="section-label" style="margin-bottom:1rem">Solutions / Enterprise</div>
+        <h1>Consistent Business Logic at Scale</h1>
+        <p class="sol-hero-lead">
+          Enterprise engineering teams face a specific problem: the same business rule lives in dozens of codebases, owned by different teams, implemented differently. Traverse gives those teams a single governed runtime to share.
+        </p>
+        <div class="sol-hero-actions">
+          <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Get started</a>
+          <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+        </div>
+      </div>
+      <div>
+        <div class="stat-block">
+          <div class="stat-item">
+            <div class="stat-value">Apache 2.0</div>
+            <div class="stat-label">No licensing cost. No vendor lock-in.</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Test coverage enforced by CI</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Lines of unsafe Rust</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">WASM</div>
+            <div class="stat-label">One binary. Any environment.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="problems-section">
+  <div class="container">
+    <div class="section-label" style="margin-bottom:0.75rem">The problem</div>
+    <h2 class="t-h2" style="max-width:600px;line-height:1.2">What enterprise teams are actually dealing with</h2>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-card-num">01</div>
+        <h3>50 teams, 50 implementations</h3>
+        <p>Each team owns a service. Each service implements the same eligibility check. Nobody agrees on edge cases. Support tickets get routed to whoever gave the wrong answer this week.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-num">02</div>
+        <h3>Compliance audits with no evidence</h3>
+        <p>An auditor asks: prove that this rule ran correctly for this transaction six months ago. You have logs. Maybe. The structure varies by service. Reconstructing what actually ran takes days.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-num">03</div>
+        <h3>Legacy systems need the new rule too</h3>
+        <p>The new platform is clean. The legacy Java service has been running for eight years and nobody wants to touch it. But both systems need to apply the same business rule.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-num">04</div>
+        <h3>AI initiatives bring a new runtime</h3>
+        <p>The AI team wants to give agents access to pricing and eligibility logic. That logic lives in the backend. The backend team does not want agents calling their APIs directly. Now what?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="solution-section">
+  <div class="container">
+    <div class="section-label" style="margin-bottom:0.75rem">What Traverse gives you</div>
+    <h2>One registry. Any runtime.</h2>
+    <p class="lead">
+      Traverse turns each business capability into a governed WASM binary. Any team, any system, any runtime pulls from the same registry and gets the same behavior.
+    </p>
+
+    <div class="solution-items">
+      <div class="sol-item">
+        <div class="sol-item-icon">⬡</div>
+        <div class="sol-item-body">
+          <h3>Single canonical capability registry</h3>
+          <p>All teams pull capabilities from one registry. Pricing, eligibility, validation. One source. No drift. When a rule changes, the registry version increments and consumers pin or upgrade on their own schedule.</p>
+        </div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-item-icon">📋</div>
+        <div class="sol-item-body">
+          <h3>Contract versioning</h3>
+          <p>Every capability has a versioned machine-readable contract. Old consumers pin to the version they tested against. New consumers get the latest. No implicit coordination required between teams.</p>
+        </div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-item-icon">📄</div>
+        <div class="sol-item-body">
+          <h3>Trace artifacts for compliance</h3>
+          <p>Every execution produces a structured trace: inputs, outputs, contract version, timestamp, precondition results, postcondition results. When an auditor asks what ran, you have a queryable record, not log spelunking.</p>
+        </div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-item-icon">⬡</div>
+        <div class="sol-item-body">
+          <h3>WASM portability</h3>
+          <p>The same binary runs in your Java service, your React app, your Cloudflare Worker, and your AI pipeline. The legacy system gets the exact same logic as the new platform without a rewrite.</p>
+        </div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-item-icon">📝</div>
+        <div class="sol-item-body">
+          <h3>Spec-governed development</h3>
+          <p>Every capability change requires an approved spec before merging. The spec is checked in with the code. Architecture decisions are tracked as ADRs. No undocumented behavioral changes ship.</p>
+        </div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-item-icon">🤖</div>
+        <div class="sol-item-body">
+          <h3>AI pipeline integration</h3>
+          <p>Expose capabilities as MCP tools. AI agents call governed capabilities, not raw APIs. The same contract enforcement and trace artifacts apply. The AI team gets access. The backend team keeps control.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-callout" style="margin-top:3rem">
+      <strong>How teams adopt it:</strong> start with one capability causing the most pain. Wire one consumer to Traverse. See the traces. Expand from there. Most teams do not need to migrate everything at once.
+    </div>
+  </div>
+</section>
+
+<section class="properties-section">
+  <div class="container">
+    <div class="section-label" style="margin-bottom:0.75rem">Enterprise properties</div>
+    <h2 class="t-h2" style="max-width:500px;line-height:1.2;margin-bottom:0.5rem">Built for the requirements enterprise brings</h2>
+    <p class="t-body t-muted" style="max-width:560px;margin-bottom:0">These are not marketing claims. They are properties enforced by the build.</p>
+    <div class="properties-grid">
+      <div class="prop-card">
+        <span class="prop-check">✓</span>
+        <div class="prop-body">
+          <strong>Apache 2.0 license</strong>
+          <span>No licensing cost. No vendor lock-in. Fork it if you need to. The license cannot change.</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <span class="prop-check">✓</span>
+        <div class="prop-body">
+          <strong>100% test coverage</strong>
+          <span>Enforced by CI. Every merge requires full coverage. No coverage-by-comment workarounds.</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <span class="prop-check">✓</span>
+        <div class="prop-body">
+          <strong>No unsafe Rust</strong>
+          <span>Zero unsafe blocks. Security teams can verify this with a single grep.</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <span class="prop-check">✓</span>
+        <div class="prop-body">
+          <strong>SBOM generation</strong>
+          <span>CycloneDX SBOM generated on every release. Every dependency is visible and auditable.</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <span class="prop-check">✓</span>
+        <div class="prop-body">
+          <strong>ADR-backed architecture</strong>
+          <span>Every major architectural decision is documented as an ADR in the repository. No tribal knowledge.</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <span class="prop-check">✓</span>
+        <div class="prop-body">
+          <strong>Structured execution traces</strong>
+          <span>Every execution produces a trace. Format is stable, versioned, and queryable. Ready for SIEM or compliance tooling.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding:4.5rem 0">
+
+  <div class="section-label" style="margin-bottom:0.75rem">How it works in practice</div>
+  <h2 class="t-h2" style="margin-bottom:1.5rem">What adoption looks like</h2>
+
+  <p class="content-p">
+    Most enterprise teams start with a single capability. Find the business rule that is implemented most inconsistently across your systems. Write a Traverse capability spec for it. Wire one consumer. Run it in parallel with the existing implementation. Compare traces. When they match, cut over.
+  </p>
+  <p class="content-p">
+    The registry grows over time. Each team that adopts a capability stops maintaining their own implementation. The rule exists once. The registry holds the version history.
+  </p>
+
+  <div class="code-block" style="margin:2rem 0">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-filename">capabilities/eligibility/customer-tier.toml</span>
+    </div>
+    <div class="code-body">
+<span class="tok-section">[capability]</span>
+<span class="tok-key">name</span>    = <span class="tok-str">"eligibility.customer-tier-check"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"3.0.1"</span>
+<span class="tok-key">owner</span>   = <span class="tok-str">"platform-team"</span>
+<span class="tok-key">spec</span>    = <span class="tok-str">"specs/eligibility/customer-tier-v3.md"</span>
+<span class="tok-key">placement</span> = [<span class="tok-str">"browser"</span>, <span class="tok-str">"edge"</span>, <span class="tok-str">"cloud"</span>, <span class="tok-str">"ai-pipeline"</span>]
+
+<span class="tok-section">[preconditions]</span>
+<span class="tok-comment"># Enforced by the runtime. All consuming teams get the same validation.</span>
+<span class="tok-key">customer_id</span>   = <span class="tok-str">"non-empty string, UUID format"</span>
+<span class="tok-key">account_age_days</span> = <span class="tok-str">"integer, >= 0"</span>
+<span class="tok-key">total_spend_usd</span>  = <span class="tok-str">"float, >= 0.0"</span>
+<span class="tok-key">region</span>        = <span class="tok-str">"ISO 3166-1 alpha-2"</span>
+
+<span class="tok-section">[postconditions]</span>
+<span class="tok-key">tier</span>           = <span class="tok-str">"one of: standard, silver, gold, platinum"</span>
+<span class="tok-key">benefits</span>       = <span class="tok-str">"array of benefit identifiers"</span>
+<span class="tok-key">next_tier</span>      = <span class="tok-str">"tier or null"</span>
+<span class="tok-key">spend_to_next</span>  = <span class="tok-str">"float or null"</span>
+
+<span class="tok-section">[constraints]</span>
+<span class="tok-key">max_execution_ms</span>  = <span class="tok-num">50</span>
+<span class="tok-key">memory_limit_mb</span>   = <span class="tok-num">16</span>
+
+<span class="tok-section">[trace]</span>
+<span class="tok-key">emit</span> = <span class="tok-bool">true</span>
+<span class="tok-key">retention</span> = <span class="tok-str">"90d"</span>
+<span class="tok-comment"># Trace retained for 90 days for compliance queries</span>
+    </div>
+  </div>
+
+  <p class="content-p">
+    Every team that previously maintained their own tier calculation now pulls this capability. The spec is checked in. The ADR documents why v3 changed the tier thresholds. The trace answers the compliance question.
+  </p>
+
+  <div class="cta-band cta-band-glow" style="margin:3rem 0">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Start with one capability.</div>
+      <div class="t-body t-muted">Pick the rule causing the most pain. Write the spec. Wire one consumer. See the trace.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem">
+    <a href="/solutions/ecommerce.html" class="btn btn-ghost">Traverse for E-commerce →</a>
+    <a href="/compare/" class="btn btn-ghost">How Traverse compares →</a>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

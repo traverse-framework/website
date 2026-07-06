@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guides: Traverse Docs</title>
+  <meta name="description" content="Step-by-step guides for building with Traverse. Author capabilities, set up MCP, integrate with React, build workflows.">
+  <link rel="canonical" href="https://traverse-framework.com/docs/guides/">
+  <meta property="og:title" content="Guides: Traverse Docs">
+  <meta property="og:url" content="https://traverse-framework.com/docs/guides/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .guides-wrap { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .guides-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+    @media (max-width: 720px) { .guides-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .guides-grid { grid-template-columns: 1fr; } }
+    .guide-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.4rem; text-decoration: none; display: flex; flex-direction: column; gap: 0.75rem; transition: border-color 0.15s, transform 0.15s; }
+    .guide-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .guide-card-title { font-size: 0.95rem; font-weight: 600; color: var(--fg); font-family: var(--font-display); }
+    .guide-card-desc { font-size: 0.82rem; color: var(--fg-muted); line-height: 1.6; flex: 1; }
+    .guide-card-meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .guide-time { font-size: 0.72rem; font-family: var(--font-mono); color: var(--fg-muted); }
+    .badge-beginner { font-size: 0.68rem; font-family: var(--font-mono); padding: 0.18rem 0.5rem; border-radius: 4px; background: rgba(34,197,94,0.1); color: #86efac; border: 1px solid rgba(34,197,94,0.2); }
+    .badge-intermediate { font-size: 0.68rem; font-family: var(--font-mono); padding: 0.18rem 0.5rem; border-radius: 4px; background: rgba(232,81,10,0.1); color: var(--accent); border: 1px solid rgba(232,81,10,0.2); }
+    .badge-coming { font-size: 0.68rem; font-family: var(--font-mono); padding: 0.18rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--fg-muted); border: 1px solid var(--border); }
+    .guide-card.coming-soon { opacity: 0.55; pointer-events: none; }
+    .decision-tree { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; margin-top: 3rem; }
+    .dt-row { display: flex; align-items: flex-start; gap: 1.25rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+    .dt-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .dt-q { font-size: 0.875rem; color: var(--fg-muted); flex: 1; line-height: 1.5; }
+    .dt-q strong { color: var(--fg); font-weight: 500; }
+    .dt-arrow { color: var(--accent); font-family: var(--font-mono); font-size: 0.85rem; flex-shrink: 0; padding-top: 0.1rem; }
+    .dt-a { flex: 1; }
+    .dt-a a { font-size: 0.875rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+    .dt-a a:hover { text-decoration: underline; }
+    .dt-a .dt-note { font-size: 0.78rem; color: var(--fg-muted); display: block; margin-top: 0.2rem; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/" style="color:var(--fg)">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="guides-wrap">
+  <div style="margin-bottom:2.5rem">
+    <div class="section-label" style="margin-bottom:0.75rem">Docs</div>
+    <h1 class="t-h1" style="margin-bottom:0.75rem">Guides</h1>
+    <p class="t-body t-muted" style="max-width:560px">Step-by-step guides for common tasks. Start with the Quickstart if this is your first time. Then pick the guide that matches what you are building.</p>
+  </div>
+
+  <div class="guides-grid">
+
+    <a href="/docs/guides/mcp-setup.html" class="guide-card">
+      <div class="guide-card-title">MCP Server Setup</div>
+      <div class="guide-card-desc">Set up the Traverse MCP stdio server so AI agents can discover and execute your governed capabilities.</div>
+      <div class="guide-card-meta">
+        <span class="guide-time">~15 min</span>
+        <span class="badge-beginner">Beginner</span>
+      </div>
+    </a>
+
+    <a href="/docs/guides/react-integration.html" class="guide-card">
+      <div class="guide-card-title">React Integration</div>
+      <div class="guide-card-desc">Add Traverse capabilities to your React app. Connect to the browser adapter and display trace output.</div>
+      <div class="guide-card-meta">
+        <span class="guide-time">~20 min</span>
+        <span class="badge-beginner">Beginner</span>
+      </div>
+    </a>
+
+    <a href="/docs/guides/capability-authoring.html" class="guide-card coming-soon">
+      <div class="guide-card-title">Author a Capability</div>
+      <div class="guide-card-desc">Write and register your first governed capability. Covers contract format, WASM binary, and bundle structure.</div>
+      <div class="guide-card-meta">
+        <span class="guide-time">~30 min</span>
+        <span class="badge-intermediate">Intermediate</span>
+        <span class="badge-coming">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="/docs/guides/workflow-authoring.html" class="guide-card coming-soon">
+      <div class="guide-card-title">Build a Workflow</div>
+      <div class="guide-card-desc">Compose multiple capabilities into a deterministic workflow with event-driven sequencing.</div>
+      <div class="guide-card-meta">
+        <span class="guide-time">~30 min</span>
+        <span class="badge-intermediate">Intermediate</span>
+        <span class="badge-coming">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="/docs/guides/wasm-agent.html" class="guide-card coming-soon">
+      <div class="guide-card-title">WASM Agent Guide</div>
+      <div class="guide-card-desc">Package an executable WASM binary under a Traverse contract. Covers build targets, entrypoint conventions, and sandboxing.</div>
+      <div class="guide-card-meta">
+        <span class="guide-time">~25 min</span>
+        <span class="badge-intermediate">Intermediate</span>
+        <span class="badge-coming">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="/docs/guides/event-authoring.html" class="guide-card coming-soon">
+      <div class="guide-card-title">Event Authoring</div>
+      <div class="guide-card-desc">Define event contracts and wire up publishers. Understand the emits and consumes fields and how the event registry works.</div>
+      <div class="guide-card-meta">
+        <span class="guide-time">~20 min</span>
+        <span class="badge-intermediate">Intermediate</span>
+        <span class="badge-coming">Coming soon</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Decision tree -->
+  <div class="decision-tree">
+    <div class="t-label" style="margin-bottom:1.5rem">Where to start</div>
+
+    <div class="dt-row">
+      <div class="dt-q"><strong>Building for AI agents?</strong><br>You want Claude, Cursor, or another MCP-compatible client to call your capabilities.</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-a">
+        <a href="/docs/guides/mcp-setup.html">MCP Server Setup</a>
+        <span class="dt-note">Get the stdio server running and test with tools/list in under 15 minutes.</span>
+      </div>
+    </div>
+
+    <div class="dt-row">
+      <div class="dt-q"><strong>Adding to an existing React app?</strong><br>You have a frontend and want to call governed capabilities from it.</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-a">
+        <a href="/docs/guides/react-integration.html">React Integration</a>
+        <span class="dt-note">No Rust required. The browser adapter handles everything behind a simple HTTP endpoint.</span>
+      </div>
+    </div>
+
+    <div class="dt-row">
+      <div class="dt-q"><strong>First time here?</strong><br>You want to understand what Traverse does before writing any code.</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-a">
+        <a href="/docs/quickstart.html">Quickstart</a>
+        <span class="dt-note">Run the expedition demo in under 5 minutes. Then come back and pick a guide.</span>
+      </div>
+    </div>
+
+    <div class="dt-row">
+      <div class="dt-q"><strong>Writing a new capability from scratch?</strong><br>You have a business function you want to govern and deploy as WASM.</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-a">
+        <a href="/docs/quickstart.html">Quickstart first</a>
+        <span class="dt-note">Then Author a Capability when it is published. Track it on GitHub.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Back to docs -->
+  <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;gap:1rem;flex-wrap:wrap">
+    <a href="/docs/" class="btn btn-ghost btn-sm">← Back to Docs</a>
+    <a href="/docs/quickstart.html" class="btn btn-primary btn-sm">Quickstart →</a>
+  </div>
+</div>
+
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

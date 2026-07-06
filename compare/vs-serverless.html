@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traverse vs Serverless Functions: Different Problems · Traverse Framework</title>
+  <meta name="description" content="Serverless functions handle event-driven compute at scale. Traverse handles portable, contract-governed business logic. They solve different problems.">
+  <link rel="canonical" href="https://traverse-framework.com/compare/vs-serverless.html">
+  <meta property="og:title" content="Traverse vs Serverless Functions: Different Problems">
+  <meta property="og:url" content="https://traverse-framework.com/compare/vs-serverless.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .compare-hero {
+      padding: 4.5rem 0 3.5rem;
+      position: relative;
+    }
+    .compare-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      margin-bottom: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb span { color: var(--accent); }
+    .compare-hero h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      max-width: 700px;
+    }
+    .compare-hero-lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      max-width: 600px;
+      line-height: 1.75;
+    }
+
+    .toc-aside {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .toc-aside h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: 0.75rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .toc-aside ol { margin: 0; padding-left: 1.25rem; }
+    .toc-aside li {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.35rem;
+      line-height: 1.5;
+    }
+    .toc-aside li a { color: var(--fg-muted); text-decoration: none; transition: color 0.15s; }
+    .toc-aside li a:hover { color: var(--accent); }
+
+    .content-section { margin: 3.5rem 0; }
+    .content-section h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 1rem;
+      padding-top: 1rem;
+    }
+    .content-section p {
+      color: var(--fg-muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+
+    .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.92rem;
+    }
+    .diff-table th {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+    }
+    .diff-table th:first-child { width: 28%; }
+    .diff-table td {
+      border: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+      vertical-align: top;
+      line-height: 1.6;
+      color: var(--fg-muted);
+    }
+    .diff-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .diff-table td:first-child {
+      font-weight: 500;
+      color: var(--fg);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+    }
+    .diff-table td.highlight { color: var(--accent); }
+
+    .when-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .when-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .when-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.75rem;
+    }
+    .when-card ul { margin: 0; padding-left: 1.1rem; }
+    .when-card li {
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+      margin-bottom: 0.4rem;
+    }
+    .when-card.accent-border { border-color: var(--accent); }
+
+    .highlight-callout {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .highlight-callout strong { color: var(--fg); }
+
+    .problem-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+      max-width: 680px;
+    }
+    .problem-list li {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+    .problem-list li:last-child { border-bottom: none; }
+    .problem-list .marker {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .compare-nav {
+      display: flex;
+      gap: 1rem;
+      margin: 3rem 0;
+      flex-wrap: wrap;
+    }
+    .compare-nav a {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      text-decoration: none;
+      color: var(--fg-muted);
+      font-size: 0.88rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .compare-nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .when-grid { grid-template-columns: 1fr; }
+      .diff-table { font-size: 0.82rem; }
+      .diff-table th, .diff-table td { padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="compare-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/compare/">Compare</a>
+      <span>/</span>
+      <span>vs Serverless</span>
+    </div>
+    <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
+    <h1>Traverse vs Serverless Functions: Different Problems</h1>
+    <p class="compare-hero-lead">Serverless functions handle event-driven compute at scale. Traverse handles portable, contract-governed business logic. They solve different problems and are often used together.</p>
+  </div>
+</section>
+
+<main class="container">
+
+  <div class="toc-aside">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#what-serverless-solves">What serverless solves</a></li>
+      <li><a href="#what-traverse-solves">What Traverse solves</a></li>
+      <li><a href="#key-differences">Key differences</a></li>
+      <li><a href="#when-to-use">When to use which</a></li>
+      <li><a href="#together">Running Traverse inside a serverless function</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <div class="content-section" id="what-serverless-solves">
+    <h2>What serverless solves</h2>
+    <p>
+      Serverless functions handle event-driven, stateless compute that scales to zero. You pay per invocation. You do not manage servers. Scaling is automatic. Cold starts exist, but for many workloads they are acceptable.
+    </p>
+    <p>
+      Serverless is genuinely good at certain things: processing webhook events, handling async jobs, running lightweight APIs, processing file uploads, and any workload where traffic is bursty and unpredictable.
+    </p>
+    <p>
+      It is a well-understood pattern with solid tooling across AWS Lambda, Cloudflare Workers, Vercel Functions, and Deno Deploy.
+    </p>
+  </div>
+
+  <div class="content-section" id="what-traverse-solves">
+    <h2>What Traverse solves</h2>
+    <p>
+      Traverse solves a narrower problem. A business rule needs to run in multiple places. An eligibility check runs in the browser, at the edge, in a cloud function, and in an AI pipeline. Each environment is different. Each one needs the same result.
+    </p>
+    <p>
+      Without governance, that rule gets copied, adapted, and then it diverges. The browser version gets a bug fix the cloud version does not. The AI pipeline gets a different interpretation of the same spec.
+    </p>
+    <p>
+      Traverse compiles the rule to a WASM binary with a machine-readable contract. The runtime validates preconditions before execution and postconditions after. Every execution produces a structured trace artifact. The same binary runs in every environment.
+    </p>
+    <div class="highlight-callout">
+      <strong>The distinction:</strong> serverless is about how compute is provisioned and priced. Traverse is about whether a specific piece of business logic is consistent, governed, and auditable wherever it runs.
+    </div>
+  </div>
+
+  <div class="content-section" id="key-differences">
+    <h2>Key differences</h2>
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Serverless Functions</th>
+          <th>Traverse</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Execution model</td>
+          <td>Invoked over the network, scales to zero, managed by the platform</td>
+          <td class="highlight">Runs in-process as WASM, no network hop, no cold start for the capability itself</td>
+        </tr>
+        <tr>
+          <td>Environment specificity</td>
+          <td>Functions are tied to a platform (Lambda, Workers, etc.)</td>
+          <td class="highlight">Same binary runs across browser, edge, cloud, and AI pipeline</td>
+        </tr>
+        <tr>
+          <td>Contract system</td>
+          <td>None built in. You define the interface yourself, informally.</td>
+          <td class="highlight">Machine-readable contracts enforced before every execution</td>
+        </tr>
+        <tr>
+          <td>Execution traces</td>
+          <td>Not produced by default. CloudWatch logs, custom telemetry, or nothing.</td>
+          <td class="highlight">Structured trace artifact on every execution, queryable</td>
+        </tr>
+        <tr>
+          <td>Versioning</td>
+          <td>Function aliases and versions vary by platform. Often informal.</td>
+          <td class="highlight">Capability registry with pinned versions, contract versioning</td>
+        </tr>
+        <tr>
+          <td>Primary use</td>
+          <td>Event-driven async processing, webhooks, lightweight APIs</td>
+          <td class="highlight">Portable governed business logic across environments</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section" id="when-to-use">
+    <h2>When to use which</h2>
+    <div class="when-grid">
+      <div class="when-card">
+        <h3>Use serverless when</h3>
+        <ul>
+          <li>You have bursty, unpredictable traffic that needs to scale to zero</li>
+          <li>Processing webhook events, async jobs, or file uploads</li>
+          <li>You want zero server management overhead</li>
+          <li>Per-invocation billing fits your cost model</li>
+          <li>The function does not need to run in a browser or AI pipeline</li>
+        </ul>
+      </div>
+      <div class="when-card accent-border">
+        <h3>Use Traverse when</h3>
+        <ul>
+          <li>A business rule needs to produce the same result in multiple environments</li>
+          <li>Compliance requires a reproducible, auditable execution record</li>
+          <li>Logic drift between environments is causing production bugs</li>
+          <li>An AI agent needs to call the same business logic your backend uses</li>
+          <li>You want contracts enforced before execution, not just hoped for</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="together">
+    <h2>Running Traverse inside a serverless function</h2>
+    <p>
+      These tools compose cleanly. A serverless function handles the event-driven invocation and scaling. Traverse handles the business logic inside that function. The function stays stateless. The logic stays governed.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-filename">functions/process-order.ts</span>
+      </div>
+      <div class="code-body">
+<span class="tok-comment">// Cloudflare Worker — serverless, scales to zero</span>
+<span class="tok-key">import</span> { TraverseRuntime } <span class="tok-key">from</span> <span class="tok-str">'@traverse-framework/runtime'</span>;
+
+<span class="tok-comment">// Runtime initialized once at worker startup (not per-request)</span>
+<span class="tok-key">const</span> runtime = <span class="tok-key">await</span> TraverseRuntime.<span class="tok-fn">init</span>({
+  registry: Env.TRAVERSE_REGISTRY_URL,
+});
+
+<span class="tok-key">export default</span> {
+  <span class="tok-key">async</span> <span class="tok-fn">fetch</span>(request: Request, env: Env): Promise&lt;Response&gt; {
+    <span class="tok-key">const</span> order = <span class="tok-key">await</span> request.<span class="tok-fn">json</span>();
+
+    <span class="tok-comment">// Business logic: same WASM binary as the storefront and AI pipeline</span>
+    <span class="tok-key">const</span> eligibility = <span class="tok-key">await</span> runtime.<span class="tok-fn">execute</span>(
+      <span class="tok-str">'promotions.check-eligibility@2.1.0'</span>,
+      {
+        customer_id: order.customer_id,
+        promo_code: order.promo_code,
+        cart_total: order.cart_total,
+        region: order.region,
+      }
+    );
+
+    <span class="tok-comment">// Contract enforced. Trace produced. No extra setup needed.</span>
+    <span class="tok-key">if</span> (!eligibility.output.eligible) {
+      <span class="tok-key">return</span> Response.<span class="tok-fn">json</span>(
+        { error: eligibility.output.reason, trace_id: eligibility.trace_id },
+        { status: <span class="tok-num">422</span> }
+      );
+    }
+
+    <span class="tok-key">return</span> Response.<span class="tok-fn">json</span>({ applied: <span class="tok-bool">true</span>, trace_id: eligibility.trace_id });
+  },
+};
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem">
+      The Worker scales to zero between invocations. The eligibility logic runs identically in the browser, in this Worker, and in any AI pipeline that calls it. Same contract. Same trace format. Same result.
+    </p>
+  </div>
+
+  <div class="content-section" id="verdict">
+    <h2>The verdict</h2>
+    <p>
+      Serverless is about how and where compute runs. Traverse is about what that compute does and whether it is consistent. Choosing one does not mean avoiding the other.
+    </p>
+    <p>
+      If you run serverless functions that execute business logic, Traverse can govern that logic inside the function. You get the scaling and zero-management benefits of serverless, and the contract enforcement and traceability of Traverse.
+    </p>
+    <p>
+      If your serverless function is doing pure infrastructure work (S3 events, webhook acknowledgment, background jobs), you may not need Traverse at all. Pick the tool that matches the job.
+    </p>
+  </div>
+
+  <div class="compare-nav">
+    <a href="/compare/">← All comparisons</a>
+    <a href="/compare/vs-microservices.html">Traverse vs Microservices →</a>
+    <a href="/compare/vs-function-calling.html">Traverse vs AI Function Calling →</a>
+  </div>
+
+  <div class="cta-band cta-band-glow" style="margin:3rem 0">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Add governance to your existing functions.</div>
+      <div class="t-body t-muted">Drop a Traverse capability into a function you already run.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

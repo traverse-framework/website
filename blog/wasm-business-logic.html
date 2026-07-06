@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What WASM actually gives you for business logic — Traverse Blog</title>
+  <meta name="description" content="Most people think of WASM as a way to run C++ in the browser. The more interesting story is portable, sandboxed business logic that runs anywhere without recompilation.">
+  <link rel="canonical" href="https://traverse-framework.com/blog/wasm-business-logic.html">
+  <meta property="og:title" content="What WASM actually gives you for business logic">
+  <meta property="og:url" content="https://traverse-framework.com/blog/wasm-business-logic.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .post-hero { padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); }
+    .post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose .code-block { margin: 1.75rem 0; }
+    .post-prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/" style="color:var(--fg)">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog/" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">June 22, 2026</span>
+      <span class="badge">WASM</span>
+      <span class="badge">Rust</span>
+    </div>
+    <h1 class="t-h1">What WASM actually gives you for business logic</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Most people think of WebAssembly as a way to run C++ in the browser. Port a game engine, run a video codec, compute something expensive without dropping frames. That is a valid use case. It is not the most interesting one.</p>
+
+      <p>The more interesting use case is portable, sandboxed business logic. Logic that you compile once and run anywhere without touching it again. Logic that carries its permission requirements with it. Logic that behaves identically whether it is running in a browser tab, an edge node, a cloud function, or an AI orchestration pipeline.</p>
+
+      <p>That is what Traverse is built around. But before getting to that, it is worth being specific about what WASM actually is and what properties it actually provides.</p>
+
+      <h2 id="what-wasm-is">What WASM actually is</h2>
+
+      <p>WebAssembly is a binary instruction format. You compile source code to it and a WASM runtime executes the result. The runtime could be a browser, a Node.js process, a dedicated server runtime like Wasmtime or Wasmer, or a custom host built with a WASM embedding library.</p>
+
+      <p>The key property is that WASM is VM-independent. The same binary file runs in any conformant runtime. You do not recompile for each target. You do not write target-specific wrappers. The bytecode is the artifact.</p>
+
+      <p>This is different from JavaScript, where you ship source and the engine compiles it at runtime. It is different from Java's bytecode, which is tied to the JVM. WASM has a formal spec. Any runtime that implements the spec runs your binary correctly.</p>
+
+      <p>Rust is particularly well-suited for compiling to WASM. The output is compact, the runtime overhead is minimal, and Rust's ownership model means you can reason about memory behavior before the binary ships.</p>
+
+      <h2 id="sandbox">Why the sandbox matters for business logic</h2>
+
+      <p>A WASM module runs in a sandbox by default. It has no access to the filesystem, no access to the network, no ability to spawn threads, no way to call host system functions. None of these things are available unless the host runtime explicitly grants them.</p>
+
+      <p>For most application code this sounds restrictive. For business logic it is exactly right.</p>
+
+      <p>Business logic should not be reading files. It should not be making outbound HTTP calls mid-calculation. It should take inputs, apply rules, and return outputs. The sandbox enforces this discipline. If a module tries to do something outside its declared scope, the runtime stops it.</p>
+
+      <div class="callout">
+        The sandbox is not just a security property. It is a testability property. Logic that cannot have side effects is logic you can test in isolation, without mocking infrastructure.
+      </div>
+
+      <p>When you need a capability to have access to something, you declare it. The declaration is part of the contract. The runtime reads the contract, provisions the grant if policy allows, and the capability gets exactly what it asked for. Nothing more.</p>
+
+      <h2 id="what-you-give-up">What you give up</h2>
+
+      <p>WASM is not a free lunch. There are real constraints.</p>
+
+      <p>No direct DOM access. A WASM module cannot reach into the page and manipulate elements. If you want UI interaction you need to pass values back to JavaScript and let JS handle the DOM. This is usually fine for business logic, which should not be touching the DOM anyway.</p>
+
+      <p>No native system calls without explicit grants. If your capability genuinely needs to read a config file or write to a cache, you need to declare that need in the contract and the host needs to wire up the import. It is more work than just calling <code>fs.readFileSync</code>. That is the point.</p>
+
+      <p>Startup latency on cold loads. The first time a WASM module loads there is a compilation step. Subsequent runs from cache are fast. Edge and cloud runtimes typically pre-compile and cache aggressively. For browser use, Traverse handles caching as part of placement.</p>
+
+      <p>WASM interface types are still maturing. Passing complex data structures between the host and the module requires care. Traverse uses a typed serialization layer defined in the contract to handle this.</p>
+
+      <h2 id="what-traverse-adds">What Traverse adds on top of raw WASM</h2>
+
+      <p>Raw WASM gives you portability and sandboxing. It does not give you a way to describe what a module does, where it should run, or what it requires. You get a binary file and a set of exported function names. That is not enough to build a governed system.</p>
+
+      <p>Traverse adds four things on top of raw WASM.</p>
+
+      <p><strong>Contracts.</strong> A structured TOML file that describes the capability's inputs, outputs, permissions, placement targets, and version. The contract is the source of truth. The runtime reads it before executing anything.</p>
+
+      <p><strong>Registry.</strong> A discovery layer where capabilities are published and resolved by contract ID. Other capabilities and external callers find capabilities through the registry, not through hardcoded imports.</p>
+
+      <p><strong>Placement.</strong> The runtime reads the contract's placement targets and decides where to run the capability based on current context: connectivity, latency requirements, policy constraints. The capability does not make this decision. The runtime does.</p>
+
+      <p><strong>Traces.</strong> Every capability execution produces a structured trace artifact: inputs received, outputs produced, placement decision, timing. This trace is inspectable. It is the basis for audit, debugging, and AI governance.</p>
+
+      <p>Here is what WASM constraints look like inside a Traverse contract:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-filename">tax-calculator.capability.toml</span>
+        </div>
+        <div class="code-body">
+<span class="tok-section">[capability]</span>
+<span class="tok-key">id</span>      = <span class="tok-str">"finance.tax-calculator"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"1.3.0"</span>
+
+<span class="tok-section">[wasm]</span>
+<span class="tok-key">module</span>  = <span class="tok-str">"./tax_calculator.wasm"</span>
+<span class="tok-key">memory</span>  = <span class="tok-str">"8mb"</span>
+
+<span class="tok-section">[wasm.permissions]</span>
+<span class="tok-comment"># Everything is denied by default.</span>
+<span class="tok-comment"># Declare only what the module genuinely needs.</span>
+<span class="tok-key">network</span>     = <span class="tok-bool">false</span>
+<span class="tok-key">filesystem</span>  = <span class="tok-bool">false</span>
+<span class="tok-key">env_vars</span>    = <span class="tok-bool">false</span>
+<span class="tok-key">clock</span>       = <span class="tok-bool">true</span>   <span class="tok-comment"># needs current date for tax year logic</span>
+<span class="tok-key">host_calls</span>  = <span class="tok-str">["tax_table.lookup"]</span>  <span class="tok-comment"># specific host import allowed</span>
+
+<span class="tok-section">[contract]</span>
+<span class="tok-key">inputs</span>  = <span class="tok-str">["amount: Decimal", "jurisdiction: string", "category: TaxCategory"]</span>
+<span class="tok-key">outputs</span> = <span class="tok-str">["tax_amount: Decimal", "effective_rate: f64", "breakdown: Vec&lt;TaxLine&gt;"]</span>
+
+<span class="tok-section">[placement]</span>
+<span class="tok-key">targets</span> = <span class="tok-str">["edge", "cloud"]</span>
+        </div>
+      </div>
+
+      <p>The <code>[wasm.permissions]</code> block is explicit. Network access is denied. Filesystem access is denied. The only host call this module is allowed to make is <code>tax_table.lookup</code>, a specific function the host exposes for reading tax rate tables. If the module tries to do anything else, the runtime rejects it at the boundary.</p>
+
+      <h2 id="who-should-care">Who should care</h2>
+
+      <p>If you maintain the same logic in multiple environments, WASM with contracts is worth serious attention.</p>
+
+      <p>The pattern fits particularly well when the logic is:</p>
+
+      <ul>
+        <li>Computationally non-trivial (pricing, tax, validation rules, scoring algorithms)</li>
+        <li>Subject to change (regulatory updates, business rule changes)</li>
+        <li>Required in multiple runtimes (browser, server, edge, AI pipeline)</li>
+        <li>Auditable (financial calculations, compliance checks, AI decisions)</li>
+      </ul>
+
+      <p>If your logic is simple and lives in one place, the overhead is not worth it. Not everything needs to be a Traverse capability. But for the logic that is genuinely shared and genuinely important, compiling once and running anywhere with a machine-readable contract is a much better deal than maintaining four copies and hoping they stay in sync.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-wasm-is">What WASM actually is</a></li>
+          <li><a href="#sandbox">Why the sandbox matters</a></li>
+          <li><a href="#what-you-give-up">What you give up</a></li>
+          <li><a href="#what-traverse-adds">What Traverse adds</a></li>
+          <li><a href="#who-should-care">Who should care</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/logic-duplication.html">Why I stopped writing the same business logic four times →</a></li>
+          <li><a href="/blog/runtime-assumptions.html">The hidden cost of runtime assumptions →</a></li>
+          <li><a href="/blog/ai-agents-need-contracts.html">AI agents need contracts, not just function definitions →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">See it run</div>
+        <p>The quickstart walks through compiling a Rust capability to WASM and placing it with a contract.</p>
+        <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the quickstart →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Compile once. Run anywhere.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Write your capability in Rust, define the contract, and let the Traverse runtime handle placement across browser, edge, cloud, and AI pipelines.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Get started →</a>
+      <a href="https://github.com/traverse-framework/traverse" class="btn btn-ghost" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

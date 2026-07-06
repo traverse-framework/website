@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traverse vs Microservices: What is the Difference? · Traverse Framework</title>
+  <meta name="description" content="Traverse is not a replacement for microservices. It solves a specific problem microservices do not: portable, contract-governed business logic that runs identically across environments.">
+  <link rel="canonical" href="https://traverse-framework.com/compare/vs-microservices.html">
+  <meta property="og:title" content="Traverse vs Microservices: What is the Difference?">
+  <meta property="og:url" content="https://traverse-framework.com/compare/vs-microservices.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .compare-hero {
+      padding: 4.5rem 0 3.5rem;
+      position: relative;
+    }
+    .compare-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      margin-bottom: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb span { color: var(--accent); }
+    .compare-hero h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      max-width: 700px;
+    }
+    .compare-hero-lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      max-width: 600px;
+      line-height: 1.75;
+    }
+
+    .toc-aside {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .toc-aside h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: 0.75rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .toc-aside ol {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    .toc-aside li {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.35rem;
+      line-height: 1.5;
+    }
+    .toc-aside li a {
+      color: var(--fg-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .toc-aside li a:hover { color: var(--accent); }
+
+    .content-section {
+      margin: 3.5rem 0;
+    }
+    .content-section h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 1rem;
+      padding-top: 1rem;
+    }
+    .content-section p {
+      color: var(--fg-muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 720px;
+    }
+
+    .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.92rem;
+    }
+    .diff-table th {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+    }
+    .diff-table th:first-child { width: 28%; }
+    .diff-table td {
+      border: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+      vertical-align: top;
+      line-height: 1.6;
+      color: var(--fg-muted);
+    }
+    .diff-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .diff-table td:first-child {
+      font-weight: 500;
+      color: var(--fg);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+    }
+    .diff-table td.highlight { color: var(--accent); }
+
+    .when-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .when-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .when-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.75rem;
+      color: var(--fg);
+    }
+    .when-card ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+    .when-card li {
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+      margin-bottom: 0.4rem;
+    }
+    .when-card.accent-border { border-color: var(--accent); }
+
+    .highlight-callout {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .highlight-callout strong { color: var(--fg); }
+
+    .compare-nav {
+      display: flex;
+      gap: 1rem;
+      margin: 3rem 0;
+      flex-wrap: wrap;
+    }
+    .compare-nav a {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      text-decoration: none;
+      color: var(--fg-muted);
+      font-size: 0.88rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .compare-nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .when-grid { grid-template-columns: 1fr; }
+      .diff-table { font-size: 0.82rem; }
+      .diff-table th, .diff-table td { padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="compare-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/compare/">Compare</a>
+      <span>/</span>
+      <span>vs Microservices</span>
+    </div>
+    <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
+    <h1>Traverse vs Microservices: What is the Difference?</h1>
+    <p class="compare-hero-lead">Traverse is not a replacement for microservices. It solves a specific problem microservices do not: portable, contract-governed business logic that runs identically across environments.</p>
+  </div>
+</section>
+
+<main class="container">
+
+  <div class="toc-aside">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#what-microservices-solve">What microservices solve</a></li>
+      <li><a href="#what-traverse-solves">What Traverse solves</a></li>
+      <li><a href="#key-differences">Key differences</a></li>
+      <li><a href="#when-to-use">When to use which</a></li>
+      <li><a href="#code-example">Code example</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <div class="content-section" id="what-microservices-solve">
+    <h2>What microservices solve</h2>
+    <p>
+      Microservices decompose large systems into independently deployable services. Each service owns its domain, can be scaled independently, and can be built by a separate team in a separate language.
+    </p>
+    <p>
+      This is genuinely useful. A monolith that grew too large, a team that needs to ship without coordinating with six other teams, a service that needs 10x the capacity of everything else. Microservices handle these cases well.
+    </p>
+    <p>
+      The pattern is well understood, well tooled, and battle-tested. It is not going anywhere.
+    </p>
+  </div>
+
+  <div class="content-section" id="what-traverse-solves">
+    <h2>What Traverse solves</h2>
+    <p>
+      Traverse solves a different problem. Imagine a pricing rule. It needs to run in the browser for instant feedback. It needs to run at the edge for fast confirmation. It needs to run in a cloud worker for fulfillment. It needs to run in an AI pipeline that handles quotes.
+    </p>
+    <p>
+      Four runtimes, one rule. Without Traverse, each environment reimplements the rule. They drift. A bug gets fixed in the cloud but not the browser. An eligibility change ships to the API but not the AI pipeline. The rule you thought was consistent is actually four different versions of the same idea.
+    </p>
+    <p>
+      Traverse compiles that rule to a single WASM binary with a machine-readable contract. Every environment loads the same binary. The contract is enforced before every execution. A trace artifact is produced every time.
+    </p>
+    <div class="highlight-callout">
+      <strong>The core difference:</strong> microservices are about where services run and how they communicate. Traverse is about what a specific piece of logic does and that it behaves identically everywhere.
+    </div>
+  </div>
+
+  <div class="content-section" id="key-differences">
+    <h2>Key differences</h2>
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Microservices</th>
+          <th>Traverse</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Unit of deployment</td>
+          <td>A service with an endpoint, a container, an API</td>
+          <td class="highlight">A governed WASM binary with a contract</td>
+        </tr>
+        <tr>
+          <td>Communication</td>
+          <td>Over the network: HTTP, gRPC, message queues</td>
+          <td class="highlight">In-process: no network hop, runs where the caller runs</td>
+        </tr>
+        <tr>
+          <td>Contracts</td>
+          <td>Implicit: API docs, OpenAPI specs, informal agreements</td>
+          <td class="highlight">Machine-readable, enforced before every execution</td>
+        </tr>
+        <tr>
+          <td>Execution traces</td>
+          <td>Not produced by default. Requires logging or tracing setup.</td>
+          <td class="highlight">Produced for every execution, structured and queryable</td>
+        </tr>
+        <tr>
+          <td>Portability</td>
+          <td>Services run in specific environments, typically containerized</td>
+          <td class="highlight">Same binary in browser, edge, cloud, and AI pipeline</td>
+        </tr>
+        <tr>
+          <td>Primary concern</td>
+          <td>System decomposition, independent scaling, team autonomy</td>
+          <td class="highlight">Consistent, governed business logic across environments</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section" id="when-to-use">
+    <h2>When to use which</h2>
+    <div class="when-grid">
+      <div class="when-card">
+        <h3>Use microservices when</h3>
+        <ul>
+          <li>You need to decompose a large system into independently scalable parts</li>
+          <li>Multiple teams need to own separate domains without coordination overhead</li>
+          <li>You need different services to use different technology stacks</li>
+          <li>Independent deployment cadences matter per service</li>
+        </ul>
+      </div>
+      <div class="when-card accent-border">
+        <h3>Use Traverse when</h3>
+        <ul>
+          <li>A business rule needs to run identically in multiple environments</li>
+          <li>You need enforced contracts and audit trails on business logic</li>
+          <li>Logic drift between environments is causing bugs or compliance issues</li>
+          <li>An AI pipeline needs to call the same logic your backend already uses</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight-callout">
+      They compose. Your microservice can use Traverse internally to run business capabilities. The service stays independently deployable. The logic inside it stays governed, portable, and traceable.
+    </div>
+  </div>
+
+  <div class="content-section" id="code-example">
+    <h2>Calling a Traverse capability from a microservice</h2>
+    <p>
+      This is what the integration looks like in practice. A pricing microservice uses Traverse to execute the pricing logic. The logic is identical to what runs in the browser and in the AI pipeline.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-filename">pricing-service/src/handler.rs</span>
+      </div>
+      <div class="code-body">
+<span class="tok-comment">// Traverse runtime loaded once at service startup</span>
+<span class="tok-key">let</span> runtime = TraverseRuntime::new(config).<span class="tok-fn">await</span>?;
+
+<span class="tok-comment">// Capability loaded from the registry — same binary as the browser uses</span>
+<span class="tok-key">let</span> capability = runtime
+    .<span class="tok-fn">load</span>(<span class="tok-str">"pricing.calculate-order-total@1.3.2"</span>)
+    .<span class="tok-fn">await</span>?;
+
+<span class="tok-comment">// Handler: Traverse validates preconditions before execution</span>
+<span class="tok-key">async fn</span> <span class="tok-fn">handle_quote_request</span>(
+    runtime: &amp;TraverseRuntime,
+    capability: &amp;Capability,
+    order: Order,
+) -&gt; Result&lt;QuoteResponse&gt; {
+    <span class="tok-key">let</span> input = json!({
+        <span class="tok-str">"items"</span>: order.items,
+        <span class="tok-str">"customer_tier"</span>: order.customer_tier,
+        <span class="tok-str">"promo_code"</span>: order.promo_code,
+        <span class="tok-str">"currency"</span>: order.currency,
+    });
+
+    <span class="tok-comment">// Runtime checks preconditions, runs WASM, checks postconditions</span>
+    <span class="tok-key">let</span> result = runtime.<span class="tok-fn">execute</span>(capability, input).<span class="tok-fn">await</span>?;
+
+    <span class="tok-comment">// trace_id links this execution to the browser quote and AI pipeline run</span>
+    tracing::<span class="tok-fn">info</span>(trace_id = %result.trace_id, <span class="tok-str">"pricing executed"</span>);
+
+    Ok(QuoteResponse {
+        total: result.output[<span class="tok-str">"total"</span>].<span class="tok-fn">as_f64</span>()?,
+        breakdown: result.output[<span class="tok-str">"breakdown"</span>].<span class="tok-fn">clone</span>(),
+        trace_id: result.trace_id,
+    })
+}
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem">
+      The pricing service owns its API surface, its deployment pipeline, and its scaling. Traverse owns the pricing logic. Neither intrudes on the other.
+    </p>
+  </div>
+
+  <div class="content-section" id="verdict">
+    <h2>The verdict</h2>
+    <p>
+      If you run microservices, Traverse is additive. Pick one service where logic drift between environments is causing the most pain. Replace that logic with a Traverse capability. The service stays a microservice. The logic becomes governed.
+    </p>
+    <p>
+      If you are starting fresh and deciding on architecture, use microservices for system decomposition. Use Traverse for business logic that will need to run in more than one kind of environment.
+    </p>
+    <p>
+      They are good at different things. Both is often the right answer.
+    </p>
+  </div>
+
+  <div class="compare-nav">
+    <a href="/compare/">← All comparisons</a>
+    <a href="/compare/vs-serverless.html">Traverse vs Serverless →</a>
+    <a href="/compare/vs-function-calling.html">Traverse vs AI Function Calling →</a>
+  </div>
+
+  <div class="cta-band cta-band-glow" style="margin:3rem 0">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Try it alongside your existing services.</div>
+      <div class="t-body t-muted">Add a single capability. See a trace. Decide from there.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

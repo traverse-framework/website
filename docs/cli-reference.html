@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLI Reference: Traverse Docs</title>
+  <meta name="description" content="Complete command reference for traverse-cli. All commands, flags, and expected output.">
+  <link rel="canonical" href="https://traverse-framework.com/docs/cli-reference.html">
+  <meta property="og:title" content="CLI Reference: Traverse Docs">
+  <meta property="og:url" content="https://traverse-framework.com/docs/cli-reference.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .cmd-block { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .cmd-block:last-child { border-bottom: none; }
+    .cmd-sig { font-family: var(--font-mono); font-size: 1rem; color: var(--fg); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; margin-bottom: 1.25rem; display: inline-block; }
+    .cmd-sig .cmd-name { color: var(--accent); }
+    .flags-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+    .flags-table th { text-align: left; padding: 0.5rem 0.75rem; font-size: 0.72rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+    .flags-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .flags-table tr:last-child td { border-bottom: none; }
+    .flag-name { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
+    .flag-type { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-muted); }
+    .badge-future { font-size: 0.68rem; font-family: var(--font-mono); background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.45rem; color: var(--fg-muted); vertical-align: middle; margin-left: 0.5rem; }
+    .section-label-sm { font-size: 0.68rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.07em; color: var(--fg-muted); margin-bottom: 0.5rem; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+    @media (max-width:540px) { .toc-grid { grid-template-columns: 1fr; } }
+    .toc-link { font-size: 0.82rem; color: var(--fg-muted); text-decoration: none; padding: 0.3rem 0; display: block; }
+    .toc-link:hover { color: var(--fg); }
+    .toc-code { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/" style="color:var(--fg)">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Getting Started</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/quickstart.html">Quickstart</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Core Concepts</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/concepts.html">Contracts</a>
+        <a href="/docs/architecture.html">Architecture</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Guides</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/guides/">All Guides</a>
+        <a href="/docs/guides/mcp-setup.html">MCP Setup</a>
+        <a href="/docs/guides/react-integration.html">React Integration</a>
+        <a href="/docs/guides/capability-authoring.html">Author a Capability</a>
+        <a href="/docs/guides/workflow-authoring.html">Build a Workflow</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Reference</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/cli-reference.html" class="active">CLI Reference</a>
+        <a href="/docs/troubleshooting.html">Troubleshooting</a>
+        <a href="/examples/">Examples</a>
+        <a href="/changelog.html">Changelog</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="docs-content">
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem">Reference</div>
+      <h1 class="t-h1" style="margin-bottom:0.75rem">CLI Reference</h1>
+      <p class="t-body t-muted">All commands, flags, and expected output for <code>traverse-cli</code>.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap">
+        <span class="badge badge-success badge-dot">v0.7.0</span>
+        <span class="badge">traverse-cli</span>
+      </div>
+    </div>
+
+    <!-- Installation -->
+    <div class="cmd-block" id="installation">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Installation</h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">Build the CLI from the workspace. No separate install step needed.</p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">build</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo build -p traverse-cli</span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-cli v0.7.0</span></div>
+          <div class="terminal-line"><span class="terminal-out">    Finished dev [unoptimized + debuginfo] target(s)</span></div>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">The binary is at <code>target/debug/traverse-cli</code> after building. Use <code>cargo run -p traverse-cli --</code> during development to build and run in one step.</p>
+    </div>
+
+    <!-- Global flags -->
+    <div class="cmd-block" id="global-flags">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Global flags</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">These flags work with any command.</p>
+      <table class="flags-table">
+        <thead>
+          <tr><th>Flag</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="flag-name">--help</span></td>
+            <td class="t-muted" style="font-size:0.875rem">Print help text for any command. Works at the top level and on each subcommand.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">--version</span></td>
+            <td class="t-muted" style="font-size:0.875rem">Print the CLI version and exit.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">examples</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> traverse-cli --version</span></div>
+          <div class="terminal-line"><span class="terminal-out">traverse-cli 0.7.0</span></div>
+          <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-prompt">$</span><span class="terminal-cmd"> traverse-cli --help</span></div>
+          <div class="terminal-line"><span class="terminal-out">Traverse CLI — contract-driven WASM runtime</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">Usage: traverse-cli [COMMAND]</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">Commands:</span></div>
+          <div class="terminal-line"><span class="terminal-out">  bundle           Inspect and manage capability bundles</span></div>
+          <div class="terminal-line"><span class="terminal-out">  browser-adapter  Run the local browser adapter server</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bundle inspect -->
+    <div class="cmd-block" id="bundle-inspect">
+      <div class="section-label-sm">bundle</div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">bundle inspect <code style="font-size:0.8em">&lt;path&gt;</code></h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Inspect a registry bundle. Prints the bundle name, version, and all capabilities found in the manifest. Validates the manifest format without executing anything.
+      </p>
+      <div class="cmd-sig"><span class="cmd-name">traverse-cli</span> bundle inspect &lt;PATH&gt;</div>
+      <table class="flags-table">
+        <thead>
+          <tr><th>Argument / Flag</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="flag-name">&lt;PATH&gt;</span></td>
+            <td><span class="flag-type">path</span></td>
+            <td class="t-muted" style="font-size:0.875rem">Path to the bundle directory. Must contain a <code>manifest.json</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">--verbose</span></td>
+            <td><span class="flag-type">flag</span></td>
+            <td class="t-muted" style="font-size:0.875rem">Print full contract details for each capability.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">example</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- bundle inspect ./bundles/expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">Bundle: expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out">Version: 1.0.0</span></div>
+          <div class="terminal-line"><span class="terminal-out">Capabilities: 1</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">  plan-expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out">    version:  1.0.0</span></div>
+          <div class="terminal-line"><span class="terminal-out">    target:   local</span></div>
+          <div class="terminal-line"><span class="terminal-out">    binary:   plan_expedition.wasm</span></div>
+          <div class="terminal-line"><span class="terminal-out">    inputs:   goal (string), team_size (integer), duration_days (integer)</span></div>
+          <div class="terminal-line"><span class="terminal-out">    outputs:  plan (string), equipment_list (array)</span></div>
+          <div class="terminal-line"><span class="terminal-out">    emits:    expedition.planned</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- browser-adapter serve -->
+    <div class="cmd-block" id="browser-adapter-serve">
+      <div class="section-label-sm">browser-adapter</div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">browser-adapter serve</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Start the local browser adapter. This is an HTTP server that sits between your React app and the Traverse runtime. It exposes a <code>/execute</code> endpoint and a <code>/health</code> endpoint. The adapter loads the specified bundle at startup.
+      </p>
+      <div class="cmd-sig"><span class="cmd-name">traverse-cli</span> browser-adapter serve --bind &lt;ADDR&gt; [--bundle &lt;PATH&gt;]</div>
+      <table class="flags-table">
+        <thead>
+          <tr><th>Flag</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="flag-name">--bind</span></td>
+            <td><span class="flag-type">string</span></td>
+            <td><code>127.0.0.1:4174</code></td>
+            <td class="t-muted" style="font-size:0.875rem">Address and port to listen on.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">--bundle</span></td>
+            <td><span class="flag-type">path</span></td>
+            <td class="t-muted" style="font-size:0.875rem">default bundle</td>
+            <td class="t-muted" style="font-size:0.875rem">Path to the bundle directory to load at startup.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">example</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli -- browser-adapter serve \</span></div>
+          <div class="terminal-line"><span class="terminal-cmd">     --bind 127.0.0.1:4174 \</span></div>
+          <div class="terminal-line"><span class="terminal-cmd">     --bundle ./bundles/expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">Loading bundle: ./bundles/expedition</span></div>
+          <div class="terminal-line"><span class="terminal-out">  plan-expedition v1.0.0 ... ok</span></div>
+          <div class="terminal-line"><span class="terminal-out">Registry ready. 1 capability loaded.</span></div>
+          <div class="terminal-line"><span class="terminal-out">Adapter listening on 127.0.0.1:4174</span></div>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">The adapter runs until you stop it with Ctrl-C. It does not hot-reload bundles. Restart after any bundle changes.</p>
+    </div>
+
+    <!-- register (future) -->
+    <div class="cmd-block" id="register">
+      <div class="section-label-sm">Coming soon</div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">register <code style="font-size:0.8em">&lt;bundle&gt;</code> <span class="badge-future">not yet available</span></h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        Register a bundle with a remote registry. This command will push the bundle manifest and WASM binaries to a registry endpoint and index all capabilities for remote discovery.
+      </p>
+      <div class="cmd-sig" style="opacity:0.5"><span class="cmd-name">traverse-cli</span> register &lt;BUNDLE_PATH&gt; --registry &lt;URL&gt;</div>
+      <p class="t-body t-muted" style="margin-top:1rem">Planned for a future release. Track progress on GitHub.</p>
+    </div>
+
+    <!-- list (future) -->
+    <div class="cmd-block" id="list">
+      <div class="section-label-sm">Coming soon</div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">list <span class="badge-future">not yet available</span></h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        List all capabilities registered with a remote registry. Will output capability IDs, versions, and available targets in a table.
+      </p>
+      <div class="cmd-sig" style="opacity:0.5"><span class="cmd-name">traverse-cli</span> list [--registry &lt;URL&gt;] [--json]</div>
+      <p class="t-body t-muted" style="margin-top:1rem">Planned for a future release.</p>
+    </div>
+
+    <!-- validate (future) -->
+    <div class="cmd-block" id="validate">
+      <div class="section-label-sm">Coming soon</div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">validate <code style="font-size:0.8em">&lt;contract&gt;</code> <span class="badge-future">not yet available</span></h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        Validate a single contract file against the Traverse contract schema. Will report any missing required fields, type mismatches, or invalid constraint declarations.
+      </p>
+      <div class="cmd-sig" style="opacity:0.5"><span class="cmd-name">traverse-cli</span> validate &lt;CONTRACT_PATH&gt;</div>
+      <p class="t-body t-muted" style="margin-top:1rem">Planned for a future release.</p>
+    </div>
+
+    <!-- run (future) -->
+    <div class="cmd-block" id="run">
+      <div class="section-label-sm">Coming soon</div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">run <code style="font-size:0.8em">&lt;capability-id&gt;</code> <span class="badge-future">not yet available</span></h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        Execute a capability directly from the CLI. Will load the bundle, run the capability with the provided inputs, and print the trace artifact to stdout.
+      </p>
+      <div class="cmd-sig" style="opacity:0.5"><span class="cmd-name">traverse-cli</span> run &lt;CAPABILITY_ID&gt; --bundle &lt;PATH&gt; --input &lt;JSON&gt;</div>
+      <p class="t-body t-muted" style="margin-top:1rem">Planned for a future release.</p>
+    </div>
+
+  </main>
+</div>
+
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

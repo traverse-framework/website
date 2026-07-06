@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The hidden cost of runtime assumptions — Traverse Blog</title>
+  <meta name="description" content="Every time you write 'if we're on the browser, do X; if we're on the server, do Y', you have made a runtime assumption. They seem harmless. They compound.">
+  <link rel="canonical" href="https://traverse-framework.com/blog/runtime-assumptions.html">
+  <meta property="og:title" content="The hidden cost of runtime assumptions">
+  <meta property="og:url" content="https://traverse-framework.com/blog/runtime-assumptions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .post-hero { padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); }
+    .post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose .code-block { margin: 1.75rem 0; }
+    .post-prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .refactor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.75rem 0; }
+    @media (max-width: 640px) { .refactor-grid { grid-template-columns: 1fr; } }
+    .refactor-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    .refactor-label.before { color: #e05252; }
+    .refactor-label.after { color: var(--success); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/" style="color:var(--fg)">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog/" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">July 1, 2026</span>
+      <span class="badge">Architecture</span>
+    </div>
+    <h1 class="t-h1">The hidden cost of runtime assumptions</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Every time you write "if we're on the browser, do X; if we're on the server, do Y", you have made a runtime assumption. They seem harmless. One conditional in one function, for a good reason, on a Tuesday when you were trying to ship. They compound.</p>
+
+      <p>Give it a year. That codebase has dozens of them. Each one made sense individually. Together they form something you cannot test, cannot move, and cannot explain to a new team member without walking through every environment your code runs in.</p>
+
+      <h2 id="what-they-look-like">What runtime assumptions look like in practice</h2>
+
+      <p>They are not always obvious. Some of the most common patterns:</p>
+
+      <ul>
+        <li><code>typeof window !== 'undefined'</code> scattered through utility functions</li>
+        <li><code>process.env.NODE_ENV === 'browser'</code> buried inside business logic</li>
+        <li><code>if (isServer) { log to file } else { log to console }</code> mixed into domain code</li>
+        <li>Functions that call <code>localStorage</code> directly instead of taking a storage interface</li>
+        <li>Date formatting that assumes the server timezone is UTC</li>
+        <li>Error handling that assumes a network stack is available</li>
+      </ul>
+
+      <p>Each of these is a runtime assumption baked into logic that should be environment-agnostic. The logic says: "I know where I am running, and I behave differently based on that knowledge."</p>
+
+      <h2 id="why-they-accumulate">Why they accumulate</h2>
+
+      <p>Each assumption is locally rational. You need to log somewhere. You need to read config from somewhere. You need to format dates for the user's locale. The environment provides these things differently depending on context, and the path of least resistance is an inline check.</p>
+
+      <p>The alternative would be abstracting behind an interface, injecting dependencies, or designing the logic to receive context rather than detect it. That takes more time on any individual PR. So teams take the shortcut, mark the code with a comment saying "clean this up later", and move on.</p>
+
+      <p>Later rarely comes. The assumption hardens. Other code starts relying on the same pattern. The shortcut becomes the standard.</p>
+
+      <h2 id="hidden-cost">The hidden cost</h2>
+
+      <p>The immediate cost of a runtime assumption is small. Almost zero. The deferred cost is what gets you.</p>
+
+      <p><strong>Testing becomes environment-specific.</strong> You cannot unit test logic that checks <code>typeof window</code> without either mocking the browser environment or running the tests in a browser. Your test suite forks. You end up with browser tests and server tests for the same logical behavior, and keeping them synchronized is manual work.</p>
+
+      <p><strong>Behavior becomes unpredictable across environments.</strong> As the assumptions accumulate, the function's behavior in a new environment depends on which assumptions trigger. Add an edge runtime and now you need to audit every assumption to understand what "edge" evaluates to. Some assumptions will evaluate to neither branch. Some will throw. You discover this in production.</p>
+
+      <p><strong>New environments mean new code paths.</strong> Adding AI pipeline support or an edge worker should not require touching business logic. But if the business logic is full of environment checks, every new environment requires a new code path review. You cannot just drop the capability somewhere new and trust it will behave correctly.</p>
+
+      <div class="callout">
+        The true cost shows up when the business asks "can we run this on the edge?" and the answer is "we'd need a few weeks to audit what breaks." That is the accumulated cost of assumptions that each took thirty seconds to write.
+      </div>
+
+      <h2 id="contracts-first-alternative">The contracts-first alternative</h2>
+
+      <p>The contracts-first approach removes environment detection from business logic entirely.</p>
+
+      <p>A capability declares what it needs from the environment, not what environment it is in. It declares: "I need a clock, a logger, and access to the orders table." The runtime reads this from the contract and provides the correct implementations for wherever the capability is running. The capability itself never checks.</p>
+
+      <p>Placement is a deployment decision, not a logic decision. The capability does not know where it runs. The runtime does. The runtime was designed to know. The capability was designed to compute correctly regardless.</p>
+
+      <p>This is not a new idea. It is dependency injection applied at the runtime level, enforced by a contract, with the placement logic moved to infrastructure where it belongs.</p>
+
+      <h2 id="refactored">One concrete example refactored</h2>
+
+      <p>Here is a discount eligibility check with a common runtime assumption baked in:</p>
+
+      <div class="refactor-grid">
+        <div>
+          <div class="refactor-label before">Before: assumption inside logic</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-body" style="font-size:0.8rem">
+<span class="tok-key">fn</span> is_eligible(user: &amp;User) -&gt; bool {
+  <span class="tok-comment">// Browser has session, server has DB</span>
+  <span class="tok-key">let</span> tier = <span class="tok-key">if</span> cfg!(target_arch = <span class="tok-str">"wasm32"</span>) {
+    session::get_tier(&amp;user.id)
+  } <span class="tok-key">else</span> {
+    db::fetch_tier(&amp;user.id)
+  };
+
+  tier == Tier::Premium
+    &amp;&amp; user.account_age_days &gt; <span class="tok-num">30</span>
+}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="refactor-label after">After: capability with contract</div>
+          <div class="code-block" style="margin:0">
+            <div class="code-body" style="font-size:0.8rem">
+<span class="tok-comment">// Logic receives what it needs.</span>
+<span class="tok-comment">// No environment check.</span>
+<span class="tok-key">fn</span> is_eligible(
+  user: &amp;User,
+  tier: Tier,          <span class="tok-comment">// injected by runtime</span>
+) -&gt; bool {
+  tier == Tier::Premium
+    &amp;&amp; user.account_age_days &gt; <span class="tok-num">30</span>
+}
+
+<span class="tok-comment">// Contract declares the dependency:</span>
+<span class="tok-comment">// host_calls = ["tier.resolve"]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p>The before version works fine as long as you only run it in the two environments it knows about. The after version works in any environment because it does not know about any of them. The contract tells the runtime to inject a resolved <code>Tier</code> value. The runtime knows how to get that value in each context. The logic does not care.</p>
+
+      <p>This is a small change. Applied consistently, across a whole codebase, it is the difference between logic that can run anywhere and logic that can only run where it already runs.</p>
+
+      <p>The next time you reach for an environment check inside business logic, it is worth pausing for a moment. The cost right now is near zero. The cost in eighteen months, when someone asks where else this can run, is much harder to calculate.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-they-look-like">What they look like</a></li>
+          <li><a href="#why-they-accumulate">Why they accumulate</a></li>
+          <li><a href="#hidden-cost">The hidden cost</a></li>
+          <li><a href="#contracts-first-alternative">The contracts-first alternative</a></li>
+          <li><a href="#refactored">A concrete refactor</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/logic-duplication.html">Why I stopped writing the same logic four times →</a></li>
+          <li><a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic →</a></li>
+          <li><a href="/blog/uma-explained.html">What Universal Microservices Architecture got right →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Try Traverse</div>
+        <p>Write capabilities that declare their dependencies. Let the runtime handle placement.</p>
+        <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the quickstart →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Logic that belongs to no environment.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Define capabilities with contracts. Let Traverse decide where they run. Your business logic stays clean regardless of what environments your product adds next.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Get started →</a>
+      <a href="/use-cases/" class="btn btn-ghost">See use cases</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

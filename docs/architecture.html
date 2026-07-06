@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture: Traverse Docs</title>
+  <meta name="description" content="How Traverse is structured internally. Runtime crates, execution model, registry design, WASM sandbox, and how components fit together.">
+  <link rel="canonical" href="https://traverse-framework.com/docs/architecture.html">
+  <meta property="og:title" content="Architecture: Traverse Docs">
+  <meta property="og:url" content="https://traverse-framework.com/docs/architecture.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .crate-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+    .crate-table th { text-align: left; padding: 0.6rem 1rem; font-size: 0.72rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+    .crate-table td { padding: 0.8rem 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .crate-table tr:last-child td { border-bottom: none; }
+    .crate-name { font-family: var(--font-mono); color: var(--accent); font-size: 0.82rem; }
+    .state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1.5rem 0; }
+    @media (max-width: 640px) { .state-grid { grid-template-columns: 1fr; } }
+    .state-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+    .state-name { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); margin-bottom: 0.4rem; }
+    .state-desc { font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .constraint-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+    .constraint-table th { text-align: left; padding: 0.5rem 0.75rem; font-size: 0.72rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+    .constraint-table td { padding: 0.65rem 0.75rem; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+    .constraint-table tr:last-child td { border-bottom: none; }
+    .section-block { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .section-block:last-child { border-bottom: none; }
+    .flow-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; font-family: var(--font-mono); font-size: 0.82rem; line-height: 2; }
+    .flow-arrow { color: var(--fg-muted); }
+    .flow-step { color: var(--fg); }
+    .flow-note { color: var(--fg-muted); font-size: 0.75rem; margin-left: 1.5rem; }
+    .spec-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.65rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-muted); }
+    .spec-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/" style="color:var(--fg)">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Getting Started</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/quickstart.html">Quickstart</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Core Concepts</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/concepts.html">Contracts</a>
+        <a href="/docs/architecture.html" class="active">Architecture</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Guides</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/guides/">All Guides</a>
+        <a href="/docs/guides/mcp-setup.html">MCP Setup</a>
+        <a href="/docs/guides/react-integration.html">React Integration</a>
+        <a href="/docs/guides/capability-authoring.html">Author a Capability</a>
+        <a href="/docs/guides/workflow-authoring.html">Build a Workflow</a>
+      </div>
+    </div>
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">Reference</div>
+      <div class="docs-sidebar-links">
+        <a href="/docs/cli-reference.html">CLI Reference</a>
+        <a href="/docs/troubleshooting.html">Troubleshooting</a>
+        <a href="/examples/">Examples</a>
+        <a href="/changelog.html">Changelog</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="docs-content">
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem">Core Concepts</div>
+      <h1 class="t-h1" style="margin-bottom:0.75rem">Architecture</h1>
+      <p class="t-body t-muted">How Traverse is structured internally. Crates, execution model, registry design, and the WASM sandbox.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap">
+        <span class="badge badge-success badge-dot">v0.7.0</span>
+        <span class="badge">Rust workspace</span>
+        <span class="badge">wasm32-wasi</span>
+      </div>
+    </div>
+
+    <!-- Overview -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Overview</h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        Traverse is a Rust workspace. There is no single monolith. Each concern lives in its own crate with a clear boundary. The runtime does not know about the CLI. The contracts crate does not know about the registry. You can depend on any crate independently.
+      </p>
+      <p class="t-body t-muted">
+        All crates enforce <code>#![forbid(unsafe_code)]</code>. CI requires 100% test coverage and checks spec alignment on every push. A software bill of materials (SBOM) is generated via CycloneDX on each release.
+      </p>
+    </div>
+
+    <!-- Crate map -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Crate map</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Six crates. Each one owns a distinct surface area.</p>
+      <table class="crate-table">
+        <thead>
+          <tr>
+            <th>Crate</th>
+            <th>Responsibility</th>
+            <th>Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="crate-name">traverse-runtime</span></td>
+            <td class="t-muted">Core engine. Drives the state machine, coordinates registry lookups, dispatches WASM execution, emits events, and records traces.</td>
+            <td><code>native</code></td>
+          </tr>
+          <tr>
+            <td><span class="crate-name">traverse-contracts</span></td>
+            <td class="t-muted">Contract parsing and validation. Loads JSON contract files, validates schema, resolves inputs and outputs, checks preconditions.</td>
+            <td><code>native</code></td>
+          </tr>
+          <tr>
+            <td><span class="crate-name">traverse-registry</span></td>
+            <td class="t-muted">Capability and event registries. Loads bundles from disk, indexes contracts, resolves capabilities by ID, and manages event subscriptions.</td>
+            <td><code>native</code></td>
+          </tr>
+          <tr>
+            <td><span class="crate-name">traverse-cli</span></td>
+            <td class="t-muted">CLI surface. Provides <code>bundle inspect</code> and <code>browser-adapter serve</code>. Thin layer over the runtime and registry crates.</td>
+            <td><code>native</code></td>
+          </tr>
+          <tr>
+            <td><span class="crate-name">traverse-mcp</span></td>
+            <td class="t-muted">MCP stdio server. Exposes governed capabilities as MCP tools. Accepts <code>tools/list</code> and <code>tools/call</code> over stdin/stdout.</td>
+            <td><code>native</code></td>
+          </tr>
+          <tr>
+            <td><span class="crate-name">traverse-expedition-wasm</span></td>
+            <td class="t-muted">Example WASM capability. The expedition planner shipped as a <code>wasm32-wasi</code> binary. Shows how to package executable WASM under a Traverse contract.</td>
+            <td><code>wasm32-wasi</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Execution flow -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Execution flow</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Every request follows the same path through the runtime. Nothing is skipped. Each step produces a record in the trace artifact.
+      </p>
+      <div class="flow-block">
+        <div><span class="flow-step">1. Request arrives</span></div>
+        <div class="flow-note">goal string + requested_target + caller identifier</div>
+        <div><span class="flow-arrow">  ↓</span></div>
+        <div><span class="flow-step">2. Registry lookup</span></div>
+        <div class="flow-note">find all capabilities whose contract matches the goal</div>
+        <div><span class="flow-arrow">  ↓</span></div>
+        <div><span class="flow-step">3. Constraint evaluation</span></div>
+        <div class="flow-note">check network_access, filesystem_access, host_api_access against declared contract constraints</div>
+        <div><span class="flow-arrow">  ↓</span></div>
+        <div><span class="flow-step">4. Placement selection</span></div>
+        <div class="flow-note">pick the best matching target from preferred_targets in the contract</div>
+        <div><span class="flow-arrow">  ↓</span></div>
+        <div><span class="flow-step">5. WASM execution</span></div>
+        <div class="flow-note">load the binary, invoke the entrypoint, pass validated inputs</div>
+        <div><span class="flow-arrow">  ↓</span></div>
+        <div><span class="flow-step">6. Event emission</span></div>
+        <div class="flow-note">publish events declared in the contract's emits list</div>
+        <div><span class="flow-arrow">  ↓</span></div>
+        <div><span class="flow-step">7. Trace output</span></div>
+        <div class="flow-note">structured record written with duration, status, selected capability, and all decisions</div>
+      </div>
+    </div>
+
+    <!-- State machine -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">State machine</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        The runtime progresses through defined states. Each transition is explicit. There is no implicit fallback.
+      </p>
+      <div class="state-grid">
+        <div class="state-card">
+          <div class="state-name">idle</div>
+          <div class="state-desc">Runtime is initialized. No active request. Waiting for input.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">loading_registry</div>
+          <div class="state-desc">Bundle is being parsed. Contracts are indexed. Registry is not yet ready to serve requests.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">ready</div>
+          <div class="state-desc">Registry is loaded and indexed. Runtime is ready to accept execution requests.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">discovering</div>
+          <div class="state-desc">Registry lookup is running. Matching capabilities against the incoming goal.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">evaluating_constraints</div>
+          <div class="state-desc">Declared constraints are being checked against the runtime environment and the requested target.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">selecting</div>
+          <div class="state-desc">A capability has been found and constraints passed. Placement target is being resolved.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">executing</div>
+          <div class="state-desc">WASM binary is loaded and the entrypoint is running. Inputs have been validated and passed.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">emitting_events</div>
+          <div class="state-desc">Execution completed. Events declared in the contract's emits list are being published.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">completed</div>
+          <div class="state-desc">Request finished successfully. Trace artifact is written. Runtime returns to idle.</div>
+        </div>
+        <div class="state-card">
+          <div class="state-name">error</div>
+          <div class="state-desc">A failure occurred at any state. Error details and the failing state are recorded in the trace.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registry design -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Registry design</h2>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        The registry is bundle-based. A bundle is a directory containing a manifest file and one or more WASM binaries with their contracts. The runtime loads the whole bundle at startup.
+      </p>
+      <p class="t-body t-muted" style="margin-bottom:1rem">
+        Indexing is contract-first. The registry reads each contract file, validates it, and builds an in-memory index keyed by capability ID. WASM binaries are not loaded until a capability is actually requested.
+      </p>
+      <p class="t-body t-muted">
+        Traversal is deterministic. If multiple capabilities match a goal, the registry returns them in the order they appear in the manifest. There is no probabilistic ranking. The contract's <code>preferred_targets</code> list controls which placement is chosen.
+      </p>
+    </div>
+
+    <!-- WASM sandbox -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">WASM sandbox</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Each capability declares its resource requirements in the contract. The runtime enforces them. A capability that does not declare network access cannot make outbound requests.
+      </p>
+      <table class="constraint-table">
+        <thead>
+          <tr>
+            <th>Constraint field</th>
+            <th>What it controls</th>
+            <th>Default</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>network_access</code></td>
+            <td class="t-muted">Whether the WASM module can make outbound network calls through the host API.</td>
+            <td><code>false</code></td>
+          </tr>
+          <tr>
+            <td><code>filesystem_access</code></td>
+            <td class="t-muted">Whether the WASM module can read or write the host filesystem.</td>
+            <td><code>false</code></td>
+          </tr>
+          <tr>
+            <td><code>host_api_access</code></td>
+            <td class="t-muted">Whether the WASM module can invoke host-provided functions beyond the WASI standard set.</td>
+            <td><code>false</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="t-body t-muted">
+        Constraints are evaluated during the <code>evaluating_constraints</code> state, before any WASM code loads. If a constraint check fails, the runtime transitions to <code>error</code> immediately. The failing constraint is recorded in the trace.
+      </p>
+    </div>
+
+    <!-- Trace system -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Trace system</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Every execution produces a trace artifact. Traces are structured records, not log strings. They are designed to be queryable.
+      </p>
+      <p class="t-body t-muted" style="margin-bottom:1rem">A trace contains:</p>
+      <ul class="checklist" style="margin-bottom:1rem">
+        <li class="checklist-item">Trace ID and request timestamp</li>
+        <li class="checklist-item">The goal string as received</li>
+        <li class="checklist-item">Discovery decisions: which capabilities were found and why</li>
+        <li class="checklist-item">Constraint evaluation: each constraint checked and its result</li>
+        <li class="checklist-item">Selected capability ID and version</li>
+        <li class="checklist-item">Inputs: validated payload passed to the WASM entrypoint</li>
+        <li class="checklist-item">Execution path: state transitions with timestamps</li>
+        <li class="checklist-item">Emitted events: list of event IDs published and their payloads</li>
+        <li class="checklist-item">Duration: total wall time in milliseconds</li>
+        <li class="checklist-item">Status: completed or error with reason</li>
+      </ul>
+      <p class="t-body t-muted">
+        Traces are available immediately after execution. The browser adapter returns the trace inline with the response. The MCP server includes it in the tool call result.
+      </p>
+    </div>
+
+    <!-- Spec governance -->
+    <div class="section-block">
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Spec governance</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        Traverse has 9 approved governing specs. Every crate and every feature is traceable to a spec. No code ships without an approved spec backing it.
+      </p>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">
+        CI runs a spec-alignment gate on every push. If code references behavior not covered by an approved spec, the gate fails. This keeps the codebase and its documentation in sync.
+      </p>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem">
+        <span class="spec-badge"><span class="spec-badge-dot"></span>runtime-execution</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>contract-format</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>registry-design</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>wasm-sandbox</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>trace-artifacts</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>placement-targets</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>event-system</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>mcp-integration</span>
+        <span class="spec-badge"><span class="spec-badge-dot"></span>cli-surface</span>
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div style="padding-top:2rem">
+      <h2 class="t-h2" style="margin-bottom:1rem">Next steps</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <a href="/docs/concepts.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Contracts</div>
+          <div class="t-body-sm t-muted">Understand the contract format and what each field controls.</div>
+        </a>
+        <a href="/docs/cli-reference.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">CLI Reference</div>
+          <div class="t-body-sm t-muted">All CLI commands, flags, and expected output.</div>
+        </a>
+        <a href="/docs/guides/capability-authoring.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Author a Capability</div>
+          <div class="t-body-sm t-muted">Write and register your first governed capability.</div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequently Asked Questions: Traverse Framework</title>
+  <meta name="description" content="Common questions about Traverse answered. What it is, how to get started, licensing, Rust requirements, production readiness, and how it compares to alternatives.">
+  <link rel="canonical" href="https://traverse-framework.com/faq.html">
+  <meta property="og:title" content="FAQ: Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/faq.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .faq-hero {
+      padding: 5rem 0 3rem;
+      text-align: center;
+    }
+    .faq-hero .t-h1 {
+      margin: 0.75rem 0 1rem;
+    }
+    .faq-hero .subtitle {
+      color: var(--fg-muted);
+      max-width: 540px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .faq-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 3rem;
+      align-items: start;
+      padding: 2rem 0 5rem;
+    }
+    @media (max-width: 768px) {
+      .faq-layout { grid-template-columns: 1fr; }
+    }
+
+    .faq-nav {
+      position: sticky;
+      top: calc(var(--nav-h) + 1.5rem);
+    }
+    .faq-nav-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 0.75rem;
+    }
+    .faq-nav a {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      text-decoration: none;
+      padding: 0.3rem 0;
+      border-left: 2px solid transparent;
+      padding-left: 0.75rem;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .faq-nav a:hover,
+    .faq-nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    @media (max-width: 768px) {
+      .faq-nav { display: none; }
+    }
+
+    .faq-sections { display: flex; flex-direction: column; gap: 3rem; }
+
+    .faq-group-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    .faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-card);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item:hover { border-color: var(--accent-dim); }
+    .faq-item.open { border-color: var(--accent-dim); }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--fg);
+      line-height: 1.4;
+    }
+    .faq-question:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: var(--fg-muted);
+      transition: transform 0.25s ease, color 0.2s;
+    }
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      color: var(--fg-muted);
+      font-size: 0.925rem;
+      line-height: 1.7;
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-answer p { margin: 0 0 0.6rem; }
+    .faq-answer p:last-child { margin-bottom: 0; }
+    .faq-answer a { color: var(--accent); text-decoration: none; }
+    .faq-answer a:hover { text-decoration: underline; }
+    .faq-answer code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--bg-elevated);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="faq-hero">
+  <div class="container">
+    <span class="section-label">FAQ</span>
+    <h1 class="t-h1">Your questions, answered.</h1>
+    <p class="subtitle">Everything you want to know before you write a single line of code. If something is missing, open an issue on GitHub.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="faq-layout">
+
+    <nav class="faq-nav" aria-label="FAQ sections">
+      <div class="faq-nav-title">Sections</div>
+      <a href="#getting-started">Getting Started</a>
+      <a href="#technical">Technical</a>
+      <a href="#licensing">Licensing &amp; Maintenance</a>
+      <a href="#ai-mcp">AI and MCP</a>
+      <a href="#community">Community</a>
+    </nav>
+
+    <div class="faq-sections">
+
+      <!-- Getting Started -->
+      <section id="getting-started">
+        <div class="faq-group-title">Getting Started</div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is Traverse in plain terms?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Traverse is a runtime that lets you write business logic once in Rust, compile it to WASM, and run it anywhere. Browser, edge, cloud, AI pipeline. Same binary, same behavior, no rewrite.</p>
+              <p>Each capability is wrapped in a machine-readable contract. The runtime checks inputs and outputs against that contract before anything runs. You get a trace artifact showing exactly what happened and why.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Do I need to know Rust to use Traverse?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>To write new capabilities from scratch, yes. Rust compiles to WASM and gives you the control and safety the runtime expects.</p>
+              <p>But you can call Traverse from JavaScript, Python, or any language with a WASM host. If someone else compiled the capability, you consume it through the SDK without touching Rust at all. The Python SDK is on the roadmap for v0.8.x.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Is Traverse production-ready?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>v0.7.0 ships with 100% test coverage and 9 governing specs. The core runtime, CLI, browser adapter, and MCP server are all working and testable today.</p>
+              <p>Some advanced executor targets are still planned. If your use case maps to what is shipping now, you can build on it. Check the <a href="/roadmap.html">roadmap</a> to see what lands when.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What environments does Traverse actually run in today?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Right now: browser via the browser adapter, server-side via the Rust runtime, and AI pipelines via the MCP server. The React demo and Expedition example both run in browser.</p>
+              <p>Edge and cloud executor adapters are next on the roadmap. Device is further out. All of them run the same WASM binary when they ship.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Technical -->
+      <section id="technical">
+        <div class="faq-group-title">Technical</div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How is this different from regular microservices?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Microservices separate deployment. Traverse separates the capability from the runtime entirely. Your pricing logic does not care whether it runs in a browser or on a server. A microservice always runs where you deployed it.</p>
+              <p>There is also no network call when a capability runs close to the user. The WASM binary runs in-process. That changes the latency profile completely.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How is this different from serverless functions?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Serverless functions are tied to a cloud provider and a specific execution model. You write a function for AWS Lambda or Cloudflare Workers and it runs there. Traverse capabilities are not tied to any provider or platform.</p>
+              <p>The contract system is also different. Serverless functions have no formal contract. Traverse validates inputs and outputs every time, which means it can catch integration errors before they reach production.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is the performance overhead?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>WASM runs near-native. The contract validation adds a fixed overhead per call, not per computation unit. For most business logic workloads this is noise. A formal benchmarks page is planned for v0.8.x.</p>
+              <p>The bigger win is usually latency, not throughput. Running capability logic in the browser or at the edge cuts the round-trip entirely.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What does "spec-governed" mean in practice?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Every capability has a contract file that declares what inputs it accepts, what outputs it produces, which placement targets it supports, and what constraints apply. The runtime reads this file before execution.</p>
+              <p>If you try to call a capability with the wrong inputs, the runtime rejects it before the WASM even runs. The trace artifact records the full decision. Nothing executes without a passing contract check.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Can I use Traverse without WASM?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>WASM is how portability works. The contract system and the trace mechanism exist independent of WASM, but the cross-environment execution story depends on it.</p>
+              <p>If you only need server-side execution, you could use the Rust crate directly. But you lose the placement portability that is the main point.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What happens when a capability fails?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>The runtime catches the failure, records it in the trace artifact with a timestamp and the failing contract clause, and returns a structured error. Nothing silent or ambiguous.</p>
+              <p>Contract violations fail before execution. Runtime errors fail during execution. Both produce a trace. You always know exactly where the failure happened and what the runtime saw at that point.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I debug problems?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Start with the trace artifact from the failed call. It records input values, contract checks, execution steps, and output values. Most problems are visible there without any additional tooling.</p>
+              <p>The CLI includes a <code>trace</code> subcommand for inspecting trace files. The MCP server exposes trace querying to AI agents. Expanded trace querying is planned for v0.8.x.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Can I use Traverse from Python or JavaScript?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>JavaScript works today via the browser adapter. You load the WASM module and call capabilities through the JS bindings. The React demo shows exactly how this looks.</p>
+              <p>Python SDK is experimental and on the roadmap for v0.8.x. Other language bindings depend on community interest and WASM host availability in that ecosystem.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is a trace artifact and why does it matter?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>A trace is a structured record produced after every capability execution. It captures the inputs the runtime received, which contract clauses were checked, the execution path taken, and the outputs produced.</p>
+              <p>This matters for two reasons. First, it makes debugging fast. Second, it makes auditing possible. If a pricing rule applied a discount you did not expect, the trace shows you exactly why. That kind of explainability is hard to add after the fact.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Licensing & Maintenance -->
+      <section id="licensing">
+        <div class="faq-group-title">Licensing &amp; Maintenance</div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is Apache 2.0 and can I use this commercially?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Apache 2.0 is a permissive open source license. You can use Traverse commercially, modify it, distribute it, and build closed-source products on top of it. You need to include the original license notice.</p>
+              <p>There are no royalties and no restrictions on commercial use. If you are evaluating this for a company, legal counsel can confirm, but Apache 2.0 is one of the most business-friendly open source licenses available.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Who maintains Traverse?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Enrico Piovesan. One person. This is not a VC-funded team with a support contract. It is research engineering built over years of real product work, published as open source.</p>
+              <p>The upside is that the design is intentional and consistent. The tradeoff is that response times on issues depend on one person's capacity. Community contributions are welcome and encouraged.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- AI and MCP -->
+      <section id="ai-mcp">
+        <div class="faq-group-title">AI and MCP</div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How does the MCP server work with AI agents like Claude?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>The MCP server exposes Traverse capabilities as tools that AI agents can call. The agent reads the capability contract to understand what the tool does, what inputs it takes, and what it returns. No custom glue code needed.</p>
+              <p>Because every call produces a trace, the agent can inspect what actually happened and reason about it. This turns capabilities into auditable building blocks for AI workflows, not just function calls that return an opaque result.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How does it compare to just using API function calling with AI agents?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Function calling gives an agent a schema and an endpoint. The agent calls the function and gets a response. There is no contract enforcement, no placement logic, and no trace.</p>
+              <p>With Traverse, the agent is working with governed capabilities. Inputs are validated before execution. The result includes a trace. The contract tells the agent exactly what the capability is allowed to do. That is a different level of trust and observability.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is Contract-Driven AI Development?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Contract-Driven AI Development, or C-DAD, is a methodology that asks AI agents to navigate systems that have machine-readable contracts rather than undocumented code. If your capabilities have contracts, an AI agent can read them and reason about the system correctly.</p>
+              <p>Without contracts, AI agents are guessing based on naming conventions and comments. With contracts, they have a precise definition of what each capability does, what it accepts, and what constraints apply. Enrico published the C-DAD whitepaper as the theoretical foundation for this approach.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is Universal Microservices Architecture?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Universal Microservices Architecture, or UMA, is the architectural pattern Traverse implements. The core idea is that business capabilities should be portable across every runtime, not tied to the environment they were first deployed in.</p>
+              <p>The UMA book on Amazon covers the theory in 13 chapters with runnable Rust and WASM examples. Traverse is the production runtime that makes those ideas executable. More at <a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">universalmicroservices.com</a>.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Community -->
+      <section id="community">
+        <div class="faq-group-title">Community</div>
+        <div class="faq-list">
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I contribute?
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p>Open an issue or a pull request on <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a>. Issues are the best place to start for new capability ideas, bug reports, or questions that are not answered here.</p>
+              <p>One rule: nothing ships without a governing spec. If you want to add a feature, the spec comes first. This keeps the codebase navigable and the intent documented regardless of who makes a change.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1;text-align:center">
+    <div class="t-h2" style="margin-bottom:0.75rem">Ready to build?</div>
+    <p class="t-body" style="color:var(--fg-muted);margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">The quickstart gets you to a running capability in under 10 minutes. No account required.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Read the quickstart</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">View on GitHub →</a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li><li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+<script>
+  // Accordion
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+      });
+      // Open clicked if it was closed
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // Highlight active nav section on scroll
+  const sections = document.querySelectorAll('.faq-sections section[id]');
+  const navLinks = document.querySelectorAll('.faq-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.faq-nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

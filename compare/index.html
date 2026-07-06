@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Traverse Compares · Traverse Framework</title>
+  <meta name="description" content="See how Traverse compares to microservices, serverless functions, and AI function calling. Honest comparisons. Different problems, different tools.">
+  <link rel="canonical" href="https://traverse-framework.com/compare/">
+  <meta property="og:title" content="How Traverse Compares · Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/compare/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@enricopiovesan">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+
+    .compare-hero {
+      padding: 5rem 0 4rem;
+      text-align: center;
+      position: relative;
+    }
+    .compare-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .compare-hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .compare-hero p {
+      font-size: 1.15rem;
+      color: var(--fg-muted);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 3rem 0;
+    }
+    .compare-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .compare-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-dim) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .compare-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .compare-card:hover::before { opacity: 1; }
+    .compare-card-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .compare-card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--fg);
+    }
+    .compare-card-summary {
+      font-size: 0.92rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+    .compare-card-link {
+      font-size: 0.88rem;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .compare-card-link::after { content: '→'; }
+
+    .verdict-section {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin: 3rem 0;
+    }
+    .verdict-section h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 1.25rem;
+    }
+    .verdict-section p {
+      color: var(--fg-muted);
+      line-height: 1.75;
+      max-width: 720px;
+      margin-bottom: 1rem;
+    }
+    .verdict-section p:last-child { margin-bottom: 0; }
+
+    .problem-box {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+      line-height: 1.7;
+    }
+    .problem-box strong { color: var(--fg); }
+
+    @media (max-width: 640px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<section class="compare-hero">
+  <div class="container">
+    <div class="section-label" style="justify-content:center;margin-bottom:1rem">Comparisons</div>
+    <h1>How Traverse compares.</h1>
+    <p>Traverse solves a specific problem. Most tools you already use do not compete with it. Here is where it fits.</p>
+  </div>
+</section>
+
+<main class="container">
+
+  <div class="compare-grid">
+    <a href="/compare/vs-microservices.html" class="compare-card">
+      <div class="compare-card-icon">⬡</div>
+      <div class="compare-card-title">Traverse vs Microservices</div>
+      <div class="compare-card-summary">
+        Microservices decompose large systems into independently deployable services. Traverse makes a single business rule run identically inside or across those services without being reimplemented each time.
+      </div>
+      <span class="compare-card-link">Read the comparison</span>
+    </a>
+
+    <a href="/compare/vs-serverless.html" class="compare-card">
+      <div class="compare-card-icon">λ</div>
+      <div class="compare-card-title">Traverse vs Serverless</div>
+      <div class="compare-card-summary">
+        Serverless handles event-driven compute that scales to zero. Traverse handles business logic that needs to run consistently across environments with governance and audit trails baked in. Different jobs.
+      </div>
+      <span class="compare-card-link">Read the comparison</span>
+    </a>
+
+    <a href="/compare/vs-function-calling.html" class="compare-card">
+      <div class="compare-card-icon">⬢</div>
+      <div class="compare-card-title">Traverse vs AI Function Calling</div>
+      <div class="compare-card-summary">
+        Function calling gives AI agents a list of functions to invoke. Traverse gives agents contracts with preconditions, postconditions, enforcement, and trace artifacts. A meaningful difference when the function matters.
+      </div>
+      <span class="compare-card-link">Read the comparison</span>
+    </a>
+  </div>
+
+  <div class="verdict-section">
+    <div class="section-label" style="margin-bottom:0.75rem">The honest answer</div>
+    <h2>Traverse is not a replacement.</h2>
+    <p>
+      These are not competing tools. Traverse solves one specific problem: portable, contract-governed business logic that runs identically wherever you deploy it.
+    </p>
+    <p>
+      Microservices, serverless, and AI function calling each solve different problems. You may already use all three. Traverse can work alongside all of them.
+    </p>
+    <p>
+      A microservice can use Traverse internally to execute business capabilities. A serverless function can run a Traverse capability. An AI agent can call Traverse capabilities as MCP tools. The contract and trace infrastructure travels with the logic no matter where it runs.
+    </p>
+    <div class="problem-box">
+      <strong>The problem Traverse actually solves:</strong> a business rule lives in five places. Browser, edge, cloud worker, fulfillment service, AI pipeline. Each one implements it differently. Bugs diverge. Audits fail. Traverse makes that rule a single governed capability that all five consume.
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:3rem 0">
+    <div class="card" style="padding:1.5rem;text-align:center">
+      <div class="t-mono t-accent" style="font-size:1.5rem;font-weight:600">v0.7.0</div>
+      <div class="t-body-sm t-muted" style="margin-top:0.4rem">Current version</div>
+    </div>
+    <div class="card" style="padding:1.5rem;text-align:center">
+      <div class="t-mono t-accent" style="font-size:1.5rem;font-weight:600">Apache 2.0</div>
+      <div class="t-body-sm t-muted" style="margin-top:0.4rem">Open source</div>
+    </div>
+    <div class="card" style="padding:1.5rem;text-align:center">
+      <div class="t-mono t-accent" style="font-size:1.5rem;font-weight:600">WASM</div>
+      <div class="t-body-sm t-muted" style="margin-top:0.4rem">Portable runtime</div>
+    </div>
+    <div class="card" style="padding:1.5rem;text-align:center">
+      <div class="t-mono t-accent" style="font-size:1.5rem;font-weight:600">Trace</div>
+      <div class="t-body-sm t-muted" style="margin-top:0.4rem">Every execution</div>
+    </div>
+  </div>
+
+  <div class="cta-band cta-band-glow" style="margin:3rem 0">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Ready to see it in action?</div>
+      <div class="t-body t-muted">The quickstart takes under ten minutes.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Get started</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Core Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>
