@@ -75,7 +75,17 @@
     .sol-card:hover::before { opacity: 1; }
 
     .sol-card-icon {
-      font-size: 1.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       line-height: 1;
     }
     .sol-card-industry {
@@ -154,7 +164,7 @@
       <div class="sol-grid">
 
         <a href="/solutions/ai-companies.html" class="sol-card">
-          <div class="sol-card-icon">🤖</div>
+          <div class="sol-card-icon">AI</div>
           <div>
             <div class="sol-card-industry">AI Companies</div>
             <div class="sol-card-title">Give your agents contracts, not just function signatures.</div>
@@ -164,7 +174,7 @@
         </a>
 
         <a href="/solutions/fintech.html" class="sol-card">
-          <div class="sol-card-icon">🏦</div>
+          <div class="sol-card-icon">FIN</div>
           <div>
             <div class="sol-card-industry">Fintech</div>
             <div class="sol-card-title">Auditable execution. Identical behavior across every runtime.</div>
@@ -174,7 +184,7 @@
         </a>
 
         <a href="/solutions/saas.html" class="sol-card">
-          <div class="sol-card-icon">🧩</div>
+          <div class="sol-card-icon">SAAS</div>
           <div>
             <div class="sol-card-industry">SaaS Platforms</div>
             <div class="sol-card-title">Write your pricing rule once and ship it everywhere.</div>
@@ -184,7 +194,7 @@
         </a>
 
         <a href="/solutions/enterprise.html" class="sol-card">
-          <div class="sol-card-icon">🏢</div>
+          <div class="sol-card-icon">ENT</div>
           <div>
             <div class="sol-card-industry">Enterprise</div>
             <div class="sol-card-title">One business capability. Consistent across all your runtimes.</div>
@@ -194,7 +204,7 @@
         </a>
 
         <a href="/solutions/ecommerce.html" class="sol-card">
-          <div class="sol-card-icon">🛒</div>
+          <div class="sol-card-icon">ECO</div>
           <div>
             <div class="sol-card-industry">E-commerce</div>
             <div class="sol-card-title">Pricing, promotions, and eligibility without the drift.</div>
@@ -204,7 +214,7 @@
         </a>
 
         <a href="/docs/quickstart.html" class="sol-card">
-          <div class="sol-card-icon">🔓</div>
+          <div class="sol-card-icon">OSS</div>
           <div>
             <div class="sol-card-industry">Open Source Teams</div>
             <div class="sol-card-title">Ship governed capabilities with zero licensing cost.</div>
@@ -215,21 +225,23 @@
 
       </div>
 
-      <hr class="sol-divider">
-
-      <div class="cta-band cta-band-glow">
-        <div>
-          <div class="t-h2">Ready to write it once?</div>
-          <p class="t-muted" style="margin-top:0.5rem">Start with the quickstart. Your first capability takes five minutes.</p>
-        </div>
-        <div style="display:flex;gap:1rem;flex-wrap:wrap">
-          <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart →</a>
-          <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
-        </div>
-      </div>
     </div>
   </section>
 </main>
+
+<section class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap">
+    <div>
+      <div class="t-h2">Ready to write it once?</div>
+      <p class="t-muted" style="margin-top:0.5rem">Start with the quickstart. Your first capability takes five minutes.</p>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart →</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">GitHub →</a>
+    </div>
+  </div>
+</section>
 
 <footer class="footer">
   <div class="container">
