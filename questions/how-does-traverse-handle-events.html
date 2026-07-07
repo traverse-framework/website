@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How does Traverse handle events? — Traverse Framework</title>
+  <meta name="description" content="Traverse emits structured events at each phase of the execution state machine. Learn how to subscribe to them and what they contain.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/how-does-traverse-handle-events.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does Traverse handle events?","acceptedAnswer":{"@type":"Answer","text":"Traverse emits structured events as the state machine transitions through each phase of execution. Callers can subscribe to these events to observe discovery, selection, validation, and execution without modifying the capability code. Events are part of the execution trace."}}]}</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem,3vw,2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main>
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / Technical Architecture</div>
+    <div class="q-label">Technical Architecture</div>
+    <h1 class="q-title">How does Traverse handle events?</h1>
+    <div class="q-body">
+      <p>Traverse emits structured events at each state machine transition during a capability execution. The <code>emitting_events</code> phase is an explicit step in the state machine — it fires after successful execution and before the runtime returns the result to the caller.</p>
+
+      <h2>What events carry</h2>
+      <p>Each event includes the capability name and version, the state machine phase that triggered it, a timestamp, and relevant context for that phase. Discovery events include the candidates found. Selection events include which version was chosen and why. Execution events include the input hash and output hash.</p>
+
+      <h2>The emitting_events phase</h2>
+      <p>After the WASM binary executes and postconditions pass, the runtime enters <code>emitting_events</code>. This is where observers receive the execution result before the state machine moves to <code>completed</code>. Subscribers can inspect the full output without modifying the capability code itself.</p>
+
+      <h2>Using events for observability</h2>
+      <ul>
+        <li>Log every capability call with input and output hashes for an audit trail</li>
+        <li>Count execution times per capability version for performance tracking</li>
+        <li>Alert when postcondition failures occur more than expected</li>
+        <li>Build an event log of every AI agent action that touched a capability</li>
+      </ul>
+
+      <h2>Trace artifacts</h2>
+      <p>Events are part of what makes up the trace artifact. The artifact is the structured record of a complete execution: every phase, every validation result, and the final output. See <a href="/questions/what-is-a-trace-artifact.html">what is a trace artifact</a> for more on how traces work.</p>
+
+      <p>Events and traces together give you reproducibility. You can reconstruct exactly what happened in any past execution from the trace artifact alone.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/what-is-a-trace-artifact.html">What is a trace artifact?</a>
+      <a href="/questions/what-is-the-traverse-state-machine.html">What is the Traverse state machine?</a>
+      <a href="/questions/how-does-traverse-handle-errors.html">How does Traverse handle errors?</a>
+      <a href="/questions/how-does-traverse-help-with-compliance.html">How does Traverse help with compliance?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/questions/">All Questions</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

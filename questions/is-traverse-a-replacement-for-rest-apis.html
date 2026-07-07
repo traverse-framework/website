@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Is Traverse a replacement for REST APIs? — Traverse Framework</title>
+  <meta name="description" content="Traverse is not a REST API replacement. It solves a different problem: portable execution of business logic with contract enforcement. Learn how they relate.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/is-traverse-a-replacement-for-rest-apis.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Traverse a replacement for REST APIs?","acceptedAnswer":{"@type":"Answer","text":"No. Traverse is not a REST API replacement. REST APIs handle network-accessible endpoints, authentication, and resource management. Traverse handles portable execution of business logic with contract enforcement. You typically run Traverse capabilities behind your REST API, not instead of it."}}]}</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem,3vw,2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main>
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / Comparisons</div>
+    <div class="q-label">Comparisons</div>
+    <h1 class="q-title">Is Traverse a replacement for REST APIs?</h1>
+    <div class="q-body">
+      <p>No. Traverse does not replace REST APIs. They solve different problems at different layers. REST APIs handle network-accessible endpoints, authentication, routing, and resource management. Traverse handles portable execution of business logic with contract enforcement. The two work together — your REST API is often the transport layer that calls a Traverse capability internally.</p>
+
+      <h2>What REST APIs do that Traverse does not</h2>
+      <ul>
+        <li>Handle HTTP routing and verbs</li>
+        <li>Manage authentication and authorization</li>
+        <li>Expose resources to external clients over the network</li>
+        <li>Handle pagination, filtering, and resource relationships</li>
+        <li>Provide versioned public interfaces for other teams or third parties</li>
+      </ul>
+
+      <h2>What Traverse does that REST APIs do not</h2>
+      <ul>
+        <li>Execute business logic in a sandboxed WASM environment</li>
+        <li>Enforce preconditions and postconditions on every call</li>
+        <li>Run the same binary in the browser, edge, and server with identical behavior</li>
+        <li>Produce a trace artifact for every execution</li>
+        <li>Expose capabilities to AI agents via MCP without building API endpoints</li>
+      </ul>
+
+      <h2>A common pattern</h2>
+      <p>You keep your REST API. When a POST request to <code>/orders/calculate</code> comes in, your API handler authenticates the caller, extracts the request body, and calls the Traverse <code>calculate_order_total</code> capability. The capability runs with contract enforcement. The API handler formats the result and returns a response. Traverse handles the business logic layer. Your API handles everything else.</p>
+
+      <h2>The portability angle</h2>
+      <p>The reason you would reach for Traverse over a plain function call inside your API handler is portability and consistency. If you want the same pricing logic to run in the browser for instant previews and on the server for billing — with identical results and full enforcement — Traverse gives you that. A REST API endpoint cannot run in a browser without a network call.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/how-is-traverse-different-from-microservices.html">How is Traverse different from microservices?</a>
+      <a href="/questions/how-is-traverse-different-from-serverless.html">How is Traverse different from serverless?</a>
+      <a href="/questions/how-is-traverse-different-from-function-calling.html">How is Traverse different from function calling?</a>
+      <a href="/questions/can-i-use-traverse-for-pricing-logic.html">Can I use Traverse for pricing logic?</a>
+      <a href="/questions/what-is-traverse.html">What is Traverse?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/questions/">All Questions</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

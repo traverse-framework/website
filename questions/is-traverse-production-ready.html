@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Is Traverse production ready? — Traverse Framework</title>
+  <meta name="description" content="Traverse v0.7.0 is stable for the local placement target. Learn what production ready means for Traverse today and what is still maturing.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/is-traverse-production-ready.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Traverse production ready?","acceptedAnswer":{"@type":"Answer","text":"Traverse v0.7.0 is stable for the local placement target. The local runtime, contract validation, MCP server, and CLI are all usable in production today. Other placement targets (browser, edge, cloud, AI pipeline) are in development. The project is pre-1.0, meaning APIs can change between minor versions."}}]}</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem,3vw,2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main>
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / Technical Edge Cases</div>
+    <div class="q-label">Technical Edge Cases</div>
+    <h1 class="q-title">Is Traverse production ready?</h1>
+    <div class="q-body">
+      <p>Traverse v0.7.0 is stable for the local placement target. You can use the local runtime, contract validation, CLI, and MCP server in production today. The project is pre-1.0, which means minor version bumps can include breaking API changes. If you build on Traverse now, pin your version and read the changelog before upgrading.</p>
+
+      <h2>What is stable today</h2>
+      <ul>
+        <li>Local placement target — runs WASM capabilities in the local process</li>
+        <li>Contract validation — preconditions and postconditions against JSON Schema</li>
+        <li>The traverse CLI — capability registration, invocation, and trace inspection</li>
+        <li>The MCP server — tools/list and tools/call for AI agent integration</li>
+        <li>Trace artifacts — every execution is recorded and inspectable</li>
+        <li>The governing spec model — linking contracts to source documents</li>
+      </ul>
+
+      <h2>What is still maturing</h2>
+      <ul>
+        <li>Browser, edge, cloud, and AI pipeline placement targets — in development</li>
+        <li>Hosted registry — not yet available</li>
+        <li>Language SDKs for Python, TypeScript, Go — planned</li>
+        <li>Streaming output — not yet supported</li>
+        <li>Capability signing and access controls — on the roadmap</li>
+      </ul>
+
+      <h2>How to evaluate readiness for your use case</h2>
+      <p>If you need the local target only — running contracts on one machine, exposing capabilities to an AI agent via MCP — then Traverse is ready for that today. The core execution model is solid. The things still in progress are around the broader deployment surface, not the fundamental runtime behavior.</p>
+      <p>If you need to deploy capabilities to the browser or cloud, or if you need a hosted registry your team can share, those features are not there yet. You would be building ahead of the stable surface and accepting more churn.</p>
+
+      <h2>The pre-1.0 caveat</h2>
+      <p>Pre-1.0 means Enrico can change APIs between minor versions if the design requires it. In practice, the contract format and core runtime behavior have been stable across recent releases. The parts that change are the edges — new placement targets bring new APIs, and those settle as the targets mature. Follow the <a href="/changelog.html">changelog</a> and the <a href="/questions/what-is-traverse-roadmap.html">roadmap</a> to stay informed.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/what-is-traverse-roadmap.html">What is the Traverse roadmap?</a>
+      <a href="/questions/how-do-placement-targets-work.html">How do placement targets work?</a>
+      <a href="/questions/what-is-traverse-security-model.html">What is Traverse's security model?</a>
+      <a href="/questions/who-maintains-traverse.html">Who maintains Traverse?</a>
+      <a href="/questions/is-traverse-open-source.html">Is Traverse open source?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/questions/">All Questions</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is Traverse? — Traverse Framework</title>
+  <meta name="description" content="Traverse is a contract-driven Rust and WASM runtime. You define business capabilities once and run the same binary across browser, edge, cloud, and AI pipelines.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/what-is-traverse.html">
+  <meta property="og:title" content="What is Traverse? — Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/questions/what-is-traverse.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is Traverse?","acceptedAnswer":{"@type":"Answer","text":"Traverse is a contract-driven Rust and WASM runtime. You define business capabilities once as WebAssembly modules governed by machine-readable contracts, and run the same binary across browser, edge, cloud, and AI pipelines. The runtime validates inputs and placement before execution and produces a trace artifact for every run. It is built on Universal Microservices Architecture (UMA) by Enrico Piovesan, currently at v0.7.0 under the Apache 2.0 license."}}]}
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main class="q-main">
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / What is Traverse?</div>
+    <div class="q-label">Question</div>
+    <h1 class="q-title">What is Traverse?</h1>
+    <div class="q-body">
+      <p>Traverse is a contract-driven Rust and WASM runtime. You define business capabilities once and run the same binary across browser, edge, cloud, and AI pipelines.</p>
+
+      <p>The problem it solves is simple to state but hard to fix: teams write the same business logic multiple times. Pricing logic lives in the frontend, re-implemented in the backend API, and copied again into a data pipeline or AI agent. Every copy drifts. Bugs appear in one place but not another. The environments are different enough that sharing code feels impractical.</p>
+
+      <p>Traverse takes a different approach. You write the logic once in Rust, compile it to WebAssembly, and attach a machine-readable contract. The contract says what the capability does, what must be true before it runs, where it is allowed to run, and what constraints apply. The runtime enforces all of that. The same binary runs in your browser, on an edge node, in a cloud function, or inside an AI pipeline without modification.</p>
+
+      <h2>What makes it different</h2>
+      <p>Most portability solutions stop at packaging. They let you deploy the same code to multiple environments, but they do not govern how it is called. Traverse adds governance at the call layer. You cannot invoke a capability with invalid inputs. You cannot place it on a target it does not support. Every execution produces a trace artifact, a structured record of what ran, what the inputs were, which contract governed it, and what the output was.</p>
+
+      <p>That trace is not a log. It is a first-class artifact you can inspect, store, and reason about. It connects the AI era's demand for explainability directly to the execution layer.</p>
+
+      <h2>Where it came from</h2>
+      <p>Traverse is built on Universal Microservices Architecture (UMA), a design philosophy developed at <a href="https://universalmicroservices.com" target="_blank" rel="noopener">universalmicroservices.com</a>. UMA treats capabilities as portable, contract-governed units that are not tied to any single deployment environment. Traverse is the Rust and WASM implementation of that idea.</p>
+
+      <p>It was created by Enrico Piovesan. The project is related to Contract-Driven AI Development (C-DAD), which applies the same contract-first approach to AI agent pipelines.</p>
+
+      <h2>Current state</h2>
+      <p>Traverse is at v0.7.0. It ships with a working expedition planning example that demonstrates 6 capabilities, 5 events, and 1 workflow running locally. The runtime, registry, CLI, browser adapter, and MCP integration are all functional. The codebase is open source under the Apache 2.0 license at <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">github.com/traverse-framework/traverse</a>.</p>
+
+      <h2>Core crates</h2>
+      <ul>
+        <li><strong>traverse-runtime</strong> — the execution engine</li>
+        <li><strong>traverse-contracts</strong> — contract definition and validation</li>
+        <li><strong>traverse-registry</strong> — capability discovery and indexing</li>
+        <li><strong>traverse-cli</strong> — terminal interface for inspecting and running</li>
+        <li><strong>traverse-mcp</strong> — Model Context Protocol integration for AI pipelines</li>
+        <li><strong>traverse-expedition-wasm</strong> — the canonical example capabilities</li>
+      </ul>
+
+      <p>If you want to see it running in under 15 minutes, start with the <a href="/docs/quickstart.html">quickstart guide</a>.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/do-i-need-rust.html">Do I need to know Rust to use Traverse?</a>
+      <a href="/questions/what-is-a-wasm-capability.html">What is a WASM capability in Traverse?</a>
+      <a href="/questions/what-is-contract-driven.html">What does "contract-driven" mean?</a>
+      <a href="/questions/how-does-traverse-execute-wasm.html">How does Traverse execute WASM?</a>
+      <a href="/questions/is-traverse-open-source.html">Is Traverse open source?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Questions</div><ul class="footer-links"><li><a href="/questions/">All Questions</a></li><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

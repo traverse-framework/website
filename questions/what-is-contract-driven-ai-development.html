@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is contract-driven AI development? — Traverse Framework</title>
+  <meta name="description" content="Contract-driven AI development (C-DAD) is a methodology where every tool an AI agent can call is governed by a machine-readable contract. Learn what it means in practice.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/what-is-contract-driven-ai-development.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is contract-driven AI development?","acceptedAnswer":{"@type":"Answer","text":"Contract-driven AI development (C-DAD) is a methodology where every tool an AI agent can invoke is governed by a machine-readable contract that defines inputs, outputs, and behavioral constraints. The runtime enforces the contract on every call. This makes agent behavior auditable, reproducible, and predictable."}}]}</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem,3vw,2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main>
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / AI and MCP</div>
+    <div class="q-label">AI and MCP</div>
+    <h1 class="q-title">What is contract-driven AI development?</h1>
+    <div class="q-body">
+      <p>Contract-driven AI development (C-DAD) is a methodology where every tool an AI agent can invoke is governed by a machine-readable contract. The contract defines what the tool accepts, what it returns, and what behavioral constraints hold. The runtime enforces these at call time — not just at documentation time.</p>
+
+      <h2>The problem it solves</h2>
+      <p>When you give an AI agent access to tools, two things tend to go wrong. First, the agent builds wrong assumptions about what a tool does because the only spec is a natural language description. Second, you have no audit trail — when an agent does something unexpected, you cannot reconstruct exactly what it called and what it got back.</p>
+      <p>C-DAD solves both. The contract is machine-readable, so the agent gets a precise spec at discovery time. The runtime produces a trace artifact on every call, so every agent action is reconstructable.</p>
+
+      <h2>What it looks like in practice</h2>
+      <ul>
+        <li>You write a contract for each business capability: input schema, output schema, preconditions, postconditions</li>
+        <li>You compile the implementation to WASM and register it alongside the contract</li>
+        <li>The agent discovers capabilities via MCP and gets the full schema for each one</li>
+        <li>The runtime enforces contracts on every agent call — invalid inputs are rejected before execution</li>
+        <li>Every call produces a trace artifact you can inspect, store, or alert on</li>
+      </ul>
+
+      <h2>Relation to design-by-contract</h2>
+      <p>C-DAD applies the decades-old design-by-contract idea to AI agent pipelines. Bertrand Meyer's original insight was that software components should specify their obligations and guarantees formally. C-DAD extends that to the interface between a non-deterministic agent and deterministic business logic.</p>
+
+      <h2>The C-DAD whitepaper</h2>
+      <p>Enrico Piovesan published the C-DAD whitepaper as part of the Traverse project. It covers the methodology in depth — why contracts are necessary for agentic systems, how to structure them, and how Traverse implements enforcement. The whitepaper builds on the Universal Microservices Architecture (UMA) foundation described in the <a href="/questions/what-is-uma.html">UMA book</a>.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/how-do-ai-agents-benefit-from-contracts.html">How do AI agents benefit from contracts?</a>
+      <a href="/questions/how-does-traverse-prevent-ai-agent-errors.html">How does Traverse prevent AI agent errors?</a>
+      <a href="/questions/what-is-uma.html">What is UMA?</a>
+      <a href="/questions/what-is-contract-driven.html">What does contract-driven mean?</a>
+      <a href="/questions/how-does-the-mcp-server-work.html">How does the MCP server work?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/questions/">All Questions</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>
