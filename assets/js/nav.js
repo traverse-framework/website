@@ -1,4 +1,4 @@
-/* Theme toggle */
+/* Theme init (runs before paint) */
 (function () {
   const stored = localStorage.getItem('theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -34,13 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (icon) icon.textContent = current === 'dark' ? '☀' : '☽';
   }
 
-  /* Scroll: add shadow to nav */
+  /* Scroll: solid nav when not at top */
   const nav = document.querySelector('.nav');
   if (nav) {
-    window.addEventListener('scroll', () => {
-      nav.style.borderBottomColor = window.scrollY > 10
-        ? 'rgba(255,255,255,0.1)'
-        : '';
-    }, { passive: true });
+    const onScroll = () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 });

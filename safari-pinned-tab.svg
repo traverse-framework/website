@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Traverse pinned tab">
+
+  <defs>
+    <linearGradient id="travGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5616d8"/>
+      <stop offset="45%" stop-color="#c91dff"/>
+      <stop offset="68%" stop-color="#ff376d"/>
+      <stop offset="86%" stop-color="#ff9800"/>
+      <stop offset="100%" stop-color="#fff03a"/>
+    </linearGradient>
+    <radialGradient id="softGlow" cx="65%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fff03a" stop-opacity="0.35"/>
+      <stop offset="45%" stop-color="#ff376d" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#5616d8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.8  0 1 0 0 0.1  0 0 1 0 1  0 0 0 0.7 0"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#ffb21a"/>
+    </marker>
+  </defs>
+
+
+  <path d="M128 18 C190 36 232 88 228 146 C224 204 166 238 100 221 C46 207 19 164 31 112 C43 60 76 25 128 18Z" fill="#000"/>
+  <path d="M55 167 C96 137 113 104 151 79 C176 62 204 58 220 72 C202 85 185 102 172 126 C148 170 112 197 55 211Z" fill="#000"/>
+
+</svg>

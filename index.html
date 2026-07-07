@@ -13,116 +13,104 @@
   <meta property="og:image" content="https://traverse-framework.com/assets/img/og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@enricopiovesan">
-  <!-- Google tag -->
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0a0a0a">
+
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/base.css">
   <link rel="stylesheet" href="/assets/css/components.css">
-  <script>
-    (function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Traverse",
-    "description": "A contract-driven Rust and WASM runtime for discovering, validating, and composing portable business capabilities across browser, edge, cloud, and AI pipeline.",
-    "url": "https://traverse-framework.com",
-    "author": { "@type": "Person", "name": "Enrico Piovesan", "url": "https://enricopiovesan.com" },
-    "license": "https://www.apache.org/licenses/LICENSE-2.0",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "Any",
-    "softwareVersion": "0.7.0",
-    "codeRepository": "https://github.com/traverse-framework/traverse"
-  }
-  </script>
-  <style>
-    /* ── Page-specific overrides ── */
-    body { padding-top: var(--nav-h); }
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
 
-    /* Hero */
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Traverse","description":"A contract-driven Rust and WASM runtime for discovering, validating, and composing portable business capabilities.","url":"https://traverse-framework.com","author":{"@type":"Person","name":"Enrico Piovesan"},"license":"https://www.apache.org/licenses/LICENSE-2.0","applicationCategory":"DeveloperApplication","softwareVersion":"0.7.0","codeRepository":"https://github.com/traverse-framework/traverse"}</script>
+
+  <style>
+    body { padding-top: 0; }
+
+    /* ── Hero ── */
     .hero {
       position: relative;
-      min-height: calc(100vh - var(--nav-h));
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       overflow: hidden;
+      background: #0a0a0a;
     }
-    .hero-grid-bg {
+    .hero-gradient {
       position: absolute;
       inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-    }
-    .hero-glow {
-      position: absolute;
-      width: 900px; height: 600px;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(ellipse, rgba(232,81,10,0.08) 0%, transparent 70%);
       pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 110%, rgba(255, 110, 20, 0.65) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 60% at 80% 110%, rgba(200, 55, 5, 0.55) 0%, transparent 55%),
+        radial-gradient(ellipse 120% 50% at 50% 120%, rgba(140, 30, 0, 0.45) 0%, transparent 60%);
     }
-    .hero-canvas-wrap {
-      display: none;
-    }
-    #hero-graph {
-      width: 100%; height: 100%;
-      display: block;
+    .hero-gradient::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, #0a0a0a 0%, #0a0a0a 20%, rgba(10,10,10,0.6) 55%, transparent 75%);
     }
     .hero-content {
       position: relative;
       z-index: 2;
       text-align: center;
-      max-width: 760px;
+      max-width: 820px;
       margin: 0 auto;
-      padding: 5rem 2rem;
+      padding: 0 2rem;
+      padding-top: 80px;
     }
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.35rem 0.9rem;
+      padding: 0.3rem 0.85rem;
       border-radius: 99px;
       border: 1px solid rgba(232,81,10,0.3);
-      background: rgba(232,81,10,0.08);
+      background: rgba(232,81,10,0.07);
       font-family: var(--font-mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.07em;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 1.75rem;
+      margin-bottom: 2rem;
     }
     .hero-eyebrow-dot {
-      width: 6px; height: 6px;
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: var(--accent);
       animation: pulse-dot 2s ease-in-out infinite;
     }
-    .hero h1 {
+    .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(2.8rem, 6vw, 5.25rem);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
       font-weight: 700;
       letter-spacing: -0.04em;
-      line-height: 1.04;
+      line-height: 1.08;
+      color: #fff;
       margin-bottom: 1.5rem;
     }
-    .hero h1 em {
-      font-style: normal;
-      color: var(--accent);
-    }
     .hero-sub {
-      font-size: clamp(1rem, 2vw, 1.125rem);
-      color: var(--fg-muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.7;
+      color: rgba(255,255,255,0.55);
       max-width: 560px;
       margin: 0 auto 2.5rem;
-      line-height: 1.7;
-      font-weight: 300;
     }
     .hero-actions {
       display: flex;
@@ -130,109 +118,306 @@
       justify-content: center;
       gap: 0.75rem;
       flex-wrap: wrap;
-      margin-bottom: 2rem;
+      margin-bottom: 3.5rem;
     }
     .hero-meta {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .hero-meta-item svg { width: 12px; height: 12px; opacity: 0.5; }
+
+    /* ── Trust bar ── */
+    .trust-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 0;
+      background: var(--bg-elevated);
+      overflow: hidden;
+    }
+    .trust-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .trust-label {
+      font-size: 0.75rem;
+      color: var(--fg-subtle);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      margin-right: 0.5rem;
+    }
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      background: var(--bg-card);
+    }
+    .trust-pill svg { width: 12px; height: 12px; }
+
+    /* ── How it works ── */
+    .hiw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    @media (max-width: 860px) {
+      .hiw-grid { grid-template-columns: 1fr; gap: 3rem; }
+    }
+    .hiw-steps { display: flex; flex-direction: column; gap: 0; }
+    .hiw-step {
+      display: flex;
+      gap: 1.25rem;
+      padding: 1.75rem 0;
+      border-bottom: 1px solid var(--border);
+      cursor: default;
+    }
+    .hiw-step:first-child { padding-top: 0; }
+    .hiw-step:last-child { border-bottom: none; padding-bottom: 0; }
+    .hiw-step-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--fg-subtle);
+      line-height: 1;
+      min-width: 2rem;
+      padding-top: 2px;
+    }
+    .hiw-step-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.015em;
+    }
+    .hiw-step-body p {
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+
+    /* ── Feature cards ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    @media (max-width: 900px) {
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+    .feature-card {
+      background: var(--bg-card);
+      padding: 2rem;
+      transition: background 0.2s;
+    }
+    .feature-card:hover { background: #1a1a1a; }
+    .feature-card-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,81,10,0.2);
+      margin-bottom: 1.25rem;
+    }
+    .feature-card-icon svg { width: 18px; height: 18px; color: var(--accent); }
+    .feature-card h3 {
+      font-family: var(--font-display);
+      font-size: 0.975rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      margin-bottom: 0.5rem;
+    }
+    .feature-card p {
+      font-size: 0.84rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+    .stat-card {
+      background: var(--bg-card);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--fg);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.84rem;
+      color: var(--fg-muted);
+      line-height: 1.55;
+      margin-top: 1rem;
+    }
+
+    /* ── Use cases ── */
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--gap-md);
+    }
+    @media (max-width: 700px) {
+      .usecase-grid { grid-template-columns: 1fr; }
+    }
+    .usecase-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      transition: border-color 0.2s;
+    }
+    .usecase-card:hover { border-color: var(--border-hover); }
+    .usecase-card h3 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.015em;
+    }
+    .usecase-card p {
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+    .usecase-card a {
+      font-size: 0.82rem;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .usecase-card a:hover { text-decoration: underline; }
+
+    /* ── CTA gradient section ── */
+    .cta-gradient {
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0a;
+      padding: 8rem 0;
+      text-align: center;
+    }
+    .cta-gradient-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(200, 60, 5, 0.45) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 60% at 10% 100%, rgba(255, 110, 20, 0.3) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 60% at 90% 100%, rgba(180, 40, 0, 0.3) 0%, transparent 55%);
+    }
+    .cta-gradient-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, #0a0a0a 0%, transparent 40%, rgba(10,10,10,0.5) 80%, #0a0a0a 100%);
+    }
+    .cta-gradient-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .cta-gradient-content h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: #fff;
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+    .cta-gradient-content p {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+      margin-bottom: 2.25rem;
+    }
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
 
-    /* Problem cards */
-    .problem-card {
-      border-left: 2px solid transparent;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .problem-card:hover {
-      border-left-color: var(--accent);
-      background: rgba(232,81,10,0.03);
-    }
-
-    /* How it works */
-    .how-code {
-      max-width: 680px;
-      margin: 3rem auto 0;
-    }
-
-    /* Use cases grid */
-    .usecase-tile {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 1.25rem 1.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      transition: border-color 0.2s, transform 0.2s;
-      text-decoration: none;
-      color: inherit;
-    }
-    .usecase-tile:hover {
-      border-color: rgba(232,81,10,0.25);
-      transform: translateY(-2px);
-    }
-    .usecase-num {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: var(--accent);
-      letter-spacing: 0.06em;
-    }
-    .usecase-title {
+    /* ── Section header ── */
+    .section-header { margin-bottom: 3.5rem; }
+    .section-header h2 {
       font-family: var(--font-display);
-      font-size: 0.9375rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      color: var(--fg);
+      margin-bottom: 0.75rem;
     }
-    .usecase-desc {
-      font-size: 0.8125rem;
+    .section-header p {
+      font-size: 1rem;
       color: var(--fg-muted);
-      line-height: 1.6;
-    }
-    .usecase-arrow {
-      margin-top: auto;
-      padding-top: 0.75rem;
-      color: var(--fg-subtle);
-      font-size: 0.8rem;
-      transition: color 0.15s;
-    }
-    .usecase-tile:hover .usecase-arrow { color: var(--accent); }
-
-    /* Principles */
-    .principle-card { display: flex; flex-direction: column; gap: 0.75rem; }
-
-    /* Example terminal */
-    .example-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 2.5rem;
-      align-items: start;
-    }
-    @media (max-width: 900px) {
-      .example-wrap { grid-template-columns: 1fr; }
-    }
-
-    /* Lineage */
-    .lineage-wrap {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 3rem;
-      align-items: start;
-    }
-    @media (max-width: 900px) {
-      .lineage-wrap { grid-template-columns: 1fr; }
+      line-height: 1.7;
+      max-width: 480px;
     }
   </style>
 </head>
 <body>
 
-<!-- ── Nav ────────────────────────────────────────────────────────────────── -->
-<nav class="nav">
+<!-- ── Nav ── -->
+<nav class="nav" id="nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">
-      <img src="/logo.png" alt="Traverse logo" onerror="this.style.display='none'">
+      <img src="/assets/img/logo/traverse_icon_32x32.png" alt="Traverse logo" width="24" height="24">
       Traverse<span class="nav-logo-dot">.</span>
     </a>
     <ul class="nav-links">
@@ -243,14 +428,11 @@
       <li><a href="/changelog.html">Changelog</a></li>
     </ul>
     <div class="nav-right">
-      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme">
-        <span class="theme-icon" style="font-size:14px">☀</span>
-      </button>
-      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:13px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub</a>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm">Get started</a>
       <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
-          <line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/>
-        </svg>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg>
       </button>
     </div>
   </div>
@@ -261,452 +443,312 @@
   <a href="/docs/">Docs</a>
   <a href="/blog/">Blog</a>
   <a href="/changelog.html">Changelog</a>
-  <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+  <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a>
+  <a href="/docs/quickstart.html" style="color:var(--fg)">Get started →</a>
 </div>
 
-<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<!-- ── Hero ── -->
 <section class="hero">
-  <div class="hero-grid-bg"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-canvas-wrap">
-    <canvas id="hero-graph"></canvas>
+  <div class="hero-gradient"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow animate-fade-up">
+      <span class="hero-eyebrow-dot"></span>
+      v0.7.0 · Apache 2.0 · Open source
+    </div>
+    <h1 class="hero-title animate-fade-up animate-delay-1">
+      Define once.<br>Run anywhere.
+    </h1>
+    <p class="hero-sub animate-fade-up animate-delay-2">
+      Traverse is a contract-driven WASM runtime. Write business logic once with a machine-readable contract and run it identically across browser, edge, cloud, and AI pipelines.
+    </p>
+    <div class="hero-actions animate-fade-up animate-delay-3">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Get started →</a>
+      <a href="/docs/" class="btn btn-ghost btn-lg">Read the docs</a>
+    </div>
+    <div class="hero-meta animate-fade-up animate-delay-4">
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Rust + WASM
+      </span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        MCP protocol
+      </span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        AI-agent ready
+      </span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Apache 2.0
+      </span>
+    </div>
   </div>
+</section>
+
+<!-- ── Trust bar ── -->
+<div class="trust-bar">
+  <div class="trust-inner">
+    <span class="trust-label">Built on</span>
+    <span class="trust-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+      WebAssembly
+    </span>
+    <span class="trust-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+      JSON Schema contracts
+    </span>
+    <span class="trust-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+      MCP protocol
+    </span>
+    <span class="trust-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+      Wasmtime runtime
+    </span>
+    <span class="trust-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+      TOML-first config
+    </span>
+  </div>
+</div>
+
+<!-- ── How it works ── -->
+<section class="section" style="background:var(--bg);">
   <div class="container">
-    <div class="hero-content">
-      <div class="hero-eyebrow animate-fade-up">
-        <span class="hero-eyebrow-dot"></span>
-        Contract-Driven WASM Runtime
+    <div class="hiw-grid">
+      <!-- Code visual -->
+      <div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="code-filename">pricing.toml</span>
+          </div>
+          <div class="code-body">
+            <pre><span class="tok-section">[capability]</span>
+<span class="tok-key">name</span>    = <span class="tok-str">"calculate-price"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"1.2.0"</span>
+<span class="tok-key">wasm</span>    = <span class="tok-str">"pricing.wasm"</span>
+
+<span class="tok-section">[governing_spec]</span>
+<span class="tok-key">title</span>   = <span class="tok-str">"Pricing Policy v3"</span>
+<span class="tok-key">source</span>  = <span class="tok-str">"docs/pricing-policy.md"</span>
+
+<span class="tok-section">[input]</span>
+<span class="tok-key">type</span> = <span class="tok-str">"object"</span>
+<span class="tok-key">properties</span>.sku      = <span class="tok-str">"string"</span>
+<span class="tok-key">properties</span>.quantity = <span class="tok-str">"integer"</span>
+<span class="tok-key">properties</span>.region   = <span class="tok-str">"string"</span>
+<span class="tok-key">required</span> = <span class="tok-str">["sku", "quantity"]</span>
+
+<span class="tok-section">[output]</span>
+<span class="tok-key">type</span> = <span class="tok-str">"object"</span>
+<span class="tok-key">properties</span>.total    = <span class="tok-str">"number"</span>
+<span class="tok-key">properties</span>.currency = <span class="tok-str">"string"</span>
+<span class="tok-key">required</span> = <span class="tok-str">["total", "currency"]</span></pre>
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="code-dots"><span></span><span></span><span></span></div>
+              <span class="terminal-title">terminal</span>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">traverse run pricing --input '{"sku":"PRO","quantity":5}'</span></div>
+              <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">✓ Contract validated</span></div>
+              <div class="terminal-line"><span class="terminal-out success">✓ WASM executed (2.1ms)</span></div>
+              <div class="terminal-line"><span class="terminal-out accent">→ {"total": 249.95, "currency": "USD"}</span></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h1 class="animate-fade-up animate-delay-1">
-        Business logic<br>that runs <em>anywhere.</em><br>Governed by contracts.
-      </h1>
-      <p class="hero-sub animate-fade-up animate-delay-2">
-        Traverse is a contract-driven Rust and WASM runtime for discovering, validating, and composing portable business capabilities across browser, edge, cloud, and AI pipeline. No rewriting logic for each environment.
-      </p>
-      <div class="hero-actions animate-fade-up animate-delay-3">
-        <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Get started →</a>
-        <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">View on GitHub</a>
-      </div>
-      <div class="hero-meta animate-fade-up animate-delay-4">
-        <span class="badge badge-accent badge-dot">v0.7.0</span>
-        <span class="badge">Apache 2.0</span>
-        <span class="badge">Rust + WASM</span>
-        <span class="badge badge-success badge-dot">Active development</span>
+
+      <!-- Steps -->
+      <div>
+        <div class="section-label">How Traverse works</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(1.75rem,3.5vw,2.5rem);font-weight:700;letter-spacing:-0.035em;line-height:1.15;margin-bottom:1rem;">
+          Write a contract.<br>Ship a capability.
+        </h2>
+        <p style="font-size:1rem;color:var(--fg-muted);line-height:1.7;margin-bottom:3rem;">
+          Three steps from idea to a portable, contract-governed piece of business logic running in any environment.
+        </p>
+        <div class="hiw-steps">
+          <div class="hiw-step">
+            <div class="hiw-step-num">01</div>
+            <div class="hiw-step-body">
+              <h3>Define the contract</h3>
+              <p>Write a TOML file with your capability name, the WASM binary path, and JSON Schema definitions for inputs and outputs. Link it to the governing spec document your team actually works from.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-step-num">02</div>
+            <div class="hiw-step-body">
+              <h3>Compile to WASM</h3>
+              <p>Implement the logic in Rust and compile to <code style="font-family:var(--font-mono);font-size:0.85em;background:var(--bg-input);border-radius:4px;padding:0.1em 0.35em;color:var(--accent)">wasm32-wasi</code>. The same binary runs on every placement target without recompilation.</p>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-step-num">03</div>
+            <div class="hiw-step-body">
+              <h3>Register and run</h3>
+              <p>Add the capability to the registry with <code style="font-family:var(--font-mono);font-size:0.85em;background:var(--bg-input);border-radius:4px;padding:0.1em 0.35em;color:var(--accent)">traverse add</code>. Call it from the CLI, from an AI agent via MCP, or from your app directly. Every call is validated and traced.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── Proof bar ──────────────────────────────────────────────────────────── -->
-<div class="proof-bar">
-  <div class="proof-items">
-    <div class="proof-item">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-      Rust-first
+<!-- ── Features ── -->
+<section class="section" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Features</div>
+      <h2>Everything business logic needs</h2>
+      <p>From contract validation to AI agent discovery, Traverse handles the entire lifecycle.</p>
     </div>
-    <div class="proof-item">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-      WASM-native
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <h3>Contract-first validation</h3>
+        <p>Every capability call validates inputs against a JSON Schema precondition before execution. Postconditions validate the output. Bad data never reaches your logic.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3>WASM sandbox isolation</h3>
+        <p>Each capability runs in its own Wasmtime WASM instance with linear memory isolation. A capability cannot access host resources it was not explicitly granted.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        </div>
+        <h3>AI agent integration</h3>
+        <p>Expose your entire capability registry to AI agents via the MCP stdio server. Claude, GPT-4, and any MCP-compatible agent can discover and call capabilities safely.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        </div>
+        <h3>Cross-platform portability</h3>
+        <p>One WASM binary runs on the local target today. The same binary will run unchanged on browser, edge, cloud, and AI pipeline targets as they ship.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <h3>Trace artifacts</h3>
+        <p>Every execution produces a trace artifact: the input, the output, the contract version, and a timestamp. Audit any past run without re-executing anything.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        </div>
+        <h3>Governing specs</h3>
+        <p>Every contract links to the governing spec document it implements. When the policy changes, you update the spec and bump the contract version. The paper trail is built in.</p>
+      </div>
     </div>
-    <div class="proof-item">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-      100% test coverage
+  </div>
+</section>
+
+<!-- ── Stats ── -->
+<section class="section" style="background:var(--bg);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">By the numbers</div>
+      <h2>One runtime. Any environment.</h2>
     </div>
-    <div class="proof-item">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-      Spec-governed
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">1</div>
+        <div class="stat-label">WASM binary runs identically across all placement targets — local, browser, edge, cloud, AI pipeline.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Logic rewrites when moving between environments. Same contract, same binary, same behavior everywhere.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">2ms</div>
+        <div class="stat-label">Typical contract execution time on the local target. WASM startup is fast. Contract validation adds negligible overhead.</div>
+      </div>
     </div>
-    <div class="proof-item">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-      CI-gated · No unsafe code
+  </div>
+</section>
+
+<!-- ── Use cases ── -->
+<section class="section" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Use cases</div>
+      <h2>Built for real business logic</h2>
+      <p>Pricing rules, eligibility checks, compliance logic — any deterministic computation that needs to run reliably everywhere.</p>
     </div>
-    <div class="proof-item">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-      9 approved governing specs
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <div class="feature-card-icon" style="margin-bottom:1rem;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-dim);border:1px solid rgba(232,81,10,0.2);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+        </div>
+        <h3>Pricing and discount logic</h3>
+        <p>Encode complex pricing rules as a contract with a link to your pricing policy document. The same capability runs in your frontend, your backend, and inside AI agent pipelines with identical results.</p>
+        <a href="/questions/can-i-use-traverse-for-pricing-logic.html">Learn more →</a>
+      </div>
+      <div class="usecase-card">
+        <div class="feature-card-icon" style="margin-bottom:1rem;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-dim);border:1px solid rgba(232,81,10,0.2);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Eligibility and access rules</h3>
+        <p>Run eligibility logic as a sandboxed WASM capability so an AI agent can check a user's eligibility for a product, service, or feature without risk of hallucinating the answer.</p>
+        <a href="/questions/can-i-use-traverse-for-eligibility-checking.html">Learn more →</a>
+      </div>
+      <div class="usecase-card">
+        <div class="feature-card-icon" style="margin-bottom:1rem;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-dim);border:1px solid rgba(232,81,10,0.2);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h3>Compliance and audit logic</h3>
+        <p>Capture regulatory and compliance rules in versioned contracts with governing spec links. Every execution is traced. Auditors can replay any historical decision from the trace artifact.</p>
+        <a href="/questions/how-does-traverse-help-with-compliance.html">Learn more →</a>
+      </div>
+      <div class="usecase-card">
+        <div class="feature-card-icon" style="margin-bottom:1rem;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-dim);border:1px solid rgba(232,81,10,0.2);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        </div>
+        <h3>AI agent guardrails</h3>
+        <p>Give your AI agents a set of contract-governed capabilities to call. The agent cannot exceed the contract's boundaries. Postcondition checks block invalid outputs before they propagate.</p>
+        <a href="/questions/how-does-traverse-prevent-ai-agent-errors.html">Learn more →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<div class="cta-gradient">
+  <div class="cta-gradient-bg"></div>
+  <div class="cta-gradient-content">
+    <h2>Start building with Traverse</h2>
+    <p>Install the CLI, write your first contract, and run it in under five minutes.</p>
+    <div class="cta-actions">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Get started →</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">View on GitHub</a>
     </div>
   </div>
 </div>
 
-<!-- ── Problem ────────────────────────────────────────────────────────────── -->
-<section class="section" id="problem">
-  <div class="container">
-    <div class="section-label">The problem</div>
-    <h2 class="t-h1" style="max-width:18ch; margin-bottom:1.5rem">The same logic.<br>Written four times.</h2>
-    <p class="t-body t-muted" style="max-width:58ch; margin-bottom:3.5rem">
-      Most distributed systems have a logic problem nobody talks about. The same business rule, whether it's a pricing formula, an eligibility check, or a validation step, gets implemented separately for the browser, the backend, the edge, and now the AI pipeline. Nobody planned it that way. Over time the copies drift. The system becomes harder to reason about, harder to change, and harder to trust.
-    </p>
-    <div class="grid-2">
-      <div class="card problem-card">
-        <p class="t-label" style="margin-bottom:.75rem">01</p>
-        <h3 class="t-h3" style="margin-bottom:.5rem">Logic duplicated across runtimes</h3>
-        <p class="t-body-sm t-muted">Browser, backend, edge, and AI pipeline each get their own implementation. Every copy drifts differently. Bugs are fixed in one place and missed in three others.</p>
-      </div>
-      <div class="card problem-card">
-        <p class="t-label" style="margin-bottom:.75rem">02</p>
-        <h3 class="t-h3" style="margin-bottom:.5rem">Runtime choices become hidden architecture</h3>
-        <p class="t-body-sm t-muted">Placement, transport, and orchestration decisions shape behavior but stay invisible in the system model. The architecture is implicit. You only find out something is wrong when it breaks.</p>
-      </div>
-      <div class="card problem-card">
-        <p class="t-label" style="margin-bottom:.75rem">03</p>
-        <h3 class="t-h3" style="margin-bottom:.5rem">AI agents cannot navigate what has no contracts</h3>
-        <p class="t-body-sm t-muted">Agents guess at intent that was never declared. Without machine-readable contracts, AI orchestration is guesswork operating on hidden assumptions.</p>
-      </div>
-      <div class="card problem-card">
-        <p class="t-label" style="margin-bottom:.75rem">04</p>
-        <h3 class="t-h3" style="margin-bottom:.5rem">Evolution becomes fragmentation</h3>
-        <p class="t-body-sm t-muted">Version sprawl and runtime drift make distributed systems harder to scale, reason about, and sustain. Every change propagates across four implementations.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── How it works ───────────────────────────────────────────────────────── -->
-<section class="section" style="border-top:1px solid var(--border); background:var(--bg-elevated)">
-  <div class="container">
-    <div class="section-label">How it works</div>
-    <h2 class="t-h1" style="margin-bottom:1rem">One capability. Every runtime.</h2>
-    <p class="t-body t-muted" style="max-width:50ch; margin-bottom:3rem">
-      Each business capability is packaged as a self-describing WASM module governed by a contract. The runtime validates, places, and executes it the same way everywhere.
-    </p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num active">01</div>
-        <h3 class="t-h3" style="margin-bottom:.4rem">Define a contract</h3>
-        <p class="t-body-sm t-muted">Declare preconditions, postconditions, invariants, and placement targets in <code style="font-family:var(--font-mono);font-size:0.8em;color:var(--accent)">contract.toml</code></p>
-      </div>
-      <div class="step">
-        <div class="step-num active">02</div>
-        <h3 class="t-h3" style="margin-bottom:.4rem">Compile to WASM</h3>
-        <p class="t-body-sm t-muted">Your business logic compiles to a portable WASM binary. The capability is self-describing and runtime-agnostic.</p>
-      </div>
-      <div class="step">
-        <div class="step-num active">03</div>
-        <h3 class="t-h3" style="margin-bottom:.4rem">Place anywhere</h3>
-        <p class="t-body-sm t-muted">The runtime discovers, validates, and executes the capability in browser, edge, cloud, or AI pipeline. Same behavior everywhere.</p>
-      </div>
-    </div>
-    <div class="how-code">
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <span class="code-filename">traverse.spec.toml</span>
-          <span></span>
-        </div>
-        <div class="code-body">
-<pre><span class="tok-comment"># capability contract</span>
-
-<span class="tok-section">[capability]</span>
-<span class="tok-key">id</span>      = <span class="tok-str">"pricing.eligibility-check"</span>
-<span class="tok-key">version</span> = <span class="tok-str">"1.2.0"</span>
-<span class="tok-key">runtime</span> = <span class="tok-str">"wasm32-wasi"</span>
-
-<span class="tok-section">[contract]</span>
-<span class="tok-key">preconditions</span>  = [<span class="tok-str">"customer.tier in ['standard', 'enterprise']"</span>, <span class="tok-str">"cart.total &gt; 0"</span>]
-<span class="tok-key">postconditions</span> = [<span class="tok-str">"result.eligible is bool"</span>, <span class="tok-str">"result.reason is string"</span>]
-<span class="tok-key">invariants</span>     = [<span class="tok-str">"enterprise customers never receive standard pricing"</span>]
-<span class="tok-key">exceptions</span>     = [<span class="tok-str">"CustomerNotFound"</span>, <span class="tok-str">"CartExpired"</span>]
-
-<span class="tok-section">[placement]</span>
-<span class="tok-key">targets</span>   = [<span class="tok-str">"browser"</span>, <span class="tok-str">"edge"</span>, <span class="tok-str">"cloud"</span>, <span class="tok-str">"ai-pipeline"</span>]
-<span class="tok-key">prefer</span>    = <span class="tok-str">"edge"</span>
-<span class="tok-key">fallback</span>  = <span class="tok-str">"cloud"</span></pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── Use cases ──────────────────────────────────────────────────────────── -->
-<section class="section" style="border-top:1px solid var(--border)">
-  <div class="container">
-    <div class="section-label">What you can build</div>
-    <h2 class="t-h1" style="margin-bottom:0.75rem">Apps you can ship today</h2>
-    <p class="t-body t-muted" style="max-width:50ch; margin-bottom:3rem">With Traverse v0.7.0, these patterns work out of the box. No glue code, no reimplementation.</p>
-    <div class="grid-3" style="grid-template-columns:repeat(3,1fr)">
-      <a href="/use-cases/#browser-app" class="usecase-tile">
-        <span class="usecase-num">01</span>
-        <span class="usecase-title">Browser-hosted governed runtime</span>
-        <span class="usecase-desc">UI owned by your app, capability execution by Traverse. Live browser adapter on port 4174.</span>
-        <span class="usecase-arrow">Explore →</span>
-      </a>
-      <a href="/use-cases/#mcp-server" class="usecase-tile">
-        <span class="usecase-num">02</span>
-        <span class="usecase-title">MCP server for AI discovery</span>
-        <span class="usecase-desc">Expose governed capabilities to AI agents via Model Context Protocol stdio server.</span>
-        <span class="usecase-arrow">Explore →</span>
-      </a>
-      <a href="/use-cases/#workflows" class="usecase-tile">
-        <span class="usecase-num">03</span>
-        <span class="usecase-title">Workflow-backed capabilities</span>
-        <span class="usecase-desc">Multi-step business flows with deterministic graph traversal and full trace output.</span>
-        <span class="usecase-arrow">Explore →</span>
-      </a>
-      <a href="/use-cases/#wasm-agents" class="usecase-tile">
-        <span class="usecase-num">04</span>
-        <span class="usecase-title">Portable WASM business rules</span>
-        <span class="usecase-desc">Single WASM binary runs identically in browser, edge, cloud, or AI pipeline.</span>
-        <span class="usecase-arrow">Explore →</span>
-      </a>
-      <a href="/use-cases/#ai-pipeline" class="usecase-tile">
-        <span class="usecase-num">05</span>
-        <span class="usecase-title">Auditable AI pipelines</span>
-        <span class="usecase-desc">Every AI decision backed by contracts. Trace artifacts make every path queryable.</span>
-        <span class="usecase-arrow">Explore →</span>
-      </a>
-      <a href="/use-cases/" class="usecase-tile" style="border-style:dashed; background:transparent">
-        <span class="usecase-num" style="opacity:0.5">06</span>
-        <span class="usecase-title" style="color:var(--fg-muted)">Multi-agent orchestration</span>
-        <span class="usecase-desc">Contracts prevent conflicts before execution. Governance layer validates composition.</span>
-        <span class="usecase-arrow">Explore →</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ── Principles ─────────────────────────────────────────────────────────── -->
-<section class="section" style="border-top:1px solid var(--border); background:var(--bg-elevated)" id="principles">
-  <div class="container">
-    <div class="section-label">Core principles</div>
-    <h2 class="t-h1" style="margin-bottom:3rem">One capability.<br>One contract. Every runtime.</h2>
-    <div class="grid-3">
-      <div class="card principle-card card-accent-hover">
-        <div class="card-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="14" height="14" rx="2"/><line x1="5" y1="7" x2="13" y2="7"/><line x1="5" y1="10" x2="10" y2="10"/></svg>
-        </div>
-        <h3 class="t-h3">Contracts first</h3>
-        <p class="t-body-sm t-muted">Every capability declares its preconditions, postconditions, and invariants in machine-readable form. The runtime enforces them. Nothing executes without a verified contract.</p>
-      </div>
-      <div class="card principle-card card-accent-hover">
-        <div class="card-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="7"/><circle cx="9" cy="9" r="3"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="9" y1="12" x2="9" y2="16"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="12" y1="9" x2="16" y2="9"/></svg>
-        </div>
-        <h3 class="t-h3">Portable by design</h3>
-        <p class="t-body-sm t-muted">Business logic is defined once, compiled to WASM, and placed where it makes sense. Browser, edge, cloud, or AI pipeline. The capability behaves identically. The environment adapts, not the logic.</p>
-      </div>
-      <div class="card principle-card card-accent-hover">
-        <div class="card-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="2"/><path d="M9 3v2M9 13v2M3 9h2M13 9h2M4.93 4.93l1.41 1.41M11.66 11.66l1.41 1.41M4.93 13.07l1.41-1.41M11.66 6.34l1.41-1.41"/></svg>
-        </div>
-        <h3 class="t-h3">Discoverable</h3>
-        <p class="t-body-sm t-muted">Traverse maintains a registry of declared capabilities. AI agents and orchestrators discover what the system can do without reading implementation code.</p>
-      </div>
-      <div class="card principle-card card-accent-hover">
-        <div class="card-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2L2 7v9h5v-5h4v5h5V7z"/></svg>
-        </div>
-        <h3 class="t-h3">Explainable</h3>
-        <p class="t-body-sm t-muted">Proposals, validations, approvals, and trace artifacts stay visible and queryable. The runtime does not hide how it reached a decision. Every execution leaves an auditable trail.</p>
-      </div>
-      <div class="card principle-card card-accent-hover">
-        <div class="card-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 9l4-4 4 4 6-6"/><polyline points="14,3 16,3 16,5"/></svg>
-        </div>
-        <h3 class="t-h3">Governed composition</h3>
-        <p class="t-body-sm t-muted">When multiple agents work against the same capability graph, contracts prevent conflicts before they happen. Composition is validated before execution, not after.</p>
-      </div>
-      <div class="card principle-card card-accent-hover">
-        <div class="card-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,16 6,10 10,13 16,4"/></svg>
-        </div>
-        <h3 class="t-h3">Spec-first</h3>
-        <p class="t-body-sm t-muted">Every component has an approved, versioned specification before implementation begins. The spec is the source of truth. The code is the proof. 9 governing specs, CI-gated.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── Live example ───────────────────────────────────────────────────────── -->
-<section class="section" style="border-top:1px solid var(--border)">
-  <div class="container">
-    <div class="section-label">Live example</div>
-    <h2 class="t-h1" style="margin-bottom:0.75rem">Expedition planning, governed.</h2>
-    <p class="t-body t-muted" style="max-width:52ch; margin-bottom:1rem">
-      A complete domain: 6 capabilities, 5 events, 1 workflow. Run it in your browser in under 5 minutes.
-    </p>
-    <a href="/examples/" class="btn btn-ghost btn-sm" style="margin-bottom:2.5rem">See the full walkthrough →</a>
-    <div class="example-wrap">
-      <div class="terminal">
-        <div class="terminal-header">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <span class="terminal-title">traverse-cli · bundle inspect</span>
-        </div>
-        <div class="terminal-body">
-          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">cargo run -p traverse-cli -- bundle inspect \</span></div>
-          <div class="terminal-line"><span class="terminal-prompt"> </span><span class="terminal-cmd">  examples/expedition/registry-bundle/manifest.json</span></div>
-          <br>
-          <div class="terminal-line"><span class="terminal-out accent">bundle_id:     expedition.planning.seed-bundle</span></div>
-          <div class="terminal-line"><span class="terminal-out">version:       1.0.0</span></div>
-          <div class="terminal-line"><span class="terminal-out success">capabilities:  6</span></div>
-          <div class="terminal-line"><span class="terminal-out success">events:        5</span></div>
-          <div class="terminal-line"><span class="terminal-out success">workflows:     1</span></div>
-          <br>
-          <div class="terminal-line"><span class="terminal-out">status: ready → discovering → executing → completed</span></div>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.75rem">
-        <p class="t-label" style="margin-bottom:0.5rem">6 capabilities in the workflow</p>
-        <div class="card" style="padding:1rem">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
-            <span class="t-body-sm" style="font-family:var(--font-mono);font-size:0.75rem">interpret-expedition-intent</span>
-          </div>
-          <p class="t-body-sm t-muted" style="font-size:0.78rem">Parse and structure planning goals from natural language</p>
-        </div>
-        <div class="card" style="padding:1rem">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
-            <span class="t-body-sm" style="font-family:var(--font-mono);font-size:0.75rem">capture-expedition-objective</span>
-          </div>
-          <p class="t-body-sm t-muted" style="font-size:0.78rem">Normalize destination, timing, and preference data</p>
-        </div>
-        <div class="card" style="padding:1rem">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
-            <span class="t-body-sm" style="font-family:var(--font-mono);font-size:0.75rem">assess-conditions-summary</span>
-          </div>
-          <p class="t-body-sm t-muted" style="font-size:0.78rem">Evaluate weather, terrain, and logistics constraints</p>
-        </div>
-        <div class="card" style="padding:1rem">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
-            <span class="t-body-sm" style="font-family:var(--font-mono);font-size:0.75rem">validate-team-readiness</span>
-          </div>
-          <p class="t-body-sm t-muted" style="font-size:0.78rem">Check team skill levels and equipment requirements</p>
-        </div>
-        <div class="card" style="padding:1rem">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
-            <span class="t-body-sm" style="font-family:var(--font-mono);font-size:0.75rem">assemble-expedition-plan</span>
-          </div>
-          <p class="t-body-sm t-muted" style="font-size:0.78rem">Compose the final plan from all validated inputs</p>
-        </div>
-        <div class="card" style="padding:1rem;border-color:rgba(232,81,10,0.25);background:var(--accent-dim)">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-            <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>
-            <span class="t-body-sm" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--accent)">plan-expedition (workflow)</span>
-          </div>
-          <p class="t-body-sm t-muted" style="font-size:0.78rem">Orchestrates all 5 capabilities via deterministic graph traversal</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── Lineage ─────────────────────────────────────────────────────────────── -->
-<section class="section" style="border-top:1px solid var(--border); background:var(--bg-elevated)" id="lineage">
-  <div class="container">
-    <div class="section-label">Lineage and context</div>
-    <div class="lineage-wrap">
-      <div>
-        <h2 class="t-h1" style="margin-bottom:1.25rem">Built on a published body of work.</h2>
-        <p class="t-body t-muted" style="max-width:55ch; margin-bottom:0.75rem">
-          Traverse is the runtime expression of ideas that began with Client-Side Microservices Architecture in 2023, expanded into Universal Microservices Architecture, and crystallized into Contract-Driven AI Development.
-        </p>
-        <p class="t-body t-muted" style="max-width:55ch; margin-bottom:2.5rem">
-          Each framework addressed a specific problem. CSMA asked why the browser could not be a first-class execution environment. UMA asked why business logic had to be rewritten for every runtime. C-DAD asked why AI agents could not navigate codebases that had no contracts. Traverse is the runtime where those answers become executable.
-        </p>
-        <div style="display:flex;flex-direction:column;gap:0.75rem">
-          <a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener" class="lineage-card">
-            <div class="lineage-icon">UMA</div>
-            <div>
-              <div class="t-h3" style="margin-bottom:0.25rem">Universal Microservices Architecture</div>
-              <div class="t-body-sm t-muted">universalmicroservices.com, the model behind Traverse</div>
-            </div>
-          </a>
-          <a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener" class="lineage-card">
-            <div class="lineage-icon accent">BK</div>
-            <div>
-              <div class="t-h3" style="margin-bottom:0.25rem">UMA — The Book</div>
-              <div class="t-body-sm t-muted">Available on Amazon · 13 chapters of runnable Rust and WASM</div>
-            </div>
-          </a>
-          <a href="https://drive.google.com/file/d/1HC_ZWJl9aYaMeN78qiL3ZYBVY7mAGl3f/view" target="_blank" rel="noopener" class="lineage-card">
-            <div class="lineage-icon">C-D</div>
-            <div>
-              <div class="t-h3" style="margin-bottom:0.25rem">Contract-Driven AI Development</div>
-              <div class="t-body-sm t-muted">The governance framework Traverse enforces at the runtime level</div>
-            </div>
-          </a>
-          <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="lineage-card">
-            <div class="lineage-icon">GH</div>
-            <div>
-              <div class="t-h3" style="margin-bottom:0.25rem">Traverse on GitHub</div>
-              <div class="t-body-sm t-muted">Spec, ADRs, and foundation. Open and versioned.</div>
-            </div>
-          </a>
-        </div>
-      </div>
-      <div class="status-card">
-        <div class="status-card-header">
-          <div>
-            <div style="font-family:var(--font-display);font-weight:700;font-size:1.25rem;letter-spacing:-0.02em">v0.7.0</div>
-            <div class="t-body-sm t-muted">Active development</div>
-          </div>
-          <span class="badge badge-success badge-dot">Open source</span>
-        </div>
-        <p class="t-body-sm t-muted" style="margin-bottom:1.25rem">
-          Traverse is spec-governed and open source under Apache 2.0. Every component is backed by an approved, versioned specification before implementation begins.
-        </p>
-        <div class="checklist">
-          <div class="checklist-item">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-            Runtime, CLI, and MCP server shipping now
-          </div>
-          <div class="checklist-item">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-            100% test coverage, CI-gated
-          </div>
-          <div class="checklist-item">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-            9 versioned specs, approved and merge-gated
-          </div>
-          <div class="checklist-item">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-            ADR process, all decisions documented
-          </div>
-          <div class="checklist-item">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-            Rust-first, no unsafe code, WASM-native
-          </div>
-          <div class="checklist-item">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,7 5.5,11 12,3"/></svg>
-            Multi-agent orchestration support in scope
-          </div>
-        </div>
-        <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
-          <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost" style="width:100%;justify-content:center">View on GitHub →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── CTA band ────────────────────────────────────────────────────────────── -->
-<section class="cta-band">
-  <div class="cta-band-glow"></div>
-  <div class="container" style="position:relative;z-index:1">
-    <p class="t-label" style="margin-bottom:1rem;justify-content:center;display:flex">Get started</p>
-    <h2 class="t-h1" style="margin-bottom:1rem;text-align:center">Start building.<br>Read the quickstart.</h2>
-    <p class="t-body t-muted" style="text-align:center;max-width:42ch;margin:0 auto 2.5rem">
-      Your first runnable flow. Browser demo, CLI commands, and expected output in under 5 minutes.
-    </p>
-    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
-      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart →</a>
-      <a href="/docs/" class="btn btn-ghost btn-lg">Browse the docs</a>
-    </div>
-  </div>
-</section>
-
-<!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+<!-- ── Footer ── -->
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="footer-brand-logo">
+          <img src="/assets/img/logo/traverse_icon_32x32.png" alt="" width="22" height="22">
           Traverse<span style="color:var(--accent)">.</span>
         </div>
         <p>Contract-driven WASM runtime for portable business capabilities.</p>
-        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+        <div style="margin-top:1rem;display:flex;gap:0.5rem">
           <span class="badge">v0.7.0</span>
           <span class="badge">Apache 2.0</span>
         </div>
@@ -715,9 +757,9 @@
         <div class="footer-col-title">Product</div>
         <ul class="footer-links">
           <li><a href="/use-cases/">Use Cases</a></li>
-          <li><a href="/examples/">Examples</a></li>
+          <li><a href="/solutions/">Solutions</a></li>
           <li><a href="/changelog.html">Changelog</a></li>
-          <li><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/roadmap.html">Roadmap</a></li>
         </ul>
       </div>
       <div>
@@ -725,35 +767,29 @@
         <ul class="footer-links">
           <li><a href="/docs/">Overview</a></li>
           <li><a href="/docs/quickstart.html">Quickstart</a></li>
-          <li><a href="/docs/concepts.html">Core Concepts</a></li>
-          <li><a href="/docs/guides.html">Guides</a></li>
+          <li><a href="/docs/cli-reference.html">CLI reference</a></li>
+          <li><a href="/questions/">All questions</a></li>
         </ul>
       </div>
       <div>
-        <div class="footer-col-title">Ecosystem</div>
+        <div class="footer-col-title">Company</div>
         <ul class="footer-links">
-          <li><a href="https://www.universalmicroservices.com/" target="_blank" rel="noopener">UMA</a></li>
-          <li><a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener">Book</a></li>
-          <li><a href="https://drive.google.com/file/d/1HC_ZWJl9aYaMeN78qiL3ZYBVY7mAGl3f/view" target="_blank" rel="noopener">C-DAD</a></li>
-          <li><a href="https://enricopiovesan.com" target="_blank" rel="noopener">Enrico Piovesan</a></li>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.amazon.com/dp/B0GTTTTQH4" target="_blank" rel="noopener">UMA book</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <span>© 2026 Enrico Piovesan · Traverse Framework</span>
-      <div class="footer-social">
-        <a href="https://github.com/traverse-framework" target="_blank" rel="noopener" aria-label="GitHub">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        </a>
-        <a href="https://x.com/enricopiovesan" target="_blank" rel="noopener" aria-label="Twitter">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M11.1 1h2.1L8.8 6.1 14 13H9.9L6.5 8.6 2.6 13H.5l4.7-5.4L0 1h4.2l3.1 4.1L11.1 1zm-.7 10.8h1.2L3.7 2.2H2.4l8 9.6z"/></svg>
-        </a>
-      </div>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" style="color:var(--fg-subtle);transition:color 0.15s;" onmouseover="this.style.color='var(--fg-muted)'" onmouseout="this.style.color='var(--fg-subtle)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
     </div>
   </div>
 </footer>
 
 <script src="/assets/js/nav.js"></script>
-<script src="/assets/js/graph.js"></script>
 </body>
 </html>
