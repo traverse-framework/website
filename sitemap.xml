@@ -34,6 +34,80 @@
   <url><loc>https://traverse-framework.com/blog/runtime-assumptions.html</loc><lastmod>2026-07-01</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://traverse-framework.com/blog/uma-explained.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 
+  <!-- Questions hub -->
+  <url><loc>https://traverse-framework.com/questions/</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+
+  <!-- Questions: Getting Started -->
+  <url><loc>https://traverse-framework.com/questions/what-is-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-i-install-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-i-run-the-first-example.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/do-i-need-rust.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-long-to-get-started.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-the-traverse-cli.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-the-capability-registry.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-the-browser-adapter.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: Contracts and Capabilities -->
+  <url><loc>https://traverse-framework.com/questions/what-is-contract-driven.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-a-contract-in-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-a-wasm-capability.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-are-preconditions.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-are-postconditions.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-a-governing-spec.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-i-write-a-capability-contract.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-contract-versioning.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-the-contract-lifecycle.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-constraint-validation-work.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: Technical Architecture -->
+  <url><loc>https://traverse-framework.com/questions/what-is-the-traverse-state-machine.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-traverse-execute-wasm.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-placement-targets-work.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-a-trace-artifact.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-crates-make-up-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-the-mcp-server-work.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-traverse-handle-errors.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-traverse-handle-events.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-traverse-performance.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-traverse-security-model.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: AI and MCP -->
+  <url><loc>https://traverse-framework.com/questions/what-is-contract-driven-ai-development.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-ai-agents-benefit-from-contracts.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-ai-agents-discover-capabilities.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-i-connect-claude-to-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-traverse-prevent-ai-agent-errors.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: Comparisons -->
+  <url><loc>https://traverse-framework.com/questions/how-is-traverse-different-from-microservices.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-is-traverse-different-from-serverless.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-is-traverse-different-from-function-calling.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/is-traverse-a-replacement-for-rest-apis.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-is-traverse-different-from-wasi.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-is-traverse-different-from-a-plugin-system.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: Use Cases -->
+  <url><loc>https://traverse-framework.com/questions/can-i-use-traverse-with-react.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/can-i-use-traverse-with-python.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/can-i-use-traverse-for-pricing-logic.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/can-i-use-traverse-for-eligibility-checking.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-does-traverse-help-with-compliance.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: Project and Licensing -->
+  <url><loc>https://traverse-framework.com/questions/is-traverse-open-source.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/can-i-use-traverse-commercially.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/who-maintains-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/how-do-i-contribute-to-traverse.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-uma.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-is-traverse-roadmap.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Questions: Technical Edge Cases -->
+  <url><loc>https://traverse-framework.com/questions/can-traverse-run-without-wasm.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/can-multiple-agents-share-a-traverse-registry.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/what-happens-when-a-capability-fails.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/does-traverse-support-streaming.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://traverse-framework.com/questions/is-traverse-production-ready.html</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
   <!-- Docs -->
   <url><loc>https://traverse-framework.com/docs/</loc><lastmod>2026-07-06</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://traverse-framework.com/docs/quickstart.html</loc><lastmod>2026-07-06</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>

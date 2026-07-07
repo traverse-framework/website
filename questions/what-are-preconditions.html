@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What are preconditions in a Traverse contract? — Traverse Framework</title>
+  <meta name="description" content="Preconditions are conditions that must be true before a capability can execute. They are declared in the contract and checked by the runtime before the WASM binary loads.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/what-are-preconditions.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What are preconditions in a Traverse contract?","acceptedAnswer":{"@type":"Answer","text":"Preconditions are conditions that must be true before a capability can execute. They are declared in the contract and checked by the runtime before loading the WASM binary. If a precondition fails, the runtime moves to error state with a precondition_failed reason and the capability never executes."}}]}</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem,3vw,2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+<div class="q-layout">
+  <main>
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / Contracts</div>
+    <div class="q-label">Contracts</div>
+    <h1 class="q-title">What are preconditions in a Traverse contract?</h1>
+    <div class="q-body">
+      <p>Preconditions are conditions that must be true before a capability can execute. They are declared in the contract and checked by the runtime before the WASM binary ever loads.</p>
+
+      <p>The contract's <code>[inputs]</code> section defines the schema and any constraints on each field. These constraints are the preconditions. If any constraint fails, the runtime moves to error state with a <code>precondition_failed</code> reason. The capability never runs.</p>
+
+      <h2>Examples of preconditions</h2>
+      <ul>
+        <li>A <code>party_size</code> field must be greater than 0. Passing <code>0</code> or a negative number fails immediately.</li>
+        <li>A <code>user_tier</code> field must be one of <code>["standard", "premium"]</code>. Passing <code>"trial"</code> fails immediately.</li>
+        <li>A <code>loan_amount</code> field must not exceed the declared credit limit. Passing a value above the limit fails before any loan logic runs.</li>
+        <li>A required field that is missing from the call fails immediately, regardless of other values.</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header"><span class="tok-comment"># Preconditions declared in [inputs]</span></div>
+        <div class="code-body">
+<pre><span class="tok-bracket">[[</span><span class="tok-key">inputs.fields</span><span class="tok-bracket">]]</span>
+<span class="tok-key">name</span>     <span class="tok-op">=</span> <span class="tok-string">"party_size"</span>
+<span class="tok-key">type</span>     <span class="tok-op">=</span> <span class="tok-string">"integer"</span>
+<span class="tok-key">required</span> <span class="tok-op">=</span> <span class="tok-bool">true</span>
+<span class="tok-key">min</span>      <span class="tok-op">=</span> <span class="tok-number">1</span>
+<span class="tok-key">max</span>      <span class="tok-op">=</span> <span class="tok-number">20</span>
+
+<span class="tok-bracket">[[</span><span class="tok-key">inputs.fields</span><span class="tok-bracket">]]</span>
+<span class="tok-key">name</span>        <span class="tok-op">=</span> <span class="tok-string">"user_tier"</span>
+<span class="tok-key">type</span>        <span class="tok-op">=</span> <span class="tok-string">"string"</span>
+<span class="tok-key">required</span>    <span class="tok-op">=</span> <span class="tok-bool">true</span>
+<span class="tok-key">allowed</span>     <span class="tok-op">=</span> <span class="tok-bracket">[</span><span class="tok-string">"standard"</span><span class="tok-op">,</span> <span class="tok-string">"premium"</span><span class="tok-bracket">]</span></pre>
+        </div>
+      </div>
+
+      <h2>Preconditions vs validation inside the capability</h2>
+      <p>You can write validation logic inside your Rust capability code. That is normal application logic. Preconditions are different.</p>
+      <p>Preconditions are structural. They are declared in the contract by whoever governs the capability, not by the capability author. They are enforced by the runtime, not by the code. This means:</p>
+      <ul>
+        <li>They cannot be bypassed by a bug in the implementation.</li>
+        <li>They apply regardless of who calls the capability — an agent, a service, or a human-facing UI.</li>
+        <li>They are auditable. The contract is the spec, and the spec is stored in the registry.</li>
+      </ul>
+
+      <p>When a precondition fails, the trace artifact records the reason. The caller gets a clear <code>precondition_failed</code> error, not a mid-execution crash or a silent incorrect result.</p>
+
+      <h2>Why this matters for AI agents</h2>
+      <p>An AI agent calling a capability via MCP reads the contract before deciding to call it. The agent knows the preconditions upfront. If the agent's context does not satisfy the preconditions, it should not call the capability. If it calls anyway with invalid inputs, the runtime rejects the call before any state changes. This is one of the core mechanisms Traverse uses to make agent behavior safe and auditable.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/what-are-postconditions.html">What are postconditions in a Traverse contract?</a>
+      <a href="/questions/what-is-a-contract-in-traverse.html">What is a contract in Traverse?</a>
+      <a href="/questions/how-does-traverse-prevent-ai-agent-errors.html">How does Traverse prevent AI agent errors?</a>
+      <a href="/questions/what-is-the-contract-lifecycle.html">What is the contract lifecycle?</a>
+    </div>
+    <div class="q-cta"><p>Ready to build with Traverse?</p><a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a></div>
+  </aside>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Questions</div><ul class="footer-links"><li><a href="/questions/">All Questions</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

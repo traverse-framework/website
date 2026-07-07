@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Can I use Traverse with React? — Traverse Framework</title>
+  <meta name="description" content="You can run Traverse capabilities in a React app via the browser adapter. The same contract-governed WASM binary runs in the browser and on your server.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/can-i-use-traverse-with-react.html">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I use Traverse with React?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can load Traverse capabilities in a React application using the browser adapter. The same WASM binary that runs your business logic on the server can execute in the browser. Pricing previews, eligibility checks, and validation rules run locally with no network round-trip, and the contract is enforced identically."}}]}</script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem,3vw,2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main>
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / Use Cases</div>
+    <div class="q-label">Use Cases</div>
+    <h1 class="q-title">Can I use Traverse with React?</h1>
+    <div class="q-body">
+      <p>Yes. The Traverse browser adapter lets you load and call capabilities inside a React application. The same WASM binary that runs your pricing logic or eligibility rules on the server executes in the browser, with identical contract enforcement and no network round-trip.</p>
+
+      <h2>Why you would do this</h2>
+      <p>The main use case is consistency. If your checkout flow computes a price in React before the user submits, and your API computes the same price after submission, you want both computations to use the same logic and produce the same result. With Traverse, they run the same binary. There is no risk of a JavaScript implementation drifting from the server-side implementation.</p>
+
+      <h2>How it works</h2>
+      <p>The <code>traverse-expedition-wasm</code> crate compiles the Traverse runtime to WASM so it can run inside the browser. You load your capability binary as a URL or bundled asset, initialize the runtime, and call capabilities from JavaScript or TypeScript. The React integration guide walks through the setup in detail.</p>
+
+      <ul>
+        <li>Load the capability binary once on component mount</li>
+        <li>Call capabilities on user input events or form submissions</li>
+        <li>The runtime validates the contract before and after execution</li>
+        <li>Results are typed and match your contract's output schema</li>
+      </ul>
+
+      <h2>Current status</h2>
+      <p>The browser adapter is in active development as of v0.7.0. The local target is stable for server-side use. Browser deployment is available but not yet production-ready. See the <a href="/docs/guides/react-integration.html">React integration guide</a> for the current setup and known limitations.</p>
+
+      <h2>Server-side React (Next.js, Remix)</h2>
+      <p>If you are using a server-side React framework, you can call Traverse capabilities from your server components or API routes using the local target — no browser adapter needed. The capability runs on your Node.js server via the CLI or directly through the runtime crate.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/what-is-the-browser-adapter.html">What is the browser adapter?</a>
+      <a href="/questions/how-do-placement-targets-work.html">How do placement targets work?</a>
+      <a href="/questions/can-i-use-traverse-for-pricing-logic.html">Can I use Traverse for pricing logic?</a>
+      <a href="/questions/can-i-use-traverse-with-python.html">Can I use Traverse with Python?</a>
+      <a href="/questions/is-traverse-production-ready.html">Is Traverse production ready?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/changelog.html">Changelog</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/">Overview</a></li><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/questions/">All Questions</a></li></ul></div>
+      <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li><li><a href="/blog/">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>

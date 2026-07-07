@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is a governing spec in Traverse? — Traverse Framework</title>
+  <meta name="description" content="A governing spec is an approved design document that must exist before any feature is implemented in Traverse. The spec precedes the code, not the other way around.">
+  <link rel="canonical" href="https://traverse-framework.com/questions/what-is-a-governing-spec.html">
+  <meta property="og:title" content="What is a governing spec in Traverse? — Traverse Framework">
+  <meta property="og:url" content="https://traverse-framework.com/questions/what-is-a-governing-spec.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z2T980YV3P');</script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a governing spec in Traverse?","acceptedAnswer":{"@type":"Answer","text":"A governing spec is a document that must be approved before any feature is implemented in Traverse. It describes the problem, the proposed solution, alternatives considered, and acceptance criteria. The spec precedes the code. Traverse has 9 approved governing specs as of v0.7.0. This prevents speculative code and ensures every feature is intentional. It is similar to an Architecture Decision Record but required for all feature work."}}]}
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <script>(function(){const s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(p?'dark':'light'));})();</script>
+  <style>
+    body { padding-top: var(--nav-h); }
+    .q-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; } }
+    .q-label { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 1rem; }
+    .q-title { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 700; line-height: 1.25; margin-bottom: 1.5rem; }
+    .q-body p { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+    .q-body p:first-child { font-size: 1.1rem; color: var(--fg); }
+    .q-body h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+    .q-body ul { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .q-body ul li { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+    .q-body a { color: var(--accent); text-decoration: none; }
+    .q-body a:hover { text-decoration: underline; }
+    .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+    .q-related { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 1rem; }
+    .q-related a { display: block; font-size: 0.875rem; color: var(--fg); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+    .q-related a:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-related a:hover { color: var(--accent); }
+    .q-cta { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+    .q-breadcrumb { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 1.5rem; }
+    .q-breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+    .q-breadcrumb a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Traverse<span class="nav-logo-dot">.</span></a>
+    <ul class="nav-links">
+      <li><a href="/use-cases/">Use Cases</a></li>
+      <li><a href="/solutions/">Solutions</a></li>
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme"><span class="theme-icon" style="font-size:14px">☀</span></button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/use-cases/">Use Cases</a><a href="/solutions/">Solutions</a><a href="/docs/">Docs</a><a href="/blog/">Blog</a><a href="/changelog.html">Changelog</a><a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+</div>
+
+<div class="q-layout">
+  <main class="q-main">
+    <div class="q-breadcrumb"><a href="/">Home</a> / <a href="/questions/">Questions</a> / What is a governing spec?</div>
+    <div class="q-label">Question</div>
+    <h1 class="q-title">What is a governing spec in Traverse?</h1>
+    <div class="q-body">
+      <p>A governing spec is a design document that must be written and approved before any feature is implemented in Traverse. The spec precedes the code. Not the other way around.</p>
+
+      <p>Every change in the Traverse codebase that adds or modifies significant behavior must be backed by an approved governing spec. You cannot open a pull request implementing a feature that does not have a corresponding approved spec. This is what "spec-governed development" means in practice.</p>
+
+      <h2>What a governing spec contains</h2>
+      <ul>
+        <li><strong>Problem statement</strong> — what specific problem this change addresses</li>
+        <li><strong>Proposed solution</strong> — the design being implemented, in enough detail to be reviewed on its own</li>
+        <li><strong>Alternatives considered</strong> — what other approaches were evaluated and why they were not chosen</li>
+        <li><strong>Acceptance criteria</strong> — what must be true for the implementation to be considered complete</li>
+      </ul>
+
+      <h2>How many governing specs exist</h2>
+      <p>Traverse has 9 approved governing specs as of v0.7.0. Each one corresponds to a major system component or behavioral capability: the runtime execution model, contract validation, the registry, placement targeting, the browser adapter, the state machine, trace artifacts, the MCP integration, and the expedition example.</p>
+
+      <p>You can read them in the repository under the <code>specs/</code> directory.</p>
+
+      <h2>Why this matters</h2>
+      <p>Most codebases accumulate speculative features. Someone has an idea, writes the code, and the feature exists. Without a record of why it was built, you cannot evaluate whether it is still needed, whether it conflicts with a newer direction, or what it was meant to solve.</p>
+
+      <p>Governing specs prevent that. Every piece of Traverse has a documented reason for existing. When something changes in a future version, the spec record shows what the original intent was and what the acceptance criteria were. That is useful for contributors, for auditors, and for anyone trying to understand why a design decision was made.</p>
+
+      <h2>How it relates to contract-driven development</h2>
+      <p>Traverse applies contract-driven thinking at two levels. At the capability level, contracts govern execution. At the project level, governing specs govern implementation. Both are about making intent explicit and machine-checkable before anything runs or ships.</p>
+
+      <p>The governing spec process is similar to an Architecture Decision Record (ADR), but it is required for all feature work, not just high-level architectural decisions. That is a higher bar, and it is intentional.</p>
+
+      <h2>For contributors</h2>
+      <p>If you want to contribute a new feature to Traverse, the first step is drafting a governing spec and opening it for discussion. See the <a href="/questions/how-do-i-contribute-to-traverse.html">contribution guide</a> for details on the process.</p>
+    </div>
+  </main>
+  <aside class="q-sidebar">
+    <div class="q-related">
+      <div class="q-related-title">Related questions</div>
+      <a href="/questions/what-is-traverse.html">What is Traverse?</a>
+      <a href="/questions/what-is-contract-driven.html">What does "contract-driven" mean?</a>
+      <a href="/questions/is-traverse-open-source.html">Is Traverse open source?</a>
+      <a href="/questions/how-do-i-contribute-to-traverse.html">How do I contribute to Traverse?</a>
+    </div>
+    <div class="q-cta">
+      <p>Ready to build with Traverse?</p>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="footer-brand-logo">Traverse<span style="color:var(--accent)">.</span></div><p>Contract-driven WASM runtime for portable business capabilities.</p><div style="margin-top:1rem;display:flex;gap:0.5rem"><span class="badge">v0.7.0</span><span class="badge">Apache 2.0</span></div></div>
+      <div><div class="footer-col-title">Product</div><ul class="footer-links"><li><a href="/use-cases/">Use Cases</a></li><li><a href="/solutions/">Solutions</a></li><li><a href="/examples/">Examples</a></li></ul></div>
+      <div><div class="footer-col-title">Docs</div><ul class="footer-links"><li><a href="/docs/quickstart.html">Quickstart</a></li><li><a href="/docs/concepts.html">Concepts</a></li><li><a href="/faq.html">FAQ</a></li></ul></div>
+      <div><div class="footer-col-title">Questions</div><ul class="footer-links"><li><a href="/questions/">All Questions</a></li><li><a href="/about.html">About</a></li><li><a href="/roadmap.html">Roadmap</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Enrico Piovesan · Traverse Framework</span></div>
+  </div>
+</footer>
+<script src="/assets/js/nav.js"></script>
+</body>
+</html>
