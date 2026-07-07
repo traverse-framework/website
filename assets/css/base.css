@@ -9,25 +9,26 @@ ul { list-style: none; }
 /* ─── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
   /* Surface */
-  --bg:           #0a0a0a;
-  --bg-elevated:  #0f0f0f;
-  --bg-card:      #141414;
-  --bg-input:     #1c1c1c;
+  --bg:           #0c0817;
+  --bg-elevated:  #110d1f;
+  --bg-card:      #160e27;
+  --bg-input:     #1e1231;
 
   /* Text */
-  --fg:           #f0f0f0;
-  --fg-muted:     #888;
-  --fg-subtle:    #4a4a4a;
+  --fg:           #f0eeff;
+  --fg-muted:     #9088aa;
+  --fg-subtle:    #4a3d60;
 
   /* Accent */
-  --accent:       #E8510A;
-  --accent-hover: #f05f18;
-  --accent-glow:  rgba(232, 81, 10, 0.15);
-  --accent-dim:   rgba(232, 81, 10, 0.08);
+  --accent:       #ff7a1a;
+  --accent-hover: #ff9533;
+  --accent-glow:  rgba(255, 122, 26, 0.18);
+  --accent-dim:   rgba(255, 122, 26, 0.08);
+  --accent-purple: #8822cc;
 
   /* Borders */
-  --border:       rgba(255, 255, 255, 0.06);
-  --border-hover: rgba(255, 255, 255, 0.12);
+  --border:       rgba(136, 34, 204, 0.14);
+  --border-hover: rgba(136, 34, 204, 0.28);
 
   /* Semantic */
   --success:      #3fb950;
@@ -90,12 +91,12 @@ ul { list-style: none; }
   --code-bg:     #0d1117;
 }
 [data-theme="dark"] {
-  --bg:           #0a0a0a;
-  --bg-elevated:  #0f0f0f;
-  --bg-card:      #141414;
-  --fg:           #f0f0f0;
-  --fg-muted:     #888;
-  --border:       rgba(255, 255, 255, 0.06);
+  --bg:           #0c0817;
+  --bg-elevated:  #110d1f;
+  --bg-card:      #160e27;
+  --fg:           #f0eeff;
+  --fg-muted:     #9088aa;
+  --border:       rgba(136, 34, 204, 0.14);
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
