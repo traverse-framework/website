@@ -9,31 +9,13 @@ const _body = "<section class=\"compare-hero\">\n  <div class=\"container\">\n  
   canonical={"https://traverse-framework.com/compare/vs-microservices.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Compare", href: "/compare/" }]}
 >
-  <style is:global slot="head">body { padding-top: var(--nav-h); }
-
-    .compare-hero {
-      padding: 4.5rem 0 3.5rem;
-      position: relative;
-    }
-    .compare-hero::before {
+  <style is:global slot="head">.compare-hero::before {
       content: '';
       position: absolute;
       inset: 0;
       background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%);
       pointer-events: none;
     }
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.82rem;
-      color: var(--fg-muted);
-      margin-bottom: 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .breadcrumb a { color: var(--fg-muted); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .breadcrumb span { color: var(--accent); }
     .compare-hero h1 {
       font-size: clamp(2rem, 4.5vw, 3.2rem);
       font-weight: 700;

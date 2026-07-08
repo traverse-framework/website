@@ -9,73 +9,7 @@ const _body = "<main>\n  <section class=\"page-hero\">\n    <div class=\"contain
   canonical={"https://traverse-framework.com/solutions/ai-companies.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Solutions", href: "/solutions/" }]}
 >
-  <style is:global slot="head">body { padding-top: var(--nav-h); }
-
-    .page-hero {
-      padding: 5rem 0 4rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .page-hero-inner {
-      max-width: 780px;
-    }
-    .page-hero h1 {
-      margin: 1rem 0 1.5rem;
-    }
-    .page-hero-sub {
-      font-size: 1.1rem;
-      line-height: 1.75;
-      color: var(--fg-muted);
-      max-width: 640px;
-    }
-    .page-hero-badges {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-    @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; gap: 2.5rem; } }
-
-    .problem-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    .problem-item {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-    .problem-icon {
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: rgba(239,68,68,0.12);
-      border: 1px solid rgba(239,68,68,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      color: #ef4444;
-      margin-top: 2px;
-    }
-    .problem-text {
-      font-size: 0.95rem;
-      line-height: 1.65;
-      color: var(--fg-muted);
-    }
-
-    .feature-grid {
+  <style is:global slot="head">.feature-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.25rem;
@@ -157,32 +91,6 @@ const _body = "<main>\n  <section class=\"page-hero\">\n    <div class=\"contain
       color: var(--fg-muted);
       margin-bottom: 1rem;
       line-height: 1.6;
-    }
-
-    .section-title-sm {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      line-height: 1.3;
-    }
-    .section-lead {
-      color: var(--fg-muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-      margin-bottom: 2rem;
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-      color: var(--fg-muted);
-      margin-bottom: 1.25rem;
-    }
-    .breadcrumb a { color: var(--fg-muted); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .breadcrumb-sep { opacity: 0.4; }</style>
+    }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>
