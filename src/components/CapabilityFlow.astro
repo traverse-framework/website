@@ -1,0 +1,198 @@
+---
+// Liquid blob animation: a capability flowing from the client through the
+// contract-validating runtime out to cloud, edge, and AI targets.
+// Pure SVG + CSS (gooey filter + offset-path), zero JS.
+---
+<section class="section flow-section">
+  <div class="container">
+    <div class="section-label">Capability flow</div>
+    <h2 class="flow-title">Logic that travels.</h2>
+    <p class="flow-sub">
+      A capability leaves your app, passes the contract gate, and lands wherever it runs best. Same binary, same behavior, every target.
+    </p>
+
+    <div class="flow-stage">
+      <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Animated diagram of a capability flowing from a client app through the Traverse runtime to cloud, edge, and AI agent targets">
+        <defs>
+          <filter id="goo" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo" />
+          </filter>
+          <linearGradient id="blob-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff9533" />
+            <stop offset="60%" stop-color="#ff7a1a" />
+            <stop offset="100%" stop-color="#d21e78" />
+          </linearGradient>
+          <linearGradient id="pipe-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(255,122,26,0.25)" />
+            <stop offset="50%" stop-color="rgba(210,30,120,0.2)" />
+            <stop offset="100%" stop-color="rgba(136,34,204,0.25)" />
+          </linearGradient>
+        </defs>
+
+        <!-- pipes -->
+        <path class="pipe" d="M 150 170 C 240 170, 260 170, 350 170" />
+        <path class="pipe" d="M 550 170 C 640 170, 650 60, 750 60" />
+        <path class="pipe" d="M 550 170 C 650 170, 660 170, 750 170" />
+        <path class="pipe" d="M 550 170 C 640 170, 650 280, 750 280" />
+
+        <!-- liquid blobs (gooey group) -->
+        <g class="goo-layer" filter="url(#goo)">
+          <circle class="blob blob-in-1" r="11" fill="url(#blob-grad)" />
+          <circle class="blob blob-in-2" r="7" fill="url(#blob-grad)" />
+          <circle class="blob blob-in-3" r="5" fill="url(#blob-grad)" />
+          <circle class="blob blob-cloud-1" r="10" fill="url(#blob-grad)" />
+          <circle class="blob blob-cloud-2" r="6" fill="url(#blob-grad)" />
+          <circle class="blob blob-edge-1" r="10" fill="url(#blob-grad)" />
+          <circle class="blob blob-edge-2" r="6" fill="url(#blob-grad)" />
+          <circle class="blob blob-ai-1" r="10" fill="url(#blob-grad)" />
+          <circle class="blob blob-ai-2" r="6" fill="url(#blob-grad)" />
+          <!-- liquid pool inside the runtime hub -->
+          <circle class="hub-pool" cx="450" cy="170" r="16" fill="url(#blob-grad)" />
+        </g>
+
+        <!-- client node -->
+        <g class="node">
+          <rect x="40" y="130" width="110" height="80" rx="14" />
+          <text x="95" y="164" class="node-label">Your app</text>
+          <text x="95" y="184" class="node-sub">client</text>
+        </g>
+
+        <!-- runtime hub -->
+        <g class="node hub">
+          <rect x="350" y="118" width="200" height="104" rx="16" />
+          <text x="450" y="150" class="node-label">Traverse runtime</text>
+          <text x="450" y="204" class="node-sub">contract validated ✓</text>
+        </g>
+
+        <!-- targets -->
+        <g class="node target">
+          <rect x="750" y="24" width="110" height="72" rx="14" />
+          <text x="805" y="54" class="node-label">Cloud</text>
+          <text x="805" y="74" class="node-sub">server</text>
+        </g>
+        <g class="node target">
+          <rect x="750" y="134" width="110" height="72" rx="14" />
+          <text x="805" y="164" class="node-label">Edge</text>
+          <text x="805" y="184" class="node-sub">CDN worker</text>
+        </g>
+        <g class="node target">
+          <rect x="750" y="244" width="110" height="72" rx="14" />
+          <text x="805" y="274" class="node-label">AI agent</text>
+          <text x="805" y="294" class="node-sub">via MCP</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .flow-section {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+  .flow-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    color: var(--fg);
+    margin-bottom: 0.75rem;
+  }
+  .flow-sub {
+    font-size: 1rem;
+    color: var(--fg-muted);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 3rem;
+  }
+  .flow-stage svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .pipe {
+    fill: none;
+    stroke: url(#pipe-grad);
+    stroke-width: 2;
+    stroke-dasharray: 4 6;
+  }
+
+  .node rect {
+    fill: var(--bg-card);
+    stroke: var(--border-hover);
+    stroke-width: 1;
+  }
+  .node.hub rect {
+    stroke: var(--accent);
+    stroke-opacity: 0.45;
+  }
+  .node-label {
+    fill: var(--fg);
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+  .node-sub {
+    fill: var(--fg-muted);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-anchor: middle;
+  }
+  .node.hub .node-sub { fill: var(--accent); }
+
+  /* hub liquid pool breathes as blobs merge into it */
+  .hub-pool {
+    transform-origin: 450px 170px;
+    animation: pool-breathe 4s ease-in-out infinite;
+  }
+
+  /* blobs ride the pipes via offset-path; trailing droplets lag slightly
+     so the goo filter stretches them into a liquid tail */
+  .blob { offset-rotate: 0deg; }
+
+  .blob-in-1, .blob-in-2, .blob-in-3 {
+    offset-path: path('M 150 170 C 240 170, 260 170, 350 170');
+  }
+  .blob-in-1 { animation: travel 4s ease-in-out infinite; }
+  .blob-in-2 { animation: travel 4s ease-in-out infinite 0.18s; }
+  .blob-in-3 { animation: travel 4s ease-in-out infinite 0.34s; }
+
+  .blob-cloud-1, .blob-cloud-2 {
+    offset-path: path('M 550 170 C 640 170, 650 60, 750 60');
+  }
+  .blob-edge-1, .blob-edge-2 {
+    offset-path: path('M 550 170 C 650 170, 660 170, 750 170');
+  }
+  .blob-ai-1, .blob-ai-2 {
+    offset-path: path('M 550 170 C 640 170, 650 280, 750 280');
+  }
+  .blob-cloud-1 { animation: travel 4s ease-in-out infinite 2s; }
+  .blob-cloud-2 { animation: travel 4s ease-in-out infinite 2.18s; }
+  .blob-edge-1  { animation: travel 4s ease-in-out infinite 2.1s; }
+  .blob-edge-2  { animation: travel 4s ease-in-out infinite 2.28s; }
+  .blob-ai-1    { animation: travel 4s ease-in-out infinite 2.2s; }
+  .blob-ai-2    { animation: travel 4s ease-in-out infinite 2.38s; }
+
+  @keyframes travel {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    42%  { offset-distance: 100%; opacity: 1; }
+    50%  { offset-distance: 100%; opacity: 0; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+
+  @keyframes pool-breathe {
+    0%, 100% { transform: scale(1); }
+    45%      { transform: scale(1.35); }
+    60%      { transform: scale(0.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob, .hub-pool { animation: none; }
+    .blob { offset-distance: 100%; opacity: 0; }
+  }
+</style>
