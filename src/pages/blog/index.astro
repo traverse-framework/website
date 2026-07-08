@@ -1,0 +1,42 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const posts = [
+  { href: '/blog/ai-agents-need-contracts.html', title: 'AI agents need contracts, not just function definitions', desc: 'Function calling tells an agent what a tool does. It says nothing about what has to be true before or after it runs.' },
+  { href: '/blog/logic-duplication.html', title: 'Why I stopped writing the same business logic four times', desc: 'The same pricing rule lived in the web app, the mobile app, the backend, and the AI pipeline. Each copy drifted.' },
+  { href: '/blog/runtime-assumptions.html', title: 'The hidden cost of runtime assumptions', desc: 'Most bugs in business logic are not logic bugs. They are assumptions about the environment that turned out to be false.' },
+  { href: '/blog/uma-explained.html', title: 'What Universal Microservices Architecture got right', desc: 'UMA argued for one deployable unit that runs anywhere. Traverse is one way to build that.' },
+  { href: '/blog/wasm-business-logic.html', title: 'What WASM actually gives you for business logic', desc: 'Portability and sandboxing, not performance, is the reason WASM matters for governed business logic.' },
+];
+---
+<SubpageLayout
+  title={"Blog — Traverse Framework"}
+  description={"Writing on contract-driven development, portable business logic, and the Traverse runtime."}
+  canonical={"https://traverse-framework.com/blog.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="page-hero-inner">
+          <span class="section-label">Blog</span>
+          <h1 class="t-h1">Notes on contract-driven development.</h1>
+          <p class="page-hero-sub">Writing on portable business logic, contract governance, and why the same rule keeps getting rewritten four times.</p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="usecase-grid">
+          {posts.map((p) => (
+            <a href={p.href} class="usecase-card" style="text-decoration:none;display:block">
+              <h3>{p.title}</h3>
+              <p>{p.desc}</p>
+              <span style="color:var(--accent);font-size:0.82rem">Read more →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+</SubpageLayout>

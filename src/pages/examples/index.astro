@@ -1,0 +1,77 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+---
+<SubpageLayout
+  title={"Examples — Traverse Framework"}
+  description={"A worked example of a Traverse capability contract, from TOML definition to execution trace."}
+  canonical={"https://traverse-framework.com/examples.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="page-hero-inner">
+          <span class="section-label">Examples</span>
+          <h1 class="t-h1">A capability, end to end.</h1>
+          <p class="page-hero-sub">A pricing capability defined as a contract, compiled to WASM, and run from the CLI with a full trace.</p>
+        </div>
+      </div>
+    </section>
+    <section class="section-sm">
+      <div class="container">
+        <div class="two-col">
+          <div>
+            <span class="section-label">Contract</span>
+            <h2 class="section-title-sm" style="margin-top:0.75rem">pricing.toml</h2>
+            <p class="section-lead">The contract declares the capability, links it to the governing spec it implements, and defines the input and output shapes as JSON Schema.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="code-filename">pricing.toml</span>
+              </div>
+              <div class="code-body">
+                <pre><span class="tok-section">[capability]</span>
+<span class="tok-key">name</span>    = <span class="tok-str">"calculate-price"</span>
+<span class="tok-key">version</span> = <span class="tok-str">"1.2.0"</span>
+<span class="tok-key">wasm</span>    = <span class="tok-str">"pricing.wasm"</span>
+
+<span class="tok-section">[governing_spec]</span>
+<span class="tok-key">title</span>   = <span class="tok-str">"Pricing Policy v3"</span>
+<span class="tok-key">source</span>  = <span class="tok-str">"docs/pricing-policy.md"</span>
+
+<span class="tok-section">[input]</span>
+<span class="tok-key">type</span> = <span class="tok-str">"object"</span>
+<span class="tok-key">properties</span>.sku      = <span class="tok-str">"string"</span>
+<span class="tok-key">properties</span>.quantity = <span class="tok-str">"integer"</span>
+<span class="tok-key">required</span> = <span class="tok-str">["sku", "quantity"]</span>
+
+<span class="tok-section">[output]</span>
+<span class="tok-key">type</span> = <span class="tok-str">"object"</span>
+<span class="tok-key">properties</span>.total    = <span class="tok-str">"number"</span>
+<span class="tok-key">properties</span>.currency = <span class="tok-str">"string"</span></pre>
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="section-label">Run</span>
+            <h2 class="section-title-sm" style="margin-top:0.75rem">traverse run</h2>
+            <p class="section-lead">The runtime validates the input against the contract's preconditions, executes the WASM binary, and writes a trace artifact for the run.</p>
+            <div class="terminal">
+              <div class="terminal-header">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="terminal-title">terminal</span>
+              </div>
+              <div class="terminal-body">
+                <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">traverse run pricing --input '{'{'}"sku":"PRO","quantity":5{'}'}'</span></div>
+                <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">✓ Contract validated</span></div>
+                <div class="terminal-line"><span class="terminal-out success">✓ WASM executed (2.1ms)</span></div>
+                <div class="terminal-line"><span class="terminal-out accent">→ {'{'}"total": 249.95, "currency": "USD"{'}'}</span></div>
+              </div>
+            </div>
+            <p class="section-lead" style="margin-top:1.5rem">For a full walkthrough of installing the CLI and running this yourself, see the <a href="/docs/quickstart.html" style="color:var(--accent)">quickstart</a>. More worked examples live in the <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" style="color:var(--accent)">GitHub repository</a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</SubpageLayout>

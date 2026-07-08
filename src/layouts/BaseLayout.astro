@@ -17,6 +17,7 @@ const {
   canonical = Astro.url.href,
   jsonLd,
   ogImage = '/assets/img/logo/traverse_icon_1024x1024.png',
+  class: bodyClass,
 } = Astro.props;
 
 const fullTitle = title.includes('Traverse') ? title : `${title} — Traverse Framework`;
@@ -103,7 +104,7 @@ const siteJsonLd = JSON.stringify({
     })();
   </script>
 </head>
-<body>
+<body class={bodyClass}>
   <Nav />
   <slot />
   <Footer />

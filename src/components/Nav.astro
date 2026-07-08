@@ -144,14 +144,14 @@ const { currentPath = '' } = Astro.props;
           </div>
           <div class="dropdown-section">
             <div class="dropdown-label">Resources</div>
-            <a href="/questions/" class="dropdown-item" role="menuitem">
+            <a href="/questions.html" class="dropdown-item" role="menuitem">
               <span class="dropdown-icon">◎</span>
               <span>
                 <span class="dropdown-item-title">All Questions</span>
                 <span class="dropdown-item-desc">55 answered questions</span>
               </span>
             </a>
-            <a href="/examples/" class="dropdown-item" role="menuitem">
+            <a href="/examples.html" class="dropdown-item" role="menuitem">
               <span class="dropdown-icon">◷</span>
               <span>
                 <span class="dropdown-item-title">Examples</span>
@@ -162,7 +162,7 @@ const { currentPath = '' } = Astro.props;
         </div>
       </li>
 
-      <li class="nav-item"><a href="/blog/" class="nav-link">Blog</a></li>
+      <li class="nav-item"><a href="/blog.html" class="nav-link">Blog</a></li>
     </ul>
 
     <div class="nav-right">
@@ -184,9 +184,9 @@ const { currentPath = '' } = Astro.props;
 
 <div class="nav-mobile-menu" id="nav-mobile-menu">
   <a href="/questions/what-is-traverse.html">What is Traverse</a>
-  <a href="/solutions/">Solutions</a>
-  <a href="/docs/">Docs</a>
-  <a href="/blog/">Blog</a>
+  <a href="/solutions.html">Solutions</a>
+  <a href="/docs.html">Docs</a>
+  <a href="/blog.html">Blog</a>
   <a href="/changelog.html">Changelog</a>
   <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
   <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem">Get started</a>
@@ -237,6 +237,24 @@ const { currentPath = '' } = Astro.props;
   }
   .nav-logo img { width: 24px; height: 24px; object-fit: contain; }
   .nav-logo-dot { color: var(--accent); }
+
+  /* The homepage hero has a hardcoded-dark background regardless of theme
+     (brand art). While the nav is transparent and sitting on top of it,
+     force light text so light-mode's dark --fg doesn't vanish against it. */
+  :global(body.home) .nav:not(.scrolled) .nav-logo { color: #f0eeff; }
+  :global(body.home) .nav:not(.scrolled) .nav-link-btn,
+  :global(body.home) .nav:not(.scrolled) .nav-link { color: rgba(240,238,255,0.7); }
+  :global(body.home) .nav:not(.scrolled) .nav-theme-btn,
+  :global(body.home) .nav:not(.scrolled) .nav-mobile-btn { color: rgba(240,238,255,0.7); }
+  :global(body.home) .nav:not(.scrolled) .nav-right .btn-ghost {
+    color: rgba(240,238,255,0.7);
+    border-color: rgba(240,238,255,0.25);
+  }
+  :global(body.home) .nav:not(.scrolled) .nav-right .btn-ghost:hover {
+    color: #f0eeff;
+    border-color: rgba(240,238,255,0.4);
+    background: rgba(255,255,255,0.06);
+  }
 
   .nav-links {
     display: flex;

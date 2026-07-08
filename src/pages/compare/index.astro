@@ -1,0 +1,40 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const pages = [
+  { href: '/compare/vs-function-calling.html', title: 'Traverse vs AI Function Calling', desc: 'Function definitions describe a shape. Contracts govern behavior, before and after execution.' },
+  { href: '/compare/vs-microservices.html', title: 'Traverse vs Microservices', desc: 'Microservices split logic by team boundary. Traverse splits it by capability, running as one portable binary.' },
+  { href: '/compare/vs-serverless.html', title: 'Traverse vs Serverless Functions', desc: 'Serverless solves deployment and scaling. Traverse solves contract governance and portability. Different problems.' },
+];
+---
+<SubpageLayout
+  title={"Compare — Traverse Framework"}
+  description={"How Traverse compares to AI function calling, microservices, and serverless functions."}
+  canonical={"https://traverse-framework.com/compare.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="page-hero-inner">
+          <span class="section-label">Compare</span>
+          <h1 class="t-h1">How Traverse compares.</h1>
+          <p class="page-hero-sub">Traverse overlaps with a few existing approaches without replacing any of them outright. Here's where it fits.</p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="usecase-grid">
+          {pages.map((p) => (
+            <a href={p.href} class="usecase-card" style="text-decoration:none;display:block">
+              <h3>{p.title}</h3>
+              <p>{p.desc}</p>
+              <span style="color:var(--accent);font-size:0.82rem">Read comparison →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+</SubpageLayout>

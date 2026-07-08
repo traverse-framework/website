@@ -1,0 +1,62 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const useCases = [
+  { href: '/questions/can-i-use-traverse-for-pricing-logic.html', title: 'Pricing and discount logic', desc: 'Encode complex pricing rules as a contract with a link to your pricing policy document. The same capability runs in your frontend, your backend, and inside AI agent pipelines with identical results.' },
+  { href: '/questions/can-i-use-traverse-for-eligibility-checking.html', title: 'Eligibility and access rules', desc: 'Run eligibility logic as a sandboxed WASM capability so an AI agent can check a user\'s eligibility without risk of hallucinating the answer.' },
+  { href: '/questions/how-does-traverse-help-with-compliance.html', title: 'Compliance and audit logic', desc: 'Capture regulatory and compliance rules in versioned contracts with governing spec links. Every execution is traced and replayable.' },
+  { href: '/questions/how-does-traverse-prevent-ai-agent-errors.html', title: 'AI agent guardrails', desc: 'Give your AI agents a set of contract-governed capabilities to call. The agent cannot exceed the contract\'s boundaries.' },
+];
+
+const industries = [
+  { href: '/solutions/fintech.html', title: 'Fintech' },
+  { href: '/solutions/saas.html', title: 'SaaS Platforms' },
+  { href: '/solutions/ecommerce.html', title: 'E-commerce' },
+  { href: '/solutions/enterprise.html', title: 'Enterprise' },
+  { href: '/solutions/ai-companies.html', title: 'AI Companies' },
+];
+---
+<SubpageLayout
+  title={"Use Cases — Traverse Framework"}
+  description={"Concrete use cases for Traverse: pricing logic, eligibility checks, compliance, and AI agent guardrails."}
+  canonical={"https://traverse-framework.com/use-cases.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="page-hero-inner">
+          <span class="section-label">Use cases</span>
+          <h1 class="t-h1">Built for real business logic.</h1>
+          <p class="page-hero-sub">Pricing rules, eligibility checks, compliance logic — any deterministic computation that needs to run reliably everywhere.</p>
+        </div>
+      </div>
+    </section>
+    <section class="section-sm">
+      <div class="container">
+        <div class="usecase-grid">
+          {useCases.map((u) => (
+            <a href={u.href} class="usecase-card" style="text-decoration:none;display:block">
+              <h3>{u.title}</h3>
+              <p>{u.desc}</p>
+              <span style="color:var(--accent);font-size:0.82rem">Learn more →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+    <section class="section-sm" style="border-top:1px solid var(--border)">
+      <div class="container">
+        <span class="section-label">By industry</span>
+        <h2 class="section-title-sm" style="margin-top:0.75rem;margin-bottom:1.5rem">See how each industry applies this.</h2>
+        <div class="usecase-grid">
+          {industries.map((i) => (
+            <a href={i.href} class="usecase-card" style="text-decoration:none;display:block">
+              <h3>{i.title}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+</SubpageLayout>

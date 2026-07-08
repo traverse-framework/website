@@ -1,0 +1,49 @@
+---
+export interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+
+const sections = [
+  {
+    title: 'Getting Started',
+    links: [{ href: '/docs/quickstart.html', label: 'Quickstart' }],
+  },
+  {
+    title: 'Core Concepts',
+    links: [
+      { href: '/docs/concepts.html', label: 'Contracts' },
+      { href: '/docs/architecture.html', label: 'Architecture' },
+    ],
+  },
+  {
+    title: 'Guides',
+    links: [
+      { href: '/docs/guides.html', label: 'All Guides' },
+      { href: '/docs/guides/mcp-setup.html', label: 'MCP Setup' },
+      { href: '/docs/guides/react-integration.html', label: 'React Integration' },
+    ],
+  },
+  {
+    title: 'Reference',
+    links: [
+      { href: '/docs/cli-reference.html', label: 'CLI Reference' },
+      { href: '/docs/troubleshooting.html', label: 'Troubleshooting' },
+      { href: '/examples.html', label: 'Examples' },
+      { href: '/changelog.html', label: 'Changelog' },
+    ],
+  },
+];
+---
+<aside class="docs-sidebar">
+  {sections.map((section) => (
+    <div class="docs-sidebar-section">
+      <div class="docs-sidebar-title">{section.title}</div>
+      <div class="docs-sidebar-links">
+        {section.links.map((link) => (
+          <a href={link.href} class={link.href === active ? 'active' : undefined}>{link.label}</a>
+        ))}
+      </div>
+    </div>
+  ))}
+</aside>

@@ -1,0 +1,41 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+import DocsSidebar from '@components/DocsSidebar.astro';
+
+const links = [
+  { href: '/docs/quickstart.html', title: 'Quickstart', desc: 'Install the CLI, write your first contract, and run it in under five minutes.' },
+  { href: '/docs/concepts.html', title: 'Contracts', desc: 'Contracts, the capability registry, the runtime, placement targets, traces, and workflows.' },
+  { href: '/docs/architecture.html', title: 'Architecture', desc: 'How the runtime, registry, and WASM sandbox fit together.' },
+  { href: '/docs/guides.html', title: 'Guides', desc: 'MCP server setup, React integration, and other practical walkthroughs.' },
+  { href: '/docs/cli-reference.html', title: 'CLI Reference', desc: 'Every command, flag, and expected output for traverse-cli.' },
+  { href: '/docs/troubleshooting.html', title: 'Troubleshooting', desc: 'Common errors and how to resolve them.' },
+];
+---
+<SubpageLayout
+  title={"Docs — Traverse Framework"}
+  description={"Documentation for Traverse: quickstart, core concepts, architecture, guides, and CLI reference."}
+  canonical={"https://traverse-framework.com/docs.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">body { padding-top: var(--nav-h); }</style>
+  <main>
+    <div class="docs-layout">
+      <DocsSidebar active="/docs.html" />
+      <div class="docs-content">
+        <div style="margin-bottom:2rem">
+          <div class="section-label" style="margin-bottom:0.75rem">Documentation</div>
+          <h1 class="t-h1" style="margin-bottom:0.75rem">Everything to build with Traverse.</h1>
+          <p class="t-body t-muted">Start with the quickstart, then go deeper into concepts, architecture, and reference material as you need it.</p>
+        </div>
+        <div class="usecase-grid">
+          {links.map((l) => (
+            <a href={l.href} class="usecase-card" style="text-decoration:none;display:block">
+              <h3>{l.title}</h3>
+              <p>{l.desc}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+</SubpageLayout>
