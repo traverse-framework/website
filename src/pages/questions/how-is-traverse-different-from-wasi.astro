@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>WASI is a specification — it defines how WASM modules interact with the host operating system through a standard set of system call interfaces. Traverse is a runtime that uses WASI underneath. They operate at different levels and are not alternatives to each other.</p>\n\n      <h2>What WASI is</h2>\n      <p>WASI (WebAssembly System Interface) standardizes how a WASM module can call host functions for things like file I/O, networking, environment variables, and clocks. Without WASI, a WASM module runs in a pure sandbox with no way to reach the outside world. WASI defines the interface for breaking out of that sandbox in a controlled, portable way.</p>\n\n      <h2>What Traverse adds on top</h2>\n      <p>Traverse compiles capabilities to <code>wasm32-wasi</code> targets — WASM binaries that use the WASI interface. Then it adds its own layer on top:</p>\n      <ul>\n        <li>A contract system that defines what a capability accepts and returns</li>\n        <li>Precondition and postcondition enforcement before and after execution</li>\n        <li>A registry for storing, versioning, and discovering capabilities</li>\n        <li>A state machine execution model that tracks every phase of a call</li>\n        <li>A trace artifact produced on every execution</li>\n        <li>An MCP server that exposes capabilities to AI agents</li>\n      </ul>\n\n      <h2>The analogy</h2>\n      <p>WASI is to Traverse roughly as POSIX is to a web framework. POSIX defines how programs call the OS. A web framework builds on top of those OS calls and adds routing, middleware, and request handling. You use the web framework — it uses POSIX under the hood. You use Traverse — it uses WASI under the hood.</p>\n\n      <h2>Why this matters for portability</h2>\n      <p>Traverse capabilities compile to the WASI target, which means the same binary runs on any WASI-compatible runtime: Wasmtime, WasmEdge, browser via polyfill, edge runtimes. WASI provides the portability foundation. Traverse provides the contract governance layer on top of it.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How is Traverse different from WASI?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"WASI (WebAssembly System Interface) is a standard for how WASM modules call host system functions like file I/O and networking. Traverse is a runtime that uses WASI underneath for those calls but adds its own layer: contract definitions, precondition/postcondition enforcement, a capability registry, and a state machine execution model.\"}}]}";
+---
+<QuestionLayout
+  title={"How is Traverse different from WASI?"}
+  description={"WASI is a system interface standard for WASM. Traverse is a contract-driven runtime that uses WASI underneath. They operate at different layers."}
+  canonical={"https://traverse-framework.com/questions/how-is-traverse-different-from-wasi.html"}
+  category={"Comparisons"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

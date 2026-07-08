@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>You connect Claude Desktop to Traverse by adding the Traverse MCP server to your Claude Desktop config. Claude discovers your registered capabilities as tools on the next restart and calls them with full contract validation on every invocation.</p>\n\n      <h2>Step 1 — Register capabilities</h2>\n      <p>Make sure you have at least one capability registered in your local Traverse registry:</p>\n      <pre><code>traverse capability register \\\n  --contract my_capability.toml \\\n  --wasm target/wasm32-wasi/release/my_capability.wasm</code></pre>\n\n      <h2>Step 2 — Add to Claude Desktop config</h2>\n      <p>Open your Claude Desktop MCP config file. On macOS it lives at <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>. Add the Traverse server:</p>\n      <pre><code>{\n  \"mcpServers\": {\n    \"traverse\": {\n      \"command\": \"traverse\",\n      \"args\": [\"mcp\", \"serve\"]\n    }\n  }\n}</code></pre>\n\n      <h2>Step 3 — Restart Claude Desktop</h2>\n      <p>Quit and reopen Claude Desktop. The app starts the Traverse MCP server as a subprocess. When you open a new conversation, your capabilities appear in Claude's tool list. Claude can call them directly in response to your prompts.</p>\n\n      <h2>What Claude sees</h2>\n      <p>Each registered capability appears as a tool with the name from your contract's <code>[capability]</code> section, the description you wrote, and the full input schema. Claude uses the schema to construct valid inputs. If it sends an invalid input, the runtime returns a structured error Claude can read and correct from.</p>\n\n      <p>See <a href=\"/questions/how-does-the-mcp-server-work.html\">how the MCP server works</a> for more detail on the protocol, and the <a href=\"/docs/guides/mcp-setup.html\">MCP setup guide</a> for a full walkthrough.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I connect Claude to Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Add the Traverse MCP server to your Claude Desktop config file. Point it at the traverse CLI command with the mcp serve subcommand. Claude will discover your registered capabilities as tools on the next restart and can call them with contract validation on every invocation.\"}}]}";
+---
+<QuestionLayout
+  title={"How do I connect Claude to Traverse?"}
+  description={"Connect Claude Desktop to your Traverse registry in three steps. Your capabilities become tools Claude can discover and call directly."}
+  canonical={"https://traverse-framework.com/questions/how-do-i-connect-claude-to-traverse.html"}
+  category={"AI and MCP"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>The Traverse MCP server is a stdio process that implements the Model Context Protocol. It sits between your AI agent (Claude, GPT, or any MCP-compatible client) and your registered capabilities. The agent asks what tools exist, the server returns them, and the agent calls them by name.</p>\n\n      <h2>The two core methods</h2>\n      <p><strong>tools/list</strong> — returns all capabilities currently in the registry as MCP tool definitions. Each tool definition includes the capability name, a description drawn from the contract, and the JSON schema for the input. The agent uses this to decide which tool to call.</p>\n      <p><strong>tools/call</strong> — takes a capability name and a JSON input, runs it through the full Traverse runtime (precondition check, WASM execution, postcondition check), and returns the output. If any validation fails, the error goes back to the agent with a structured message.</p>\n\n      <h2>Starting the server</h2>\n      <pre><code>traverse mcp serve</code></pre>\n      <p>This starts the stdio server on the current registry. To connect it to Claude Desktop, add it to your MCP config:</p>\n      <pre><code>{\n  \"mcpServers\": {\n    \"traverse\": {\n      \"command\": \"traverse\",\n      \"args\": [\"mcp\", \"serve\"]\n    }\n  }\n}</code></pre>\n\n      <h2>Why this matters for AI agents</h2>\n      <p>Without contracts, an agent calling a tool is guessing. It sends inputs it thinks are valid and hopes the output matches what it expected. With Traverse, the agent gets the schema upfront. The runtime validates the call before execution. The agent gets a typed, predictable result every time.</p>\n      <p>See <a href=\"/questions/how-do-ai-agents-discover-capabilities.html\">how AI agents discover capabilities</a> for more on the discovery flow.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How does the Traverse MCP server work?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The Traverse MCP server (traverse-mcp) is a stdio server that implements the Model Context Protocol. It exposes two methods: tools/list returns all registered capabilities with their contract schemas as tool definitions, and tools/call executes a capability by name with contract validation and returns the result.\"}}]}";
+---
+<QuestionLayout
+  title={"How does the Traverse MCP server work?"}
+  description={"The Traverse MCP server exposes your registered capabilities as tools that AI agents can discover and call. Learn how it works and how to set it up."}
+  canonical={"https://traverse-framework.com/questions/how-does-the-mcp-server-work.html"}
+  category={"Technical Architecture"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

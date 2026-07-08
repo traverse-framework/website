@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>A contract is a TOML file. It sits next to your Rust implementation and describes what the capability accepts, what it produces, and what conditions must hold on both sides. You register the contract and the compiled WASM binary together.</p>\n\n      <h2>Minimal contract structure</h2>\n      <pre><code>[capability]\nname = \"calculate_price\"\nversion = \"1.0.0\"\ndescription = \"Calculates the total price for a line item\"\n\n[input]\ntype = \"object\"\nrequired = [\"quantity\", \"unit_price\"]\n\n[input.properties.quantity]\ntype = \"integer\"\nminimum = 1\n\n[input.properties.unit_price]\ntype = \"number\"\nminimum = 0.0\n\n[output]\ntype = \"object\"\nrequired = [\"total\"]\n\n[output.properties.total]\ntype = \"number\"\n\n[[preconditions]]\nfield = \"quantity\"\nop = \"gt\"\nvalue = 0\n\n[[postconditions]]\nfield = \"total\"\nop = \"gte\"\nvalue = 0.0</code></pre>\n\n      <h2>What each section does</h2>\n      <ul>\n        <li><code>[capability]</code> — name, version, and description used by the registry and MCP server</li>\n        <li><code>[input]</code> — JSON Schema for the input object the caller must provide</li>\n        <li><code>[output]</code> — JSON Schema for the output the WASM binary must return</li>\n        <li><code>[[preconditions]]</code> — conditions the runtime checks before execution; each is a field, operator, and value</li>\n        <li><code>[[postconditions]]</code> — conditions the runtime checks after execution; same structure</li>\n      </ul>\n\n      <h2>Registering the contract</h2>\n      <pre><code>traverse capability register \\\n  --contract pricing.toml \\\n  --wasm target/wasm32-wasi/release/pricing.wasm</code></pre>\n\n      <p>The CLI validates the TOML schema before accepting the registration. If your contract references a field that does not exist in the input schema, it will reject it.</p>\n\n      <p>See <a href=\"/questions/what-are-preconditions.html\">what are preconditions</a> and <a href=\"/questions/what-are-postconditions.html\">what are postconditions</a> for more detail on writing conditions.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I write a capability contract?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"A capability contract is a TOML file that defines the capability name, version, input schema, output schema, preconditions, postconditions, and placement constraints. You write it alongside your Rust implementation and register both together with the Traverse CLI.\"}}]}";
+---
+<QuestionLayout
+  title={"How do I write a capability contract?"}
+  description={"A Traverse capability contract is a TOML file with input schema, output schema, preconditions, and postconditions. Learn how to write one step by step."}
+  canonical={"https://traverse-framework.com/questions/how-do-i-write-a-capability-contract.html"}
+  category={"Contracts"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>The Traverse CLI is the <code>traverse</code> command-line tool you use to compile contracts, register capabilities, execute them locally, and inspect results. It is built from the <code>traverse-cli</code> crate and wraps the full runtime in a developer-friendly interface.</p>\n\n      <h2>What you can do with it</h2>\n      <ul>\n        <li>Compile a contract TOML file into a validated contract artifact</li>\n        <li>Register a capability (contract + WASM binary) into the local registry</li>\n        <li>Run a capability with a JSON input and see the output and trace</li>\n        <li>List all registered capabilities and their versions</li>\n        <li>Start the MCP stdio server for AI agent integration</li>\n        <li>Inspect trace artifacts from previous executions</li>\n      </ul>\n\n      <h2>Basic usage</h2>\n      <pre><code># Register a capability\ntraverse capability register \\\n  --contract pricing.toml \\\n  --wasm target/wasm32-wasi/release/pricing.wasm\n\n# Run it\ntraverse capability run pricing --input '{\"quantity\":10,\"unit_price\":5.00}'\n\n# List registered capabilities\ntraverse registry list</code></pre>\n\n      <h2>Starting the MCP server</h2>\n      <p>The CLI also starts the MCP stdio server that AI agents use to discover and call capabilities:</p>\n      <pre><code>traverse mcp serve</code></pre>\n      <p>This makes your local registry available to any MCP-compatible client, including Claude Desktop. See <a href=\"/questions/how-does-the-mcp-server-work.html\">how the MCP server works</a> for details.</p>\n\n      <h2>Installation</h2>\n      <p>Install from crates.io with Cargo:</p>\n      <pre><code>cargo install traverse-cli</code></pre>\n      <p>You need Rust 1.75 or newer and the <code>wasm32-wasi</code> target installed. See the <a href=\"/docs/cli-reference.html\">CLI reference</a> for a full command listing.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is the Traverse CLI?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The Traverse CLI (traverse-cli) is the command-line tool for compiling contracts, registering capabilities, running them locally, and inspecting trace artifacts. It is the primary interface for developing with Traverse outside of an IDE.\"}}]}";
+---
+<QuestionLayout
+  title={"What is the Traverse CLI?"}
+  description={"The Traverse CLI is the command-line tool for building, registering, and running WASM capabilities. Learn what it does and how to use it."}
+  canonical={"https://traverse-framework.com/questions/what-is-the-traverse-cli.html"}
+  category={"Getting Started"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

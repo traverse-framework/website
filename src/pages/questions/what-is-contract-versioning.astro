@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Every capability registration includes a semver version string. Multiple versions of the same capability can live in the registry at once. Callers can pin to a specific version or request the latest version that satisfies a given constraint. Old versions keep working until you explicitly remove them.</p>\n\n      <h2>Why versioning matters</h2>\n      <p>Business logic changes. A pricing rule that worked last quarter might need new inputs next quarter. Without versioning, you have two choices: update all callers at once (risky), or freeze the logic forever (costly). With versioning, you register a new version and migrate callers incrementally. Nothing breaks until you choose to retire the old version.</p>\n\n      <h2>How version selection works</h2>\n      <p>When a caller requests <code>calculate_price</code> without pinning a version, the runtime queries the registry for all registered versions of that capability and picks the latest one that satisfies the caller's placement constraints. If the caller pins to <code>1.0.0</code>, the runtime resolves only that entry.</p>\n\n      <h2>Breaking vs. non-breaking changes</h2>\n      <ul>\n        <li>Adding an optional input field — non-breaking, patch or minor bump</li>\n        <li>Removing a required input field — non-breaking for callers, minor bump</li>\n        <li>Adding a required input field — breaking for existing callers, major bump</li>\n        <li>Changing output field types — breaking, major bump</li>\n        <li>Tightening preconditions — breaking for callers that relied on the looser constraint</li>\n      </ul>\n\n      <h2>Retiring old versions</h2>\n      <p>Remove a version with <code>traverse registry remove calculate_price --version 1.0.0</code>. Callers pinned to that version will fail with a registry error at discovery time. Plan migrations before removing versions that have active callers.</p>\n\n      <p>See also <a href=\"/questions/what-is-the-contract-lifecycle.html\">what is the contract lifecycle</a> for the full picture from creation to retirement.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is contract versioning in Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Contract versioning in Traverse means each capability registration includes a semver version string. Multiple versions of the same capability can exist in the registry simultaneously. Callers can pin to a specific version or let the runtime select the latest version that satisfies their constraints.\"}}]}";
+---
+<QuestionLayout
+  title={"What is contract versioning in Traverse?"}
+  description={"Contract versioning lets you evolve capabilities without breaking existing callers. Learn how Traverse handles multiple versions in the registry."}
+  canonical={"https://traverse-framework.com/questions/what-is-contract-versioning.html"}
+  category={"Contracts"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

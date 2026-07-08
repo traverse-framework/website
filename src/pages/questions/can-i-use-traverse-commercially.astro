@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Yes. Apache 2.0 explicitly permits commercial use. You can embed Traverse in products you sell, run it in SaaS platforms, deploy it in enterprise software, and build commercial services on top of it. There are no licensing fees, no per-seat costs, and no usage-based charges.</p>\n\n      <h2>What you need to do</h2>\n      <p>Apache 2.0 has two obligations for distributions:</p>\n      <ul>\n        <li>Include a copy of the Apache 2.0 license text in your distribution</li>\n        <li>Include the original copyright notice: \"Copyright 2024 Enrico Piovesan\"</li>\n        <li>If you modified source files, note that changes were made (a changelog or comment is sufficient)</li>\n      </ul>\n      <p>If you are using Traverse as a runtime dependency in a server-side application you do not distribute, these obligations typically do not apply. Consult your own legal team if you have specific compliance requirements.</p>\n\n      <h2>What you cannot do</h2>\n      <ul>\n        <li>Use the Traverse name or logo to imply your product is endorsed by or affiliated with Traverse</li>\n        <li>Remove the copyright notice or license from distributions of the source</li>\n        <li>Hold the authors liable for damages (the license explicitly disclaims warranty)</li>\n      </ul>\n\n      <h2>Building on Traverse</h2>\n      <p>You are free to build proprietary capability implementations on top of the Traverse runtime. Your WASM binaries and contract definitions are your own — Apache 2.0 covers the runtime code, not the work you create with it. A capability you write and register is yours.</p>\n\n      <p>See <a href=\"/questions/is-traverse-open-source.html\">is Traverse open source</a> for the full licensing context.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I use Traverse commercially?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. Traverse is Apache 2.0 licensed, which explicitly permits commercial use. You can embed it in products you sell, run it in SaaS platforms, and deploy it in enterprise environments with no licensing fees. You need to include the copyright notice and license text in distributions.\"}}]}";
+---
+<QuestionLayout
+  title={"Can I use Traverse commercially?"}
+  description={"Yes. Traverse is Apache 2.0 licensed. You can use it in commercial products, SaaS platforms, and enterprise software with no fees or restrictions beyond standard Apache 2.0 terms."}
+  canonical={"https://traverse-framework.com/questions/can-i-use-traverse-commercially.html"}
+  category={"Project and Licensing"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse runs WASM at near-native speed and adds a small, predictable overhead for contract validation. For the business logic Traverse is designed for — pricing rules, eligibility checks, tax calculations — the validation cost is a rounding error next to the capability's own computation time.</p>\n\n      <h2>Where the overhead comes from</h2>\n      <p>There are three validation passes per call: precondition check before execution, the WASM execution itself, and postcondition check after. The pre and post checks are JSON schema validation against the contract definition. They do not execute arbitrary code. On modern hardware, a schema check against a typical business logic payload takes microseconds.</p>\n\n      <h2>WASM execution speed</h2>\n      <p>WASM runs close to native machine speed. Rust compiled to WASM is a good fit for computation-heavy logic like pricing engines, scoring models, or rules evaluation. The Wasmtime runtime Traverse uses applies optimizations at load time, so repeated calls to the same capability amortize the startup cost.</p>\n\n      <h2>State machine overhead</h2>\n      <p>The runtime drives a state machine through seven phases on each call. The state transitions themselves are cheap. The phases that take real time are the WASM execution phase and the validation phases. Discovery and selection are registry lookups — fast if the registry is small, still bounded if it is large.</p>\n\n      <h2>When performance matters</h2>\n      <ul>\n        <li>High-frequency trading or real-time streaming: measure first, but Traverse is not designed for microsecond-latency pipelines</li>\n        <li>Batch processing: WASM startup cost per call amortizes well in batch scenarios</li>\n        <li>Web requests: pricing or eligibility on a web request adds sub-millisecond overhead</li>\n        <li>AI agent pipelines: network latency to the LLM dominates, validation overhead is irrelevant</li>\n      </ul>\n\n      <p>See <a href=\"/questions/is-traverse-production-ready.html\">is Traverse production ready</a> for a broader readiness assessment.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is Traverse's performance like?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse adds a small, predictable overhead for contract validation on top of WASM execution. WASM itself runs near-native speed. The validation pass is a schema check against the input and output, not a general computation. For business logic that runs in microseconds to milliseconds, the validation overhead is negligible.\"}}]}";
+---
+<QuestionLayout
+  title={"What is Traverse's performance like?"}
+  description={"Traverse adds contract validation overhead on top of WASM execution. Learn what the performance characteristics look like and when they matter."}
+  canonical={"https://traverse-framework.com/questions/what-is-traverse-performance.html"}
+  category={"Technical Architecture"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

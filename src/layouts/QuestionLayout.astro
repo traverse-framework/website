@@ -1,0 +1,122 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  jsonLd?: string;
+  category: string;
+  crumbs?: Array<{ label: string; href?: string }>;
+  relatedLinks?: Array<{ label: string; href: string }>;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  jsonLd,
+  category,
+  crumbs = [{ label: 'Home', href: '/' }, { label: 'Questions', href: '/questions/' }],
+  relatedLinks = [],
+} = Astro.props;
+---
+<BaseLayout {title} {description} {canonical} {jsonLd}>
+  <div class="q-wrap">
+    <div class="q-layout">
+      <main class="q-main">
+        <Breadcrumb crumbs={[...crumbs, { label: category }]} />
+        <div class="t-label" style="margin-bottom:1rem">{category}</div>
+        <h1 class="q-title">{title.replace(' — Traverse Framework', '').replace(' — Traverse', '')}</h1>
+        <div class="q-body">
+          <slot />
+        </div>
+      </main>
+
+      <aside class="q-sidebar">
+        {relatedLinks.length > 0 && (
+          <div class="q-related">
+            <div class="q-related-title">Related questions</div>
+            {relatedLinks.map(l => <a href={l.href}>{l.label}</a>)}
+          </div>
+        )}
+        <div class="q-cta">
+          <p>Ready to build with Traverse?</p>
+          <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .q-wrap { padding-top: var(--nav-h); }
+
+  .q-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+  @media (max-width: 800px) {
+    .q-layout { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.25rem; }
+  }
+
+  .q-title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 1.5rem;
+  }
+
+  .q-body :global(p) { font-size: 1rem; line-height: 1.75; color: var(--fg-muted); margin-bottom: 1.25rem; }
+  .q-body :global(p:first-child) { font-size: 1.1rem; color: var(--fg); }
+  .q-body :global(h2) { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin: 2rem 0 0.75rem; }
+  .q-body :global(ul) { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+  .q-body :global(li) { font-size: 0.95rem; line-height: 1.65; color: var(--fg-muted); margin-bottom: 0.4rem; }
+  .q-body :global(a) { color: var(--accent); text-decoration: none; }
+  .q-body :global(a:hover) { text-decoration: underline; }
+  .q-body :global(code) { font-family: var(--font-mono); font-size: 0.875em; background: var(--bg-card); padding: 0.1em 0.4em; border-radius: 4px; }
+
+  .q-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); height: fit-content; }
+
+  .q-related {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .q-related-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+    margin-bottom: 1rem;
+  }
+  .q-related :global(a) {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--fg);
+    text-decoration: none;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.4;
+    transition: color 0.15s;
+  }
+  .q-related :global(a:last-child) { border-bottom: none; padding-bottom: 0; }
+  .q-related :global(a:hover) { color: var(--accent); }
+
+  .q-cta {
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .q-cta p { font-size: 0.875rem; color: var(--fg-muted); margin-bottom: 1rem; line-height: 1.5; }
+</style>

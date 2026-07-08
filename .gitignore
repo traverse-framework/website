@@ -2,3 +2,6 @@
 *.png
 *.jpeg
 *.jpg
+node_modules/
+dist/
+.astro/

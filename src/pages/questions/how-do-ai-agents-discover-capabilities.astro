@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>AI agents discover Traverse capabilities through the MCP <code>tools/list</code> call. When your agent connects to the Traverse MCP server, it receives a list of every registered capability with its name, description, and full input schema. The agent uses this to decide which capability fits a given task.</p>\n\n      <h2>What the agent receives</h2>\n      <p>Each capability in the list includes the name from your contract's <code>[capability]</code> section, the description you wrote, and a JSON Schema for the input object. The agent does not need to read documentation or make assumptions. The schema tells it exactly what fields are required, their types, and any constraints like minimum values.</p>\n\n      <h2>The discovery flow inside Traverse</h2>\n      <p>The <code>tools/list</code> call triggers the Traverse runtime's <code>discovering</code> state. The runtime queries the registry for all registered capabilities and assembles the tool definitions. Capabilities that are not registered do not appear. There is no ambient discovery — everything must be explicitly registered.</p>\n\n      <h2>Naming conventions matter</h2>\n      <p>The capability name is the primary signal the agent uses to choose a tool. Write names that are specific and action-oriented: <code>calculate_order_total</code> rather than <code>pricing</code>. The description gives the agent context for when to use the capability versus alternatives. Both end up in the agent's tool context window.</p>\n\n      <h2>Dynamic vs. static discovery</h2>\n      <p>Discovery happens at agent session start. If you register a new capability while a session is running, the agent does not see it until it calls <code>tools/list</code> again. Some MCP clients refresh the tool list on each turn. Check your client's behavior if you need real-time registry updates.</p>\n\n      <p>See <a href=\"/questions/how-does-the-mcp-server-work.html\">how the MCP server works</a> for the full protocol details.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do AI agents discover capabilities?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"AI agents discover Traverse capabilities by calling tools/list on the MCP server. The server returns all registered capabilities as tool definitions with their full JSON Schema input specs. The agent uses these definitions to understand what each capability does and what inputs it requires.\"}}]}";
+---
+<QuestionLayout
+  title={"How do AI agents discover capabilities?"}
+  description={"AI agents discover Traverse capabilities through the MCP tools/list call. Each capability returns its full contract schema as a tool definition."}
+  canonical={"https://traverse-framework.com/questions/how-do-ai-agents-discover-capabilities.html"}
+  category={"AI and MCP"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

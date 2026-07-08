@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Yes. Traverse is open source under the Apache License 2.0. The full source is on GitHub at <a href=\"https://github.com/traverse-framework/traverse\" target=\"_blank\" rel=\"noopener\">github.com/traverse-framework/traverse</a>. You can use it, modify it, fork it, and build products on top of it with no licensing fees.</p>\n\n      <h2>What Apache 2.0 means in practice</h2>\n      <ul>\n        <li>You can use Traverse in commercial products without paying anything</li>\n        <li>You can modify the source and distribute your modified version</li>\n        <li>You must include the original copyright notice and license text in any distribution</li>\n        <li>You must state what changes you made if you distribute a modified version</li>\n        <li>You cannot use the Traverse name or trademarks to imply endorsement</li>\n      </ul>\n\n      <h2>Why Apache 2.0 specifically</h2>\n      <p>Apache 2.0 is business-friendly. It includes an explicit patent grant, which MIT does not. If a contributor holds a patent on something they contribute, they grant you a license to use it. For infrastructure that handles business logic — pricing, eligibility, financial rules — that patent clarity matters to legal teams.</p>\n\n      <h2>Crates on crates.io</h2>\n      <p>The Traverse crates are published to crates.io under the same Apache 2.0 license. You can add them as dependencies in your Rust project and use them freely. The crates available are: <code>traverse-runtime</code>, <code>traverse-contracts</code>, <code>traverse-registry</code>, <code>traverse-cli</code>, <code>traverse-mcp</code>, and <code>traverse-expedition-wasm</code>.</p>\n\n      <p>See <a href=\"/questions/can-i-use-traverse-commercially.html\">can I use Traverse commercially</a> for more on commercial use, and <a href=\"/questions/how-do-i-contribute-to-traverse.html\">how to contribute</a> if you want to give back to the project.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is Traverse open source?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. Traverse is open source under the Apache 2.0 license. You can use it in commercial products, modify it, and distribute it without paying licensing fees. Attribution is required per the Apache 2.0 terms.\"}}]}";
+---
+<QuestionLayout
+  title={"Is Traverse open source?"}
+  description={"Traverse is open source under the Apache 2.0 license. You can use it, modify it, and build on it with no licensing fees."}
+  canonical={"https://traverse-framework.com/questions/is-traverse-open-source.html"}
+  category={"Project and Licensing"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

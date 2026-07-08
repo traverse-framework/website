@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Yes. The Traverse browser adapter lets you load and call capabilities inside a React application. The same WASM binary that runs your pricing logic or eligibility rules on the server executes in the browser, with identical contract enforcement and no network round-trip.</p>\n\n      <h2>Why you would do this</h2>\n      <p>The main use case is consistency. If your checkout flow computes a price in React before the user submits, and your API computes the same price after submission, you want both computations to use the same logic and produce the same result. With Traverse, they run the same binary. There is no risk of a JavaScript implementation drifting from the server-side implementation.</p>\n\n      <h2>How it works</h2>\n      <p>The <code>traverse-expedition-wasm</code> crate compiles the Traverse runtime to WASM so it can run inside the browser. You load your capability binary as a URL or bundled asset, initialize the runtime, and call capabilities from JavaScript or TypeScript. The React integration guide walks through the setup in detail.</p>\n\n      <ul>\n        <li>Load the capability binary once on component mount</li>\n        <li>Call capabilities on user input events or form submissions</li>\n        <li>The runtime validates the contract before and after execution</li>\n        <li>Results are typed and match your contract's output schema</li>\n      </ul>\n\n      <h2>Current status</h2>\n      <p>The browser adapter is in active development as of v0.7.0. The local target is stable for server-side use. Browser deployment is available but not yet production-ready. See the <a href=\"/docs/guides/react-integration.html\">React integration guide</a> for the current setup and known limitations.</p>\n\n      <h2>Server-side React (Next.js, Remix)</h2>\n      <p>If you are using a server-side React framework, you can call Traverse capabilities from your server components or API routes using the local target — no browser adapter needed. The capability runs on your Node.js server via the CLI or directly through the runtime crate.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I use Traverse with React?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. You can load Traverse capabilities in a React application using the browser adapter. The same WASM binary that runs your business logic on the server can execute in the browser. Pricing previews, eligibility checks, and validation rules run locally with no network round-trip, and the contract is enforced identically.\"}}]}";
+---
+<QuestionLayout
+  title={"Can I use Traverse with React?"}
+  description={"You can run Traverse capabilities in a React app via the browser adapter. The same contract-governed WASM binary runs in the browser and on your server."}
+  canonical={"https://traverse-framework.com/questions/can-i-use-traverse-with-react.html"}
+  category={"Use Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

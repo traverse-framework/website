@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse is created and maintained by Enrico Piovesan. The project is open source under Apache 2.0 and hosted under the <a href=\"https://github.com/traverse-framework\" target=\"_blank\" rel=\"noopener\">traverse-framework</a> GitHub organization. Community contributions are welcome.</p>\n\n      <h2>About the author</h2>\n      <p>Enrico Piovesan is the author of the Universal Microservices Architecture (UMA) book and the Contract-Driven AI Development (C-DAD) whitepaper. Traverse is the reference implementation of those ideas — a runtime built to demonstrate that contract-governed, portable business capabilities are practical to build and deploy today.</p>\n\n      <h2>Project governance</h2>\n      <p>Traverse is currently maintained by a small core team. Major decisions on API design, feature prioritization, and breaking changes go through the project maintainer. The roadmap is public — see <a href=\"/roadmap.html\">roadmap</a> — and community input on priorities is welcome through GitHub issues.</p>\n\n      <h2>How to reach the maintainers</h2>\n      <ul>\n        <li>Open an issue on <a href=\"https://github.com/traverse-framework/traverse\" target=\"_blank\" rel=\"noopener\">GitHub</a> for bugs or feature requests</li>\n        <li>Start a discussion on GitHub for design questions or proposals</li>\n        <li>Submit pull requests for bug fixes and small improvements</li>\n      </ul>\n\n      <h2>Long-term sustainability</h2>\n      <p>Traverse is built on a foundation of published methodology (the UMA book) rather than a single company's strategic interest. The goal is for the project to grow a contributor community over time. If you are using Traverse in production, contributing back is the best way to keep the project healthy.</p>\n\n      <p>See <a href=\"/about.html\">about</a> for more on the project's origin and direction.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Who maintains Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse is created and maintained by Enrico Piovesan. It is an open source project under Apache 2.0. Community contributions are welcome through GitHub.\"}}]}";
+---
+<QuestionLayout
+  title={"Who maintains Traverse?"}
+  description={"Traverse is created and maintained by Enrico Piovesan. It is an open source project built on the Universal Microservices Architecture (UMA) methodology."}
+  canonical={"https://traverse-framework.com/questions/who-maintains-traverse.html"}
+  category={"Project and Licensing"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

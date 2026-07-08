@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Your first capability runs in about five minutes if Rust and the <code>wasm32-wasi</code> target are already installed. The CLI quickstart walks you through writing a contract, compiling a WASM binary, registering it, and calling it with a JSON input.</p>\n\n      <h2>The five-minute path</h2>\n      <ul>\n        <li>Install the CLI: <code>cargo install traverse-cli</code></li>\n        <li>Write a contract TOML with input and output schemas</li>\n        <li>Write the Rust implementation and compile to <code>wasm32-wasi</code></li>\n        <li>Register with <code>traverse capability register</code></li>\n        <li>Run with <code>traverse capability run</code></li>\n      </ul>\n      <p>That loop is deliberately short. You do not need to understand everything to get output from your first run.</p>\n\n      <h2>The learning curve after that</h2>\n      <p>Getting comfortable with contracts takes a bit longer. You need to understand preconditions and postconditions, what a governing spec is, and how the runtime validates both sides of a call. Most developers with Rust experience get there in an afternoon.</p>\n\n      <p>If you are new to Rust, budget more time. You do not need to be a Rust expert, but you do need to compile to WASM. The <a href=\"/questions/do-i-need-rust.html\">do I need Rust page</a> covers what level of Rust knowledge is actually required.</p>\n\n      <h2>Production readiness</h2>\n      <p>Getting a capability into production on the local target is straightforward. Integrating with AI agents via MCP, deploying to edge or cloud targets, and setting up a shared registry for a team takes more planning. The <a href=\"/docs/quickstart.html\">quickstart</a> is the right place to start either way.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How long does it take to get started with Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Your first capability takes about five minutes if you have Rust and the wasm32-wasi target installed. Writing and registering a contract, compiling the WASM binary, and running it through the CLI is a short loop. Production use takes longer — you need to understand contracts, placement targets, and how the registry fits into your deployment.\"}}]}";
+---
+<QuestionLayout
+  title={"How long does it take to get started with Traverse?"}
+  description={"Your first Traverse capability takes about five minutes. Learn what you need and what the learning curve looks like."}
+  canonical={"https://traverse-framework.com/questions/how-long-to-get-started.html"}
+  category={"Getting Started"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

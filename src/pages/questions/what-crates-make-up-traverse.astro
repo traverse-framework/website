@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse is a workspace of six Rust crates. Each one has a specific job. You can use them together through the CLI or pull individual crates into your own code.</p>\n\n      <h2>traverse-runtime</h2>\n      <p>The core execution engine. It drives the state machine from <code>idle</code> through discovery, constraint evaluation, selection, and execution. Every placement target builds on this crate. You use it if you are embedding Traverse in a Rust application rather than calling it from the CLI.</p>\n\n      <h2>traverse-contracts</h2>\n      <p>Defines the contract schema: input and output types, preconditions, postconditions, placement constraints, and the governing spec. The runtime uses this crate to parse, validate, and enforce contracts. You interact with it by writing TOML contract files.</p>\n\n      <h2>traverse-registry</h2>\n      <p>Stores capability registrations and handles discovery queries. A registration is a contract plus a compiled WASM binary. The registry supports multiple versions of the same capability and lets the runtime select the right one based on constraints.</p>\n\n      <h2>traverse-cli</h2>\n      <p>The <code>traverse</code> command you install with <code>cargo install traverse-cli</code>. It wraps the runtime, registry, and MCP server in a terminal interface. Most developers only need this crate directly.</p>\n\n      <h2>traverse-mcp</h2>\n      <p>Implements the MCP stdio server that exposes your capabilities to AI agents. It supports <code>tools/list</code> and <code>tools/call</code>. The CLI starts it with <code>traverse mcp serve</code>. See <a href=\"/questions/how-does-the-mcp-server-work.html\">how the MCP server works</a> for details.</p>\n\n      <h2>traverse-expedition-wasm</h2>\n      <p>Compiles the runtime to a WASM binary for use in browsers and edge environments. This is the crate behind the browser adapter. It is the least mature of the six and is still in active development.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What crates make up Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse is made up of six crates: traverse-runtime (core execution engine), traverse-contracts (contract schema and validation), traverse-registry (capability storage and discovery), traverse-cli (command-line interface), traverse-mcp (MCP stdio server for AI agents), and traverse-expedition-wasm (WASM compilation target for browser and edge).\"}}]}";
+---
+<QuestionLayout
+  title={"What crates make up Traverse?"}
+  description={"Traverse is composed of six Rust crates. Learn what each one does and how they fit together."}
+  canonical={"https://traverse-framework.com/questions/what-crates-make-up-traverse.html"}
+  category={"Technical Architecture"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

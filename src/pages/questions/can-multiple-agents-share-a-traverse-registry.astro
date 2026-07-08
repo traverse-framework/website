@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Yes. Multiple agents can connect to the same Traverse MCP server and use the same registry. Each agent gets the same capability list at discovery time and the same contract enforcement on every call. The registry is read-only from a calling agent's perspective — agents discover and call capabilities, they do not modify the registry.</p>\n\n      <h2>How it works in practice</h2>\n      <p>You run one instance of <code>traverse mcp serve</code>. Multiple MCP clients — Claude Desktop, a custom agent, an automated pipeline — all connect to that same server. Each client gets a full <code>tools/list</code> response from the same registry. When any of them calls a capability, the runtime handles the call independently with full contract enforcement.</p>\n\n      <h2>Concurrency</h2>\n      <p>Capability execution is stateless by design. Each call takes an input, runs the WASM binary in isolation, and returns an output. There is no shared mutable state between calls. Multiple agents calling the same capability concurrently is safe — each call runs in its own WASM instance with its own linear memory.</p>\n\n      <h2>Isolation between agents</h2>\n      <p>Agents do not see each other's inputs or outputs. Each call produces its own trace artifact. If you need to attribute a trace to a specific agent, pass the agent identifier as part of the capability input — the trace will include it. The runtime itself does not tag traces with caller identity.</p>\n\n      <h2>Team-wide registries</h2>\n      <p>For teams where multiple developers or multiple agent pipelines need to share capabilities, a shared registry server is the right architecture. Each person or pipeline points their MCP config at the same server. The capability versions are consistent across all of them. The hosted registry on the roadmap will make this easier to operate.</p>\n\n      <p>See <a href=\"/questions/what-is-the-capability-registry.html\">what is the capability registry</a> and <a href=\"/questions/what-is-traverse-roadmap.html\">the roadmap</a> for more.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can multiple AI agents share a Traverse registry?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. Multiple agents can share a Traverse registry by connecting to the same MCP server instance. Each agent discovers the same capabilities and gets the same contract enforcement on every call. The registry is stateless between calls so concurrent access from multiple agents is safe.\"}}]}";
+---
+<QuestionLayout
+  title={"Can multiple AI agents share a Traverse registry?"}
+  description={"Multiple agents can share a Traverse registry by pointing to the same MCP server. Each agent gets the same capability list and the same contract enforcement."}
+  canonical={"https://traverse-framework.com/questions/can-multiple-agents-share-a-traverse-registry.html"}
+  category={"Technical Edge Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

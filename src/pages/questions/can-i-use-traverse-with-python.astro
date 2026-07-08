@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Yes. You can call Traverse capabilities from Python even though Traverse is written in Rust. The two practical approaches are calling the CLI as a subprocess or connecting to the MCP server from a Python MCP client. The capability contract is enforced on every call regardless of how you invoke it.</p>\n\n      <h2>Option 1: CLI subprocess</h2>\n      <p>The simplest approach is to call <code>traverse capability run</code> from Python using <code>subprocess</code>:</p>\n      <pre><code>import subprocess, json\n\nresult = subprocess.run(\n    [\"traverse\", \"capability\", \"run\", \"calculate_price\",\n     \"--input\", json.dumps({\"quantity\": 10, \"unit_price\": 5.0})],\n    capture_output=True, text=True\n)\noutput = json.loads(result.stdout)</code></pre>\n      <p>This works but adds subprocess overhead per call. It is fine for batch processing or occasional calls. For high-frequency use, the MCP server approach is better.</p>\n\n      <h2>Option 2: MCP client</h2>\n      <p>Start the Traverse MCP server once and connect from your Python code using any MCP client library. The MCP protocol communicates over stdio using JSON-RPC. Your Python process sends <code>tools/call</code> messages and reads responses. The server handles contract enforcement.</p>\n\n      <h2>Option 3: Embed via Wasmtime</h2>\n      <p>Python has Wasmtime bindings. If you want to embed WASM execution directly in Python without the Traverse runtime's full contract enforcement, you can load the capability binary yourself. You lose the contract validation layer, but it is an option for lightweight use cases.</p>\n\n      <h2>What Python provides vs. what Traverse provides</h2>\n      <ul>\n        <li>Python handles your application logic, data pipelines, and ML workflows</li>\n        <li>Traverse handles business capability execution with contract enforcement</li>\n        <li>A common pattern: Python orchestrates, Traverse executes critical business rules</li>\n      </ul>\n\n      <p>A native Python SDK is on the roadmap. See <a href=\"/questions/what-is-traverse-roadmap.html\">the roadmap</a> for timing.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I use Traverse with Python?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. You can call Traverse capabilities from Python by invoking the traverse CLI as a subprocess, or by using the MCP protocol if your Python code acts as an MCP client. The capability contract is enforced on every call regardless of the calling language.\"}}]}";
+---
+<QuestionLayout
+  title={"Can I use Traverse with Python?"}
+  description={"You can call Traverse capabilities from Python via the CLI or subprocess. Learn how Python services can consume contract-governed WASM capabilities."}
+  canonical={"https://traverse-framework.com/questions/can-i-use-traverse-with-python.html"}
+  category={"Use Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

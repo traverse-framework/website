@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Plugin systems load code at runtime and call it through a defined interface. Traverse does something similar at the surface — it loads WASM binaries and calls them. The difference is what comes with every capability: a machine-readable contract that the runtime enforces on every call. Plugins make promises in documentation. Capabilities make promises the runtime enforces.</p>\n\n      <h2>Plugin systems: flexible, unguaranteed</h2>\n      <p>A typical plugin system defines a host interface — a set of functions the plugin must implement. The plugin loads, implements those functions, and the host calls them. What the plugin does inside those functions is its business. It can return unexpected values, violate preconditions, or behave differently on different inputs. The host trusts the plugin to do the right thing.</p>\n\n      <h2>Traverse capabilities: contract-bound</h2>\n      <p>A Traverse capability carries a contract that defines its input schema, output schema, preconditions, and postconditions. The runtime validates all of these on every call. A capability that returns an output violating its contract's postconditions gets rejected — the result never reaches the caller. A caller that sends an invalid input gets rejected before execution starts.</p>\n\n      <h2>WASM isolation</h2>\n      <p>Plugin systems often load native code that runs with full host privileges. Traverse capabilities run in a WASM sandbox. They cannot read arbitrary memory, access the filesystem, or make network calls unless the host explicitly grants those permissions. For business logic from a third party, this isolation is a meaningful security property.</p>\n\n      <h2>Versioned registry</h2>\n      <p>Plugin systems typically load the latest compatible version of a plugin. Traverse's registry supports explicit versioning and lets callers pin to a specific version. Old and new versions of a capability coexist. You can roll out new behavior while old callers stay pinned.</p>\n\n      <h2>When plugin systems are fine</h2>\n      <p>If you are extending an application with user-authored scripts, a plugin system is simpler and more appropriate. Traverse is for business logic that needs governance, portability, and auditability — not general-purpose extensibility.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How is Traverse different from a plugin system?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Plugin systems load arbitrary code at runtime with limited guarantees about what the code does or returns. Traverse loads capabilities that are bound to contracts. The runtime enforces those contracts on every call. You know exactly what a capability accepts, what it returns, and what conditions hold — before you call it and after.\"}}]}";
+---
+<QuestionLayout
+  title={"How is Traverse different from a plugin system?"}
+  description={"Plugin systems load arbitrary code at runtime. Traverse loads governed capabilities with enforced contracts. Learn where they diverge."}
+  canonical={"https://traverse-framework.com/questions/how-is-traverse-different-from-a-plugin-system.html"}
+  category={"Comparisons"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

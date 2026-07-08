@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse emits structured events at each state machine transition during a capability execution. The <code>emitting_events</code> phase is an explicit step in the state machine — it fires after successful execution and before the runtime returns the result to the caller.</p>\n\n      <h2>What events carry</h2>\n      <p>Each event includes the capability name and version, the state machine phase that triggered it, a timestamp, and relevant context for that phase. Discovery events include the candidates found. Selection events include which version was chosen and why. Execution events include the input hash and output hash.</p>\n\n      <h2>The emitting_events phase</h2>\n      <p>After the WASM binary executes and postconditions pass, the runtime enters <code>emitting_events</code>. This is where observers receive the execution result before the state machine moves to <code>completed</code>. Subscribers can inspect the full output without modifying the capability code itself.</p>\n\n      <h2>Using events for observability</h2>\n      <ul>\n        <li>Log every capability call with input and output hashes for an audit trail</li>\n        <li>Count execution times per capability version for performance tracking</li>\n        <li>Alert when postcondition failures occur more than expected</li>\n        <li>Build an event log of every AI agent action that touched a capability</li>\n      </ul>\n\n      <h2>Trace artifacts</h2>\n      <p>Events are part of what makes up the trace artifact. The artifact is the structured record of a complete execution: every phase, every validation result, and the final output. See <a href=\"/questions/what-is-a-trace-artifact.html\">what is a trace artifact</a> for more on how traces work.</p>\n\n      <p>Events and traces together give you reproducibility. You can reconstruct exactly what happened in any past execution from the trace artifact alone.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How does Traverse handle events?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse emits structured events as the state machine transitions through each phase of execution. Callers can subscribe to these events to observe discovery, selection, validation, and execution without modifying the capability code. Events are part of the execution trace.\"}}]}";
+---
+<QuestionLayout
+  title={"How does Traverse handle events?"}
+  description={"Traverse emits structured events at each phase of the execution state machine. Learn how to subscribe to them and what they contain."}
+  canonical={"https://traverse-framework.com/questions/how-does-traverse-handle-events.html"}
+  category={"Technical Architecture"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

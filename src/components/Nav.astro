@@ -1,0 +1,475 @@
+---
+export interface Props {
+  currentPath?: string;
+}
+const { currentPath = '' } = Astro.props;
+---
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <img src="/assets/img/logo/traverse_icon_32x32.svg" alt="Traverse" width="24" height="24">
+      Traverse<span class="nav-logo-dot">.</span>
+    </a>
+
+    <ul class="nav-links">
+      <!-- Product dropdown -->
+      <li class="nav-item has-dropdown">
+        <button class="nav-link-btn" aria-expanded="false" aria-haspopup="true">
+          Product
+          <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="dropdown" role="menu">
+          <div class="dropdown-section">
+            <div class="dropdown-label">Overview</div>
+            <a href="/questions/what-is-traverse.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">⬡</span>
+              <span>
+                <span class="dropdown-item-title">What is Traverse</span>
+                <span class="dropdown-item-desc">Contract-driven WASM runtime</span>
+              </span>
+            </a>
+            <a href="/docs/concepts.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◈</span>
+              <span>
+                <span class="dropdown-item-title">How it works</span>
+                <span class="dropdown-item-desc">Capabilities, contracts, placement</span>
+              </span>
+            </a>
+          </div>
+          <div class="dropdown-section">
+            <div class="dropdown-label">Updates</div>
+            <a href="/roadmap.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◎</span>
+              <span>
+                <span class="dropdown-item-title">Roadmap</span>
+                <span class="dropdown-item-desc">What's coming next</span>
+              </span>
+            </a>
+            <a href="/changelog.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◷</span>
+              <span>
+                <span class="dropdown-item-title">Changelog</span>
+                <span class="dropdown-item-desc">Release notes</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </li>
+
+      <!-- Solutions dropdown -->
+      <li class="nav-item has-dropdown">
+        <button class="nav-link-btn" aria-expanded="false" aria-haspopup="true">
+          Solutions
+          <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="dropdown" role="menu">
+          <div class="dropdown-section">
+            <div class="dropdown-label">By industry</div>
+            <a href="/solutions/fintech.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◈</span>
+              <span>
+                <span class="dropdown-item-title">Fintech</span>
+                <span class="dropdown-item-desc">Pricing, compliance, risk</span>
+              </span>
+            </a>
+            <a href="/solutions/saas.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">⬡</span>
+              <span>
+                <span class="dropdown-item-title">SaaS</span>
+                <span class="dropdown-item-desc">Multi-tenant business logic</span>
+              </span>
+            </a>
+            <a href="/solutions/ecommerce.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◎</span>
+              <span>
+                <span class="dropdown-item-title">E-commerce</span>
+                <span class="dropdown-item-desc">Promotions, eligibility</span>
+              </span>
+            </a>
+            <a href="/solutions/enterprise.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◷</span>
+              <span>
+                <span class="dropdown-item-title">Enterprise</span>
+                <span class="dropdown-item-desc">Portable, auditable rules</span>
+              </span>
+            </a>
+            <a href="/solutions/ai-companies.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">⬡</span>
+              <span>
+                <span class="dropdown-item-title">AI Companies</span>
+                <span class="dropdown-item-desc">Safe AI agent tooling</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </li>
+
+      <!-- Developers dropdown -->
+      <li class="nav-item has-dropdown">
+        <button class="nav-link-btn" aria-expanded="false" aria-haspopup="true">
+          Developers
+          <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="dropdown" role="menu">
+          <div class="dropdown-section">
+            <div class="dropdown-label">Documentation</div>
+            <a href="/docs/quickstart.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">▷</span>
+              <span>
+                <span class="dropdown-item-title">Quickstart</span>
+                <span class="dropdown-item-desc">Up in minutes</span>
+              </span>
+            </a>
+            <a href="/docs/concepts.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◈</span>
+              <span>
+                <span class="dropdown-item-title">Concepts</span>
+                <span class="dropdown-item-desc">Core mental model</span>
+              </span>
+            </a>
+            <a href="/docs/cli-reference.html" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">⬡</span>
+              <span>
+                <span class="dropdown-item-title">CLI Reference</span>
+                <span class="dropdown-item-desc">traverse command docs</span>
+              </span>
+            </a>
+          </div>
+          <div class="dropdown-section">
+            <div class="dropdown-label">Resources</div>
+            <a href="/questions/" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◎</span>
+              <span>
+                <span class="dropdown-item-title">All Questions</span>
+                <span class="dropdown-item-desc">55 answered questions</span>
+              </span>
+            </a>
+            <a href="/examples/" class="dropdown-item" role="menuitem">
+              <span class="dropdown-icon">◷</span>
+              <span>
+                <span class="dropdown-item-title">Examples</span>
+                <span class="dropdown-item-desc">Real-world patterns</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </li>
+
+      <li class="nav-item"><a href="/blog/" class="nav-link">Blog</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme">
+        <span class="theme-icon" style="font-size:14px">☀</span>
+      </button>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-sm">Get started</a>
+      <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="2" y1="5" x2="16" y2="5"/>
+          <line x1="2" y1="9" x2="16" y2="9"/>
+          <line x1="2" y1="13" x2="16" y2="13"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/questions/what-is-traverse.html">What is Traverse</a>
+  <a href="/solutions/">Solutions</a>
+  <a href="/docs/">Docs</a>
+  <a href="/blog/">Blog</a>
+  <a href="/changelog.html">Changelog</a>
+  <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+  <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem">Get started</a>
+</div>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    z-index: 100;
+    background: transparent;
+    transition: background 0.3s, border-color 0.3s;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.scrolled {
+    background: rgba(12, 8, 23, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom-color: var(--border);
+  }
+  [data-theme="light"] .nav.scrolled {
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  .nav-logo img { width: 24px; height: 24px; object-fit: contain; }
+  .nav-logo-dot { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-item { position: relative; }
+
+  .nav-link-btn,
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    border-radius: var(--radius-sm);
+    transition: color 0.15s, background 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-link-btn:hover,
+  .nav-link:hover { color: var(--fg); background: rgba(255,255,255,0.05); }
+
+  .chevron {
+    transition: transform 0.2s var(--ease);
+    opacity: 0.6;
+  }
+  .nav-item.open .chevron { transform: rotate(180deg); }
+
+  /* ─── Dropdown ─────────────────────────────────────────────── */
+  .dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 260px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(136,34,204,0.1);
+    z-index: 200;
+    animation: dropIn 0.15s var(--ease) both;
+  }
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .nav-item.open .dropdown { display: flex; flex-direction: row; gap: 0.25rem; }
+  .has-dropdown:last-child .dropdown { left: auto; right: 0; transform: none; }
+  .has-dropdown:last-child.open .dropdown { animation: dropInRight 0.15s var(--ease) both; }
+  @keyframes dropInRight {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .dropdown-section {
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+  .dropdown-section + .dropdown-section {
+    border-left: 1px solid var(--border);
+    padding-left: 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  .dropdown-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-subtle);
+    padding: 0.3rem 0.5rem 0.5rem;
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.55rem 0.6rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--fg);
+    transition: background 0.12s;
+  }
+  .dropdown-item:hover { background: rgba(255,122,26,0.08); }
+  .dropdown-item:hover .dropdown-item-title { color: var(--accent); }
+
+  .dropdown-icon {
+    font-size: 0.9rem;
+    color: var(--accent);
+    width: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .dropdown-item-title {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--fg);
+    transition: color 0.12s;
+    line-height: 1.3;
+  }
+  .dropdown-item-desc {
+    display: block;
+    font-size: 0.7375rem;
+    color: var(--fg-muted);
+    line-height: 1.3;
+    margin-top: 1px;
+  }
+
+  /* ─── Right side ───────────────────────────────────────────── */
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .nav-theme-btn {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+    color: var(--fg-muted);
+    transition: color 0.15s, background 0.15s;
+  }
+  .nav-theme-btn:hover { color: var(--fg); background: var(--bg-card); }
+  .nav-mobile-btn {
+    display: none;
+    width: 32px; height: 32px;
+    align-items: center; justify-content: center;
+    color: var(--fg-muted);
+  }
+
+  /* ─── Mobile menu ──────────────────────────────────────────── */
+  .nav-mobile-menu {
+    display: none;
+    position: fixed;
+    top: var(--nav-h); left: 0; right: 0;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 99;
+  }
+  .nav-mobile-menu.open { display: flex; }
+  .nav-mobile-menu a {
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+    text-decoration: none;
+    padding: 0.4rem 0;
+    transition: color 0.15s;
+  }
+  .nav-mobile-menu a:hover { color: var(--fg); }
+
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .nav-mobile-btn { display: flex; }
+    .nav-right .btn-primary { display: none; }
+  }
+</style>
+
+<script>
+  // Dropdown toggle
+  document.querySelectorAll('.has-dropdown').forEach(item => {
+    const btn = item.querySelector('.nav-link-btn');
+    if (!btn) return;
+
+    const close = () => {
+      item.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    };
+    const open = () => {
+      // Close all other dropdowns
+      document.querySelectorAll('.nav-item.open').forEach(o => {
+        if (o !== item) {
+          o.classList.remove('open');
+          o.querySelector('.nav-link-btn')?.setAttribute('aria-expanded', 'false');
+        }
+      });
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    };
+
+    btn.addEventListener('click', () => item.classList.contains('open') ? close() : open());
+
+    // Close on outside click
+    document.addEventListener('click', e => {
+      if (!item.contains(e.target as Node)) close();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  });
+
+  // Mobile menu
+  const mobileBtn = document.getElementById('nav-mobile-btn');
+  const mobileMenu = document.getElementById('nav-mobile-menu');
+  mobileBtn?.addEventListener('click', () => mobileMenu?.classList.toggle('open'));
+
+  // Theme toggle
+  const themeBtn = document.getElementById('theme-btn');
+  if (themeBtn) {
+    const updateTheme = (theme: string) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const icon = themeBtn.querySelector('.theme-icon');
+      if (icon) (icon as HTMLElement).textContent = theme === 'dark' ? '☀' : '☽';
+    };
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      updateTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    const icon = themeBtn.querySelector('.theme-icon');
+    if (icon) (icon as HTMLElement).textContent =
+      document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☽';
+  }
+
+  // Scrolled class
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav?.classList.toggle('scrolled', window.scrollY > 20);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse produces typed errors at three distinct points in the execution pipeline. Each error type tells you exactly where the failure occurred, which condition failed, and what the state machine looked like at the time.</p>\n\n      <h2>Precondition failures</h2>\n      <p>Before the WASM binary runs, the runtime validates preconditions defined in the contract. If the input does not satisfy them, execution never starts. The error includes the capability name, the version, and which precondition failed with what input value. This is a hard stop — no partial execution happens.</p>\n\n      <h2>Execution errors</h2>\n      <p>If the WASM binary itself traps or returns an error, the runtime captures it as an execution error. The state machine moves to the <code>error</code> terminal state. The trace artifact records the input, the execution attempt, and the trap reason. You do not get a partial output.</p>\n\n      <h2>Postcondition failures</h2>\n      <p>After the WASM binary returns a result, the runtime validates postconditions. If the output does not satisfy them, the result is discarded and a postcondition error is returned to the caller. This is a safeguard against buggy implementations that return technically valid WASM output but violate the contract's guarantees.</p>\n\n      <h2>What errors carry</h2>\n      <ul>\n        <li>Capability name and version at the time of failure</li>\n        <li>The specific condition that failed and the value that triggered it</li>\n        <li>The state machine phase where the failure occurred</li>\n        <li>The trace artifact up to the point of failure</li>\n      </ul>\n\n      <h2>Error handling for AI agents</h2>\n      <p>When a capability fails via the MCP server, the error goes back to the agent as a structured MCP error response. The agent can read which precondition failed and adjust its inputs rather than retrying blindly. See <a href=\"/questions/how-does-traverse-prevent-ai-agent-errors.html\">how Traverse prevents AI agent errors</a> for more.</p>\n\n      <p>See also: <a href=\"/questions/what-happens-when-a-capability-fails.html\">what happens when a capability fails</a>.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How does Traverse handle errors?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse produces typed errors at three points: precondition validation before execution, WASM execution itself, and postcondition validation after execution. Each error type carries the capability name, version, the failing condition, and the trace artifact up to the point of failure.\"}}]}";
+---
+<QuestionLayout
+  title={"How does Traverse handle errors?"}
+  description={"Traverse has three distinct error categories: precondition failures, execution errors, and postcondition failures. Each is typed and carries context for debugging."}
+  canonical={"https://traverse-framework.com/questions/how-does-traverse-handle-errors.html"}
+  category={"Technical Architecture"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>
