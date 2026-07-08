@@ -9,5 +9,141 @@ const _body = "<div class=\"faq-hero\">\n  <div class=\"container\">\n    <span 
   canonical={"https://traverse-framework.com/faq.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
+  <style is:global slot="head">body { padding-top: var(--nav-h); }
+
+    .faq-hero {
+      padding: 5rem 0 3rem;
+      text-align: center;
+    }
+    .faq-hero .t-h1 {
+      margin: 0.75rem 0 1rem;
+    }
+    .faq-hero .subtitle {
+      color: var(--fg-muted);
+      max-width: 540px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .faq-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 3rem;
+      align-items: start;
+      padding: 2rem 0 5rem;
+    }
+    @media (max-width: 768px) {
+      .faq-layout { grid-template-columns: 1fr; }
+    }
+
+    .faq-nav {
+      position: sticky;
+      top: calc(var(--nav-h) + 1.5rem);
+    }
+    .faq-nav-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 0.75rem;
+    }
+    .faq-nav a {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      text-decoration: none;
+      padding: 0.3rem 0;
+      border-left: 2px solid transparent;
+      padding-left: 0.75rem;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .faq-nav a:hover,
+    .faq-nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    @media (max-width: 768px) {
+      .faq-nav { display: none; }
+    }
+
+    .faq-sections { display: flex; flex-direction: column; gap: 3rem; }
+
+    .faq-group-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    .faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-card);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item:hover { border-color: var(--accent-dim); }
+    .faq-item.open { border-color: var(--accent-dim); }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--fg);
+      line-height: 1.4;
+    }
+    .faq-question:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: var(--fg-muted);
+      transition: transform 0.25s ease, color 0.2s;
+    }
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      color: var(--fg-muted);
+      font-size: 0.925rem;
+      line-height: 1.7;
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-answer p { margin: 0 0 0.6rem; }
+    .faq-answer p:last-child { margin-bottom: 0; }
+    .faq-answer a { color: var(--accent); text-decoration: none; }
+    .faq-answer a:hover { text-decoration: underline; }
+    .faq-answer code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--bg-elevated);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent);
+    }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>

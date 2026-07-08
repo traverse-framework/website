@@ -9,5 +9,22 @@ const _body = "<section class=\"hero\">\n  <div class=\"container\">\n    <div c
   canonical={"https://traverse-framework.com/solutions/saas.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Solutions", href: "/solutions/" }]}
 >
+  <style is:global slot="head">body { padding-top: var(--nav-h); }
+    .hero { padding: 6rem 0 4rem; }
+    .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .problem-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .problem-card .problem-title { font-size: 0.9rem; font-weight: 600; color: var(--fg); margin-bottom: 0.5rem; }
+    .problem-card p { font-size: 0.875rem; color: var(--fg-muted); line-height: 1.6; margin: 0; }
+    .sol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+    .sol-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .sol-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+    .sol-item h3 { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.25rem; }
+    .sol-item p { font-size: 0.85rem; color: var(--fg-muted); margin: 0; line-height: 1.5; }
+    .use-case-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .use-case-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: border-color 0.2s; }
+    .use-case-card:hover { border-color: var(--accent); }
+    .use-case-num { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .use-case-card h3 { font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem; }
+    .use-case-card p { font-size: 0.85rem; color: var(--fg-muted); margin: 0; line-height: 1.5; }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>

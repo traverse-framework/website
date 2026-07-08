@@ -75,6 +75,13 @@ def get_json_ld(html: str) -> str:
     return m.group(1).strip() if m else ""
 
 
+def get_inline_styles(html: str) -> str:
+    """Extract inline <style> blocks from <head>."""
+    styles = re.findall(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
+    combined = '\n'.join(s.strip() for s in styles)
+    return combined.strip()
+
+
 def get_body_content(html: str) -> str:
     """Extract everything between the end of nav-mobile-menu div and the footer."""
     # Find end of nav-mobile-menu
@@ -91,6 +98,9 @@ def get_body_content(html: str) -> str:
         footer_start = html.rfind('</body>')
 
     content = html[nav_end:footer_start].strip()
+    # Strip old inline breadcrumb divs (replaced by SubpageLayout's Breadcrumb component)
+    content = re.sub(r'<div\s+class=["\']breadcrumb["\'][^>]*>.*?</div>', '', content, flags=re.DOTALL)
+    content = re.sub(r'<nav\s+[^>]*aria-label=["\']breadcrumb["\'][^>]*>.*?</nav>', '', content, flags=re.DOTALL)
     return content
 
 
@@ -118,8 +128,9 @@ def escape_backtick(s: str) -> str:
     return s.replace('`', r'\`').replace('$', r'\$')
 
 
-def convert_question(html_path: Path, rel_parts: list[str]):
-    html = html_path.read_text(encoding="utf-8")
+def convert_question(html_path: Path, rel_parts: list[str], html: str = None):
+    if html is None:
+        html = html_path.read_text(encoding="utf-8")
     title = get_tag_text(html, "title")
     # Strip the site suffix for display
     display_title = re.sub(r'\s*[—–-]\s*Traverse Framework$', '', title).strip()
@@ -163,8 +174,9 @@ const _body = {json.dumps(body, ensure_ascii=False)};{json_ld_const}
     return out
 
 
-def convert_subpage(html_path: Path, rel_parts: list[str]):
-    html = html_path.read_text(encoding="utf-8")
+def convert_subpage(html_path: Path, rel_parts: list[str], html: str = None):
+    if html is None:
+        html = html_path.read_text(encoding="utf-8")
     title = get_tag_text(html, "title")
     description = get_description(html)
     canonical = get_canonical(html)
@@ -185,6 +197,9 @@ def convert_subpage(html_path: Path, rel_parts: list[str]):
     json_ld_const = f'\nconst _jsonLd = {json.dumps(json_ld, ensure_ascii=False)};' if json_ld else ''
     json_ld_prop = '\n  jsonLd={_jsonLd}' if json_ld else ''
 
+    inline_css = get_inline_styles(html)
+    style_slot = f'\n  <style is:global slot="head">{inline_css}</style>' if inline_css else ''
+
     out = f"""---
 import SubpageLayout from '@layouts/SubpageLayout.astro';
 
@@ -195,7 +210,7 @@ const _body = {json.dumps(body, ensure_ascii=False)};{json_ld_const}
   description={{{json.dumps(description, ensure_ascii=False)}}}
   canonical={{{json.dumps(canonical, ensure_ascii=False)}}}{json_ld_prop}
   crumbs={crumbs_code}
->
+>{style_slot}
   <Fragment set:html={{_body}} />
 </SubpageLayout>
 """
@@ -231,9 +246,9 @@ def process_file(html_path: Path):
     html = html_path.read_text(encoding="utf-8")
 
     if folder == "questions":
-        content = convert_question(html_path, folder_parts)
+        content = convert_question(html_path, folder_parts, html)
     else:
-        content = convert_subpage(html_path, folder_parts)
+        content = convert_subpage(html_path, folder_parts, html)
 
     out_path.write_text(content, encoding="utf-8")
     print(f"  ✓ {rel} → src/pages/{'/'.join(folder_parts)}/{stem}.astro")

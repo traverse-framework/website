@@ -9,5 +9,24 @@ const _body = "<div class=\"docs-layout\">\n  <aside class=\"docs-sidebar\">\n  
   canonical={"https://traverse-framework.com/docs/cli-reference.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Docs", href: "/docs/" }]}
 >
+  <style is:global slot="head">body { padding-top: var(--nav-h); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .cmd-block { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .cmd-block:last-child { border-bottom: none; }
+    .cmd-sig { font-family: var(--font-mono); font-size: 1rem; color: var(--fg); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; margin-bottom: 1.25rem; display: inline-block; }
+    .cmd-sig .cmd-name { color: var(--accent); }
+    .flags-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+    .flags-table th { text-align: left; padding: 0.5rem 0.75rem; font-size: 0.72rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+    .flags-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .flags-table tr:last-child td { border-bottom: none; }
+    .flag-name { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
+    .flag-type { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-muted); }
+    .badge-future { font-size: 0.68rem; font-family: var(--font-mono); background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.45rem; color: var(--fg-muted); vertical-align: middle; margin-left: 0.5rem; }
+    .section-label-sm { font-size: 0.68rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.07em; color: var(--fg-muted); margin-bottom: 0.5rem; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+    @media (max-width:540px) { .toc-grid { grid-template-columns: 1fr; } }
+    .toc-link { font-size: 0.82rem; color: var(--fg-muted); text-decoration: none; padding: 0.3rem 0; display: block; }
+    .toc-link:hover { color: var(--fg); }
+    .toc-code { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>
