@@ -16,10 +16,31 @@ const {
   description,
   canonical = Astro.url.href,
   jsonLd,
-  ogImage = '/assets/img/og-default.png',
+  ogImage = '/assets/img/logo/traverse_icon_1024x1024.png',
 } = Astro.props;
 
 const fullTitle = title.includes('Traverse') ? title : `${title} — Traverse Framework`;
+const ogImageAbs = new URL(ogImage, Astro.site).href;
+
+const siteJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://traverse-framework.com/#organization',
+      name: 'Traverse Framework',
+      url: 'https://traverse-framework.com/',
+      logo: 'https://traverse-framework.com/assets/img/logo/traverse_icon_512x512.svg',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://traverse-framework.com/#website',
+      name: 'Traverse Framework',
+      url: 'https://traverse-framework.com/',
+      publisher: { '@id': 'https://traverse-framework.com/#organization' },
+    },
+  ],
+});
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -35,8 +56,12 @@ const fullTitle = title.includes('Traverse') ? title : `${title} — Traverse Fr
   <meta property="og:title" content={fullTitle}>
   <meta property="og:description" content={description}>
   <meta property="og:url" content={canonical}>
-  <meta property="og:image" content={ogImage}>
+  <meta property="og:site_name" content="Traverse Framework">
+  <meta property="og:image" content={ogImageAbs}>
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={fullTitle}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={ogImageAbs}>
 
   <!-- Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2T980YV3P"></script>
@@ -48,6 +73,7 @@ const fullTitle = title.includes('Traverse') ? title : `${title} — Traverse Fr
   </script>
 
   <!-- Structured data -->
+  <script type="application/ld+json" set:html={siteJsonLd} />
   {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
 
   <!-- Favicons -->
