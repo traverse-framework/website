@@ -1,0 +1,37 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  jsonLd?: string;
+  label?: string;
+  crumbs?: Array<{ label: string; href?: string }>;
+}
+
+const { title, description, canonical, jsonLd, label, crumbs = [] } = Astro.props;
+---
+<BaseLayout {title} {description} {canonical} {jsonLd}>
+  <div class="subpage-wrap">
+    <div class="container">
+      <div class="subpage-header">
+        {crumbs.length > 0 && <Breadcrumb crumbs={crumbs} />}
+        {label && <div class="t-label" style="margin-bottom:0.75rem">{label}</div>}
+        <slot name="header" />
+      </div>
+      <slot />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .subpage-wrap {
+    padding-top: var(--nav-h);
+    min-height: 100vh;
+  }
+  .subpage-header {
+    padding: 3.5rem 0 2rem;
+  }
+</style>

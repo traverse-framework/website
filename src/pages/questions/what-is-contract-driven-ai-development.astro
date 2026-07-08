@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Contract-driven AI development (C-DAD) is a methodology where every tool an AI agent can invoke is governed by a machine-readable contract. The contract defines what the tool accepts, what it returns, and what behavioral constraints hold. The runtime enforces these at call time — not just at documentation time.</p>\n\n      <h2>The problem it solves</h2>\n      <p>When you give an AI agent access to tools, two things tend to go wrong. First, the agent builds wrong assumptions about what a tool does because the only spec is a natural language description. Second, you have no audit trail — when an agent does something unexpected, you cannot reconstruct exactly what it called and what it got back.</p>\n      <p>C-DAD solves both. The contract is machine-readable, so the agent gets a precise spec at discovery time. The runtime produces a trace artifact on every call, so every agent action is reconstructable.</p>\n\n      <h2>What it looks like in practice</h2>\n      <ul>\n        <li>You write a contract for each business capability: input schema, output schema, preconditions, postconditions</li>\n        <li>You compile the implementation to WASM and register it alongside the contract</li>\n        <li>The agent discovers capabilities via MCP and gets the full schema for each one</li>\n        <li>The runtime enforces contracts on every agent call — invalid inputs are rejected before execution</li>\n        <li>Every call produces a trace artifact you can inspect, store, or alert on</li>\n      </ul>\n\n      <h2>Relation to design-by-contract</h2>\n      <p>C-DAD applies the decades-old design-by-contract idea to AI agent pipelines. Bertrand Meyer's original insight was that software components should specify their obligations and guarantees formally. C-DAD extends that to the interface between a non-deterministic agent and deterministic business logic.</p>\n\n      <h2>The C-DAD whitepaper</h2>\n      <p>Enrico Piovesan published the C-DAD whitepaper as part of the Traverse project. It covers the methodology in depth — why contracts are necessary for agentic systems, how to structure them, and how Traverse implements enforcement. The whitepaper builds on the Universal Microservices Architecture (UMA) foundation described in the <a href=\"/questions/what-is-uma.html\">UMA book</a>.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is contract-driven AI development?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Contract-driven AI development (C-DAD) is a methodology where every tool an AI agent can invoke is governed by a machine-readable contract that defines inputs, outputs, and behavioral constraints. The runtime enforces the contract on every call. This makes agent behavior auditable, reproducible, and predictable.\"}}]}";
+---
+<QuestionLayout
+  title={"What is contract-driven AI development?"}
+  description={"Contract-driven AI development (C-DAD) is a methodology where every tool an AI agent can call is governed by a machine-readable contract. Learn what it means in practice."}
+  canonical={"https://traverse-framework.com/questions/what-is-contract-driven-ai-development.html"}
+  category={"AI and MCP"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

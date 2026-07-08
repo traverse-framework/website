@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Pricing logic is one of the primary use cases Traverse was built for. Write the rule once as a Rust WASM capability, define a contract that specifies valid inputs and required output constraints, and register it. The same binary runs wherever you need it — browser, API, worker — with identical results every time.</p>\n\n      <h2>The drift problem Traverse solves</h2>\n      <p>Most applications that compute prices have the same logic in multiple places. A JavaScript snippet calculates an estimate in the frontend. A Python function calculates the real price in the backend. A batch worker calculates totals for invoicing. These three implementations drift over time. Promotions get applied in one place but not another. Rounding differs. Currency handling diverges.</p>\n      <p>With Traverse, there is one implementation. One binary. One contract. All three places call the same capability and get the same number.</p>\n\n      <h2>What a pricing capability looks like</h2>\n      <p>A pricing capability takes an input object — quantity, unit price, discount tier, currency — and returns a result object — subtotal, tax, total. The contract defines preconditions like minimum quantity greater than zero and unit price greater than zero. Postconditions confirm the total is non-negative and the currency is present in the output. The runtime enforces all of this on every call.</p>\n\n      <h2>Auditability</h2>\n      <p>Every call to your pricing capability produces a trace artifact. For disputed invoices, you can replay the exact inputs and get the same output. The trace shows which version of the capability ran, which preconditions were checked, and what the raw output was before any formatting. This is hard to achieve with plain code.</p>\n\n      <h2>AI agents calling pricing</h2>\n      <p>If you expose pricing via the MCP server, an AI agent can call it directly. The agent gets the full input schema at discovery time and the runtime validates every call. The agent cannot compute an invalid price — the contract rejects the inputs before execution.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I use Traverse for pricing logic?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. Pricing logic is one of Traverse's primary use cases. You write the pricing rule once as a Rust WASM capability, define the contract with preconditions like minimum quantity and valid price ranges, and register it. The same binary runs in the browser for previews, in your API for billing, and in workers for batch calculations — all with identical behavior.\"}}]}";
+---
+<QuestionLayout
+  title={"Can I use Traverse for pricing logic?"}
+  description={"Pricing logic is one of Traverse"}
+  canonical={"https://traverse-framework.com/questions/can-i-use-traverse-for-pricing-logic.html"}
+  category={"Use Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

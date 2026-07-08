@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>No. Traverse does not replace REST APIs. They solve different problems at different layers. REST APIs handle network-accessible endpoints, authentication, routing, and resource management. Traverse handles portable execution of business logic with contract enforcement. The two work together — your REST API is often the transport layer that calls a Traverse capability internally.</p>\n\n      <h2>What REST APIs do that Traverse does not</h2>\n      <ul>\n        <li>Handle HTTP routing and verbs</li>\n        <li>Manage authentication and authorization</li>\n        <li>Expose resources to external clients over the network</li>\n        <li>Handle pagination, filtering, and resource relationships</li>\n        <li>Provide versioned public interfaces for other teams or third parties</li>\n      </ul>\n\n      <h2>What Traverse does that REST APIs do not</h2>\n      <ul>\n        <li>Execute business logic in a sandboxed WASM environment</li>\n        <li>Enforce preconditions and postconditions on every call</li>\n        <li>Run the same binary in the browser, edge, and server with identical behavior</li>\n        <li>Produce a trace artifact for every execution</li>\n        <li>Expose capabilities to AI agents via MCP without building API endpoints</li>\n      </ul>\n\n      <h2>A common pattern</h2>\n      <p>You keep your REST API. When a POST request to <code>/orders/calculate</code> comes in, your API handler authenticates the caller, extracts the request body, and calls the Traverse <code>calculate_order_total</code> capability. The capability runs with contract enforcement. The API handler formats the result and returns a response. Traverse handles the business logic layer. Your API handles everything else.</p>\n\n      <h2>The portability angle</h2>\n      <p>The reason you would reach for Traverse over a plain function call inside your API handler is portability and consistency. If you want the same pricing logic to run in the browser for instant previews and on the server for billing — with identical results and full enforcement — Traverse gives you that. A REST API endpoint cannot run in a browser without a network call.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is Traverse a replacement for REST APIs?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. Traverse is not a REST API replacement. REST APIs handle network-accessible endpoints, authentication, and resource management. Traverse handles portable execution of business logic with contract enforcement. You typically run Traverse capabilities behind your REST API, not instead of it.\"}}]}";
+---
+<QuestionLayout
+  title={"Is Traverse a replacement for REST APIs?"}
+  description={"Traverse is not a REST API replacement. It solves a different problem: portable execution of business logic with contract enforcement. Learn how they relate."}
+  canonical={"https://traverse-framework.com/questions/is-traverse-a-replacement-for-rest-apis.html"}
+  category={"Comparisons"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

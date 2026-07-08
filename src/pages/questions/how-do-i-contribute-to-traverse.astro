@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse is open source and welcomes contributions. The main repository is at <a href=\"https://github.com/traverse-framework/traverse\" target=\"_blank\" rel=\"noopener\">github.com/traverse-framework/traverse</a>. Whether you fix a bug, improve a doc, or build a new placement target adapter, contributions move the project forward.</p>\n\n      <h2>Good first contributions</h2>\n      <ul>\n        <li>Bug reports with a minimal reproduction case</li>\n        <li>Documentation improvements — clearer explanations, corrected examples</li>\n        <li>New capability examples that show real-world use cases</li>\n        <li>Test coverage for edge cases in the contract validation logic</li>\n        <li>Translations or localization of docs</li>\n      </ul>\n\n      <h2>Larger contributions</h2>\n      <p>Before building something substantial — a new placement target adapter, a significant API change, a new crate — open a GitHub issue or discussion first. Describe what you want to build and why. This avoids wasted work if the direction does not align with the project's design goals.</p>\n\n      <h2>The pull request process</h2>\n      <ul>\n        <li>Fork the repository and create a branch for your change</li>\n        <li>Make sure existing tests pass: <code>cargo test --workspace</code></li>\n        <li>Add tests for new behavior</li>\n        <li>Keep commits focused — one logical change per commit</li>\n        <li>Open a pull request with a clear description of what changes and why</li>\n      </ul>\n\n      <h2>What Traverse needs most</h2>\n      <p>The highest-value contributions right now are placement target adapters (browser, edge, cloud), real-world capability examples in industries like fintech and SaaS, and feedback from people using Traverse in production. If you are building something with Traverse, sharing what is working and what is not is itself a valuable contribution.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I contribute to Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Contribute to Traverse by filing issues on GitHub, submitting pull requests for bug fixes, adding examples, improving documentation, or building new placement target adapters. The project follows a standard GitHub workflow with Rust conventions.\"}}]}";
+---
+<QuestionLayout
+  title={"How do I contribute to Traverse?"}
+  description={"Traverse welcomes contributions. Learn how to file issues, submit pull requests, and help with documentation, examples, and new placement targets."}
+  canonical={"https://traverse-framework.com/questions/how-do-i-contribute-to-traverse.html"}
+  category={"Project and Licensing"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

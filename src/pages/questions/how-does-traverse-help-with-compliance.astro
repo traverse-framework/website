@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse helps with compliance in two ways: it enforces business rules consistently across every runtime through contracts, and it produces a trace artifact on every execution that records exactly what happened. You do not need to build a separate audit logging system — the runtime creates the record as a side effect of execution.</p>\n\n      <h2>Reproducible decisions</h2>\n      <p>Compliance often requires proving that a decision was made correctly at a specific point in time. With Traverse, every execution produces a trace that includes the exact input, the contract version that governed the run, which preconditions were checked and passed, the WASM binary that executed, and the output. You can replay any past execution and get the same result from the same inputs.</p>\n\n      <h2>Contract versioning as a compliance mechanism</h2>\n      <p>When regulations change, you register a new contract version with updated rules. Old executions remain tied to the version that was in effect at the time. A compliance audit can verify: this decision was made under contract version 1.2.0, which was the governing version on this date, and these were the rules in that version. The registry preserves all versions until you explicitly remove them.</p>\n\n      <h2>Consistent rule enforcement</h2>\n      <p>For financial services, healthcare, and insurance, the same eligibility or calculation rule must produce the same result regardless of where it runs. A rule that behaves differently in the frontend versus the API is a compliance risk. Traverse eliminates that divergence — one binary, one contract, one behavior.</p>\n\n      <h2>What Traverse does not provide</h2>\n      <ul>\n        <li>Long-term trace storage — you need to persist trace artifacts to your own system</li>\n        <li>Access controls on who can call capabilities</li>\n        <li>Regulatory framework mapping — you define which contracts correspond to which requirements</li>\n        <li>Legal advice on compliance posture</li>\n      </ul>\n\n      <p>Traverse gives you the enforcement and audit raw material. How you use that material to satisfy specific regulatory frameworks is your design decision.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How does Traverse help with compliance?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse helps with compliance by producing a trace artifact on every capability execution. Each trace records the exact input, the contract version that governed the run, the precondition and postcondition results, and the output. You can reconstruct any past decision from the trace alone.\"}}]}";
+---
+<QuestionLayout
+  title={"How does Traverse help with compliance?"}
+  description={"Traverse produces a trace artifact on every capability execution. Every business decision is reproducible, auditable, and tied to a specific contract version."}
+  canonical={"https://traverse-framework.com/questions/how-does-traverse-help-with-compliance.html"}
+  category={"Use Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

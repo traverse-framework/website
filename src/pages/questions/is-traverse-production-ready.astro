@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse v0.7.0 is stable for the local placement target. You can use the local runtime, contract validation, CLI, and MCP server in production today. The project is pre-1.0, which means minor version bumps can include breaking API changes. If you build on Traverse now, pin your version and read the changelog before upgrading.</p>\n\n      <h2>What is stable today</h2>\n      <ul>\n        <li>Local placement target — runs WASM capabilities in the local process</li>\n        <li>Contract validation — preconditions and postconditions against JSON Schema</li>\n        <li>The traverse CLI — capability registration, invocation, and trace inspection</li>\n        <li>The MCP server — tools/list and tools/call for AI agent integration</li>\n        <li>Trace artifacts — every execution is recorded and inspectable</li>\n        <li>The governing spec model — linking contracts to source documents</li>\n      </ul>\n\n      <h2>What is still maturing</h2>\n      <ul>\n        <li>Browser, edge, cloud, and AI pipeline placement targets — in development</li>\n        <li>Hosted registry — not yet available</li>\n        <li>Language SDKs for Python, TypeScript, Go — planned</li>\n        <li>Streaming output — not yet supported</li>\n        <li>Capability signing and access controls — on the roadmap</li>\n      </ul>\n\n      <h2>How to evaluate readiness for your use case</h2>\n      <p>If you need the local target only — running contracts on one machine, exposing capabilities to an AI agent via MCP — then Traverse is ready for that today. The core execution model is solid. The things still in progress are around the broader deployment surface, not the fundamental runtime behavior.</p>\n      <p>If you need to deploy capabilities to the browser or cloud, or if you need a hosted registry your team can share, those features are not there yet. You would be building ahead of the stable surface and accepting more churn.</p>\n\n      <h2>The pre-1.0 caveat</h2>\n      <p>Pre-1.0 means Enrico can change APIs between minor versions if the design requires it. In practice, the contract format and core runtime behavior have been stable across recent releases. The parts that change are the edges — new placement targets bring new APIs, and those settle as the targets mature. Follow the <a href=\"/changelog.html\">changelog</a> and the <a href=\"/questions/what-is-traverse-roadmap.html\">roadmap</a> to stay informed.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is Traverse production ready?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse v0.7.0 is stable for the local placement target. The local runtime, contract validation, MCP server, and CLI are all usable in production today. Other placement targets (browser, edge, cloud, AI pipeline) are in development. The project is pre-1.0, meaning APIs can change between minor versions.\"}}]}";
+---
+<QuestionLayout
+  title={"Is Traverse production ready?"}
+  description={"Traverse v0.7.0 is stable for the local placement target. Learn what production ready means for Traverse today and what is still maturing."}
+  canonical={"https://traverse-framework.com/questions/is-traverse-production-ready.html"}
+  category={"Technical Edge Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

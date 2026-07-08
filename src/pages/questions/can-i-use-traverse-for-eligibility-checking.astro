@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Eligibility rules are a natural fit for Traverse. You write the rule once as a WASM capability, define a contract that specifies the required inputs and constrains the output, and run it wherever you need it. The same rule that powers instant UI feedback also governs your API authorization and your batch reporting jobs.</p>\n\n      <h2>The consistency problem</h2>\n      <p>Eligibility logic tends to live in multiple places. A frontend check tells the user whether they qualify before they apply. An API check enforces the rule when they submit. A data pipeline checks eligibility for reporting. When these three implementations drift — a new rule added to the API but not the frontend, a condition inverted in the batch job — users get inconsistent experiences and compliance becomes harder to prove.</p>\n      <p>With Traverse, one binary defines the rule. All three callers get the same answer from the same logic.</p>\n\n      <h2>Contract structure for eligibility</h2>\n      <p>A typical eligibility capability takes an applicant profile as input and returns an eligibility result: a boolean, a reason code, and optionally a list of failing conditions. The contract's preconditions validate that required profile fields are present and have valid types. Postconditions confirm the result structure is complete. If the capability returns an eligibility decision without a reason code, the postcondition rejects it.</p>\n\n      <h2>Compliance and auditability</h2>\n      <p>For regulated industries, every eligibility decision may need to be auditable. Traverse produces a trace artifact on every call. The artifact records the exact input, the contract version that governed the decision, and the output. You have a complete audit trail without building one separately.</p>\n\n      <ul>\n        <li>Insurance underwriting rules</li>\n        <li>Loan qualification checks</li>\n        <li>Feature access controls based on subscription tier</li>\n        <li>Promotional eligibility (first-time buyer, region-based offers)</li>\n        <li>Compliance-gated actions in regulated workflows</li>\n      </ul>\n\n      <p>See <a href=\"/questions/how-does-traverse-help-with-compliance.html\">how Traverse helps with compliance</a> for more on the audit trail.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I use Traverse for eligibility checking?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. Eligibility rules are a natural fit for Traverse. You define the rule as a WASM capability with a contract that specifies required input fields and constrains the output to a boolean eligibility result with a reason. The same rule runs in your frontend for instant feedback, in your API for authorization, and in batch jobs for reporting.\"}}]}";
+---
+<QuestionLayout
+  title={"Can I use Traverse for eligibility checking?"}
+  description={"Eligibility rules are a natural fit for Traverse. Write the rule once with contract-enforced preconditions and run it consistently across all your services."}
+  canonical={"https://traverse-framework.com/questions/can-i-use-traverse-for-eligibility-checking.html"}
+  category={"Use Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

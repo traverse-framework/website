@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse is built from source. There are no binary releases yet. The process takes about 10 minutes if you already have Rust installed.</p>\n\n      <h2>Prerequisites</h2>\n      <ul>\n        <li><strong>Rust toolchain</strong> — install via <a href=\"https://rustup.rs\" target=\"_blank\" rel=\"noopener\">rustup.rs</a> if you do not have it</li>\n        <li><strong>wasm32-wasi target</strong> — needed to compile capabilities to WASM</li>\n        <li><strong>Node.js</strong> — only needed if you want to run the React demo</li>\n      </ul>\n\n      <h2><span class=\"step-num\">1</span> Add the WASM target</h2>\n      <p>After installing Rust, add the WASM target:</p>\n      <pre><code>rustup target add wasm32-wasi</code></pre>\n\n      <h2><span class=\"step-num\">2</span> Clone the repository</h2>\n      <pre><code>git clone https://github.com/traverse-framework/traverse\ncd traverse</code></pre>\n\n      <h2><span class=\"step-num\">3</span> Build the workspace</h2>\n      <p>This builds all crates including the runtime, registry, CLI, and the expedition WASM capabilities:</p>\n      <pre><code>cargo build</code></pre>\n      <p>The first build will take a few minutes while Cargo downloads and compiles dependencies. Subsequent builds are much faster.</p>\n\n      <h2><span class=\"step-num\">4</span> Verify with bundle inspect</h2>\n      <p>Run the bundle inspect command to confirm everything built correctly. It prints the registry contents, showing all capabilities indexed from the bundle:</p>\n      <pre><code>cargo run -p traverse-cli -- bundle inspect</code></pre>\n      <p>You should see a list of capabilities from the expedition planning example, each with their contract metadata. If this runs without error, your installation is working.</p>\n\n      <h2>What is installed where</h2>\n      <p>Nothing is installed globally. All binaries live in <code>target/debug/</code>. The WASM capability modules are compiled to <code>target/wasm32-wasi/debug/</code>. The CLI reads from those paths at runtime.</p>\n\n      <h2>Next step</h2>\n      <p>Once the build passes, follow the <a href=\"/questions/how-do-i-run-the-first-example.html\">expedition example walkthrough</a> to see the full runtime in action, including the browser adapter and React demo.</p>\n\n      <p>For more detail, see the <a href=\"/docs/quickstart.html\">quickstart documentation</a>.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I install Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse is built from source. Prerequisites are the Rust toolchain (rustup), the wasm32-wasi target, and Node.js for the React demo. Clone the repo at github.com/traverse-framework/traverse, run cargo build, then run cargo run -p traverse-cli -- bundle inspect to verify the installation. There are no binary releases yet.\"}}]}";
+---
+<QuestionLayout
+  title={"How do I install Traverse?"}
+  description={"Step-by-step installation guide for Traverse Framework. Prerequisites, clone, build from source, and run your first command."}
+  canonical={"https://traverse-framework.com/questions/how-do-i-install-traverse.html"}
+  category={"Question"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

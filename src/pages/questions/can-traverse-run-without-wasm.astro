@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>No. WASM is not optional in Traverse. The entire capability model is built on it. Capabilities must be compiled to WASM binaries, and the runtime uses WASM execution for isolation and portability. There is no way to register a native code capability in the current design.</p>\n\n      <h2>Why WASM is non-negotiable</h2>\n      <p>Traverse's two core properties — sandbox isolation and cross-runtime portability — both depend on WASM. WASM provides memory isolation so a capability cannot access host resources it was not granted. WASM provides a portable binary format so the same compiled output runs on Wasmtime, in a browser, or on an edge runtime without recompilation.</p>\n      <p>If you removed WASM, you would have a contract validation framework around arbitrary native code. You would lose the sandbox, lose the portability, and get different behavior across runtimes. That undermines the whole point.</p>\n\n      <h2>What this means for you</h2>\n      <p>You need to compile your implementation to <code>wasm32-wasi</code>. Rust is the primary language because it has first-class <code>wasm32-wasi</code> support and compiles cleanly to WASM. Other languages that compile to WASM also work in principle.</p>\n      <p>If your capability needs to call external services (databases, APIs), you need to design that interaction carefully. The WASM sandbox restricts outbound calls. You can pass external data in through the contract input rather than fetching it inside the capability, which is often the right design anyway.</p>\n\n      <h2>Future language support</h2>\n      <p>The roadmap includes SDKs for Python, TypeScript, and Go. Those SDKs will still compile to WASM — they will just make the compilation step transparent. The runtime stays WASM-based.</p>\n\n      <p>See <a href=\"/questions/do-i-need-rust.html\">do I need to know Rust</a> and <a href=\"/questions/what-is-traverse-security-model.html\">the security model</a> for more context on the WASM requirement.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can Traverse run without WASM?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. WASM is central to Traverse's capability model. Capabilities must be compiled to WASM binaries. The runtime uses WASM for sandboxed execution and for the portability guarantee that the same binary runs identically across placement targets. There is no native code execution path in the current design.\"}}]}";
+---
+<QuestionLayout
+  title={"Can Traverse run without WASM?"}
+  description={"Traverse requires WASM. The capability execution model is built on WASM isolation and portability. Learn why WASM is not optional and what that means for you."}
+  canonical={"https://traverse-framework.com/questions/can-traverse-run-without-wasm.html"}
+  category={"Technical Edge Cases"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

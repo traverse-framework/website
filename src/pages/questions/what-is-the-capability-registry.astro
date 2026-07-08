@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>The capability registry is the catalog Traverse uses to discover, version, and select WASM capabilities at runtime. Every capability you register gets stored alongside its contract metadata so the runtime can make informed decisions before calling anything.</p>\n\n      <h2>What it stores</h2>\n      <p>Each entry in the registry holds the capability name, version, the compiled WASM binary, and the full contract definition. The contract includes input schema, output schema, preconditions, postconditions, and placement constraints. Without all of this, the runtime cannot validate a call before it happens.</p>\n\n      <h2>How the runtime uses it</h2>\n      <p>When a caller requests a capability, the runtime enters the <code>discovering</code> phase. It queries the registry for matching entries. Then it moves to <code>evaluating_constraints</code> to check which candidates satisfy the current environment. Finally it moves to <code>selecting</code> to pick the best match and then <code>executing</code>.</p>\n\n      <p>This means the registry is not just a lookup table. It is the gating mechanism for every execution. If no registered capability satisfies the constraints, the runtime fails fast rather than calling the wrong thing.</p>\n\n      <h2>Versioning</h2>\n      <p>Multiple versions of the same capability can coexist in a registry. A caller can pin to a specific version or let the runtime select the latest that satisfies its constraints. This makes it safe to roll out new behavior gradually. Old consumers keep resolving to the version they are pinned to.</p>\n\n      <h2>The traverse-registry crate</h2>\n      <p>The registry logic lives in the <code>traverse-registry</code> crate. You interact with it through the CLI or programmatically through the runtime API. The CLI command <code>traverse capability register</code> compiles your contract and binary and adds the entry.</p>\n\n      <ul>\n        <li>Capabilities are discovered by name and version constraint</li>\n        <li>The registry validates the contract schema before accepting a registration</li>\n        <li>You can list registered capabilities with <code>traverse registry list</code></li>\n        <li>Removing a version does not affect consumers pinned to other versions</li>\n      </ul>\n\n      <p>Think of the registry as the source of truth for what capabilities exist and what they promise. The runtime enforces those promises at call time.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is the capability registry?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The capability registry is the catalog Traverse uses to discover, version, and select WASM capabilities at runtime. It stores contract metadata alongside each binary so the runtime can validate preconditions before execution and pick the right capability version for a given constraint set.\"}}]}";
+---
+<QuestionLayout
+  title={"What is the capability registry?"}
+  description={"The Traverse capability registry is the central catalog of available WASM capabilities and their contracts. Learn how discovery, versioning, and selection work."}
+  canonical={"https://traverse-framework.com/questions/what-is-the-capability-registry.html"}
+  category={"Getting Started"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

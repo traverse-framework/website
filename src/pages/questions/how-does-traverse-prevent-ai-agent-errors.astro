@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>Traverse puts three enforcement points between an AI agent and your business logic: schema-based tool definitions at discovery, precondition validation before execution, and postcondition validation after. Each one catches a different class of error before it can propagate.</p>\n\n      <h2>Accurate specs at discovery</h2>\n      <p>The first source of agent errors is a mismatch between what the agent thinks a tool does and what it actually does. Traverse eliminates this by surfacing the full JSON Schema for every capability at <code>tools/list</code> time. The agent does not build assumptions from a description — it reads the schema. Required fields, types, value ranges: all machine-readable and authoritative.</p>\n\n      <h2>Precondition enforcement before execution</h2>\n      <p>Even with a good schema, agents sometimes construct inputs that technically match the type but violate business constraints — a quantity of zero, a negative price, a date in the past. Preconditions catch these. The runtime checks them before the WASM binary runs and returns a structured error: which field failed, what value was provided, what the constraint was. The agent can read this and self-correct.</p>\n\n      <h2>Postcondition enforcement after execution</h2>\n      <p>A buggy capability could return an output that violates the contract. Maybe a pricing function returns a negative total under an edge case. Postconditions catch this before the output reaches the agent. The agent never reasons on top of a result that violates the contract's guarantees.</p>\n\n      <h2>Structured errors the agent can act on</h2>\n      <p>All three enforcement points return structured errors through the MCP protocol. The agent receives a JSON object with the failure type, the failing field, and the constraint. This is more useful than an HTTP 400 with a message string. A well-designed agent loop can read the error, adjust the call, and retry without human intervention.</p>\n\n      <p>See <a href=\"/questions/how-does-traverse-handle-errors.html\">how Traverse handles errors</a> for the full error type reference.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How does Traverse prevent AI agent errors?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse prevents agent errors at three points: schema validation at discovery gives the agent accurate tool specs, precondition enforcement rejects invalid inputs before execution, and postcondition enforcement prevents bad outputs from reaching the agent. Each failure returns a structured error the agent can act on.\"}}]}";
+---
+<QuestionLayout
+  title={"How does Traverse prevent AI agent errors?"}
+  description={"Traverse stops AI agents from calling capabilities with wrong inputs, and prevents bad outputs from reaching the agent. Learn the three enforcement points."}
+  canonical={"https://traverse-framework.com/questions/how-does-traverse-prevent-ai-agent-errors.html"}
+  category={"AI and MCP"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

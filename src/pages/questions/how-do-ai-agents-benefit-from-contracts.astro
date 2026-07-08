@@ -1,0 +1,17 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [];
+const _body = "<p>When an AI agent calls a tool, it usually sends inputs it constructed from context and hopes the output matches what it expects. There is no enforcement layer. Contracts change that. The agent gets a precise spec at discovery time, and the runtime enforces it at call time — on both the input and the output.</p>\n\n      <h2>Structured discovery</h2>\n      <p>When the agent calls <code>tools/list</code> on the Traverse MCP server, it receives full JSON Schema definitions for every registered capability. Not a description — a machine-readable schema. The agent knows exactly which fields are required, their types, and their valid ranges. It does not need to guess or infer from documentation.</p>\n\n      <h2>Validated execution</h2>\n      <p>When the agent calls <code>tools/call</code>, the runtime checks preconditions before the WASM binary runs. A malformed input gets a clear error message back to the agent: which field failed, what value was provided, what the constraint was. The agent can correct its inputs and retry rather than getting a cryptic server error or a silent wrong answer.</p>\n\n      <h2>Trusted outputs</h2>\n      <p>After execution, postconditions validate the output before it reaches the agent. If the capability returns something outside the contract's bounds — a negative price, a missing required field — the runtime rejects it. The agent never receives an output that violates the contract's guarantees.</p>\n\n      <h2>Audit trail</h2>\n      <p>Every call produces a trace artifact. For AI agent pipelines, this means you can reconstruct exactly which capability the agent called, with what inputs, and what it got back. When something goes wrong in an automated pipeline, the trace tells you where.</p>\n\n      <ul>\n        <li>Contracts reduce agent hallucination about tool behavior</li>\n        <li>Precondition errors give agents actionable feedback to self-correct</li>\n        <li>Typed outputs let agents build reliable reasoning chains</li>\n        <li>Traces make agent behavior auditable after the fact</li>\n      </ul>\n\n      <p>See <a href=\"/questions/what-is-contract-driven-ai-development.html\">contract-driven AI development</a> for the broader methodology.</p>";
+const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do AI agents benefit from contracts?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Contracts give AI agents a precise specification of what each tool accepts and returns, enforced at runtime. The agent cannot call a capability with invalid inputs — the runtime rejects them before execution. The agent gets typed, predictable outputs it can reason about without guessing what shape the response will take.\"}}]}";
+---
+<QuestionLayout
+  title={"How do AI agents benefit from contracts?"}
+  description={"Contracts give AI agents reliable tool definitions with validated inputs and outputs. Learn why contracts make agent behavior more predictable."}
+  canonical={"https://traverse-framework.com/questions/how-do-ai-agents-benefit-from-contracts.html"}
+  category={"AI and MCP"}
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>
