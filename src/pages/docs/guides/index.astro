@@ -1,0 +1,37 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+import DocsSidebar from '@components/DocsSidebar.astro';
+
+const guides = [
+  { href: '/docs/guides/mcp-setup.html', title: 'MCP Server Setup', desc: 'Expose your capability registry to Claude and other MCP-compatible agents.' },
+  { href: '/docs/guides/react-integration.html', title: 'React Integration', desc: 'Call Traverse capabilities from a React app.' },
+];
+---
+<SubpageLayout
+  title={"Guides — Traverse Docs"}
+  description={"Practical guides for integrating Traverse: MCP server setup, React integration, and more."}
+  canonical={"https://traverse-framework.com/docs/guides.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Docs", href: "/docs.html" }]}
+>
+  <style is:global slot="head">body { padding-top: var(--nav-h); }</style>
+  <main>
+    <div class="docs-layout">
+      <DocsSidebar active="/docs/guides.html" />
+      <div class="docs-content">
+        <div style="margin-bottom:2rem">
+          <div class="section-label" style="margin-bottom:0.75rem">Guides</div>
+          <h1 class="t-h1" style="margin-bottom:0.75rem">Practical guides.</h1>
+          <p class="t-body t-muted">Step-by-step walkthroughs for common integrations.</p>
+        </div>
+        <div class="usecase-grid">
+          {guides.map((g) => (
+            <a href={g.href} class="usecase-card" style="text-decoration:none;display:block">
+              <h3>{g.title}</h3>
+              <p>{g.desc}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+</SubpageLayout>

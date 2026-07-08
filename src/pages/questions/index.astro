@@ -1,0 +1,130 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const groups = [
+  {
+    label: 'Getting started',
+    items: [
+      ['how-do-i-install-traverse.html', 'How do I install Traverse?'],
+      ['do-i-need-rust.html', 'Do I need to know Rust to use Traverse?'],
+      ['how-long-to-get-started.html', 'How long does it take to get started with Traverse?'],
+      ['how-do-i-run-the-first-example.html', 'How do I run the Traverse expedition example?'],
+      ['can-i-use-traverse-with-python.html', 'Can I use Traverse with Python?'],
+      ['can-i-use-traverse-with-react.html', 'Can I use Traverse with React?'],
+      ['how-do-i-contribute-to-traverse.html', 'How do I contribute to Traverse?'],
+    ],
+  },
+  {
+    label: 'Contracts and capabilities',
+    items: [
+      ['what-is-a-contract-in-traverse.html', 'What is a contract in Traverse?'],
+      ['what-is-contract-driven.html', 'What does "contract-driven" mean in Traverse?'],
+      ['how-do-i-write-a-capability-contract.html', 'How do I write a capability contract?'],
+      ['what-are-preconditions.html', 'What are preconditions in a Traverse contract?'],
+      ['what-are-postconditions.html', 'What are postconditions in a Traverse contract?'],
+      ['what-is-a-governing-spec.html', 'What is a governing spec in Traverse?'],
+      ['what-is-contract-versioning.html', 'What is contract versioning in Traverse?'],
+      ['what-is-the-contract-lifecycle.html', 'What is the contract lifecycle in Traverse?'],
+      ['what-is-a-wasm-capability.html', 'What is a WASM capability in Traverse?'],
+      ['what-happens-when-a-capability-fails.html', 'What happens when a capability fails?'],
+      ['how-does-constraint-validation-work.html', 'How does constraint validation work in Traverse?'],
+    ],
+  },
+  {
+    label: 'Runtime and architecture',
+    items: [
+      ['how-does-traverse-execute-wasm.html', 'How does Traverse execute WASM?'],
+      ['can-traverse-run-without-wasm.html', 'Can Traverse run without WASM?'],
+      ['what-is-the-capability-registry.html', 'What is the capability registry?'],
+      ['how-do-placement-targets-work.html', 'How do placement targets work in Traverse?'],
+      ['what-is-a-trace-artifact.html', 'What is a trace artifact in Traverse?'],
+      ['what-is-the-traverse-state-machine.html', 'What is the Traverse execution state machine?'],
+      ['what-is-the-browser-adapter.html', 'What is the browser adapter?'],
+      ['what-crates-make-up-traverse.html', 'What crates make up Traverse?'],
+      ['what-is-the-traverse-cli.html', 'What is the Traverse CLI?'],
+      ['how-does-traverse-handle-errors.html', 'How does Traverse handle errors?'],
+      ['how-does-traverse-handle-events.html', 'How does Traverse handle events?'],
+      ['does-traverse-support-streaming.html', 'Does Traverse support streaming?'],
+    ],
+  },
+  {
+    label: 'AI agents and MCP',
+    items: [
+      ['how-does-the-mcp-server-work.html', 'How does the Traverse MCP server work?'],
+      ['how-do-i-connect-claude-to-traverse.html', 'How do I connect Claude to Traverse?'],
+      ['how-do-ai-agents-discover-capabilities.html', 'How do AI agents discover capabilities?'],
+      ['how-do-ai-agents-benefit-from-contracts.html', 'How do AI agents benefit from contracts?'],
+      ['how-does-traverse-prevent-ai-agent-errors.html', 'How does Traverse prevent AI agent errors?'],
+      ['can-multiple-agents-share-a-traverse-registry.html', 'Can multiple AI agents share a Traverse registry?'],
+      ['what-is-contract-driven-ai-development.html', 'What is contract-driven AI development?'],
+    ],
+  },
+  {
+    label: 'How Traverse compares',
+    items: [
+      ['how-is-traverse-different-from-function-calling.html', 'How is Traverse different from function calling?'],
+      ['how-is-traverse-different-from-microservices.html', 'How is Traverse different from microservices?'],
+      ['how-is-traverse-different-from-serverless.html', 'How is Traverse different from serverless functions?'],
+      ['how-is-traverse-different-from-wasi.html', 'How is Traverse different from WASI?'],
+      ['how-is-traverse-different-from-a-plugin-system.html', 'How is Traverse different from a plugin system?'],
+      ['is-traverse-a-replacement-for-rest-apis.html', 'Is Traverse a replacement for REST APIs?'],
+      ['what-is-uma.html', 'What is UMA (Universal Microservices Architecture)?'],
+    ],
+  },
+  {
+    label: 'Use cases',
+    items: [
+      ['can-i-use-traverse-for-pricing-logic.html', 'Can I use Traverse for pricing logic?'],
+      ['can-i-use-traverse-for-eligibility-checking.html', 'Can I use Traverse for eligibility checking?'],
+      ['how-does-traverse-help-with-compliance.html', 'How does Traverse help with compliance?'],
+    ],
+  },
+  {
+    label: 'Project and licensing',
+    items: [
+      ['what-is-traverse.html', 'What is Traverse?'],
+      ['is-traverse-open-source.html', 'Is Traverse open source?'],
+      ['can-i-use-traverse-commercially.html', 'Can I use Traverse commercially?'],
+      ['is-traverse-production-ready.html', 'Is Traverse production ready?'],
+      ['what-is-traverse-performance.html', 'What is Traverse\'s performance like?'],
+      ['what-is-traverse-security-model.html', 'What is Traverse\'s security model?'],
+      ['what-is-traverse-roadmap.html', 'What is the Traverse roadmap?'],
+      ['who-maintains-traverse.html', 'Who maintains Traverse?'],
+    ],
+  },
+];
+---
+<SubpageLayout
+  title={"Frequently Asked Questions — Traverse Framework"}
+  description={"Answers to common questions about Traverse: contracts, capabilities, the runtime, AI agent integration, and how it compares to other approaches."}
+  canonical={"https://traverse-framework.com/questions.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="page-hero-inner">
+          <span class="section-label">Questions</span>
+          <h1 class="t-h1">Answers to common questions.</h1>
+          <p class="page-hero-sub">Contracts, capabilities, the runtime, AI agent integration, and how Traverse compares to what you already know.</p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        {groups.map((g) => (
+          <div style="margin-bottom:3rem">
+            <div class="section-label" style="margin-bottom:1rem">{g.label}</div>
+            <ul style="list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 2rem">
+              {g.items.map(([slug, title]) => (
+                <li>
+                  <a href={`/questions/${slug}`} style="display:block;padding:0.6rem 0;color:var(--fg-muted);border-bottom:1px solid var(--border);font-size:0.9rem;text-decoration:none">{title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  </main>
+</SubpageLayout>
