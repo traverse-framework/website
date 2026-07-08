@@ -9,31 +9,13 @@ const _body = "<section class=\"compare-hero\">\n  <div class=\"container\">\n  
   canonical={"https://traverse-framework.com/compare/vs-serverless.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Compare", href: "/compare/" }]}
 >
-  <style is:global slot="head">body { padding-top: var(--nav-h); }
-
-    .compare-hero {
-      padding: 4.5rem 0 3.5rem;
-      position: relative;
-    }
-    .compare-hero::before {
+  <style is:global slot="head">.compare-hero::before {
       content: '';
       position: absolute;
       inset: 0;
       background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%);
       pointer-events: none;
     }
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.82rem;
-      color: var(--fg-muted);
-      margin-bottom: 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .breadcrumb a { color: var(--fg-muted); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .breadcrumb span { color: var(--accent); }
     .compare-hero h1 {
       font-size: clamp(2rem, 4.5vw, 3.2rem);
       font-weight: 700;
@@ -164,31 +146,6 @@ const _body = "<section class=\"compare-hero\">\n  <div class=\"container\">\n  
       max-width: 720px;
     }
     .highlight-callout strong { color: var(--fg); }
-
-    .problem-list {
-      list-style: none;
-      padding: 0;
-      margin: 1.5rem 0;
-      max-width: 680px;
-    }
-    .problem-list li {
-      display: flex;
-      gap: 0.75rem;
-      align-items: flex-start;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.92rem;
-      color: var(--fg-muted);
-      line-height: 1.65;
-    }
-    .problem-list li:last-child { border-bottom: none; }
-    .problem-list .marker {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      margin-top: 0.2rem;
-      flex-shrink: 0;
-    }
 
     .compare-nav {
       display: flex;

@@ -9,14 +9,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
   canonical={"https://traverse-framework.com/solutions/enterprise.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Solutions", href: "/solutions/" }]}
 >
-  <style is:global slot="head">body { padding-top: var(--nav-h); }
-
-    .sol-hero {
-      padding: 5rem 0 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .sol-hero::before {
+  <style is:global slot="head">.sol-hero::before {
       content: '';
       position: absolute;
       inset: 0;
@@ -63,19 +56,6 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     .stat-item:nth-child(2) { border-radius: 0 8px 0 0; }
     .stat-item:nth-child(3) { border-radius: 0 0 0 8px; }
     .stat-item:nth-child(4) { border-radius: 0 0 8px 0; }
-    .stat-value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 0.35rem;
-    }
-    .stat-label {
-      font-size: 0.82rem;
-      color: var(--fg-muted);
-      line-height: 1.4;
-    }
 
     .problems-section {
       padding: 4rem 0;
