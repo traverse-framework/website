@@ -9,5 +9,231 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
   canonical={"https://traverse-framework.com/solutions/enterprise.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Solutions", href: "/solutions/" }]}
 >
+  <style is:global slot="head">body { padding-top: var(--nav-h); }
+
+    .sol-hero {
+      padding: 5rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .sol-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 50% at 15% 50%, var(--accent-dim) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .sol-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .sol-hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .sol-hero-lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      margin-bottom: 2rem;
+    }
+    .sol-hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .stat-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      overflow: hidden;
+    }
+    .stat-item {
+      padding: 1.25rem;
+      background: var(--bg-elevated);
+    }
+    .stat-item:nth-child(1) { border-radius: 8px 0 0 0; }
+    .stat-item:nth-child(2) { border-radius: 0 8px 0 0; }
+    .stat-item:nth-child(3) { border-radius: 0 0 0 8px; }
+    .stat-item:nth-child(4) { border-radius: 0 0 8px 0; }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      line-height: 1.4;
+    }
+
+    .problems-section {
+      padding: 4rem 0;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .problem-card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.75rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .problem-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.6rem;
+      color: var(--fg);
+    }
+    .problem-card p {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+
+    .solution-section { padding: 4.5rem 0; }
+    .solution-section h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    .solution-section .lead {
+      font-size: 1.05rem;
+      color: var(--fg-muted);
+      max-width: 600px;
+      line-height: 1.75;
+      margin-bottom: 3rem;
+    }
+
+    .solution-items {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .sol-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .sol-item-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .sol-item-body h3 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.4rem;
+      color: var(--fg);
+    }
+    .sol-item-body p {
+      font-size: 0.88rem;
+      color: var(--fg-muted);
+      line-height: 1.65;
+    }
+
+    .properties-section {
+      padding: 4rem 0;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .properties-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+    .prop-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .prop-check {
+      color: var(--success);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .prop-body strong {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--fg);
+      margin-bottom: 0.25rem;
+    }
+    .prop-body span {
+      font-size: 0.83rem;
+      color: var(--fg-muted);
+      line-height: 1.55;
+    }
+
+    .highlight-callout {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .highlight-callout strong { color: var(--fg); }
+
+    .content-p {
+      color: var(--fg-muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 680px;
+      font-size: 0.97rem;
+    }
+
+    @media (max-width: 768px) {
+      .sol-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .solution-items { grid-template-columns: 1fr; }
+    }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>

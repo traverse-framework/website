@@ -9,5 +9,190 @@ const _body = "<div class=\"container\">\n  <div class=\"about-hero\">\n    <spa
   canonical={"https://traverse-framework.com/about.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
+  <style is:global slot="head">body { padding-top: var(--nav-h); }
+
+    /* Hero */
+    .about-hero {
+      padding: 5rem 0 4rem;
+      max-width: 720px;
+    }
+    .about-hero .t-h1 {
+      margin: 0.75rem 0 1.5rem;
+      line-height: 1.15;
+    }
+    .about-hero .lead {
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      line-height: 1.7;
+      max-width: 600px;
+    }
+
+    /* Layout */
+    .about-body {
+      padding-bottom: 5rem;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 4rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .about-body { grid-template-columns: 1fr; gap: 3rem; }
+    }
+
+    /* Main prose */
+    .about-prose { display: flex; flex-direction: column; gap: 3.5rem; }
+
+    .prose-section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .prose-section h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0 0 1rem;
+      line-height: 1.3;
+    }
+    .prose-section p {
+      color: var(--fg-muted);
+      font-size: 0.975rem;
+      line-height: 1.75;
+      margin: 0 0 0.9rem;
+    }
+    .prose-section p:last-child { margin-bottom: 0; }
+
+    /* Philosophy blockquote */
+    .philosophy-block {
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-card);
+      border-radius: 0 10px 10px 0;
+      margin: 0;
+    }
+    .philosophy-block p {
+      font-size: 1.15rem !important;
+      font-weight: 500;
+      color: var(--fg) !important;
+      line-height: 1.55 !important;
+      margin: 0 !important;
+    }
+    .philosophy-block cite {
+      display: block;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--fg-subtle);
+      font-style: normal;
+    }
+
+    /* Work timeline */
+    .work-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .work-item {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .work-year {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      padding-top: 0.2rem;
+      font-weight: 500;
+    }
+    .work-content {}
+    .work-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0 0 0.35rem;
+    }
+    .work-desc {
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      line-height: 1.6;
+      margin: 0 0 0.5rem;
+    }
+    .work-link {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .work-link:hover { text-decoration: underline; }
+
+    /* Sidebar */
+    .about-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .sidebar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .sidebar-card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 1rem;
+    }
+    .sidebar-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .sidebar-stat:last-child { border-bottom: none; padding-bottom: 0; }
+    .sidebar-stat-label { color: var(--fg-muted); }
+    .sidebar-stat-value { color: var(--fg); font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+    .sidebar-links { display: flex; flex-direction: column; gap: 0.5rem; }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 7px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover { background: var(--bg-elevated); color: var(--fg); }
+    .sidebar-link-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--fg-subtle);
+    }
+
+    /* Status bar */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px var(--success);
+      animation: pulse-dot 2.5s ease infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>

@@ -9,5 +9,52 @@ const _body = "<div class=\"changelog-wrap\">\n  <div class=\"section-label\" st
   canonical={"https://traverse-framework.com/changelog.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
+  <style is:global slot="head">body { padding-top: var(--nav-h); }
+    .changelog-wrap { max-width: 760px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+    @media (max-width: 768px) { .changelog-wrap { padding: 2.5rem 1.25rem 4rem; } }
+
+    .release {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 2.5rem;
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 640px) { .release { grid-template-columns: 1fr; gap: 1rem; } }
+    .release:last-child { border-bottom: none; }
+
+    .release-meta { padding-top: 0.25rem; }
+    .release-version {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+    .release-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-subtle); margin-bottom: 0.75rem; }
+    .release-tag { margin-bottom: 0.5rem; }
+
+    .release-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+    .release-body p { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.7; margin-bottom: 1.25rem; max-width: 56ch; }
+    .release-body ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .release-body li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.875rem; color: var(--fg-muted); }
+    .release-body li::before { content: '—'; color: var(--accent); flex-shrink: 0; margin-top: 0.05em; }
+
+    .release-section-title {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 0.6rem;
+      margin-top: 1.25rem;
+    }
+    code { font-family: var(--font-mono); font-size: 0.82em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>

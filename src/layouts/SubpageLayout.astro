@@ -7,22 +7,20 @@ export interface Props {
   description: string;
   canonical?: string;
   jsonLd?: string;
-  label?: string;
   crumbs?: Array<{ label: string; href?: string }>;
 }
 
-const { title, description, canonical, jsonLd, label, crumbs = [] } = Astro.props;
+const { title, description, canonical, jsonLd, crumbs = [] } = Astro.props;
 ---
 <BaseLayout {title} {description} {canonical} {jsonLd}>
+  <slot name="head" slot="head" />
   <div class="subpage-wrap">
-    <div class="container">
-      <div class="subpage-header">
-        {crumbs.length > 0 && <Breadcrumb crumbs={crumbs} />}
-        {label && <div class="t-label" style="margin-bottom:0.75rem">{label}</div>}
-        <slot name="header" />
+    {crumbs.length > 0 && (
+      <div class="subpage-breadcrumb container">
+        <Breadcrumb crumbs={crumbs} />
       </div>
-      <slot />
-    </div>
+    )}
+    <slot />
   </div>
 </BaseLayout>
 
@@ -31,7 +29,8 @@ const { title, description, canonical, jsonLd, label, crumbs = [] } = Astro.prop
     padding-top: var(--nav-h);
     min-height: 100vh;
   }
-  .subpage-header {
-    padding: 3.5rem 0 2rem;
+  .subpage-breadcrumb {
+    padding-top: 1.25rem;
+    padding-bottom: 0;
   }
 </style>
