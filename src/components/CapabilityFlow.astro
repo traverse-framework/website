@@ -112,6 +112,20 @@
     height: auto;
     display: block;
   }
+  /* Below ~640px the viewBox scale-down shrinks node text past legibility;
+     scroll horizontally at a fixed minimum size instead of shrinking further. */
+  @media (max-width: 640px) {
+    .flow-stage {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -2rem;
+      padding: 0 2rem;
+    }
+    .flow-stage svg {
+      width: auto;
+      min-width: 640px;
+    }
+  }
 
   .pipe {
     fill: none;
