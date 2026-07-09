@@ -163,9 +163,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
-.card:hover { border-color: var(--border-hover); }
+.card:hover { border-color: var(--border-hover); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24); }
 .card-accent-hover:hover {
   border-color: rgba(232,81,10,0.25);
   background: rgba(232,81,10,0.03);
@@ -633,11 +634,12 @@
 .use-case-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 1.5rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
-.use-case-card:hover { border-color: var(--accent); }
+.use-case-card:hover { border-color: var(--accent); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24); }
 .use-case-num {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -669,9 +671,10 @@
 .stat-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 1.5rem;
   text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .stat-value {
   font-family: var(--font-display);
@@ -686,3 +689,48 @@
   color: var(--fg-muted);
   line-height: 1.4;
 }
+
+/* ─── Use-case link card (homepage + section landing pages) ─────────────── */
+.usecase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap-md);
+}
+@media (max-width: 700px) {
+  .usecase-grid { grid-template-columns: 1fr; }
+}
+.usecase-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.usecase-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+.usecase-card h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.015em;
+}
+.usecase-card p {
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
+.usecase-card a {
+  font-size: 0.82rem;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.usecase-card a:hover { text-decoration: underline; }
