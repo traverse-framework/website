@@ -1,0 +1,340 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const findings = [
+  { sev: 'Critical', domain: 'Security', loc: 'security.rs:46-49 · http_api.rs', finding: 'Runtime defaults to Development; unsigned artifacts allowed; HTTP serve never forces Production.' },
+  { sev: 'Critical', domain: 'Security', loc: 'security.rs:120-147 · http_api.rs:983+', finding: 'JWT identity derived by base64 payload parse only — no signature/JWKS verification; alg:none accepted in tests.' },
+  { sev: 'High', domain: 'Security', loc: 'http_api.rs:938-951', finding: 'Arbitrary bearer strings become subject_id; --allow-unauthenticated and loopback bypasses enable impersonation.' },
+  { sev: 'High', domain: 'Security', loc: 'security.rs:287-310', finding: 'Sigstore verification is a verified:// stub; CI uses placeholder bundles as if verified.' },
+  { sev: 'High', domain: 'Security', loc: 'traverse-mcp/stdio_server.rs', finding: 'MCP stdio has no auth — any stdin writer can execute capabilities and read full traces.' },
+  { sev: 'High', domain: 'Permanence', loc: 'events/broker.rs · types.rs', finding: 'Event replay is in-memory only (default 5m retention); no durable journal, WAL, or cross-restart permanence.' },
+  { sev: 'Medium', domain: 'Security', loc: 'security.rs:156-185 · wasm.rs', finding: 'Runtime checksum gate missing from verify_artifact; SHA-256 only optional in WasmExecutor.' },
+  { sev: 'Medium', domain: 'Security', loc: 'events/types.rs:19-39', finding: 'TraverseEvent lacks subject_id/actor_id — identity not propagated to events or subscription filters (spec 030 FR-006/016).' },
+  { sev: 'Medium', domain: 'Security', loc: 'security.rs:187-204', finding: 'Governed-artifact trust level uses path/URL heuristics, not registry or approved-specs lookup.' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Only Memory + LocalFile adapters; no SQLite/cloud durability, no workspace-scoped keys, no integrity hashes on records.' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'trace/private.rs', finding: 'Private traces hash I/O well, but traces are not an append-only durable store — audit evidence is process-lifetime.' },
+  { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'MCP stdio server implemented and CI-required but spec 022 unapproved; specs 057–059 approved but unimplemented.' },
+  { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated.' },
+  { sev: 'Low', domain: 'Security', loc: 'SECURITY.md:11', finding: 'Vulnerability reporting path points to a stale personal SUPPORT.md path (cogolo).' },
+  { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo.' },
+];
+
+const permanenceMatrix = [
+  { g: 'Deterministic execution (same inputs → same outputs)', spec: 'Yes (constitution + NFRs)', impl: 'Partial — WASM/expedition strong; inference/Ollama non-deterministic', gap: 'No formal determinism test suite across executors' },
+  { g: 'Immutable governing specs', spec: 'Yes (approved-specs.json)', impl: 'Yes — registry marks immutable', gap: 'Some approved specs still say Status: Draft in headers' },
+  { g: 'Artifact integrity (signature + checksum)', spec: 'Yes (030, 031)', impl: 'Ed25519 real; Sigstore stub; checksum optional', gap: 'Production path can skip checksum; Sigstore false confidence' },
+  { g: 'Event replay / recovery', spec: 'Yes (036)', impl: 'In-process cursor replay + retention prune', gap: 'No durable log; restart loses buffer; default 5m window' },
+  { g: 'Audit trail permanence', spec: 'Partial (030 NFR-003, 035 audit JSONL)', impl: 'HTTP audit JSONL; execution traces in-memory/export', gap: 'No tamper-evident, append-only, long-retention audit store' },
+  { g: 'Identity-bound evidence', spec: 'Yes (030 FR-006)', impl: 'Derived identity on request path', gap: 'Events/subscriptions omit subject_id — audit cannot attribute emitters' },
+  { g: 'App / workspace state durability', spec: 'Partial (032, 052)', impl: 'LocalFileDataStore + .traverse workspace state', gap: 'No multi-node durability; no record integrity seals' },
+  { g: 'Contractual immutability at execution', spec: 'Yes (040)', impl: 'Draft quarantine + contractual CI gate', gap: 'Gate validates JSON shape, not runtime behavioral equivalence' },
+];
+
+const crates = [
+  { name: 'traverse-contracts', maturity: 'Mature', coverage: '100% gated', risk: 'Low' },
+  { name: 'traverse-registry', maturity: 'Mature (extraction pending)', coverage: '100% gated', risk: 'Med — dual home' },
+  { name: 'traverse-runtime', maturity: 'Core / mature', coverage: '100% gated', risk: 'Med — security defaults' },
+  { name: 'traverse-cli', maturity: 'Real, monolithic', coverage: 'Ungated', risk: 'High — 9k LOC HTTP TCB' },
+  { name: 'traverse-mcp', maturity: 'Functional (docs say stub)', coverage: 'Ungated', risk: 'High if exposed' },
+  { name: 'traverse-expedition-wasm', maturity: 'Reference binary', coverage: 'Ungated', risk: 'Low' },
+];
+
+const roadmap = [
+  { p: 'Flip production security default + real JWT verify', why: 'Closes the two highest exploit paths before any network exposure', effort: 'M' },
+  { p: 'Replace Sigstore stub; add runtime checksum to verify_artifact', why: 'Makes artifact permanence/integrity claims honest', effort: 'M' },
+  { p: 'Durable event journal + configurable long retention', why: 'Turns 036 replay from session recovery into real permanence', effort: 'L' },
+  { p: 'Propagate subject_id/actor_id into TraverseEvent + filters', why: 'Enables attributable audit and multi-tenant event isolation', effort: 'S' },
+  { p: 'MCP auth boundary + redacted traces', why: 'Prevents local-tool surface from becoming full execution authority', effort: 'S' },
+  { p: 'Coverage-gate CLI http_api + MCP', why: 'Largest TCB is currently outside the 100% coverage constitution claim', effort: 'M' },
+  { p: 'Execute registry extraction (051) cleanly', why: 'Removes dual-source permanence risk for governed artifacts', effort: 'L' },
+  { p: 'First connector plugin + SQLite data adapter', why: 'Unlocks durable external I/O without expanding host ABI surface', effort: 'M' },
+  { p: 'Formal threat model + fix SECURITY.md reporting path', why: 'Documents trust boundaries operators currently must infer', effort: 'S' },
+  { p: 'Approve or decouple 022; implement or defer 057–059', why: 'Closes governance drift between approved registry and shipped code', effort: 'M' },
+];
+
+const sevClass = (s) => ({ Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low' }[s] || 'sev-low');
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'Traverse Permanence & Security Audit',
+  description: 'Full-framework analysis of durability/determinism guarantees and security risk vs opportunity in Traverse.',
+  datePublished: '2026-07-01',
+  author: { '@type': 'Organization', name: 'Traverse Framework' },
+});
+---
+<SubpageLayout
+  title={"Permanence & Security Audit — Traverse Framework"}
+  description={"Full-framework analysis of Traverse's durability, determinism guarantees, and security posture — sourced directly from specs, crates, CI gates, and SECURITY.md."}
+  canonical={"https://traverse-framework.com/security-audit.html"}
+  jsonLd={jsonLd}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">
+    .audit-hero { padding: 4rem 0 2.5rem; border-bottom: 1px solid var(--border); }
+    .audit-hero h1 { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1rem; }
+    .audit-hero-lead { font-size: 1.05rem; color: var(--fg-muted); max-width: 680px; line-height: 1.75; margin-bottom: 1rem; }
+    .audit-source { font-size: 0.8rem; color: var(--fg-subtle); font-family: var(--font-mono); }
+
+    .verdict-callout {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 1.5rem 1.75rem;
+      margin: 2.5rem 0;
+      font-size: 0.98rem;
+      color: var(--fg-muted);
+      line-height: 1.8;
+      max-width: 820px;
+    }
+    .verdict-callout strong { color: var(--fg); }
+
+    .audit-stats {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: 2.5rem 0;
+    }
+    @media (max-width: 900px) { .audit-stats { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 560px) { .audit-stats { grid-template-columns: repeat(2, 1fr); } }
+    .audit-stat { background: var(--bg-card); padding: 1.25rem 1rem; text-align: center; }
+    .audit-stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--fg); line-height: 1; margin-bottom: 0.4rem; }
+    .audit-stat-value.crit { color: #ef4444; }
+    .audit-stat-value.high { color: #f97316; }
+    .audit-stat-value.med { color: #eab308; }
+    .audit-stat-label { font-size: 0.7rem; color: var(--fg-muted); line-height: 1.4; }
+
+    .audit-section { margin: 3.5rem 0; }
+    .audit-section h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .audit-section-note { font-size: 0.88rem; color: var(--fg-subtle); margin-bottom: 1.5rem; max-width: 720px; line-height: 1.65; }
+
+    .audit-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.86rem; }
+    .audit-table th {
+      background: var(--bg-elevated); border: 1px solid var(--border); padding: 0.7rem 0.9rem;
+      text-align: left; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted);
+    }
+    .audit-table td { border: 1px solid var(--border); padding: 0.75rem 0.9rem; vertical-align: top; line-height: 1.55; color: var(--fg-muted); }
+    .audit-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .audit-table td:first-child { font-weight: 500; }
+
+    .sev-pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
+    .sev-critical { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .sev-high { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
+    .sev-medium { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+    .sev-low { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+
+    .strengths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin: 1.5rem 0; }
+    @media (max-width: 700px) { .strengths-grid { grid-template-columns: 1fr; } }
+    .strengths-col h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--fg); }
+    .strengths-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .strengths-col li { font-size: 0.88rem; color: var(--fg-muted); line-height: 1.6; padding-left: 1.4rem; position: relative; }
+    .strengths-col li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+
+    .boundary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin: 1.5rem 0; }
+    @media (max-width: 700px) { .boundary-grid { grid-template-columns: 1fr; } }
+    .boundary-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+    .boundary-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--fg); }
+    .boundary-card p { font-size: 0.85rem; color: var(--fg-muted); line-height: 1.65; margin: 0; }
+
+    .move-list { list-style: none; padding: 0; margin: 1.5rem 0; counter-reset: move; }
+    .move-list li { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+    .move-list li:last-child { border-bottom: none; }
+    .move-num { font-family: var(--font-display); font-weight: 700; color: var(--accent); flex-shrink: 0; }
+    .move-list p { margin: 0; color: var(--fg-muted); font-size: 0.92rem; line-height: 1.65; }
+
+    .evidence-line { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-subtle); line-height: 1.8; word-break: break-word; }
+  </style>
+
+  <main>
+    <section class="audit-hero">
+      <div class="container">
+        <span class="section-label">Security &amp; Permanence</span>
+        <h1 style="margin-top:1rem">Traverse Permanence &amp; Security Audit</h1>
+        <p class="audit-hero-lead">Full-framework analysis of durability/determinism guarantees and security risk vs. opportunity.</p>
+        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · July 2026</p>
+      </div>
+    </section>
+
+    <section class="section-sm">
+      <div class="container">
+        <div class="verdict-callout">
+          <strong>Verdict:</strong> Traverse has a strong specification and governance layer, but is correctly labeled pre-production. Security controls are partially implemented with dangerous defaults (dev mode, unverified JWTs, stub Sigstore). Permanence is strongest for immutable specs and Ed25519 artifact signing; weakest for durable audit, long-retention replay, and identity-bound event evidence.
+        </div>
+
+        <div class="audit-stats">
+          <div class="audit-stat"><div class="audit-stat-value crit">2</div><div class="audit-stat-label">Critical findings</div></div>
+          <div class="audit-stat"><div class="audit-stat-value high">4</div><div class="audit-stat-label">High findings</div></div>
+          <div class="audit-stat"><div class="audit-stat-value med">7</div><div class="audit-stat-label">Medium findings</div></div>
+          <div class="audit-stat"><div class="audit-stat-value">2</div><div class="audit-stat-label">Low / info</div></div>
+          <div class="audit-stat"><div class="audit-stat-value">52</div><div class="audit-stat-label">Approved specs</div></div>
+          <div class="audit-stat"><div class="audit-stat-value">6</div><div class="audit-stat-label">Workspace crates</div></div>
+          <div class="audit-stat"><div class="audit-stat-value">3/6</div><div class="audit-stat-label">Coverage-gated crates</div></div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Spec vs. implementation readiness</h2>
+          <p class="audit-section-note">Isolation (WASM sandbox + WASI deny-by-default) is specified, implemented, and close to production-ready. CI gates (coverage, supply-chain, contractual checks) are specified and implemented for 3 of 6 crates, but not production-ready across the workspace — the CLI's ~9k-line HTTP surface and the MCP server both ship outside the coverage gate.</p>
+        </div>
+
+        <div class="audit-section">
+          <h2>Findings register</h2>
+          <div style="overflow-x:auto">
+            <table class="audit-table">
+              <thead><tr><th>Severity</th><th>Domain</th><th>Location</th><th>Finding</th></tr></thead>
+              <tbody>
+                {findings.map((f) => (
+                  <tr>
+                    <td><span class={`sev-pill ${sevClass(f.sev)}`}>{f.sev}</span></td>
+                    <td>{f.domain}</td>
+                    <td class="evidence-line">{f.loc}</td>
+                    <td>{f.finding}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Permanence guarantee matrix</h2>
+          <p class="audit-section-note">What the framework claims to keep durable, deterministic, or attributable — vs. what code actually preserves across process restart and time.</p>
+          <div style="overflow-x:auto">
+            <table class="audit-table">
+              <thead><tr><th>Guarantee</th><th>Specified</th><th>Implemented</th><th>Gap</th></tr></thead>
+              <tbody>
+                {permanenceMatrix.map((r) => (
+                  <tr>
+                    <td>{r.g}</td>
+                    <td>{r.spec}</td>
+                    <td>{r.impl}</td>
+                    <td>{r.gap}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Security &amp; permanence strengths</h2>
+          <div class="strengths-grid">
+            <div class="strengths-col">
+              <h3>Security strengths</h3>
+              <ul>
+                <li>Ed25519 artifact verification is real and deterministic</li>
+                <li>WASM deny-by-default WASI + ABI import CI gate</li>
+                <li>Draft contract quarantine at execution boundary</li>
+                <li>HTTP workspace auth, scopes, audit JSONL (partial)</li>
+                <li>Supply-chain CI: lockfile, SBOM, reproducible build checks</li>
+                <li>No production unsafe; hot paths largely avoid unwrap/panic</li>
+              </ul>
+            </div>
+            <div class="strengths-col">
+              <h3>Permanence strengths</h3>
+              <ul>
+                <li>Approved specs marked immutable in governance registry</li>
+                <li>Cursor replay + duplicate event_id suppression (036)</li>
+                <li>Private traces hash inputs/outputs (no raw I/O leakage)</li>
+                <li>Semver progression and contractual enforcement gates</li>
+                <li>Expedition WASM path is a deterministic vertical slice</li>
+                <li>LocalFileDataStore provides basic on-disk persistence</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Crate maturity &amp; blast radius</h2>
+          <div style="overflow-x:auto">
+            <table class="audit-table">
+              <thead><tr><th>Crate</th><th>Maturity</th><th>Coverage</th><th>Risk signal</th></tr></thead>
+              <tbody>
+                {crates.map((c) => (
+                  <tr>
+                    <td class="evidence-line">{c.name}</td>
+                    <td>{c.maturity}</td>
+                    <td>{c.coverage}</td>
+                    <td>{c.risk}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Opportunity roadmap</h2>
+          <p class="audit-section-note">Ranked by risk reduction per effort. P0 items close exploit paths that contradict approved specs 030/031 today.</p>
+          <div style="overflow-x:auto">
+            <table class="audit-table">
+              <thead><tr><th>Opportunity</th><th>Why it matters</th><th>Effort</th></tr></thead>
+              <tbody>
+                {roadmap.map((r) => (
+                  <tr>
+                    <td>{r.p}</td>
+                    <td>{r.why}</td>
+                    <td>{r.effort}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Trust boundary map</h2>
+          <div class="boundary-grid">
+            <div class="boundary-card">
+              <h3>HTTP API (serve)</h3>
+              <p>Broadest attack surface. Dev defaults, unverified JWT, optional unauthenticated mode. Also the richest permanence surface (registration, traces, sessions).</p>
+            </div>
+            <div class="boundary-card">
+              <h3>MCP stdio</h3>
+              <p>Implicit local trust only. Full execute + trace export with no credential check. Safe as an IDE child process; unsafe if redirected or remotely bridged.</p>
+            </div>
+            <div class="boundary-card">
+              <h3>WASM guest</h3>
+              <p>Wasmtime isolation + WASI deny-by-default is solid. Host ABI whitelist exists but traverse_host::* functions are not linked yet.</p>
+            </div>
+            <div class="boundary-card">
+              <h3>Artifact / supply chain</h3>
+              <p>Ed25519 works. Sigstore and checksum gates are incomplete. Publish/sync trusts the external registry path before extraction completes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="audit-section">
+          <h2>Recommended next moves</h2>
+          <ol class="move-list">
+            <li><span class="move-num">1</span><p>Treat all network-facing surfaces as non-production until JWT crypto verification and Production-default security ship.</p></li>
+            <li><span class="move-num">2</span><p>Add a durable event/audit journal if compliance or multi-restart recovery is a product requirement — in-memory 5-minute replay is not permanence.</p></li>
+            <li><span class="move-num">3</span><p>Close governance holes: approve or decouple spec 022; coverage-gate CLI/MCP; finish or explicitly defer specs 051/057–059.</p></li>
+          </ol>
+        </div>
+
+        <div class="audit-section">
+          <h2>Key evidence</h2>
+          <p class="evidence-line">crates/traverse-runtime/src/security.rs · crates/traverse-cli/src/http_api.rs · crates/traverse-mcp/src/stdio_server.rs · crates/traverse-runtime/src/events/broker.rs · specs/030, 031, 036 · SECURITY.md</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="cta-band-glow"></div>
+      <div class="container" style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap">
+        <div>
+          <div class="t-h2">See where Traverse actually stands.</div>
+          <p class="t-muted" style="margin-top:0.5rem">Read the honest production-readiness breakdown, or dig into the governing specs yourself.</p>
+        </div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <a href="/questions/is-traverse-production-ready.html" class="btn btn-primary btn-lg">Production readiness →</a>
+          <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">View source →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</SubpageLayout>
