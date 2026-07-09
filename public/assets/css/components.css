@@ -531,6 +531,9 @@
   padding: 5rem 0 4rem;
   border-bottom: 1px solid var(--border);
 }
+@media (max-width: 768px) {
+  .page-hero { padding: 3rem 0 2.5rem; }
+}
 .page-hero-inner { max-width: 780px; }
 .page-hero h1 { margin: 1rem 0 1.5rem; }
 .page-hero-sub {
