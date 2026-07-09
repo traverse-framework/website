@@ -284,45 +284,6 @@ body { padding-top: 0; }
       margin-top: 1rem;
     }
 
-    /* ── Use cases ── */
-    .usecase-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--gap-md);
-    }
-    @media (max-width: 700px) {
-      .usecase-grid { grid-template-columns: 1fr; }
-    }
-    .usecase-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      transition: border-color 0.2s;
-    }
-    .usecase-card:hover { border-color: var(--border-hover); }
-    .usecase-card h3 {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.015em;
-    }
-    .usecase-card p {
-      font-size: 0.85rem;
-      color: var(--fg-muted);
-      line-height: 1.65;
-      margin-bottom: 1.25rem;
-    }
-    .usecase-card a {
-      font-size: 0.82rem;
-      color: var(--accent);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    .usecase-card a:hover { text-decoration: underline; }
 
     /* ── CTA gradient section ── */
     .cta-gradient {
