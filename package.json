@@ -5,12 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "postbuild": "cp dist/sitemap-0.xml dist/sitemap.xml",
+    "postbuild": "node scripts/generate-sitemap.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.0.0"
   }
 }
