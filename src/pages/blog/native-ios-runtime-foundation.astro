@@ -1,0 +1,343 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">July 19, 2026</span>
+      <span class="badge">iOS</span>
+      <span class="badge">WASM</span>
+    </div>
+    <h1 class="t-h1">Native iOS without a JIT: a hands-on feasibility proof</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>8 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>iOS does not let ordinary apps compile and execute code at runtime. No JIT, no <code>mmap</code>-and-jump, none of the tricks a browser or a server process can lean on. If you are building a portable WASM capability system and one of your placement targets is a native iOS app, that single platform restriction rules out most WASM runtimes by default. You need an interpreter, not a compiler, and you need it to run inside Apple's sandbox rules without asking for an entitlement you will not get.</p>
+
+      <p>We spent the last stretch of work answering a narrower question than "does Traverse run on iOS": can a Swift application call into a Rust static library running the <code>wasmi</code> interpreter, have the host enforce memory and fuel limits on the guest module, and do all of that on a physical iPhone with no Xcode errors and a UI that stays responsive afterward. The answer is yes.</p>
+
+      <div class="callout">
+        This is a foundation for a production iOS runtime path, not an announcement that the full Traverse runtime or SDK has shipped on iOS. The feasibility proof covers the Swift host, the Rust bridge, and the <code>wasmi</code> interpreter layers. Running the digest-pinned Traverse runtime and real application manifests on top of this is later work, tracked below.
+      </div>
+
+      <h2 id="why-a-native-host">Why a native host, not a JIT</h2>
+
+      <p>Most WASM engines get their speed from a JIT: translate WASM bytecode to native machine code the first time a function runs, then execute that native code on every call after. That is fast, and it is exactly the class of runtime code generation that iOS's code-signing and sandbox model exists to prevent outside of a handful of first-party exceptions like <code>WKWebView</code>'s JavaScriptCore. A Traverse capability host embedded in a third-party app does not get that exception.</p>
+
+      <p><code>wasmi</code> sidesteps the problem by staying an interpreter. It walks the WASM bytecode directly instead of generating and executing native instructions at runtime, so it needs nothing from the platform beyond the ability to run ordinary compiled code. That makes it slower than a JIT for CPU-bound workloads, and it makes it viable to ship inside an App Store binary today. For a capability host whose job is to run host-governed business logic under a contract, not to win a benchmark, that trade is the right one.</p>
+
+      <h2 id="architecture">The architecture we proved</h2>
+
+      <p>The full delivery path has more layers than the ones we tested. Here is where the proof stops and where the later work picks up:</p>
+
+      <div class="chain-flow">
+        <div class="chain-node proven">
+          <span class="chain-label">Proven</span>
+          <strong>Swift iOS app</strong>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-node proven">
+          <span class="chain-label">Proven</span>
+          <strong>TraverseSwiftHost XCFramework</strong>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-node proven">
+          <span class="chain-label">Proven</span>
+          <strong>Narrow C-compatible Rust bridge</strong>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-node proven">
+          <span class="chain-label">Proven</span>
+          <strong>wasmi interpreter</strong>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-node future">
+          <span class="chain-label">Later</span>
+          <strong>Digest-pinned runtime.wasm</strong>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-node future">
+          <span class="chain-label">Later</span>
+          <strong>Application manifest</strong>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-node future">
+          <span class="chain-label">Later</span>
+          <strong>Capability WASM</strong>
+        </div>
+      </div>
+
+      <p>The Swift app talks to the XCFramework, which calls a deliberately narrow C-compatible surface in the Rust static library, which drives <code>wasmi</code>. Nothing in that chain is speculative anymore; all four layers built, linked, and ran on a physical device. The digest-pinned runtime, application manifests, and independently packaged capability WASM sit on top of that foundation and are the next things to wire in, not things we are claiming today.</p>
+
+      <h2 id="host-owned-limits">Host-owned limits, not guest promises</h2>
+
+      <p>A capability that is packaged separately and might run on any of several host platforms cannot be trusted to police its own resource usage. If the host does not enforce a ceiling, a buggy or hostile guest module will happily grow its memory without bound or spin forever in a loop, and on a phone that turns into a crash or a frozen UI rather than a server that a load balancer quietly cycles. So the limits live in the host, not the guest, and the guest cannot opt out of them.</p>
+
+      <div class="safety-grid">
+        <div class="safety-card">
+          <div class="safety-card-title">Memory ceiling</div>
+          <p>The host configures a fixed limit before the guest module runs. When a guest tries to grow past it, <code>wasmi</code> rejects the growth instead of allocating past the boundary.</p>
+        </div>
+        <div class="safety-card">
+          <div class="safety-card-title">Deterministic fuel budget</div>
+          <p>Execution is metered in fuel units set by the host. A guest that never terminates on its own runs out of fuel and stops, deterministically, without a wall-clock watchdog racing the guest.</p>
+        </div>
+      </div>
+
+      <h2 id="what-we-verified">What we verified</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Proof</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Rust static-library build</td><td>Built for iPhone, Apple Silicon iOS simulator, and Apple Silicon macOS.</td></tr>
+            <tr><td>Swift interop</td><td>Swift imported the XCFramework and called the Rust bridge on macOS.</td></tr>
+            <tr><td>Memory control</td><td>Growth past a configured 64 KiB host limit stopped with <code>GrowthOperationLimited</code>.</td></tr>
+            <tr><td>Execution control</td><td>A non-terminating module stopped with <code>OutOfFuel</code>.</td></tr>
+            <tr><td>Physical iOS run</td><td>The proof app launched with no Xcode errors, displayed success, and remained responsive.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="hands-on">Hands-on: build and run it yourself</h2>
+
+      <p>Everything below runs against the #769 branch and worktree. If you are building a portable capability system and iOS is one of your targets, this is the fastest way to see the current state for yourself.</p>
+
+      <h3>1. Build the XCFramework</h3>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="terminal-title">terminal</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">cd /private/tmp/traverse-issue-769</span></div>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">bash scripts/build_swift_host_xcframework.sh</span></div>
+        </div>
+      </div>
+
+      <p>This produces <code>target/apple/TraverseSwiftHost.xcframework</code>, with slices for an iPhone device, the Apple Silicon simulator, and Apple Silicon macOS.</p>
+
+      <h3>2. Run the macOS smoke test</h3>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="terminal-title">terminal</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">bash scripts/swift_host_macos_smoke.sh</span></div>
+          <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">Traverse Swift host ABI 1 is available</span></div>
+        </div>
+      </div>
+
+      <p>This compiles a small Swift program that imports the XCFramework and calls straight into the Rust static library.</p>
+
+      <h3>3. Run the resource-control tests</h3>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="terminal-title">terminal</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">cargo test -p traverse-swift-host</span></div>
+        </div>
+      </div>
+
+      <p>Expect three passing tests, covering the host API version, memory-growth rejection, and fuel exhaustion.</p>
+
+      <h3>4. Test on a physical iPhone or iPad</h3>
+
+      <ol>
+        <li>Create a new SwiftUI iOS App in Xcode named <code>TraverseSwiftHostProof</code>.</li>
+        <li>Set your development team and a unique bundle identifier.</li>
+        <li>Drag <code>target/apple/TraverseSwiftHost.xcframework</code> into the project.</li>
+        <li>Add it under <strong>Frameworks, Libraries, and Embedded Content</strong> as <strong>Do Not Embed</strong> — it is static.</li>
+        <li>Replace the application entry point with the code below.</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-filename">TraverseSwiftHostProofApp.swift</span>
+        </div>
+        <div class="code-body">
+<pre><span class="tok-kw">import</span> SwiftUI
+<span class="tok-kw">import</span> TraverseSwiftHost
+
+<span class="tok-kw">@main</span>
+<span class="tok-kw">struct</span> <span class="tok-type">TraverseSwiftHostProofApp</span>: <span class="tok-type">App</span> {
+    <span class="tok-key">init</span>() {
+        precondition(traverse_swift_host_abi_version() == <span class="tok-num">1</span>)
+        precondition(traverse_swift_host_memory_limit_fixture() == <span class="tok-num">0</span>)
+        precondition(traverse_swift_host_fuel_limit_fixture() == <span class="tok-num">0</span>)
+    }
+
+    <span class="tok-key">var</span> body: <span class="tok-key">some</span> Scene {
+        WindowGroup { Text(<span class="tok-str">"Traverse Swift host proof passed"</span>) }
+    }
+}</pre>
+        </div>
+      </div>
+
+      <ol start="6">
+        <li>Connect and unlock the device, trust the Mac if prompted, select it in Xcode, and press Run.</li>
+        <li>Record the device model, iOS version, Xcode version, commit SHA, the visible success message, and whether the app stayed responsive after the fixtures ran.</li>
+      </ol>
+
+      <h2 id="device-test-meaning">What the device test actually proves</h2>
+
+      <p>The two fixtures deliberately hand the interpreter a hostile input each. What matters is not that they fail — it's that the app regains control cleanly both times, without a watchdog racing the guest or leaving it running in the background.</p>
+
+      <div class="proof-flow">
+        <div class="proof-flow-item">
+          <span class="proof-flow-num">1</span>
+          <div>
+            <strong>Memory-limit fixture</strong>
+            <p>Swift calls the memory-limit fixture. The host asks <code>wasmi</code> to grow memory past the configured ceiling. <code>wasmi</code> returns <code>GrowthOperationLimited</code>. The host reports success — the fixture was stopped safely, not crashed into.</p>
+          </div>
+        </div>
+        <div class="proof-flow-item">
+          <span class="proof-flow-num">2</span>
+          <div>
+            <strong>Fuel-limit fixture</strong>
+            <p>Swift calls the fuel-limit fixture. The host runs an infinite loop with a finite fuel budget. <code>wasmi</code> returns <code>OutOfFuel</code>. The host reports success — execution terminated on schedule, not on a timeout.</p>
+          </div>
+        </div>
+      </div>
+
+      <h2 id="what-remains">What's left before this ships</h2>
+
+      <ul>
+        <li>Select <code>wasmi</code> as the engine through a successor ADR.</li>
+        <li>Resolve the scoped C-ABI governance follow-up (<a href="https://github.com/traverse-framework/traverse/issues/771" target="_blank" rel="noopener">#771</a>).</li>
+        <li>Implement the complete Swift embedder SDK (<a href="https://github.com/traverse-framework/traverse/issues/647" target="_blank" rel="noopener">#647</a>).</li>
+        <li>Run the digest-pinned Traverse runtime and real application manifests on top of this host.</li>
+        <li>Validate declared capability profiles and cross-host conformance against the other placement targets.</li>
+      </ul>
+
+      <p>None of that changes what this proof establishes: native iOS execution is now an implementable Traverse and UMA delivery path, not a speculative engine choice. If you're building a portable WASM capability system and iOS was the platform you weren't sure how to reach, this is the branch to go read.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why-a-native-host">Why a native host, not a JIT</a></li>
+          <li><a href="#architecture">The architecture we proved</a></li>
+          <li><a href="#host-owned-limits">Host-owned limits</a></li>
+          <li><a href="#what-we-verified">What we verified</a></li>
+          <li><a href="#hands-on">Hands-on: build and run it</a></li>
+          <li><a href="#device-test-meaning">What the device test proves</a></li>
+          <li><a href="#what-remains">What's left before this ships</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic →</a></li>
+          <li><a href="/blog/runtime-assumptions.html">The hidden cost of runtime assumptions →</a></li>
+          <li><a href="/blog/uma-explained.html">What Universal Microservices Architecture got right →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Follow the work</div>
+        <p>Track the wasmi feasibility spike and the follow-up work on GitHub.</p>
+        <a href="https://github.com/traverse-framework/traverse/issues/769" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">View issue #769 →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">One runtime, one more platform within reach.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Define capabilities with contracts once. As placement targets like native iOS come online, the same contract and the same guarantees travel with them.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Get started →</a>
+      <a href="/use-cases.html" class="btn btn-ghost">See use cases</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"Native iOS without a JIT: a hands-on feasibility proof — Traverse Blog"}
+  description={"Traverse validated that a Swift app can call a Rust wasmi interpreter, enforce host-owned memory and fuel limits, and run on a physical iPhone — without a JIT."}
+  canonical={"https://traverse-framework.com/blog/native-ios-runtime-foundation.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose .code-block { margin: 1.75rem 0; }
+    .post-prose .terminal { margin: 1.75rem 0; }
+    .post-prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .callout code { background: var(--bg-card); }
+    .chain-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 1.75rem 0; padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+    .chain-node { display: flex; flex-direction: column; gap: 0.3rem; padding: 0.6rem 0.85rem; border-radius: 8px; font-size: 0.82rem; background: var(--bg-elevated); border: 1px solid var(--border); }
+    .chain-node.proven { border-color: rgba(63,185,80,0.35); }
+    .chain-node.future { border-style: dashed; opacity: 0.75; }
+    .chain-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-muted); }
+    .chain-node.proven .chain-label { color: var(--success); }
+    .chain-arrow { color: var(--fg-muted); font-size: 1rem; }
+    @media (max-width: 640px) { .chain-flow { flex-direction: column; align-items: stretch; } .chain-arrow { transform: rotate(90deg); align-self: center; } }
+    .safety-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.75rem 0; }
+    @media (max-width: 640px) { .safety-grid { grid-template-columns: 1fr; } }
+    .safety-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; }
+    .safety-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--fg); margin-bottom: 0.5rem; }
+    .safety-card p { font-size: 0.875rem; color: var(--fg-muted); margin: 0; line-height: 1.6; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; white-space: nowrap; }
+    .proof-flow { display: flex; flex-direction: column; gap: 1rem; margin: 1.75rem 0; }
+    .proof-flow-item { display: flex; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; }
+    .proof-flow-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-dim); color: var(--accent); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+    .proof-flow-item strong { display: block; margin-bottom: 0.35rem; color: var(--fg); }
+    .proof-flow-item p { font-size: 0.875rem; color: var(--fg-muted); margin: 0; line-height: 1.6; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
