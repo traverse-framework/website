@@ -3,73 +3,157 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 ---
 <SubpageLayout
   title={"Examples — Traverse Framework"}
-  description={"A worked example of a Traverse capability contract, from TOML definition to execution trace."}
+  description={"Six real, runnable Traverse examples — hello-world, expedition, doc-approval, meeting-notes, traverse-starter, and the Swift/iOS feasibility proof — not one illustrative snippet."}
   canonical={"https://traverse-framework.com/examples.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
+  <style is:global slot="head">
+    .example-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    @media (max-width: 900px) { .example-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .example-grid { grid-template-columns: 1fr; } }
+    .example-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; display: flex; flex-direction: column; }
+    .example-card-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .example-card-top h3 { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 500; color: var(--fg); margin: 0; }
+    .example-card p { font-size: 0.85rem; color: var(--fg-muted); line-height: 1.65; margin: 0 0 1rem; flex: 1; }
+    .example-card code { font-family: var(--font-mono); font-size: 0.82em; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .example-card a { font-size: 0.82rem; color: var(--accent); text-decoration: none; }
+    .example-card a:hover { text-decoration: underline; }
+  </style>
   <main>
     <section class="page-hero">
       <div class="container">
         <div class="page-hero-inner">
           <span class="section-label">Examples</span>
-          <h1 class="t-h1">A capability, end to end.</h1>
-          <p class="page-hero-sub">A pricing capability defined as a contract, compiled to WASM, and run from the CLI with a full trace.</p>
+          <h1 class="t-h1">Six real, runnable examples.</h1>
+          <p class="page-hero-sub">Every one of these lives in the repo today — contract, package, and runtime request included. No illustrative snippets standing in for the platform.</p>
         </div>
       </div>
     </section>
+
     <section class="section-sm">
       <div class="container">
         <div class="two-col">
           <div>
-            <span class="section-label">Contract</span>
-            <h2 class="section-title-sm" style="margin-top:0.75rem">pricing.toml</h2>
-            <p class="section-lead">The contract declares the capability, links it to the governing spec it implements, and defines the input and output shapes as JSON Schema.</p>
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-dots"><span></span><span></span><span></span></div>
-                <span class="code-filename">pricing.toml</span>
-              </div>
-              <div class="code-body">
-                <pre><span class="tok-section">[capability]</span>
-<span class="tok-key">name</span>    = <span class="tok-str">"calculate-price"</span>
-<span class="tok-key">version</span> = <span class="tok-str">"1.2.0"</span>
-<span class="tok-key">wasm</span>    = <span class="tok-str">"pricing.wasm"</span>
-
-<span class="tok-section">[governing_spec]</span>
-<span class="tok-key">title</span>   = <span class="tok-str">"Pricing Policy v3"</span>
-<span class="tok-key">source</span>  = <span class="tok-str">"docs/pricing-policy.md"</span>
-
-<span class="tok-section">[input]</span>
-<span class="tok-key">type</span> = <span class="tok-str">"object"</span>
-<span class="tok-key">properties</span>.sku      = <span class="tok-str">"string"</span>
-<span class="tok-key">properties</span>.quantity = <span class="tok-str">"integer"</span>
-<span class="tok-key">required</span> = <span class="tok-str">["sku", "quantity"]</span>
-
-<span class="tok-section">[output]</span>
-<span class="tok-key">type</span> = <span class="tok-str">"object"</span>
-<span class="tok-key">properties</span>.total    = <span class="tok-str">"number"</span>
-<span class="tok-key">properties</span>.currency = <span class="tok-str">"string"</span></pre>
-              </div>
-            </div>
-          </div>
-          <div>
-            <span class="section-label">Run</span>
-            <h2 class="section-title-sm" style="margin-top:0.75rem">traverse run</h2>
-            <p class="section-lead">The runtime validates the input against the contract's preconditions, executes the WASM binary, and writes a trace artifact for the run.</p>
+            <span class="section-label">Start here</span>
+            <h2 class="section-title-sm">hello-world — the smallest governed example</h2>
+            <p class="section-lead">One command path that proves a capability contract exists, a packaged executable artifact exists, a runtime request exists, and Traverse can inspect and execute the package locally. If you run exactly one example, run this one.</p>
             <div class="terminal">
               <div class="terminal-header">
                 <div class="code-dots"><span></span><span></span><span></span></div>
                 <span class="terminal-title">terminal</span>
               </div>
               <div class="terminal-body">
-                <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">traverse run pricing --input '{'{'}"sku":"PRO","quantity":5{'}'}'</span></div>
-                <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">✓ Contract validated</span></div>
-                <div class="terminal-line"><span class="terminal-out success">✓ WASM executed (2.1ms)</span></div>
-                <div class="terminal-line"><span class="terminal-out accent">→ {'{'}"total": 249.95, "currency": "USD"{'}'}</span></div>
+                <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">bash examples/hello-world/say-hello-agent/build-fixture.sh</span></div>
+                <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-prompt">$</span><span class="terminal-cmd">cargo run -p traverse-cli-rs -- agent execute \</span></div>
+                <div class="terminal-line"><span class="terminal-cmd" style="padding-left:1.25rem">examples/hello-world/say-hello-agent/manifest.json \</span></div>
+                <div class="terminal-line"><span class="terminal-cmd" style="padding-left:1.25rem">examples/hello-world/runtime-requests/say-hello.json</span></div>
+                <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">status: completed</span></div>
+                <div class="terminal-line"><span class="terminal-out accent">greeting: Hello, Traverse!</span></div>
               </div>
             </div>
-            <p class="section-lead" style="margin-top:1.5rem">For a full walkthrough of installing the CLI and running this yourself, see the <a href="/docs/quickstart.html" style="color:var(--accent)">quickstart</a>. More worked examples live in the <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" style="color:var(--accent)">GitHub repository</a>.</p>
           </div>
+          <div>
+            <div class="status-card">
+              <div class="status-card-header">
+                <span class="t-h3" style="margin:0">What this proves</span>
+              </div>
+              <div class="checklist">
+                <div class="checklist-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>A capability contract at <code>contracts/examples/hello-world/capabilities/say-hello/</code></span>
+                </div>
+                <div class="checklist-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>A packaged, executable WASM artifact, deterministically built</span>
+                </div>
+                <div class="checklist-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>A runtime request Traverse validates before executing</span>
+                </div>
+                <div class="checklist-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>The same CLI path every other example in this repo uses</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-label">The full set</div>
+          <h2>Every example domain in the repo.</h2>
+        </div>
+        <div class="example-grid">
+
+          <div class="example-card">
+            <div class="example-card-top">
+              <h3>expedition</h3>
+              <span class="badge badge-success badge-dot">Flagship</span>
+            </div>
+            <p>The canonical governed domain — 6 capabilities, 5 events, and 1 workflow, fully governed end to end. Two of its capabilities are also packaged as standalone governed WASM AI agent examples: <code>expedition-intent-agent</code> and <code>team-readiness-agent</code>.</p>
+            <a href="/docs/quickstart.html">Walk through it in the quickstart →</a>
+          </div>
+
+          <div class="example-card">
+            <div class="example-card-top">
+              <h3>doc-approval</h3>
+              <span class="badge badge-success badge-dot">Shipped v0.8.0</span>
+            </div>
+            <p>A deterministic <code>doc-approval.recommend</code> capability plus an <code>analyze-agent</code>, composed into the canonical <code>doc-approval.pipeline</code> workflow. Added in the v0.8.0 release.</p>
+            <a href="https://github.com/traverse-framework/traverse/tree/main/examples/doc-approval" target="_blank" rel="noopener">Browse the source →</a>
+          </div>
+
+          <div class="example-card">
+            <div class="example-card-top">
+              <h3>meeting-notes</h3>
+              <span class="badge badge-success badge-dot">Shipped</span>
+            </div>
+            <p>A <code>process-agent</code> capability domain for turning raw meeting notes into governed, structured output — the same contract-first shape as every other example, applied to a different problem.</p>
+            <a href="https://github.com/traverse-framework/traverse/tree/main/examples/meeting-notes" target="_blank" rel="noopener">Browse the source →</a>
+          </div>
+
+          <div class="example-card">
+            <div class="example-card-top">
+              <h3>traverse-starter</h3>
+              <span class="badge badge-success badge-dot">Shipped</span>
+            </div>
+            <p>A reference starter application manifest composing process, summarize, and validate agents — closer to a real app skeleton than a single-capability demo.</p>
+            <a href="https://github.com/traverse-framework/traverse/tree/main/examples/traverse-starter" target="_blank" rel="noopener">Browse the source →</a>
+          </div>
+
+          <div class="example-card">
+            <div class="example-card-top">
+              <h3>swift-wasmi-proof</h3>
+              <span class="badge badge-subtle badge-dot">Feasibility proof</span>
+            </div>
+            <p>Not a capability domain — a native iOS host feasibility spike. Proves a Swift app can call a Rust-hosted <code>wasmi</code> interpreter with host-owned memory and fuel limits, verified on a physical iPhone.</p>
+            <a href="/blog/native-ios-runtime-foundation.html">Read the write-up →</a>
+          </div>
+
+          <div class="example-card">
+            <div class="example-card-top">
+              <h3>Packaged, consumable bundles</h3>
+              <span class="badge badge-subtle">Reference</span>
+            </div>
+            <p>Every domain above also has an <code>applications/</code> form — the packaged, distributable bundle shape a real downstream consumer would integrate against, not just a dev-mode manifest.</p>
+            <a href="https://github.com/traverse-framework/traverse/blob/main/docs/app-consumable-entry-path.md" target="_blank" rel="noopener">Read the app-consumable entry path →</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container" style="text-align:center">
+        <h2 class="t-h2" style="margin-bottom:0.75rem">Ready to write your own?</h2>
+        <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">The capability contract authoring guide walks through defining a contract from scratch, using these examples as reference.</p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+          <a href="/docs/quickstart.html" class="btn btn-primary">Get started →</a>
+          <a href="/system.html" class="btn btn-ghost">See the full system</a>
         </div>
       </div>
     </section>

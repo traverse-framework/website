@@ -1,0 +1,239 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <span class="section-label">The System</span>
+      <h1 class="t-h1">One workspace, nine crates, one governance layer.</h1>
+      <p class="page-hero-sub">Traverse isn't a single binary. It's a Rust workspace of purpose-built crates, each governed by an immutable, versioned spec, that together define, validate, place, and execute business capabilities. This is the map.</p>
+      <div class="page-hero-badges">
+        <span class="badge badge-success badge-dot">v0.8.1</span>
+        <span class="badge">9 workspace crates</span>
+        <span class="badge">73 approved specs</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">The mental model</div>
+      <h2>Capability in, trace out.</h2>
+      <p>Six vocabulary words cover almost everything. A <strong>Capability</strong> is a unit of business logic. A <strong>Contract</strong> declares what it needs and promises, in JSON Schema. An <strong>Event Contract</strong> does the same for things a capability publishes or consumes. A <strong>Workflow</strong> composes capabilities into a sequence. The <strong>Runtime</strong> validates a request against its contract, places it on a target, and executes it. Every execution produces a <strong>Trace</strong> — a structured, queryable record of what ran, against which contract version, with what result.</p>
+    </div>
+    <div class="flow-row">
+      <div class="flow-node">Contract</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Registry</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Runtime</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Placement</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node accent">Trace</div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Runtime core</div>
+      <h2>What executes a capability.</h2>
+      <p>Three crates carry the actual runtime behavior — reading a contract, resolving a capability against the registry, and executing it inside a sandboxed WASM instance with enforced limits.</p>
+    </div>
+    <div class="crate-grid">
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-runtime</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The core execution engine. Validates a runtime request against its contract, resolves placement, and drives execution against the correct executor — native, thread-pooled, or WASM.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-contracts</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>Contract definitions and validation. Parses capability and event contracts, checks preconditions and postconditions, and is the single source of truth the runtime defers to.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-registry</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>Capability and event registries. Resolves a name and version to a concrete contract and binary, and enforces registration integrity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Interfaces</div>
+      <h2>How you or an agent talk to it.</h2>
+      <p>Two crates expose the runtime — one for humans at a terminal, one for AI agents over the Model Context Protocol.</p>
+    </div>
+    <div class="crate-grid">
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-cli</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The <code>traverse</code> command. Register, list, validate, and run governed capabilities from the terminal. Packaged as <code>traverse-cli-rs</code> on crates.io; the binary stays <code>traverse-cli</code>.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-mcp</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The Model Context Protocol server. Lets an AI agent discover, inspect, and execute governed capabilities over stdio. See <a href="/agents.html">what agents can do with it →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Embedding &amp; native bridges</div>
+      <h2>How Traverse gets inside your app.</h2>
+      <p>Three crates in the workspace carry native embedding. This is also where the honesty matters most — status varies a lot between them. Full per-platform detail, including the four SDK packages outside this workspace, lives on <a href="/platforms.html">the Platforms page →</a></p>
+    </div>
+    <div class="crate-grid">
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-embedder</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The public Rust embedder SDK, implementing <code>embedder-api/1.0.0</code>. Real bundle execution for Linux GTK and CLI hosts, shipped in v0.8.0.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-native-bridge</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>Deterministic builder for the governed native runtime WASM bridge — the foundation layer other native embedders build on.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-swift-host</code>
+          <span class="badge badge-subtle badge-dot">Feasibility proof</span>
+        </div>
+        <p>An Apple static-library feasibility host proving a Swift app can call a Rust-hosted <code>wasmi</code> interpreter with host-owned limits. Not a shipped iOS runtime — see why on <a href="/platforms.html">Platforms →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Example domain</div>
+      <h2>Proof the whole stack works end to end.</h2>
+    </div>
+    <div class="crate-grid crate-grid-1">
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-expedition-wasm</code>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The expedition planning domain compiled to <code>wasm32-wasi</code>, governed by spec 027. Six capabilities, five events, one workflow — the canonical proof that a contract can go from definition to a traced execution. See it running in <a href="/examples.html">Examples →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="two-col">
+      <div>
+        <span class="section-label">Governance</span>
+        <h2 class="section-title-sm">73 approved specs, and code loses to them.</h2>
+        <p class="section-lead">Every one of the crates above is governed by at least one immutable, versioned spec. The project's own rule, stated plainly in its constitution: when code and contract disagree, the contract wins until it's formally amended. No change merges without passing <code>spec_alignment_check.sh</code> against its governing spec.</p>
+        <p class="section-lead">Roughly how the 73 break down by area — this is our own bucketing for orientation, not an authoritative taxonomy:</p>
+        <ul class="spec-breakdown">
+          <li><span>Runtime core / execution</span><strong>~14</strong></li>
+          <li><span>Contracts &amp; registries</span><strong>~11</strong></li>
+          <li><span>Native / embedder / mobile</span><strong>~9</strong></li>
+          <li><span>MCP, agents &amp; browser surfaces</span><strong>~7</strong></li>
+          <li><span>Observability, APIs &amp; connectors</span><strong>~7</strong></li>
+          <li><span>Foundational governance &amp; CI</span><strong>~6</strong></li>
+          <li><span>Security &amp; supply chain</span><strong>~5</strong></li>
+          <li><span>Dependencies &amp; publishing</span><strong>~5</strong></li>
+          <li><span>Example domains</span><strong>~3</strong></li>
+        </ul>
+        <a href="https://github.com/traverse-framework/traverse/blob/main/specs/governance/approved-specs.json" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Browse the full registry on GitHub →</a>
+      </div>
+      <div>
+        <div class="status-card">
+          <div class="status-card-header">
+            <span class="t-h3" style="margin:0">Where to go next</span>
+          </div>
+          <div class="checklist" style="gap:1.1rem">
+            <a href="/platforms.html" class="next-link">
+              <strong>Platforms →</strong>
+              <span>Where Traverse actually runs today, honestly scored.</span>
+            </a>
+            <a href="/agents.html" class="next-link">
+              <strong>For AI Agents →</strong>
+              <span>What an agent can discover and execute over MCP.</span>
+            </a>
+            <a href="/examples.html" class="next-link">
+              <strong>Examples →</strong>
+              <span>Six real, runnable domains — not one illustrative snippet.</span>
+            </a>
+            <a href="/docs/concepts.html" class="next-link">
+              <strong>Docs: Concepts →</strong>
+              <span>The full contract and registry model, in depth.</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Read the workspace yourself.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Every crate described here is in the open-source repo, Apache 2.0 licensed, with its own README.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-primary">View on GitHub →</a>
+      <a href="/docs/quickstart.html" class="btn btn-ghost">Read the quickstart</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"The System — Traverse Framework"}
+  description={"How Traverse is actually built: nine workspace crates grouped by role, plus the 73-spec governance layer that keeps them honest."}
+  canonical={"https://traverse-framework.com/system.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">
+    .flow-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 2rem; }
+    .flow-node { padding: 0.65rem 1.1rem; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.85rem; color: var(--fg); }
+    .flow-node.accent { border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); background: var(--accent-dim); }
+    .flow-arrow { color: var(--fg-subtle); font-size: 1rem; }
+    .crate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .crate-grid-1 { grid-template-columns: 1fr; max-width: 640px; }
+    @media (max-width: 900px) { .crate-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .crate-grid { grid-template-columns: 1fr; } }
+    .crate-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; }
+    .crate-card-top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.85rem; flex-wrap: wrap; }
+    .crate-name { font-family: var(--font-mono); font-size: 0.85rem; color: var(--fg); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 5px; padding: 0.2rem 0.5rem; }
+    .crate-card p { font-size: 0.875rem; color: var(--fg-muted); line-height: 1.65; margin: 0; }
+    .crate-card p a { color: var(--accent); }
+    .spec-breakdown { list-style: none; margin: 1.5rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .spec-breakdown li { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.875rem; color: var(--fg-muted); padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+    .spec-breakdown li strong { color: var(--fg); font-family: var(--font-mono); font-weight: 500; }
+    .next-link { display: flex; flex-direction: column; gap: 0.25rem; text-decoration: none; }
+    .next-link strong { color: var(--accent); font-size: 0.9rem; }
+    .next-link span { color: var(--fg-muted); font-size: 0.83rem; line-height: 1.5; }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

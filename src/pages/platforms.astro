@@ -1,0 +1,154 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <span class="section-label">Platforms</span>
+      <h1 class="t-h1">Where Traverse actually runs.</h1>
+      <p class="page-hero-sub">Every row below is scored against a real crate, package, or blocker document in the repo — not against the roadmap. Where something is blocked, we link the doc that says so.</p>
+      <div class="page-hero-badges">
+        <span class="badge badge-success badge-dot">Shipped</span>
+        <span class="badge badge-accent badge-dot">In progress</span>
+        <span class="badge badge-danger badge-dot">Blocked</span>
+        <span class="badge badge-subtle badge-dot">Planned</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="platform-list">
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Native — Linux, macOS, Windows</h2>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The default target and the most mature. <code>traverse-runtime</code> gives you full orchestration — <code>NativeExecutor</code>, <code>ThreadPoolExecutor</code>, and a Wasmtime-backed <code>WasmExecutor</code> for sandboxed capability execution. This is what <code>traverse-cli</code> runs on, and what every quickstart walks you through.</p>
+        <div class="platform-row-links">
+          <a href="/docs/quickstart.html">Quickstart →</a>
+          <a href="https://github.com/traverse-framework/traverse/blob/main/docs/runtime-target-matrix.md" target="_blank" rel="noopener">Runtime target matrix →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Browser</h2>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>Two things are true here, both shipped. First, the runtime core builds for <code>wasm32-unknown-unknown</code> with native adapters excluded — contracts, registry resolution, routing, traces, and events all run in a browser or edge-WASM guest with your own executor behind <code>CapabilityExecutor</code>. Second, and newer: the public <strong>Web/TypeScript embedder SDK</strong>, shipped in v0.8.0, loads a bundle, digest-verifies every WASM capability, and executes it directly in the browser's native WebAssembly host through a minimal WASI <code>preview1</code> shim — no nested engine, no server sidecar.</p>
+        <div class="platform-row-links">
+          <a href="https://github.com/traverse-framework/traverse/blob/main/packages/web/TraverseEmbedder/README.md" target="_blank" rel="noopener">Web embedder SDK README →</a>
+          <a href="/docs/guides/react-integration.html">React integration guide →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Embed in a Rust app (Linux GTK / CLI)</h2>
+          <span class="badge badge-success badge-dot">Shipped</span>
+        </div>
+        <p>The public <code>traverse-embedder</code> crate implements <code>embedder-api/1.0.0</code> — init, shutdown, submit, subscribe, and start/stop/kill — against an application-owned bundle, with real execution, a deterministic test double, and a CI-enforced conformance suite shared across every embedder SDK.</p>
+        <div class="platform-row-links">
+          <a href="https://github.com/traverse-framework/traverse/tree/main/crates/traverse-embedder" target="_blank" rel="noopener">traverse-embedder crate →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Swift / iOS</h2>
+          <span class="badge badge-danger badge-dot">Blocked</span>
+        </div>
+        <p>The formal certification path is blocked, as of a screen dated July 19, 2026: no candidate WASM engine currently exposes the public, documented resource-control APIs required for a certified native embedder baseline. WasmKit, WAMR, Wasmtime, and Wasmer were all screened and rejected — for missing resource-control APIs, no supported iOS profile, or JIT/entitlement conflicts with App Store distribution. The <code>packages/swift/TraverseEmbedder</code> package has a <code>WasmKitRuntimeBridge</code> implemented, but evidence publication and reference-app integration are explicitly tracked as blocked, not in progress.</p>
+        <p>Separately, a feasibility spike proved a workaround: embedding the <code>wasmi</code> interpreter directly via a Rust static library and a narrow C-compatible bridge, with the host enforcing memory and fuel limits — verified running on a physical iPhone. That's a real result, but it's a foundation for a future runtime path, not a shipped SDK.</p>
+        <div class="platform-row-links">
+          <a href="/blog/native-ios-runtime-foundation.html">Read the wasmi feasibility write-up →</a>
+          <a href="https://github.com/traverse-framework/traverse/blob/main/packages/swift/TraverseEmbedder/README.md" target="_blank" rel="noopener">Swift embedder README →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Kotlin / Android</h2>
+          <span class="badge badge-accent badge-dot">In progress</span>
+        </div>
+        <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to Chicory 1.7.5. Bundle validation and lifecycle types are in place. Compose reference-app integration is tracked by a separate open issue and hasn't landed yet — no public release.</p>
+        <div class="platform-row-links">
+          <a href="https://github.com/traverse-framework/traverse/blob/main/packages/kotlin/TraverseEmbedder/README.md" target="_blank" rel="noopener">Kotlin embedder README →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>.NET / WinUI</h2>
+          <span class="badge badge-accent badge-dot">In progress</span>
+        </div>
+        <p><code>packages/dotnet/TraverseEmbedder</code> has a working <code>WasmtimeRuntimeBridge</code> pinned to Wasmtime .NET 44.0.0. Request marshalling, event subscriptions, evidence publication, the shared conformance suite, and WinUI reference-app integration remain tracked as open work — no public release.</p>
+        <div class="platform-row-links">
+          <a href="https://github.com/traverse-framework/traverse/blob/main/packages/dotnet/TraverseEmbedder/README.md" target="_blank" rel="noopener">.NET embedder README →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Edge (Cloudflare Workers and similar)</h2>
+          <span class="badge badge-subtle badge-dot">Planned</span>
+        </div>
+        <p>On the public roadmap as the next executor adapter — same WASM binary, same contract, edge-specific placement. No code has shipped for this yet.</p>
+        <div class="platform-row-links">
+          <a href="/roadmap.html">See the roadmap →</a>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-row-head">
+          <h2>Cloud placement / multi-cloud orchestration</h2>
+          <span class="badge badge-subtle badge-dot">Not in v0.1 scope</span>
+        </div>
+        <p>This isn't a "we haven't gotten to it yet" gap — it's an explicit non-goal of the current milestone. The project's own constitution excludes distributed orchestration, edge/cloud placement optimization, and multi-cloud runtime execution from v0.1 by design, to keep the core small and verifiable first.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container" style="text-align:center">
+    <span class="section-label" style="justify-content:center">A note on "AI pipeline" as a target</span>
+    <p class="t-body t-muted" style="max-width:640px;margin:0.75rem auto 0">You may see "AI pipeline" listed as a placement target elsewhere in our own marketing copy. Held to the same standard as this page: the real runtime target matrix has three targets — native, browser/edge core, and the WASI guest capability target capabilities compile to. "AI pipeline" describes how an <a href="/agents.html">MCP-connected agent</a> calls into the native or browser target today, not a fourth, separate runtime placement. We're fixing that language sitewide.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Building on a specific platform?</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Start with whichever embedder README matches your stack, or open an issue if you want to help unblock one of the ones above.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-primary">View on GitHub →</a>
+      <a href="/system.html" class="btn btn-ghost">See the full system</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"Platforms — Traverse Framework"}
+  description={"Where Traverse actually runs today: native, browser, and Rust are shipped. Swift/iOS is blocked. Kotlin and .NET are in progress. Scored honestly, with evidence."}
+  canonical={"https://traverse-framework.com/platforms.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">
+    .platform-list { display: flex; flex-direction: column; gap: 1.25rem; }
+    .platform-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem 2rem; }
+    .platform-row-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.85rem; flex-wrap: wrap; }
+    .platform-row-head h2 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--fg); margin: 0; letter-spacing: -0.008em; }
+    .platform-row p { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.7; margin: 0 0 0.85rem; }
+    .platform-row p:last-of-type { margin-bottom: 1rem; }
+    .platform-row code { font-family: var(--font-mono); font-size: 0.82em; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.4em; color: var(--accent); }
+    .platform-row-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .platform-row-links a { font-size: 0.83rem; color: var(--accent); text-decoration: none; }
+    .platform-row-links a:hover { text-decoration: underline; }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
