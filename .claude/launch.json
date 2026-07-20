@@ -6,7 +6,7 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "8090", "dist"],
       "port": 8090,
-      "cwd": "/Users/enricopiovesan/Documents/repos/traverseweb"
+      "cwd": "."
     }
   ]
 }
