@@ -1,9 +1,10 @@
 body { padding-top: 0; }
 
     /* ── Hero ── */
-    /* Fixed-surface section: the hero is the brand poster — deep bottle
-       green with the coral/gold wash in BOTH themes. All text inside is
-       fixed cream; do not use theme vars for color in here. */
+    /* Fixed-surface section: the hero is the brand poster — Murky Depths
+       navy with the violet/lilac/rose wash in BOTH themes. All text
+       inside is fixed White Desert; do not use theme vars for color in
+       here. */
     .hero {
       position: relative;
       min-height: 100vh;
@@ -12,7 +13,7 @@ body { padding-top: 0; }
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: #143228;
+      background: #02273a;
     }
 
     /* Blurred logo mountains — same technique Lovable uses with their hat */
@@ -31,19 +32,19 @@ body { padding-top: 0; }
       pointer-events: none;
     }
 
-    /* Brand wash: coral rising from the left, gold from the center,
-       deep red-orange at the right edge — the poster palette over the
-       bottle-green field. */
+    /* Brand wash: Coronation violet rising from the left, Beefy Pink
+       lilac from the center, Elizabeth Rose at the right edge — the
+       MP172 pastels over the Murky Depths field. */
     .hero-gradient {
       position: absolute;
       inset: 0;
       pointer-events: none;
       z-index: 0;
       background:
-        radial-gradient(ellipse 75% 60% at 15% 100%, rgba(232, 104, 63, 0.70) 0%, transparent 50%),
-        radial-gradient(ellipse 65% 55% at 52% 100%, rgba(241, 182, 44, 0.45) 0%, transparent 50%),
-        radial-gradient(ellipse 75% 60% at 88% 100%, rgba(193, 59, 42, 0.55) 0%, transparent 50%),
-        radial-gradient(ellipse 130% 50% at 50% 110%, rgba(23, 58, 45, 0.60) 0%, transparent 55%);
+        radial-gradient(ellipse 75% 60% at 15% 100%, rgba(89, 82, 156, 0.80) 0%, transparent 50%),
+        radial-gradient(ellipse 65% 55% at 52% 100%, rgba(222, 190, 239, 0.45) 0%, transparent 50%),
+        radial-gradient(ellipse 75% 60% at 88% 100%, rgba(250, 223, 210, 0.40) 0%, transparent 50%),
+        radial-gradient(ellipse 130% 50% at 50% 110%, rgba(4, 48, 71, 0.60) 0%, transparent 55%);
     }
     .hero-gradient::after {
       content: '';
@@ -51,9 +52,9 @@ body { padding-top: 0; }
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(20,50,40,0.72) 0%,
-        rgba(20,50,40,0.45) 30%,
-        rgba(20,50,40,0.15) 58%,
+        rgba(2,39,58,0.72) 0%,
+        rgba(2,39,58,0.45) 30%,
+        rgba(2,39,58,0.15) 58%,
         transparent 78%
       );
     }
@@ -93,13 +94,13 @@ body { padding-top: 0; }
       font-weight: 600;
       letter-spacing: -0.015em;
       line-height: 1.08;
-      color: #f5efdd;
+      color: #fdfaf1;
       margin-bottom: 1.5rem;
     }
     .hero-sub {
       font-size: clamp(1rem, 2vw, 1.15rem);
       line-height: 1.7;
-      color: rgba(245,239,221,0.62);
+      color: rgba(253,250,241,0.62);
       max-width: 560px;
       margin: 0 auto 2.5rem;
     }
@@ -123,15 +124,15 @@ body { padding-top: 0; }
       align-items: center;
       gap: 0.4rem;
       font-size: 0.78rem;
-      color: rgba(245,239,221,0.55);
+      color: rgba(253,250,241,0.55);
     }
     /* Fixed-surface section: buttons must not follow theme inversion */
-    .hero .btn-primary { background: #f5efdd; color: #143228; }
-    .hero .btn-primary:hover { background: #e9e1c9; }
-    .hero .btn-ghost { border-color: rgba(245,239,221,0.25); color: rgba(245,239,221,0.8); }
-    .hero .btn-ghost:hover { border-color: rgba(245,239,221,0.5); color: #f5efdd; background: rgba(245,239,221,0.06); }
-    .hero .hero-eyebrow { border-color: rgba(232,104,63,0.4); background: rgba(232,104,63,0.10); color: #f08a63; }
-    .hero .hero-eyebrow-dot { background: #f08a63; }
+    .hero .btn-primary { background: #fdfaf1; color: #02273a; }
+    .hero .btn-primary:hover { background: #efe8d6; }
+    .hero .btn-ghost { border-color: rgba(253,250,241,0.25); color: rgba(253,250,241,0.8); }
+    .hero .btn-ghost:hover { border-color: rgba(253,250,241,0.5); color: #fdfaf1; background: rgba(253,250,241,0.06); }
+    .hero .hero-eyebrow { border-color: rgba(222,190,239,0.4); background: rgba(222,190,239,0.10); color: #debeef; }
+    .hero .hero-eyebrow-dot { background: #debeef; }
     .hero-meta-item svg { width: 12px; height: 12px; opacity: 0.7; }
 
     /* ── Trust bar ── */
@@ -243,7 +244,7 @@ body { padding-top: 0; }
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       background: var(--accent-dim);
-      border: 1px solid rgba(232,81,10,0.2);
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
       margin-bottom: 1.25rem;
     }
     .feature-card-icon svg { width: 18px; height: 18px; color: var(--accent); }
@@ -299,12 +300,12 @@ body { padding-top: 0; }
 
 
     /* ── CTA gradient section ── */
-    /* CTA stays on the deep-green editor surface in both themes so the
+    /* CTA stays on the navy editor surface in both themes so the
        closing moment always carries the brand field. */
     .cta-gradient {
       position: relative;
       overflow: hidden;
-      background: #10261e;
+      background: #021c2b;
       padding: 8rem 0;
       text-align: center;
     }
@@ -313,15 +314,15 @@ body { padding-top: 0; }
       inset: 0;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(232, 104, 63, 0.40) 0%, transparent 65%),
-        radial-gradient(ellipse 60% 60% at 10% 100%, rgba(241, 182, 44, 0.28) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 60% at 90% 100%, rgba(193, 59, 42, 0.30) 0%, transparent 55%);
+        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(89, 82, 156, 0.45) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 60% at 10% 100%, rgba(222, 190, 239, 0.25) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 60% at 90% 100%, rgba(250, 223, 210, 0.22) 0%, transparent 55%);
     }
     .cta-gradient-bg::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, #10261e 0%, transparent 40%, rgba(16,38,30,0.5) 80%, #10261e 100%);
+      background: linear-gradient(to bottom, #021c2b 0%, transparent 40%, rgba(2,28,43,0.5) 80%, #021c2b 100%);
     }
     .cta-gradient-content {
       position: relative;
@@ -335,21 +336,21 @@ body { padding-top: 0; }
       font-size: clamp(1.75rem, 4vw, 2.75rem);
       font-weight: 600;
       letter-spacing: -0.01em;
-      color: #f5efdd;
+      color: #fdfaf1;
       margin-bottom: 1rem;
       line-height: 1.15;
     }
     .cta-gradient-content p {
       font-size: 1rem;
-      color: rgba(245,239,221,0.55);
+      color: rgba(253,250,241,0.55);
       line-height: 1.7;
       margin-bottom: 2.25rem;
     }
     /* Fixed-surface section: buttons must not follow theme inversion */
-    .cta-gradient .btn-primary { background: #f5efdd; color: #143228; }
-    .cta-gradient .btn-primary:hover { background: #e9e1c9; }
-    .cta-gradient .btn-ghost { border-color: rgba(245,239,221,0.25); color: rgba(245,239,221,0.8); }
-    .cta-gradient .btn-ghost:hover { border-color: rgba(245,239,221,0.5); color: #f5efdd; background: rgba(245,239,221,0.06); }
+    .cta-gradient .btn-primary { background: #fdfaf1; color: #02273a; }
+    .cta-gradient .btn-primary:hover { background: #efe8d6; }
+    .cta-gradient .btn-ghost { border-color: rgba(253,250,241,0.25); color: rgba(253,250,241,0.8); }
+    .cta-gradient .btn-ghost:hover { border-color: rgba(253,250,241,0.5); color: #fdfaf1; background: rgba(253,250,241,0.06); }
     .cta-actions {
       display: flex;
       align-items: center;

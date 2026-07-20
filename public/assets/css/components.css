@@ -103,7 +103,7 @@
 .btn-primary:hover { background: color-mix(in srgb, var(--fg) 90%, var(--bg)); }
 .btn-accent {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
 }
 .btn-accent:hover { background: var(--accent-hover); }
 .btn-ghost {
@@ -193,7 +193,7 @@
   justify-content: space-between;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--code-border);
-  background: rgba(245,239,221,0.03);
+  background: rgba(253,250,241,0.03);
 }
 .code-dots { display: flex; gap: 6px; }
 .code-dots span {
@@ -206,7 +206,7 @@
 .code-filename {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: #7c927f;
+  color: #7d99a6;
   letter-spacing: 0.02em;
 }
 .code-body {
@@ -217,24 +217,24 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   line-height: 1.7;
-  color: #f0ead8;
+  color: #f2ecdf;
   tab-size: 2;
 }
-/* Syntax palette: warm ink on the green editor surface — sage for
-   identifiers/types, straw for strings, coral for keywords/values,
-   gold for sections/functions. Fixed values by design: the editor
-   surface does not change between themes. */
-.tok-comment { color: #7c927f; }
-.tok-key     { color: #93c9a9; }
-.tok-str     { color: #efc97f; }
-.tok-val     { color: #f08a63; }
-.tok-section { color: #f1b62c; font-weight: 500; }
-.tok-kw      { color: #f08a63; }
-.tok-fn      { color: #f1b62c; }
-.tok-type    { color: #93c9a9; }
-.tok-op      { color: #f0ead8; }
-.tok-num     { color: #f08a63; }
-.tok-bool    { color: #f08a63; }
+/* Syntax palette: pastel ink on the navy editor surface — Solitaire
+   sage for identifiers/types, Elizabeth Rose for strings, salmon for
+   keywords/values, Beefy Pink lilac for sections/functions. Fixed
+   values by design: the editor surface does not change between themes. */
+.tok-comment { color: #7d99a6; }
+.tok-key     { color: #9ccdb2; }
+.tok-str     { color: #f3cdbd; }
+.tok-val     { color: #ef9e86; }
+.tok-section { color: #debeef; font-weight: 500; }
+.tok-kw      { color: #ef9e86; }
+.tok-fn      { color: #debeef; }
+.tok-type    { color: #9ccdb2; }
+.tok-op      { color: #f2ecdf; }
+.tok-num     { color: #ef9e86; }
+.tok-bool    { color: #ef9e86; }
 
 /* ─── Terminal ───────────────────────────────────────────────────────────── */
 .terminal {
@@ -251,17 +251,17 @@
   gap: 0.5rem;
   padding: 0.6rem 1rem;
   border-bottom: 1px solid var(--code-border);
-  background: #143024;
+  background: #062c40;
 }
 .terminal-header .code-dots { display: flex; gap: 6px; }
-.terminal-title { font-size: 0.7rem; color: #7c927f; margin-left: 0.5rem; }
+.terminal-title { font-size: 0.7rem; color: #7d99a6; margin-left: 0.5rem; }
 .terminal-body { padding: 1.25rem 1.5rem; line-height: 1.75; }
 .terminal-line { display: flex; gap: 0.75rem; }
-.terminal-prompt { color: #f08a63; user-select: none; }
-.terminal-cmd { color: #f0ead8; }
-.terminal-out { color: #7c927f; }
-.terminal-out.success { color: #6fbe83; }
-.terminal-out.accent { color: #f08a63; }
+.terminal-prompt { color: #debeef; user-select: none; }
+.terminal-cmd { color: #f2ecdf; }
+.terminal-out { color: #7d99a6; }
+.terminal-out.success { color: #9ccdb2; }
+.terminal-out.accent { color: #debeef; }
 
 /* ─── Section label ──────────────────────────────────────────────────────── */
 .section-label {
