@@ -10,39 +10,39 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
 >
   <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-    .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--fg-muted); }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
     .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
-    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
     .post-byline strong { color: var(--fg); font-weight: 500; }
     .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
     @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
-    .post-prose { max-width: 680px; font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
     .post-prose p { margin: 0 0 1.4rem; }
-    .post-prose h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
-    .post-prose h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
     .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
     .post-prose li { margin-bottom: 0.5rem; }
     .post-prose strong { color: var(--fg); font-weight: 600; }
     .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
     .post-prose a:hover { text-decoration-color: var(--accent); }
     .post-prose .code-block { margin: 1.75rem 0; }
-    .post-prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
     .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
     .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.75rem 0; }
     @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
-    .compare-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
-    .compare-label.bad { color: #e05252; }
+    .compare-label { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    .compare-label.bad { color: var(--danger); }
     .compare-label.good { color: var(--success); }
     .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
     .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
-    .sidebar-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
     .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
-    .toc-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
     .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
     .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
-    .related-list a { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
     .related-list a:hover { color: var(--accent); }
     .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
-    .sidebar-cta p { font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
   <Fragment set:html={_body} />
 </SubpageLayout>

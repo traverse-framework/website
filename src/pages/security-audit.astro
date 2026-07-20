@@ -103,9 +103,9 @@ const jsonLd = JSON.stringify({
     @media (max-width: 560px) { .audit-stats { grid-template-columns: repeat(2, 1fr); } }
     .audit-stat { background: var(--bg-card); padding: 1.25rem 1rem; text-align: center; }
     .audit-stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--fg); line-height: 1; margin-bottom: 0.4rem; }
-    .audit-stat-value.crit { color: #ef4444; }
-    .audit-stat-value.high { color: #f97316; }
-    .audit-stat-value.med { color: #eab308; }
+    .audit-stat-value.crit { color: var(--danger); }
+    .audit-stat-value.high { color: var(--accent); }
+    .audit-stat-value.med { color: var(--accent-gold); }
     .audit-stat-label { font-size: 0.7rem; color: var(--fg-muted); line-height: 1.4; }
 
     .audit-section { margin: 3.5rem 0; }
@@ -122,10 +122,10 @@ const jsonLd = JSON.stringify({
     .audit-table td:first-child { font-weight: 500; }
 
     .sev-pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
-    .sev-critical { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-    .sev-high { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
-    .sev-medium { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
-    .sev-low { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+    .sev-critical { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent); }
+    .sev-high { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+    .sev-medium { background: color-mix(in srgb, var(--accent-gold) 15%, transparent); color: var(--accent-gold); border: 1px solid color-mix(in srgb, var(--accent-gold) 30%, transparent); }
+    .sev-low { background: color-mix(in srgb, var(--fg-subtle) 15%, transparent); color: var(--fg-subtle); border: 1px solid color-mix(in srgb, var(--fg-subtle) 30%, transparent); }
 
     .strengths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin: 1.5rem 0; }
     @media (max-width: 700px) { .strengths-grid { grid-template-columns: 1fr; } }

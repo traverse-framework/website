@@ -22,7 +22,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
       letter-spacing: -0.03em;
       line-height: 1.1;
       margin-bottom: 1.25rem;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       max-width: 720px;
     }
     .sol-hero-lead {
@@ -50,7 +50,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     .drift-scenario h3 {
       font-size: 1rem;
       font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       color: var(--fg);
       margin-bottom: 1.25rem;
     }
@@ -69,16 +69,16 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     }
     .drift-cell .env {
       font-size: 0.78rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       color: var(--fg-muted);
       margin-bottom: 0.5rem;
     }
     .drift-cell .val {
       font-size: 1.05rem;
       font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
     }
-    .drift-cell .val.wrong { color: #f87171; }
+    .drift-cell .val.wrong { color: var(--danger); }
     .drift-cell .val.right { color: var(--success); }
     .drift-label {
       font-size: 0.82rem;
@@ -100,7 +100,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
       padding: 1.5rem;
     }
     .problem-card-num {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 0.78rem;
       color: var(--fg-muted);
       margin-bottom: 0.75rem;
@@ -113,7 +113,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     .problem-card h3 {
       font-size: 1rem;
       font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       margin-bottom: 0.6rem;
     }
     .problem-card p {
@@ -126,7 +126,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     .solution-section h2 {
       font-size: 1.9rem;
       font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       margin-bottom: 0.75rem;
       letter-spacing: -0.02em;
     }
@@ -163,7 +163,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     .sol-item-body h3 {
       font-size: 0.98rem;
       font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       margin-bottom: 0.4rem;
     }
     .sol-item-body p {
@@ -193,7 +193,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     }
     .uc-card:hover { border-color: var(--accent); }
     .uc-num {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 0.78rem;
       color: var(--accent);
       margin-bottom: 0.75rem;
@@ -202,7 +202,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
     .uc-card h3 {
       font-size: 0.95rem;
       font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       margin-bottom: 0.5rem;
       color: var(--fg);
     }
@@ -246,7 +246,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
       border-radius: 8px;
       padding: 0.6rem 1rem;
       font-size: 0.82rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       color: var(--fg-muted);
       white-space: nowrap;
     }
@@ -265,7 +265,7 @@ const _body = "<section class=\"sol-hero\">\n  <div class=\"container\">\n    <d
       border: 1px solid var(--accent);
       color: var(--accent);
       font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
       margin-left: 0.4rem;

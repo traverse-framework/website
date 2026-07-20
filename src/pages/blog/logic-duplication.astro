@@ -17,7 +17,7 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
       flex-wrap: wrap;
     }
     .post-date {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 0.78rem;
       color: var(--fg-muted);
     }
@@ -29,7 +29,7 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
       display: flex;
       align-items: center;
       gap: 1.5rem;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: 0.875rem;
       color: var(--fg-muted);
       flex-wrap: wrap;
@@ -57,21 +57,21 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
     /* Prose */
     .post-prose {
       max-width: 680px;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: 1rem;
       line-height: 1.75;
       color: var(--fg);
     }
     .post-prose p { margin: 0 0 1.4rem; }
     .post-prose h2 {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       font-size: 1.35rem;
       font-weight: 600;
       margin: 2.5rem 0 1rem;
       color: var(--fg);
     }
     .post-prose h3 {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       font-size: 1.1rem;
       font-weight: 600;
       margin: 2rem 0 0.75rem;
@@ -101,7 +101,7 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
       padding: 1.25rem;
     }
     .sidebar-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: var(--font-display);
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -117,7 +117,7 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
       gap: 0.4rem;
     }
     .toc-list a {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: 0.83rem;
       color: var(--fg-muted);
       text-decoration: none;
@@ -139,7 +139,7 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
       gap: 0.6rem;
     }
     .related-list a {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: 0.83rem;
       color: var(--fg-muted);
       text-decoration: none;
@@ -151,7 +151,7 @@ const _body = "<section class=\"post-hero\">\n  <div class=\"container\">\n    <
       border-color: var(--accent-dim);
     }
     .sidebar-cta p {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: 0.83rem;
       color: var(--fg-muted);
       margin: 0 0 1rem;
