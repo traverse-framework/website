@@ -25,7 +25,7 @@ body { padding-top: 0; }
       transform: translate(-50%, -50%);
       width: 680px;
       height: 680px;
-      background: url('/assets/img/logo/traverse_icon_512x512.svg') center / contain no-repeat;
+      background: url('/assets/img/logo/traverse_mountain_dark_512.png') center / contain no-repeat;
       filter: blur(72px);
       opacity: 0.55;
       z-index: 1;
