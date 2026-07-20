@@ -23,7 +23,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Native — Linux, macOS, Windows</h2>
+          <h2 id="native">Native — Linux, macOS, Windows</h2>
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
         <p>The default target and the most mature. <code>traverse-runtime</code> gives you full orchestration — <code>NativeExecutor</code>, <code>ThreadPoolExecutor</code>, and a Wasmtime-backed <code>WasmExecutor</code> for sandboxed capability execution. This is what <code>traverse-cli</code> runs on, and what every quickstart walks you through.</p>
@@ -35,7 +35,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Browser</h2>
+          <h2 id="browser">Browser</h2>
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
         <p>Two things are true here, both shipped. First, the runtime core builds for <code>wasm32-unknown-unknown</code> with native adapters excluded — contracts, registry resolution, routing, traces, and events all run in a browser or edge-WASM guest with your own executor behind <code>CapabilityExecutor</code>. Second, and newer: the public <strong>Web/TypeScript embedder SDK</strong>, shipped in v0.8.0, loads a bundle, digest-verifies every WASM capability, and executes it directly in the browser's native WebAssembly host through a minimal WASI <code>preview1</code> shim — no nested engine, no server sidecar.</p>
@@ -47,7 +47,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Embed in a Rust app (Linux GTK / CLI)</h2>
+          <h2 id="rust-embedding">Embed in a Rust app (Linux GTK / CLI)</h2>
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
         <p>The public <code>traverse-embedder</code> crate implements <code>embedder-api/1.0.0</code> — init, shutdown, submit, subscribe, and start/stop/kill — against an application-owned bundle, with real execution, a deterministic test double, and a CI-enforced conformance suite shared across every embedder SDK.</p>
@@ -58,7 +58,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Swift / iOS</h2>
+          <h2 id="swift-ios">Swift / iOS</h2>
           <span class="badge badge-danger badge-dot">Blocked</span>
         </div>
         <p>The formal certification path is blocked, as of a screen dated July 19, 2026: no candidate WASM engine currently exposes the public, documented resource-control APIs required for a certified native embedder baseline. WasmKit, WAMR, Wasmtime, and Wasmer were all screened and rejected — for missing resource-control APIs, no supported iOS profile, or JIT/entitlement conflicts with App Store distribution. The <code>packages/swift/TraverseEmbedder</code> package has a <code>WasmKitRuntimeBridge</code> implemented, but evidence publication and reference-app integration are explicitly tracked as blocked, not in progress.</p>
@@ -71,7 +71,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Kotlin / Android</h2>
+          <h2 id="kotlin-android">Kotlin / Android</h2>
           <span class="badge badge-accent badge-dot">In progress</span>
         </div>
         <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to Chicory 1.7.5. Bundle validation and lifecycle types are in place. Compose reference-app integration is tracked by a separate open issue and hasn't landed yet — no public release.</p>
@@ -82,7 +82,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>.NET / WinUI</h2>
+          <h2 id="dotnet-winui">.NET / WinUI</h2>
           <span class="badge badge-accent badge-dot">In progress</span>
         </div>
         <p><code>packages/dotnet/TraverseEmbedder</code> has a working <code>WasmtimeRuntimeBridge</code> pinned to Wasmtime .NET 44.0.0. Request marshalling, event subscriptions, evidence publication, the shared conformance suite, and WinUI reference-app integration remain tracked as open work — no public release.</p>
@@ -93,7 +93,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Edge (Cloudflare Workers and similar)</h2>
+          <h2 id="edge">Edge (Cloudflare Workers and similar)</h2>
           <span class="badge badge-subtle badge-dot">Planned</span>
         </div>
         <p>On the public roadmap as the next executor adapter — same WASM binary, same contract, edge-specific placement. No code has shipped for this yet.</p>
@@ -104,7 +104,7 @@ const _body = `<section class="page-hero">
 
       <div class="platform-row">
         <div class="platform-row-head">
-          <h2>Cloud placement / multi-cloud orchestration</h2>
+          <h2 id="cloud">Cloud placement / multi-cloud orchestration</h2>
           <span class="badge badge-subtle badge-dot">Not in v0.1 scope</span>
         </div>
         <p>This isn't a "we haven't gotten to it yet" gap — it's an explicit non-goal of the current milestone. The project's own constitution excludes distributed orchestration, edge/cloud placement optimization, and multi-cloud runtime execution from v0.1 by design, to keep the core small and verifiable first.</p>
