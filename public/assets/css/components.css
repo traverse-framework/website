@@ -426,7 +426,8 @@
 /* ─── Docs sidebar ───────────────────────────────────────────────────────── */
 .docs-layout {
   display: grid; grid-template-columns: 240px 1fr; gap: 0;
-  min-height: calc(100vh - var(--nav-h)); margin-top: var(--nav-h);
+  max-width: 1000px; margin: var(--nav-h) auto 0;
+  min-height: calc(100vh - var(--nav-h));
 }
 .docs-sidebar {
   position: sticky; top: var(--nav-h);
