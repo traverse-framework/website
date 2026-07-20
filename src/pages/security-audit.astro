@@ -19,6 +19,18 @@ const findings = [
   { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo.' },
 ];
 
+// Second audit pass — 2026-07-20, commit 7c59137. Kept as a distinct batch
+// (rendered after a labeled divider row) rather than merged silently into
+// the July findings above, so the register still shows which pass found what.
+const findingsJul20 = [
+  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/supply_chain.rs:240-296', finding: 'verify_signature never checks a cryptographic signature — Ed25519 path only validates hex-string length/format, Sigstore path is a hardcoded stub. Forged artifacts pass artifact verify with overall_status: Passed. Leaves spec 065 (sigstore-bundle-verification) unimplemented.', issue: 781 },
+  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/http_api.rs:1182-1211 · :625-628', finding: 'dev-any auth mode grants admin via an unsigned token: a non-JWT bearer equal to the public literal "system_admin" yields is_admin: true, and dev-any trusts any RFC1918-private peer, not just loopback.', issue: 782 },
+  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/browser_adapter.rs:326-335', finding: 'Browser adapter allocates a buffer from unbounded Content-Length before reading the body — no size cap, unlike the sibling HTTP API’s 4 MiB MAX_REQUEST_BODY.', issue: 783 },
+  { sev: 'Medium', domain: 'Runtime', loc: 'packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs:143-167', finding: '.NET Wasmtime bridge sets fuel/epoch limits once at construction, not per call — real invocations bypass the per-call resource budget, so one expensive call can permanently brick the session. Rust core and the Kotlin/Chicory bridge are correctly implemented; .NET is the outlier.', issue: 784 },
+  { sev: 'Medium', domain: 'Functional gap', loc: 'traverse-cli/src/main.rs:3289-3296 · :4054-4074', finding: 'agent execute runs verified WASM packages through a hardcoded example executor (AgentPackageExampleExecutor) — full manifest/digest/ABI validation succeeds, then execution fails "unsupported AI agent capability" for anything outside 7 hardcoded demo IDs, e.g. doc-approval.analyze.', issue: 785 },
+  { sev: 'Low', domain: 'Performance', loc: 'traverse-registry/src/semver_resolver.rs:92-99', finding: 'resolve_version_range does a full registry scan and sort instead of a targeted lookup — DiscoveryQuery::default() has no id filter, so every capability-execution dependency check scans the whole scope before filtering by id, recursively up to MAX_TRANSITIVE_DEPTH.', issue: 786 },
+];
+
 const permanenceMatrix = [
   { g: 'Deterministic execution (same inputs → same outputs)', spec: 'Yes (constitution + NFRs)', impl: 'Partial — WASM/expedition strong; inference/Ollama non-deterministic', gap: 'No formal determinism test suite across executors' },
   { g: 'Immutable governing specs', spec: 'Yes (approved-specs.json)', impl: 'Yes — registry marks immutable', gap: 'Some approved specs still say Status: Draft in headers' },
@@ -60,6 +72,7 @@ const jsonLd = JSON.stringify({
   headline: 'Traverse Permanence & Security Audit',
   description: 'Full-framework analysis of durability/determinism guarantees and security risk vs opportunity in Traverse.',
   datePublished: '2026-07-01',
+  dateModified: '2026-07-20',
   author: { '@type': 'Organization', name: 'Traverse Framework' },
 });
 ---
@@ -120,6 +133,13 @@ const jsonLd = JSON.stringify({
     .audit-table td { border: 1px solid var(--border); padding: 0.75rem 0.9rem; vertical-align: top; line-height: 1.55; color: var(--fg-muted); }
     .audit-table tr:nth-child(even) td { background: var(--bg-elevated); }
     .audit-table td:first-child { font-weight: 500; }
+    .audit-table td a { color: var(--accent); white-space: nowrap; }
+
+    .audit-table-divider td {
+      background: var(--accent-dim); border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+      font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--accent); font-weight: 600; padding: 0.55rem 0.9rem;
+    }
 
     .sev-pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
     .sev-critical { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent); }
@@ -155,7 +175,7 @@ const jsonLd = JSON.stringify({
         <span class="section-label">Security &amp; Permanence</span>
         <h1 style="margin-top:1rem">Traverse Permanence &amp; Security Audit</h1>
         <p class="audit-hero-lead">Full-framework analysis of durability/determinism guarantees and security risk vs. opportunity.</p>
-        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · July 2026</p>
+        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · Initial audit July 2026 · Updated 2026-07-20, commit <a href="https://github.com/traverse-framework/traverse/commit/7c59137" target="_blank" rel="noopener">7c59137</a></p>
       </div>
     </section>
 
@@ -167,9 +187,9 @@ const jsonLd = JSON.stringify({
 
         <div class="audit-stats">
           <div class="audit-stat"><div class="audit-stat-value crit">2</div><div class="audit-stat-label">Critical findings</div></div>
-          <div class="audit-stat"><div class="audit-stat-value high">4</div><div class="audit-stat-label">High findings</div></div>
-          <div class="audit-stat"><div class="audit-stat-value med">7</div><div class="audit-stat-label">Medium findings</div></div>
-          <div class="audit-stat"><div class="audit-stat-value">2</div><div class="audit-stat-label">Low / info</div></div>
+          <div class="audit-stat"><div class="audit-stat-value high">6</div><div class="audit-stat-label">High findings</div></div>
+          <div class="audit-stat"><div class="audit-stat-value med">10</div><div class="audit-stat-label">Medium findings</div></div>
+          <div class="audit-stat"><div class="audit-stat-value">3</div><div class="audit-stat-label">Low / info</div></div>
           <div class="audit-stat"><div class="audit-stat-value">52</div><div class="audit-stat-label">Approved specs</div></div>
           <div class="audit-stat"><div class="audit-stat-value">6</div><div class="audit-stat-label">Workspace crates</div></div>
           <div class="audit-stat"><div class="audit-stat-value">3/6</div><div class="audit-stat-label">Coverage-gated crates</div></div>
@@ -192,6 +212,15 @@ const jsonLd = JSON.stringify({
                     <td>{f.domain}</td>
                     <td class="evidence-line">{f.loc}</td>
                     <td>{f.finding}</td>
+                  </tr>
+                ))}
+                <tr class="audit-table-divider"><td colspan="4">New findings — audited 2026-07-20, commit 7c59137</td></tr>
+                {findingsJul20.map((f) => (
+                  <tr>
+                    <td><span class={`sev-pill ${sevClass(f.sev)}`}>{f.sev}</span></td>
+                    <td>{f.domain}</td>
+                    <td class="evidence-line">{f.loc}</td>
+                    <td>{f.finding} <a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a></td>
                   </tr>
                 ))}
               </tbody>
@@ -242,6 +271,7 @@ const jsonLd = JSON.stringify({
                 <li>Semver progression and contractual enforcement gates</li>
                 <li>Expedition WASM path is a deterministic vertical slice</li>
                 <li>LocalFileDataStore provides basic on-disk persistence</li>
+                <li>wasm32-unknown-unknown portability re-verified clean (2026-07-20) — traverse-runtime --no-default-features and other portable-by-design crates build clean, native-only deps (wasmtime/rayon) correctly feature-gated</li>
               </ul>
             </div>
           </div>
@@ -319,6 +349,7 @@ const jsonLd = JSON.stringify({
         <div class="audit-section">
           <h2>Key evidence</h2>
           <p class="evidence-line">crates/traverse-runtime/src/security.rs · crates/traverse-cli/src/http_api.rs · crates/traverse-mcp/src/stdio_server.rs · crates/traverse-runtime/src/events/broker.rs · specs/030, 031, 036 · SECURITY.md</p>
+          <p class="evidence-line" style="margin-top:0.5rem">2026-07-20 update: crates/traverse-cli/src/supply_chain.rs · crates/traverse-cli/src/browser_adapter.rs · crates/traverse-cli/src/main.rs · crates/traverse-registry/src/semver_resolver.rs · packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs · spec 065</p>
         </div>
       </div>
     </section>
