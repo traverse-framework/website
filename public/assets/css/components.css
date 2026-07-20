@@ -144,6 +144,16 @@
   color: var(--success);
   background: color-mix(in srgb, var(--success) 8%, transparent);
 }
+.badge-danger {
+  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+.badge-subtle {
+  border-color: color-mix(in srgb, var(--fg-subtle) 25%, transparent);
+  color: var(--fg-subtle);
+  background: color-mix(in srgb, var(--fg-subtle) 8%, transparent);
+}
 .badge-dot::before {
   content: '';
   width: 5px; height: 5px;

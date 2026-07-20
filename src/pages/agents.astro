@@ -1,0 +1,158 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <span class="section-label">For AI Agents</span>
+      <h1 class="t-h1">Capabilities an agent can't misuse.</h1>
+      <p class="page-hero-sub">Function calling tells an agent what a tool does. It says nothing about what has to be true before or after it runs. Traverse exposes governed capabilities over the Model Context Protocol — an agent discovers them, reads their actual contract, and every call is validated and traced.</p>
+      <div class="page-hero-badges">
+        <span class="badge badge-success badge-dot">Shipped</span>
+        <span class="badge">traverse-mcp</span>
+        <span class="badge">stdio server</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Why contracts, not just function definitions</div>
+      <h2>An agent that discovers a tool still doesn't know its rules.</h2>
+      <p>A JSON schema for a function's arguments tells an agent the shape of a call. It doesn't say what has to be true beforehand, what's guaranteed afterward, or what the agent should do if a precondition fails. Traverse capabilities carry that as a real contract — preconditions, postconditions, and permissions — and the runtime enforces it on every call, not just the ones a well-behaved agent happens to check first.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">The flow</div>
+      <h2>Discover, inspect, execute, trace.</h2>
+      <p>Every agent session follows the same shape, whether it's Claude, GPT, or anything else that speaks MCP.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num active">01</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Discover</div>
+        <p class="t-body-sm t-muted">List content groups and entrypoints. No credentials required — discovery is always open, even in bearer-token mode.</p>
+      </div>
+      <div class="step">
+        <div class="step-num active">02</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Inspect</div>
+        <p class="t-body-sm t-muted">Read the real contract for an entrypoint — input/output schema, preconditions, postconditions — before proposing a call.</p>
+      </div>
+      <div class="step">
+        <div class="step-num active">03</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Execute</div>
+        <p class="t-body-sm t-muted">Call it. The runtime validates the input against the contract first — bad calls are rejected before they run, not after.</p>
+      </div>
+      <div class="step">
+        <div class="step-num active">04</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Trace</div>
+        <p class="t-body-sm t-muted">Every execution returns a public trace summary — a redacted, structured record of what ran and what it returned.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">The real tool list</div>
+      <h2>Nine commands, one JSON envelope.</h2>
+      <p>This is the actual command set exposed by <code>traverse-mcp</code> today — not an illustrative subset.</p>
+    </div>
+    <div class="mcp-table-wrap">
+      <table class="mcp-table">
+        <tbody>
+          <tr><td><code>describe_server</code></td><td>Server identity and capabilities — the first call any agent makes.</td></tr>
+          <tr><td><code>list_content_groups</code></td><td>List the available content groups (the first one shipped is <code>core-runtime-example</code>).</td></tr>
+          <tr><td><code>describe_content_group</code></td><td>Detail on one content group — what capabilities, events, and workflows it holds.</td></tr>
+          <tr><td><code>list_entrypoints</code></td><td>List the capabilities and workflows an agent can actually call.</td></tr>
+          <tr><td><code>describe_entrypoint</code></td><td>The full contract for one entrypoint — schema, preconditions, postconditions.</td></tr>
+          <tr><td><code>validate_entrypoint</code></td><td>Dry-run a proposed input against the contract without executing anything.</td></tr>
+          <tr><td><code>execute_entrypoint</code></td><td>Run it. Returns a public trace summary in the response.</td></tr>
+          <tr><td><code>render_execution_report</code></td><td>A human- or agent-readable report of a past execution.</td></tr>
+          <tr><td><code>shutdown</code></td><td>Terminate the server session cleanly.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="two-col">
+      <div>
+        <span class="section-label">Try it</span>
+        <h2 class="section-title-sm">Run the server, connect an agent.</h2>
+        <p class="section-lead">The only supported bootstrap mode today is stdio. Discovery runs in the open by default; set a bearer token to gate execution specifically, not discovery.</p>
+        <div class="terminal">
+          <div class="terminal-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="terminal-title">terminal</span>
+          </div>
+          <div class="terminal-body">
+            <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">cargo run -p traverse-mcp -- stdio</span></div>
+            <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">MCP server ready on stdio (local_trust mode)</span></div>
+          </div>
+        </div>
+        <p class="section-lead" style="margin-top:1.5rem">For a real, end-to-end agent session — connect, discover, inspect a contract, execute the approved <code>plan-expedition</code> workflow — follow the full walkthrough.</p>
+        <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-real-agent-exercise.md" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Read the real-agent exercise →</a>
+      </div>
+      <div>
+        <div class="status-card">
+          <div class="status-card-header">
+            <span class="t-h3" style="margin:0">Honest limits, today</span>
+          </div>
+          <div class="checklist">
+            <div class="checklist-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong style="color:var(--fg)">Stdio only.</strong> <code>traverse-mcp</code> runs as a subprocess an agent host launches — it isn't a library an agent process can link and call in-process yet. A library API is planned but not built.</span>
+            </div>
+            <div class="checklist-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong style="color:var(--fg)">One content group shipped.</strong> The example domain exposed today is the expedition planning workflow. Broader multi-domain discovery is not yet built.</span>
+            </div>
+            <div class="checklist-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong style="color:var(--fg)">Trace is redacted by default.</strong> Execution responses carry a public trace summary, not the full internal runtime trace.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Connect an agent to Traverse.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">The MCP setup guide walks through configuring Claude or any MCP-compatible client against a local server.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/guides/mcp-setup.html" class="btn btn-primary">MCP setup guide →</a>
+      <a href="/system.html" class="btn btn-ghost">See the full system</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"For AI Agents — Traverse Framework"}
+  description={"How an AI agent discovers, inspects, executes, and traces governed capabilities through the traverse-mcp stdio server — the real tool list, the real flow, the real limits."}
+  canonical={"https://traverse-framework.com/agents.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">
+    .mcp-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+    .mcp-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .mcp-table td { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .mcp-table tr:last-child td { border-bottom: none; }
+    .mcp-table td:first-child { white-space: nowrap; width: 1%; }
+    .mcp-table code { font-family: var(--font-mono); font-size: 0.85em; color: var(--accent); background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.15em 0.45em; }
+    .checklist-item svg { color: var(--accent); }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
