@@ -69,56 +69,6 @@ const { currentPath = '' } = Astro.props;
       <li class="nav-item"><a href="/platforms.html" class="nav-link">Platforms</a></li>
       <li class="nav-item"><a href="/agents.html" class="nav-link">Agents</a></li>
 
-      <!-- Solutions dropdown -->
-      <li class="nav-item has-dropdown">
-        <button class="nav-link-btn" aria-expanded="false" aria-haspopup="true">
-          Solutions
-          <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="dropdown" role="menu">
-          <div class="dropdown-section">
-            <div class="dropdown-label">By industry</div>
-            <a href="/solutions/fintech.html" class="dropdown-item" role="menuitem">
-              <span class="dropdown-icon">◈</span>
-              <span>
-                <span class="dropdown-item-title">Fintech</span>
-                <span class="dropdown-item-desc">Pricing, compliance, risk</span>
-              </span>
-            </a>
-            <a href="/solutions/saas.html" class="dropdown-item" role="menuitem">
-              <span class="dropdown-icon">⬡</span>
-              <span>
-                <span class="dropdown-item-title">SaaS</span>
-                <span class="dropdown-item-desc">Multi-tenant business logic</span>
-              </span>
-            </a>
-            <a href="/solutions/ecommerce.html" class="dropdown-item" role="menuitem">
-              <span class="dropdown-icon">◎</span>
-              <span>
-                <span class="dropdown-item-title">E-commerce</span>
-                <span class="dropdown-item-desc">Promotions, eligibility</span>
-              </span>
-            </a>
-            <a href="/solutions/enterprise.html" class="dropdown-item" role="menuitem">
-              <span class="dropdown-icon">◷</span>
-              <span>
-                <span class="dropdown-item-title">Enterprise</span>
-                <span class="dropdown-item-desc">Portable, auditable rules</span>
-              </span>
-            </a>
-            <a href="/solutions/ai-companies.html" class="dropdown-item" role="menuitem">
-              <span class="dropdown-icon">⬡</span>
-              <span>
-                <span class="dropdown-item-title">AI Companies</span>
-                <span class="dropdown-item-desc">Safe AI agent tooling</span>
-              </span>
-            </a>
-          </div>
-        </div>
-      </li>
-
       <!-- Developers dropdown -->
       <li class="nav-item has-dropdown">
         <button class="nav-link-btn" aria-expanded="false" aria-haspopup="true">
@@ -211,7 +161,6 @@ const { currentPath = '' } = Astro.props;
   <a href="/system.html">The System</a>
   <a href="/platforms.html">Platforms</a>
   <a href="/agents.html">Agents</a>
-  <a href="/solutions.html">Solutions</a>
   <a href="/docs/quickstart.html">Quickstart</a>
   <a href="/docs.html">Docs</a>
   <a href="/questions.html">All Questions</a>
