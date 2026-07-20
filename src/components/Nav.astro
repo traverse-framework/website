@@ -8,7 +8,8 @@ const { currentPath = '' } = Astro.props;
 <nav class="nav" id="nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">
-      <img src="/assets/img/logo/traverse_icon_32x32.svg" alt="Traverse" width="24" height="24">
+      <img src="/assets/img/logo/traverse_mountain_dark_128.png" alt="Traverse" width="24" height="24" class="logo-mark logo-mark-dark">
+      <img src="/assets/img/logo/traverse_mountain_light_128.png" alt="Traverse" width="24" height="24" class="logo-mark logo-mark-light">
       Traverse<span class="nav-logo-dot">.</span>
     </a>
 
@@ -214,13 +215,22 @@ const { currentPath = '' } = Astro.props;
     text-decoration: none;
     color: var(--fg);
   }
-  .nav-logo img { width: 24px; height: 24px; object-fit: contain; }
+  .logo-mark { width: 24px; height: 24px; object-fit: contain; }
+  /* Dark-theme mark is the default (matches the dark-first token design);
+     light theme swaps to the light-ground variant so the mark's own
+     background blends into the page instead of showing a mismatched edge. */
+  .logo-mark-light { display: none; }
+  :global([data-theme="light"]) .logo-mark-dark { display: none; }
+  :global([data-theme="light"]) .logo-mark-light { display: block; }
   .nav-logo-dot { color: var(--accent); }
 
   /* The homepage hero has a hardcoded-dark background regardless of theme
      (brand art). While the nav is transparent and sitting on top of it,
-     force light text so light-mode's dark --fg doesn't vanish against it. */
+     force light text — and the dark-ground logo mark — so light-mode's
+     variants don't vanish or mismatch against it. */
   :global(body.home) .nav:not(.scrolled) .nav-logo { color: #fdfaf1; }
+  :global(body.home) .nav:not(.scrolled) .logo-mark-dark { display: block; }
+  :global(body.home) .nav:not(.scrolled) .logo-mark-light { display: none; }
   :global(body.home) .nav:not(.scrolled) .nav-link-btn,
   :global(body.home) .nav:not(.scrolled) .nav-link { color: rgba(253,250,241,0.7); }
   :global(body.home) .nav:not(.scrolled) .nav-theme-btn,
