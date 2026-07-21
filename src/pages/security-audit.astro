@@ -71,6 +71,16 @@ const roadmap = [
 const sevClass = (s) => ({ Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low' }[s] || 'sev-low');
 const statusClass = (s) => ({ Closed: 'status-closed', Merged: 'status-closed', Resolved: 'status-closed', Open: 'status-open', 'Not filed': 'status-none' }[s] || 'status-none');
 
+// Computed from the finding data itself, not hand-typed, so the executive
+// summary can never drift from what the findings register actually says.
+// "Closed" here means Closed/Merged/Resolved — any status that isn't Open.
+const allFindings = [...findings, ...findingsJul20];
+const sevBreakdown = (sev) => {
+  const items = allFindings.filter((f) => f.sev === sev);
+  const closed = items.filter((f) => f.status !== 'Open' && f.status !== 'Not filed').length;
+  return { total: items.length, closed, open: items.length - closed };
+};
+
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
@@ -125,6 +135,9 @@ const jsonLd = JSON.stringify({
     .audit-stat-value.high { color: var(--accent); }
     .audit-stat-value.med { color: var(--accent-gold); }
     .audit-stat-label { font-size: 0.7rem; color: var(--fg-muted); line-height: 1.4; }
+    .audit-stat-split { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.02em; }
+    .split-closed { color: var(--success); }
+    .split-open { color: var(--accent); }
 
     .audit-section { margin: 3.5rem 0; }
     .audit-section h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
@@ -196,10 +209,20 @@ const jsonLd = JSON.stringify({
         </div>
 
         <div class="audit-stats">
-          <div class="audit-stat"><div class="audit-stat-value crit">2</div><div class="audit-stat-label">Critical findings</div></div>
-          <div class="audit-stat"><div class="audit-stat-value high">6</div><div class="audit-stat-label">High findings</div></div>
-          <div class="audit-stat"><div class="audit-stat-value med">10</div><div class="audit-stat-label">Medium findings</div></div>
-          <div class="audit-stat"><div class="audit-stat-value">3</div><div class="audit-stat-label">Low / info</div></div>
+          {['Critical', 'High', 'Medium', 'Low'].map((sev) => {
+            const b = sevBreakdown(sev);
+            const valClass = { Critical: 'crit', High: 'high', Medium: 'med', Low: '' }[sev];
+            return (
+              <div class="audit-stat">
+                <div class={`audit-stat-value ${valClass}`}>{b.total}</div>
+                <div class="audit-stat-label">{sev === 'Low' ? 'Low / info' : `${sev} findings`}</div>
+                <div class="audit-stat-split">
+                  <span class="split-closed">{b.closed} closed</span>
+                  <span class="split-open">{b.open} open</span>
+                </div>
+              </div>
+            );
+          })}
           <div class="audit-stat"><div class="audit-stat-value">52</div><div class="audit-stat-label">Approved specs</div></div>
           <div class="audit-stat"><div class="audit-stat-value">6</div><div class="audit-stat-label">Workspace crates</div></div>
           <div class="audit-stat"><div class="audit-stat-value">3/6</div><div class="audit-stat-label">Coverage-gated crates</div></div>
