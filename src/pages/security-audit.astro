@@ -1,34 +1,37 @@
 ---
 import SubpageLayout from '@layouts/SubpageLayout.astro';
 
+// issue: null means no GitHub issue was ever filed for this finding — shown
+// as "Not filed" rather than guessed, since these predate issue tracking
+// for this audit and a matching ticket search turned up nothing real.
 const findings = [
-  { sev: 'Critical', domain: 'Security', loc: 'security.rs:46-49 · http_api.rs', finding: 'Runtime defaults to Development; unsigned artifacts allowed; HTTP serve never forces Production.' },
-  { sev: 'Critical', domain: 'Security', loc: 'security.rs:120-147 · http_api.rs:983+', finding: 'JWT identity derived by base64 payload parse only — no signature/JWKS verification; alg:none accepted in tests.' },
-  { sev: 'High', domain: 'Security', loc: 'http_api.rs:938-951', finding: 'Arbitrary bearer strings become subject_id; --allow-unauthenticated and loopback bypasses enable impersonation.' },
-  { sev: 'High', domain: 'Security', loc: 'security.rs:287-310', finding: 'Sigstore verification is a verified:// stub; CI uses placeholder bundles as if verified.' },
-  { sev: 'High', domain: 'Security', loc: 'traverse-mcp/stdio_server.rs', finding: 'MCP stdio has no auth — any stdin writer can execute capabilities and read full traces.' },
-  { sev: 'High', domain: 'Permanence', loc: 'events/broker.rs · types.rs', finding: 'Event replay is in-memory only (default 5m retention); no durable journal, WAL, or cross-restart permanence.' },
-  { sev: 'Medium', domain: 'Security', loc: 'security.rs:156-185 · wasm.rs', finding: 'Runtime checksum gate missing from verify_artifact; SHA-256 only optional in WasmExecutor.' },
-  { sev: 'Medium', domain: 'Security', loc: 'events/types.rs:19-39', finding: 'TraverseEvent lacks subject_id/actor_id — identity not propagated to events or subscription filters (spec 030 FR-006/016).' },
-  { sev: 'Medium', domain: 'Security', loc: 'security.rs:187-204', finding: 'Governed-artifact trust level uses path/URL heuristics, not registry or approved-specs lookup.' },
-  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Only Memory + LocalFile adapters; no SQLite/cloud durability, no workspace-scoped keys, no integrity hashes on records.' },
-  { sev: 'Medium', domain: 'Permanence', loc: 'trace/private.rs', finding: 'Private traces hash I/O well, but traces are not an append-only durable store — audit evidence is process-lifetime.' },
-  { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'MCP stdio server implemented and CI-required but spec 022 unapproved; specs 057–059 approved but unimplemented.' },
-  { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated.' },
-  { sev: 'Low', domain: 'Security', loc: 'SECURITY.md:11', finding: 'Vulnerability reporting path points to a stale personal SUPPORT.md path (cogolo).' },
-  { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo.' },
+  { sev: 'Critical', domain: 'Security', loc: 'security.rs:46-49 · http_api.rs', finding: 'Runtime defaults to Development; unsigned artifacts allowed; HTTP serve never forces Production.', issue: 588, status: 'Closed' },
+  { sev: 'Critical', domain: 'Security', loc: 'security.rs:120-147 · http_api.rs:983+', finding: 'JWT identity derived by base64 payload parse only — no signature/JWKS verification; alg:none accepted in tests.', issue: 580, status: 'Closed' },
+  { sev: 'High', domain: 'Security', loc: 'http_api.rs:938-951', finding: 'Arbitrary bearer strings become subject_id; --allow-unauthenticated and loopback bypasses enable impersonation.', issue: null, status: 'Not filed' },
+  { sev: 'High', domain: 'Security', loc: 'security.rs:287-310', finding: 'Sigstore verification is a verified:// stub; CI uses placeholder bundles as if verified.', issue: 589, status: 'Closed' },
+  { sev: 'High', domain: 'Security', loc: 'traverse-mcp/stdio_server.rs', finding: 'MCP stdio has no auth — any stdin writer can execute capabilities and read full traces.', issue: 592, status: 'Closed' },
+  { sev: 'High', domain: 'Permanence', loc: 'events/broker.rs · types.rs', finding: 'Event replay is in-memory only (default 5m retention); no durable journal, WAL, or cross-restart permanence.', issue: 593, status: 'Closed' },
+  { sev: 'Medium', domain: 'Security', loc: 'security.rs:156-185 · wasm.rs', finding: 'Runtime checksum gate missing from verify_artifact; SHA-256 only optional in WasmExecutor.', issue: 590, status: 'Closed' },
+  { sev: 'Medium', domain: 'Security', loc: 'events/types.rs:19-39', finding: 'TraverseEvent lacks subject_id/actor_id — identity not propagated to events or subscription filters (spec 030 FR-006/016).', issue: 591, status: 'Closed' },
+  { sev: 'Medium', domain: 'Security', loc: 'security.rs:187-204', finding: 'Governed-artifact trust level uses path/URL heuristics, not registry or approved-specs lookup.', issue: 596, status: 'Closed' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Only Memory + LocalFile adapters; no SQLite/cloud durability, no workspace-scoped keys, no integrity hashes on records.', issue: null, status: 'Not filed' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'trace/private.rs', finding: 'Private traces hash I/O well, but traces are not an append-only durable store — audit evidence is process-lifetime.', issue: null, status: 'Not filed' },
+  { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'MCP stdio server implemented and CI-required but spec 022 unapproved; specs 057–059 approved but unimplemented.', issue: null, status: 'Not filed' },
+  { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated.', issue: 594, status: 'Closed' },
+  { sev: 'Low', domain: 'Security', loc: 'SECURITY.md:11', finding: 'Vulnerability reporting path points to a stale personal SUPPORT.md path (cogolo).', issue: 595, status: 'Closed' },
+  { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo.', issue: 627, status: 'Open' },
 ];
 
 // Second audit pass — 2026-07-20, commit 7c59137. Kept as a distinct batch
 // (rendered after a labeled divider row) rather than merged silently into
 // the July findings above, so the register still shows which pass found what.
 const findingsJul20 = [
-  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/supply_chain.rs:240-296', finding: 'verify_signature never checks a cryptographic signature — Ed25519 path only validates hex-string length/format, Sigstore path is a hardcoded stub. Forged artifacts pass artifact verify with overall_status: Passed. Leaves spec 065 (sigstore-bundle-verification) unimplemented.', issue: 781 },
-  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/http_api.rs:1182-1211 · :625-628', finding: 'dev-any auth mode grants admin via an unsigned token: a non-JWT bearer equal to the public literal "system_admin" yields is_admin: true, and dev-any trusts any RFC1918-private peer, not just loopback.', issue: 782 },
-  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/browser_adapter.rs:326-335', finding: 'Browser adapter allocates a buffer from unbounded Content-Length before reading the body — no size cap, unlike the sibling HTTP API’s 4 MiB MAX_REQUEST_BODY.', issue: 783 },
-  { sev: 'Medium', domain: 'Runtime', loc: 'packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs:143-167', finding: '.NET Wasmtime bridge sets fuel/epoch limits once at construction, not per call — real invocations bypass the per-call resource budget, so one expensive call can permanently brick the session. Rust core and the Kotlin/Chicory bridge are correctly implemented; .NET is the outlier.', issue: 784 },
-  { sev: 'Medium', domain: 'Functional gap', loc: 'traverse-cli/src/main.rs:3289-3296 · :4054-4074', finding: 'agent execute runs verified WASM packages through a hardcoded example executor (AgentPackageExampleExecutor) — full manifest/digest/ABI validation succeeds, then execution fails "unsupported AI agent capability" for anything outside 7 hardcoded demo IDs, e.g. doc-approval.analyze.', issue: 785 },
-  { sev: 'Low', domain: 'Performance', loc: 'traverse-registry/src/semver_resolver.rs:92-99', finding: 'resolve_version_range does a full registry scan and sort instead of a targeted lookup — DiscoveryQuery::default() has no id filter, so every capability-execution dependency check scans the whole scope before filtering by id, recursively up to MAX_TRANSITIVE_DEPTH.', issue: 786 },
+  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/supply_chain.rs:240-296', finding: 'verify_signature never checks a cryptographic signature — Ed25519 path only validates hex-string length/format, Sigstore path is a hardcoded stub. Forged artifacts pass artifact verify with overall_status: Passed. Leaves spec 065 (sigstore-bundle-verification) unimplemented.', issue: 781, status: 'Closed' },
+  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/http_api.rs:1182-1211 · :625-628', finding: 'dev-any auth mode grants admin via an unsigned token: a non-JWT bearer equal to the public literal "system_admin" yields is_admin: true, and dev-any trusts any RFC1918-private peer, not just loopback.', issue: 782, status: 'Open' },
+  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/browser_adapter.rs:326-335', finding: 'Browser adapter allocates a buffer from unbounded Content-Length before reading the body — no size cap, unlike the sibling HTTP API’s 4 MiB MAX_REQUEST_BODY.', issue: 783, status: 'Open' },
+  { sev: 'Medium', domain: 'Runtime', loc: 'packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs:143-167', finding: '.NET Wasmtime bridge sets fuel/epoch limits once at construction, not per call — real invocations bypass the per-call resource budget, so one expensive call can permanently brick the session. Rust core and the Kotlin/Chicory bridge are correctly implemented; .NET is the outlier.', issue: 784, status: 'Open' },
+  { sev: 'Medium', domain: 'Functional gap', loc: 'traverse-cli/src/main.rs:3289-3296 · :4054-4074', finding: 'agent execute runs verified WASM packages through a hardcoded example executor (AgentPackageExampleExecutor) — full manifest/digest/ABI validation succeeds, then execution fails "unsupported AI agent capability" for anything outside 7 hardcoded demo IDs, e.g. doc-approval.analyze.', issue: 785, status: 'Open' },
+  { sev: 'Low', domain: 'Performance', loc: 'traverse-registry/src/semver_resolver.rs:92-99', finding: 'resolve_version_range does a full registry scan and sort instead of a targeted lookup — DiscoveryQuery::default() has no id filter, so every capability-execution dependency check scans the whole scope before filtering by id, recursively up to MAX_TRANSITIVE_DEPTH.', issue: 786, status: 'Open' },
 ];
 
 const permanenceMatrix = [
@@ -65,6 +68,7 @@ const roadmap = [
 ];
 
 const sevClass = (s) => ({ Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low' }[s] || 'sev-low');
+const statusClass = (s) => ({ Closed: 'status-closed', Merged: 'status-closed', Open: 'status-open', 'Not filed': 'status-none' }[s] || 'status-none');
 
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -147,6 +151,11 @@ const jsonLd = JSON.stringify({
     .sev-medium { background: color-mix(in srgb, var(--accent-gold) 15%, transparent); color: var(--accent-gold); border: 1px solid color-mix(in srgb, var(--accent-gold) 30%, transparent); }
     .sev-low { background: color-mix(in srgb, var(--fg-subtle) 15%, transparent); color: var(--fg-subtle); border: 1px solid color-mix(in srgb, var(--fg-subtle) 30%, transparent); }
 
+    .status-pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
+    .status-closed { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); border: 1px solid color-mix(in srgb, var(--success) 30%, transparent); }
+    .status-open { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+    .status-none { background: color-mix(in srgb, var(--fg-subtle) 10%, transparent); color: var(--fg-subtle); border: 1px solid color-mix(in srgb, var(--fg-subtle) 25%, transparent); }
+
     .strengths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin: 1.5rem 0; }
     @media (max-width: 700px) { .strengths-grid { grid-template-columns: 1fr; } }
     .strengths-col h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--fg); }
@@ -202,9 +211,10 @@ const jsonLd = JSON.stringify({
 
         <div class="audit-section">
           <h2>Findings register</h2>
+          <p class="audit-section-note">Status reflects the linked GitHub issue's tracker state, not a re-audit of the fix — a closed ticket means the work was marked done, not that this page re-verified it against current code. Four July findings predate issue tracking for this audit and were never filed as tickets; shown as "Not filed" rather than guessed.</p>
           <div style="overflow-x:auto">
             <table class="audit-table">
-              <thead><tr><th>Severity</th><th>Domain</th><th>Location</th><th>Finding</th></tr></thead>
+              <thead><tr><th>Severity</th><th>Domain</th><th>Location</th><th>Finding</th><th>Ticket</th><th>Status</th></tr></thead>
               <tbody>
                 {findings.map((f) => (
                   <tr>
@@ -212,15 +222,19 @@ const jsonLd = JSON.stringify({
                     <td>{f.domain}</td>
                     <td class="evidence-line">{f.loc}</td>
                     <td>{f.finding}</td>
+                    <td>{f.issue ? <a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a> : <span class="t-subtle">Not filed</span>}</td>
+                    <td><span class={`status-pill ${statusClass(f.status)}`}>{f.status}</span></td>
                   </tr>
                 ))}
-                <tr class="audit-table-divider"><td colspan="4">New findings — audited 2026-07-20, commit 7c59137</td></tr>
+                <tr class="audit-table-divider"><td colspan="6">New findings — audited 2026-07-20, commit 7c59137</td></tr>
                 {findingsJul20.map((f) => (
                   <tr>
                     <td><span class={`sev-pill ${sevClass(f.sev)}`}>{f.sev}</span></td>
                     <td>{f.domain}</td>
                     <td class="evidence-line">{f.loc}</td>
-                    <td>{f.finding} <a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a></td>
+                    <td>{f.finding}</td>
+                    <td><a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a></td>
+                    <td><span class={`status-pill ${statusClass(f.status)}`}>{f.status}</span></td>
                   </tr>
                 ))}
               </tbody>
