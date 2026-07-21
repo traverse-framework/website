@@ -1,22 +1,23 @@
 ---
 import SubpageLayout from '@layouts/SubpageLayout.astro';
 
-// issue: null means no GitHub issue was ever filed for this finding — shown
-// as "Not filed" rather than guessed, since these predate issue tracking
-// for this audit and a matching ticket search turned up nothing real.
+// issue: null means no GitHub issue tracks this finding. As of the
+// 2026-07-20 reconciliation pass, every original finding is either
+// ticketed or explicitly resolved — see the "Resolved" status rows below,
+// which replaced what used to be four untracked "Not filed" findings.
 const findings = [
   { sev: 'Critical', domain: 'Security', loc: 'security.rs:46-49 · http_api.rs', finding: 'Runtime defaults to Development; unsigned artifacts allowed; HTTP serve never forces Production.', issue: 588, status: 'Closed' },
   { sev: 'Critical', domain: 'Security', loc: 'security.rs:120-147 · http_api.rs:983+', finding: 'JWT identity derived by base64 payload parse only — no signature/JWKS verification; alg:none accepted in tests.', issue: 580, status: 'Closed' },
-  { sev: 'High', domain: 'Security', loc: 'http_api.rs:938-951', finding: 'Arbitrary bearer strings become subject_id; --allow-unauthenticated and loopback bypasses enable impersonation.', issue: null, status: 'Not filed' },
+  { sev: 'High', domain: 'Security', loc: 'http_api.rs:1168-1211', finding: 'Reconciled 2026-07-20: the original --allow-unauthenticated+loopback claim is stale — that path (:1214-1219) now returns a hardcoded, non-admin "local" identity, not an attacker-controlled one. The live risk is narrower and specific: in dev auth modes, an arbitrary non-JWT bearer token is accepted directly as subject_id, and is_admin is granted when it equals the literal "system_admin". Same root cause as #782 — scope broadened via comment, see issue for detail.', issue: 782, status: 'Open' },
   { sev: 'High', domain: 'Security', loc: 'security.rs:287-310', finding: 'Sigstore verification is a verified:// stub; CI uses placeholder bundles as if verified.', issue: 589, status: 'Closed' },
   { sev: 'High', domain: 'Security', loc: 'traverse-mcp/stdio_server.rs', finding: 'MCP stdio has no auth — any stdin writer can execute capabilities and read full traces.', issue: 592, status: 'Closed' },
   { sev: 'High', domain: 'Permanence', loc: 'events/broker.rs · types.rs', finding: 'Event replay is in-memory only (default 5m retention); no durable journal, WAL, or cross-restart permanence.', issue: 593, status: 'Closed' },
   { sev: 'Medium', domain: 'Security', loc: 'security.rs:156-185 · wasm.rs', finding: 'Runtime checksum gate missing from verify_artifact; SHA-256 only optional in WasmExecutor.', issue: 590, status: 'Closed' },
   { sev: 'Medium', domain: 'Security', loc: 'events/types.rs:19-39', finding: 'TraverseEvent lacks subject_id/actor_id — identity not propagated to events or subscription filters (spec 030 FR-006/016).', issue: 591, status: 'Closed' },
   { sev: 'Medium', domain: 'Security', loc: 'security.rs:187-204', finding: 'Governed-artifact trust level uses path/URL heuristics, not registry or approved-specs lookup.', issue: 596, status: 'Closed' },
-  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Only Memory + LocalFile adapters; no SQLite/cloud durability, no workspace-scoped keys, no integrity hashes on records.', issue: null, status: 'Not filed' },
-  { sev: 'Medium', domain: 'Permanence', loc: 'trace/private.rs', finding: 'Private traces hash I/O well, but traces are not an append-only durable store — audit evidence is process-lifetime.', issue: null, status: 'Not filed' },
-  { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'MCP stdio server implemented and CI-required but spec 022 unapproved; specs 057–059 approved but unimplemented.', issue: null, status: 'Not filed' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Reconciled 2026-07-20: MemoryDataStore is actually #[cfg(test)]-only, not a shipped adapter. The real gap is that the one production adapter, LocalFileDataStore, has zero call sites anywhere in the workspace — fully defined, fully unwired — plus no integrity hash on records.', issue: 788, status: 'Open' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'trace/store.rs:8-11', finding: 'Reconciled 2026-07-20: confirmed TraceStore is a plain in-memory HashMap — a distinct subsystem from the event broker durability gap already fixed in #593. All trace/audit history is lost on restart.', issue: 789, status: 'Open' },
+  { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'Resolved 2026-07-20: spec 022 is now formally marked Superseded (2026-07-18, decision-log Decision 25) — never approved, no implementation ever referenced it. Specs 057, 058, and 059 are all Approved and now have real implementations (the traverse-embedder crate, traverse-runtime/src/workflows.rs, and traverse-cli/src/http_api.rs\'s command dispatch). The original "CI-required" claim no longer holds either — MCP is not referenced in any current .github/workflows/*.yml.', issue: null, status: 'Resolved' },
   { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated.', issue: 594, status: 'Closed' },
   { sev: 'Low', domain: 'Security', loc: 'SECURITY.md:11', finding: 'Vulnerability reporting path points to a stale personal SUPPORT.md path (cogolo).', issue: 595, status: 'Closed' },
   { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo.', issue: 627, status: 'Open' },
@@ -68,7 +69,7 @@ const roadmap = [
 ];
 
 const sevClass = (s) => ({ Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low' }[s] || 'sev-low');
-const statusClass = (s) => ({ Closed: 'status-closed', Merged: 'status-closed', Open: 'status-open', 'Not filed': 'status-none' }[s] || 'status-none');
+const statusClass = (s) => ({ Closed: 'status-closed', Merged: 'status-closed', Resolved: 'status-closed', Open: 'status-open', 'Not filed': 'status-none' }[s] || 'status-none');
 
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -211,7 +212,7 @@ const jsonLd = JSON.stringify({
 
         <div class="audit-section">
           <h2>Findings register</h2>
-          <p class="audit-section-note">Status reflects the linked GitHub issue's tracker state, not a re-audit of the fix — a closed ticket means the work was marked done, not that this page re-verified it against current code. Four July findings predate issue tracking for this audit and were never filed as tickets; shown as "Not filed" rather than guessed.</p>
+          <p class="audit-section-note">Status reflects the linked GitHub issue's tracker state, not a re-audit of the fix — a closed ticket means the work was marked done, not that this page re-verified it against current code. Four July findings were originally untracked and shown as "Not filed"; a 2026-07-20 reconciliation pass closed that gap — one turned out to share its root cause with #782, two got new tickets (#788, #789), and one (spec 022's governance status) is fully resolved with no ticket needed. Each reconciled row is marked "Reconciled" or "Resolved 2026-07-20" in its finding text.</p>
           <div style="overflow-x:auto">
             <table class="audit-table">
               <thead><tr><th>Severity</th><th>Domain</th><th>Location</th><th>Finding</th><th>Ticket</th><th>Status</th></tr></thead>
@@ -222,7 +223,7 @@ const jsonLd = JSON.stringify({
                     <td>{f.domain}</td>
                     <td class="evidence-line">{f.loc}</td>
                     <td>{f.finding}</td>
-                    <td>{f.issue ? <a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a> : <span class="t-subtle">Not filed</span>}</td>
+                    <td>{f.issue ? <a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a> : <span class="t-subtle">{f.status === 'Resolved' ? 'No ticket needed' : 'Not filed'}</span>}</td>
                     <td><span class={`status-pill ${statusClass(f.status)}`}>{f.status}</span></td>
                   </tr>
                 ))}
