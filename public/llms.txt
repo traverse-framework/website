@@ -14,6 +14,7 @@ Traverse is not a web framework, an agent-orchestration framework, or a general 
 ## Building with an agent
 
 - [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (describe_server, list_entrypoints, execute_entrypoint, and 6 more), the discover-inspect-execute-trace flow, and the honest limits (stdio only today, no library API yet).
+- [traverse-framework/claude-skills](https://github.com/traverse-framework/claude-skills): Claude Skills for building apps with Traverse — starting with `traverse-app-builder`, which checks the registry before authoring anything new, composes capabilities into workflows, and validates against the real traverse-cli, including this platform's current execution limitations.
 - [MCP setup guide](https://traverse-framework.com/docs/guides/mcp-setup.html): connect Claude or any MCP client to a local traverse-mcp server.
 - [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output.
 
