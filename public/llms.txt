@@ -1,0 +1,39 @@
+# Traverse
+
+> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract (JSON Schema pre/postconditions), compile it to WASM, and run the same binary natively, in the browser, or expose it to an AI agent over MCP with the contract enforced on every call. Apache 2.0, pre-1.0 (v0.8.1) — check /platforms.html before assuming any target or feature is shipped.
+
+Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment.
+
+## Start here
+
+- [Quickstart](https://traverse-framework.com/docs/quickstart.html): install the CLI, write a contract, run it, read the trace — the fastest working path.
+- [Core Concepts](https://traverse-framework.com/docs/concepts.html): the actual vocabulary — Capability, Contract, Registry, Runtime, Placement, Trace, and the spec-governance model.
+- [The System](https://traverse-framework.com/system.html): what the codebase is made of — 9 workspace crates by role, plus how the 73-spec governance layer works.
+- [Examples](https://traverse-framework.com/examples.html): six real, runnable example domains, not illustrative snippets — start with hello-world.
+
+## Building with an agent
+
+- [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (describe_server, list_entrypoints, execute_entrypoint, and 6 more), the discover-inspect-execute-trace flow, and the honest limits (stdio only today, no library API yet).
+- [traverse-framework/claude-skills](https://github.com/traverse-framework/claude-skills): Claude Skills for building apps with Traverse — starting with `traverse-app-builder`, which checks the registry before authoring anything new, composes capabilities into workflows, and validates against the real traverse-cli, including this platform's current execution limitations.
+- [MCP setup guide](https://traverse-framework.com/docs/guides/mcp-setup.html): connect Claude or any MCP client to a local traverse-mcp server.
+- [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output.
+
+## Where it runs
+
+- [Platforms](https://traverse-framework.com/platforms.html): honest, evidence-linked status per target — native and browser are shipped; Swift/iOS is blocked; Kotlin and .NET embedders are in progress; edge is planned; cloud placement is an explicit non-goal for v0.1. Do not assume a target works without checking this page first.
+- [React integration guide](https://traverse-framework.com/docs/guides/react-integration.html): using the Web embedder SDK from a React app.
+- [Architecture](https://traverse-framework.com/docs/architecture.html): how the runtime, registry, and WASM sandbox fit together.
+
+## Project status
+
+- [Roadmap](https://traverse-framework.com/roadmap.html): shipped / next / blocked / exploring, with the real v1.0 milestone gates.
+- [Changelog](https://traverse-framework.com/changelog.html): release-by-release history.
+- [Security & Permanence Audit](https://traverse-framework.com/security-audit.html): every known finding, its GitHub ticket, and its real status — not a marketing page.
+- [FAQ](https://traverse-framework.com/faq.html) and [Questions](https://traverse-framework.com/questions.html): 70+ specific Q&A pages, mostly long-tail but accurate.
+
+## Optional
+
+- [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims.
+- [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html)
+- [About](https://traverse-framework.com/about.html): project history and motivation.
+- [GitHub](https://github.com/traverse-framework/traverse): source, issues, and the 73 approved governing specs.
