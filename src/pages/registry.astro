@@ -1,0 +1,119 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <span class="section-label">Registry</span>
+      <h1 class="t-h1">One queryable source of truth for every capability.</h1>
+      <p class="page-hero-sub"><code>traverse-framework/registry</code> is a git-based, CI-validated, PR-published registry of capability contracts. It's where <code>traverse-registry</code> — the runtime crate — actually resolves capabilities from. Nothing gets in without a review.</p>
+      <div class="page-hero-badges">
+        <span class="badge badge-success badge-dot">Shipped</span>
+        <span class="badge">11 capabilities</span>
+        <span class="badge">38 published versions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">What's actually in it</div>
+      <h2>Small and real, not a placeholder catalog.</h2>
+      <p>Counted directly from <code>contract.json</code> files in the repo — 38 published version files across 11 distinct capabilities, 15 of them already deprecated in favor of a newer version. That churn is a feature: it means the immutability and versioning rules are actually being exercised, not just declared.</p>
+    </div>
+    <div class="registry-stats-grid">
+      <div class="registry-stat-card">
+        <div class="registry-stat-name">validation</div>
+        <div class="registry-stat-count">4 capabilities · 10 versions</div>
+      </div>
+      <div class="registry-stat-card">
+        <div class="registry-stat-name">traverse-starter</div>
+        <div class="registry-stat-count">3 capabilities · 12 versions</div>
+      </div>
+      <div class="registry-stat-card">
+        <div class="registry-stat-name">doc-approval</div>
+        <div class="registry-stat-count">2 capabilities · 9 versions</div>
+      </div>
+      <div class="registry-stat-card">
+        <div class="registry-stat-name">formatting</div>
+        <div class="registry-stat-count">1 capability · 2 versions</div>
+      </div>
+      <div class="registry-stat-card">
+        <div class="registry-stat-name">meeting-notes</div>
+        <div class="registry-stat-count">1 capability · 5 versions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">The catalog</div>
+      <h2>Browse it like a package registry, not a JSON dump.</h2>
+      <p>The live site at <a href="https://registry.traverse-framework.com" target="_blank" rel="noopener">registry.traverse-framework.com</a> is a static site — plain HTML, CSS, and vanilla JS on GitHub Pages, no framework. A Rust/WASM build step (<code>catalog-builder</code>) generates the data behind it from the actual repo contents, not hand-maintained copy.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num active">01</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">List</div>
+        <p class="t-body-sm t-muted">One card per capability — version count, real test-coverage badge, use-case count. A checkbox hides deprecated versions.</p>
+      </div>
+      <div class="step">
+        <div class="step-num active">02</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Search</div>
+        <p class="t-body-sm t-muted">Free-text search across the catalog — no need to know the exact namespace up front.</p>
+      </div>
+      <div class="step">
+        <div class="step-num active">03</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Inspect</div>
+        <p class="t-body-sm t-muted">A hash-routed detail view per version: description, use cases, real <code>cargo llvm-cov</code> coverage percentages, input/output JSON Schemas, and version history.</p>
+      </div>
+      <div class="step">
+        <div class="step-num active">04</div>
+        <div class="t-h3" style="margin-bottom:0.4rem">Verify</div>
+        <p class="t-body-sm t-muted">A collapsible raw <code>contract.json</code> on every detail page — the actual file, not a rendered summary of it.</p>
+      </div>
+    </div>
+    <a href="https://registry.traverse-framework.com" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="margin-top:1.5rem">Browse the catalog →</a>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">How a capability gets published</div>
+      <h2>A PR, not an upload button.</h2>
+      <p>An author runs <code>traverse-cli capability publish</code>, which validates the contract locally and opens a PR automatically. CI then runs deterministic checks — schema validation, semver correctness, digest integrity, namespace-collision detection. A human still has to approve it: automated checks alone can never merge a publish. Once merged, a published version is immutable — fixes go through yanking or deprecating a version, never an in-place edit.</p>
+      <a href="https://github.com/traverse-framework/registry/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Read CONTRIBUTING.md →</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Building something new?</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Check the registry before authoring a new capability — something close enough to reuse or extend might already exist.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://registry.traverse-framework.com" target="_blank" rel="noopener" class="btn btn-primary">Browse the catalog →</a>
+      <a href="/agents.html" class="btn btn-ghost">Building with an AI agent</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"Registry — Traverse Framework"}
+  description={"The public capability registry for Traverse: 11 capabilities, 38 published versions, git-based and PR-reviewed. Browse the live catalog or read how publishing actually works."}
+  canonical={"https://traverse-framework.com/registry.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">
+    .registry-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-top: 1.5rem; }
+    .registry-stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; }
+    .registry-stat-name { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); margin-bottom: 0.3rem; }
+    .registry-stat-count { font-size: 0.82rem; color: var(--fg-muted); }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
