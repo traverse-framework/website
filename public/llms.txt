@@ -1,6 +1,6 @@
 # Traverse
 
-> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract (JSON Schema pre/postconditions), compile it to WASM, and run the same binary natively, in the browser, or expose it to an AI agent over MCP with the contract enforced on every call. Apache 2.0, pre-1.0 (v0.8.1) — check /platforms.html before assuming any target or feature is shipped.
+> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract, compile it to WASM, and run it natively, in the browser, or expose it to an AI agent over MCP. Apache 2.0, pre-1.0 (v0.9.1) — check /platforms.html before assuming any target or feature is shipped.
 
 Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment.
 
