@@ -8,19 +8,19 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 const findings = [
   { sev: 'Critical', domain: 'Security', loc: 'security.rs:46-49 · http_api.rs', finding: 'Runtime defaults to Development; unsigned artifacts allowed; HTTP serve never forces Production.', issue: 588, status: 'Closed' },
   { sev: 'Critical', domain: 'Security', loc: 'security.rs:120-147 · http_api.rs:983+', finding: 'JWT identity derived by base64 payload parse only — no signature/JWKS verification; alg:none accepted in tests.', issue: 580, status: 'Closed' },
-  { sev: 'High', domain: 'Security', loc: 'http_api.rs:1168-1211', finding: 'Reconciled 2026-07-20: the original --allow-unauthenticated+loopback claim is stale — that path (:1214-1219) now returns a hardcoded, non-admin "local" identity, not an attacker-controlled one. The live risk is narrower and specific: in dev auth modes, an arbitrary non-JWT bearer token is accepted directly as subject_id, and is_admin is granted when it equals the literal "system_admin". Same root cause as #782 — scope broadened via comment, see issue for detail.', issue: 782, status: 'Open' },
+  { sev: 'High', domain: 'Security', loc: 'http_api.rs:1168-1211', finding: 'Reconciled 2026-07-20: the original --allow-unauthenticated+loopback claim is stale — that path (:1214-1219) now returns a hardcoded, non-admin "local" identity, not an attacker-controlled one. The live risk is narrower and specific: in dev auth modes, an arbitrary non-JWT bearer token is accepted directly as subject_id, and is_admin is granted when it equals the literal "system_admin". Same root cause as #782 — scope broadened via comment, see issue for detail. Resolved 2026-07-21.', issue: 782, status: 'Closed' },
   { sev: 'High', domain: 'Security', loc: 'security.rs:287-310', finding: 'Sigstore verification is a verified:// stub; CI uses placeholder bundles as if verified.', issue: 589, status: 'Closed' },
   { sev: 'High', domain: 'Security', loc: 'traverse-mcp/stdio_server.rs', finding: 'MCP stdio has no auth — any stdin writer can execute capabilities and read full traces.', issue: 592, status: 'Closed' },
   { sev: 'High', domain: 'Permanence', loc: 'events/broker.rs · types.rs', finding: 'Event replay is in-memory only (default 5m retention); no durable journal, WAL, or cross-restart permanence.', issue: 593, status: 'Closed' },
   { sev: 'Medium', domain: 'Security', loc: 'security.rs:156-185 · wasm.rs', finding: 'Runtime checksum gate missing from verify_artifact; SHA-256 only optional in WasmExecutor.', issue: 590, status: 'Closed' },
   { sev: 'Medium', domain: 'Security', loc: 'events/types.rs:19-39', finding: 'TraverseEvent lacks subject_id/actor_id — identity not propagated to events or subscription filters (spec 030 FR-006/016).', issue: 591, status: 'Closed' },
   { sev: 'Medium', domain: 'Security', loc: 'security.rs:187-204', finding: 'Governed-artifact trust level uses path/URL heuristics, not registry or approved-specs lookup.', issue: 596, status: 'Closed' },
-  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Reconciled 2026-07-20: MemoryDataStore is actually #[cfg(test)]-only, not a shipped adapter. The real gap is that the one production adapter, LocalFileDataStore, has zero call sites anywhere in the workspace — fully defined, fully unwired — plus no integrity hash on records.', issue: 788, status: 'Open' },
-  { sev: 'Medium', domain: 'Permanence', loc: 'trace/store.rs:8-11', finding: 'Reconciled 2026-07-20: confirmed TraceStore is a plain in-memory HashMap — a distinct subsystem from the event broker durability gap already fixed in #593. All trace/audit history is lost on restart.', issue: 789, status: 'Open' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Reconciled 2026-07-20: MemoryDataStore is actually #[cfg(test)]-only, not a shipped adapter. The real gap is that the one production adapter, LocalFileDataStore, has zero call sites anywhere in the workspace — fully defined, fully unwired — plus no integrity hash on records. Resolved 2026-07-27.', issue: 788, status: 'Closed' },
+  { sev: 'Medium', domain: 'Permanence', loc: 'trace/store.rs:8-11', finding: 'Reconciled 2026-07-20: confirmed TraceStore is a plain in-memory HashMap — a distinct subsystem from the event broker durability gap already fixed in #593. All trace/audit history is lost on restart. Resolved 2026-07-21.', issue: 789, status: 'Closed' },
   { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'Resolved 2026-07-20: spec 022 is now formally marked Superseded (2026-07-18, decision-log Decision 25) — never approved, no implementation ever referenced it. Specs 057, 058, and 059 are all Approved and now have real implementations (the traverse-embedder crate, traverse-runtime/src/workflows.rs, and traverse-cli/src/http_api.rs\'s command dispatch). The original "CI-required" claim no longer holds either — MCP is not referenced in any current .github/workflows/*.yml.', issue: null, status: 'Resolved' },
   { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated.', issue: 594, status: 'Closed' },
   { sev: 'Low', domain: 'Security', loc: 'SECURITY.md:11', finding: 'Vulnerability reporting path points to a stale personal SUPPORT.md path (cogolo).', issue: 595, status: 'Closed' },
-  { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo.', issue: 627, status: 'Open' },
+  { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo. Resolved 2026-07-21.', issue: 627, status: 'Closed' },
 ];
 
 // Second audit pass — 2026-07-20, commit 7c59137. Kept as a distinct batch
@@ -28,11 +28,19 @@ const findings = [
 // the July findings above, so the register still shows which pass found what.
 const findingsJul20 = [
   { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/supply_chain.rs:240-296', finding: 'verify_signature never checks a cryptographic signature — Ed25519 path only validates hex-string length/format, Sigstore path is a hardcoded stub. Forged artifacts pass artifact verify with overall_status: Passed. Leaves spec 065 (sigstore-bundle-verification) unimplemented.', issue: 781, status: 'Closed' },
-  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/http_api.rs:1182-1211 · :625-628', finding: 'dev-any auth mode grants admin via an unsigned token: a non-JWT bearer equal to the public literal "system_admin" yields is_admin: true, and dev-any trusts any RFC1918-private peer, not just loopback.', issue: 782, status: 'Open' },
-  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/browser_adapter.rs:326-335', finding: 'Browser adapter allocates a buffer from unbounded Content-Length before reading the body — no size cap, unlike the sibling HTTP API’s 4 MiB MAX_REQUEST_BODY.', issue: 783, status: 'Open' },
-  { sev: 'Medium', domain: 'Runtime', loc: 'packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs:143-167', finding: '.NET Wasmtime bridge sets fuel/epoch limits once at construction, not per call — real invocations bypass the per-call resource budget, so one expensive call can permanently brick the session. Rust core and the Kotlin/Chicory bridge are correctly implemented; .NET is the outlier.', issue: 784, status: 'Open' },
-  { sev: 'Medium', domain: 'Functional gap', loc: 'traverse-cli/src/main.rs:3289-3296 · :4054-4074', finding: 'agent execute runs verified WASM packages through a hardcoded example executor (AgentPackageExampleExecutor) — full manifest/digest/ABI validation succeeds, then execution fails "unsupported AI agent capability" for anything outside 7 hardcoded demo IDs, e.g. doc-approval.analyze.', issue: 785, status: 'Open' },
-  { sev: 'Low', domain: 'Performance', loc: 'traverse-registry/src/semver_resolver.rs:92-99', finding: 'resolve_version_range does a full registry scan and sort instead of a targeted lookup — DiscoveryQuery::default() has no id filter, so every capability-execution dependency check scans the whole scope before filtering by id, recursively up to MAX_TRANSITIVE_DEPTH.', issue: 786, status: 'Open' },
+  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/http_api.rs:1182-1211 · :625-628', finding: 'dev-any auth mode grants admin via an unsigned token: a non-JWT bearer equal to the public literal "system_admin" yields is_admin: true, and dev-any trusts any RFC1918-private peer, not just loopback. Resolved 2026-07-21.', issue: 782, status: 'Closed' },
+  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/browser_adapter.rs:326-335', finding: 'Browser adapter allocates a buffer from unbounded Content-Length before reading the body — no size cap, unlike the sibling HTTP API’s 4 MiB MAX_REQUEST_BODY. Resolved 2026-07-21.', issue: 783, status: 'Closed' },
+  { sev: 'Medium', domain: 'Runtime', loc: 'packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs:143-167', finding: '.NET Wasmtime bridge sets fuel/epoch limits once at construction, not per call — real invocations bypass the per-call resource budget, so one expensive call can permanently brick the session. Rust core and the Kotlin/Chicory bridge are correctly implemented; .NET is the outlier. Resolved 2026-07-21.', issue: 784, status: 'Closed' },
+  { sev: 'Medium', domain: 'Functional gap', loc: 'traverse-cli/src/main.rs:3289-3296 · :4054-4074', finding: 'agent execute runs verified WASM packages through a hardcoded example executor (AgentPackageExampleExecutor) — full manifest/digest/ABI validation succeeds, then execution fails "unsupported AI agent capability" for anything outside 7 hardcoded demo IDs, e.g. doc-approval.analyze. Resolved 2026-07-21.', issue: 785, status: 'Closed' },
+  { sev: 'Low', domain: 'Performance', loc: 'traverse-registry/src/semver_resolver.rs:92-99', finding: 'resolve_version_range does a full registry scan and sort instead of a targeted lookup — DiscoveryQuery::default() has no id filter, so every capability-execution dependency check scans the whole scope before filtering by id, recursively up to MAX_TRANSITIVE_DEPTH. Resolved 2026-07-21.', issue: 786, status: 'Closed' },
+];
+
+// Third audit pass — 2026-08-17, commit 1104473. #1065 is recorded Closed
+// because it was fixed and closed same-day (2026-08-17) — this page reflects
+// the linked issue's live tracker state, not a snapshot from audit time.
+const findingsAug17 = [
+  { sev: 'Medium', domain: 'Portability', loc: 'traverse-runtime/src/lib.rs:10 · inference.rs:590', finding: 'Governed local-inference module (pub mod inference) is compiled unconditionally into traverse-runtime with no wasm32/target gating, despite doing synchronous TcpStream::connect_timeout I/O. The crate\'s own CI checks cargo check -p traverse-runtime --target wasm32-unknown-unknown --no-default-features, which passes (the module type-checks), but any wasm32 embedder that actually calls Runtime::execute_governed_model_dependency gets a raw io::Error(Unsupported) at runtime instead of a typed error, since wasm32-unknown-unknown has no functioning socket backend. Fixed and closed same-day (2026-08-17).', issue: 1065, status: 'Closed' },
+  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/grpc_event_transport.rs:51-183 · http_api.rs:554-607', finding: 'The TLS gRPC EventService (traverse-cli serve --grpc-bind, spec 097-websocket-grpc-event-transport) has no ConcurrencyLimitLayer and no idle/max-duration timeout on stream_events, unlike the HTTP/JSON API beside it, which explicitly bounds concurrency (fixed worker pool, per-connection timeouts, whole-request deadline) to mitigate CWE-400. Any authenticated caller can open unbounded long-lived streams, each holding a tokio::spawned task indefinitely, exhausting server resources with no server-side ceiling.', issue: 1066, status: 'Open' },
 ];
 
 const permanenceMatrix = [
@@ -74,7 +82,7 @@ const statusClass = (s) => ({ Closed: 'status-closed', Merged: 'status-closed', 
 // Computed from the finding data itself, not hand-typed, so the executive
 // summary can never drift from what the findings register actually says.
 // "Closed" here means Closed/Merged/Resolved — any status that isn't Open.
-const allFindings = [...findings, ...findingsJul20];
+const allFindings = [...findings, ...findingsJul20, ...findingsAug17];
 const sevBreakdown = (sev) => {
   const items = allFindings.filter((f) => f.sev === sev);
   const closed = items.filter((f) => f.status !== 'Open' && f.status !== 'Not filed').length;
@@ -87,7 +95,7 @@ const jsonLd = JSON.stringify({
   headline: 'Traverse Permanence & Security Audit',
   description: 'Full-framework analysis of durability/determinism guarantees and security risk vs opportunity in Traverse.',
   datePublished: '2026-07-01',
-  dateModified: '2026-07-20',
+  dateModified: '2026-08-17',
   author: { '@type': 'Organization', name: 'Traverse Framework' },
 });
 ---
@@ -198,7 +206,7 @@ const jsonLd = JSON.stringify({
         <span class="section-label">Security &amp; Permanence</span>
         <h1 style="margin-top:1rem">Traverse Permanence &amp; Security Audit</h1>
         <p class="audit-hero-lead">Full-framework analysis of durability/determinism guarantees and security risk vs. opportunity.</p>
-        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · Initial audit July 2026 · Updated 2026-07-20, commit <a href="https://github.com/traverse-framework/traverse/commit/7c59137" target="_blank" rel="noopener">7c59137</a></p>
+        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · Initial audit July 2026 · Updated 2026-08-17, commit <a href="https://github.com/traverse-framework/traverse/commit/1104473" target="_blank" rel="noopener">1104473</a></p>
       </div>
     </section>
 
@@ -261,6 +269,17 @@ const jsonLd = JSON.stringify({
                     <td><span class={`status-pill ${statusClass(f.status)}`}>{f.status}</span></td>
                   </tr>
                 ))}
+                <tr class="audit-table-divider"><td colspan="6">New findings — audited 2026-08-17, commit 1104473</td></tr>
+                {findingsAug17.map((f) => (
+                  <tr>
+                    <td><span class={`sev-pill ${sevClass(f.sev)}`}>{f.sev}</span></td>
+                    <td>{f.domain}</td>
+                    <td class="evidence-line">{f.loc}</td>
+                    <td>{f.finding}</td>
+                    <td><a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a></td>
+                    <td><span class={`status-pill ${statusClass(f.status)}`}>{f.status}</span></td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -298,6 +317,7 @@ const jsonLd = JSON.stringify({
                 <li>HTTP workspace auth, scopes, audit JSONL (partial)</li>
                 <li>Supply-chain CI: lockfile, SBOM, reproducible build checks</li>
                 <li>No production unsafe; hot paths largely avoid unwrap/panic</li>
+                <li>App-event/gRPC eventing subsystem reviewed 2026-08-17 and found soundly designed — no spoofable event source/owner fields, no cross-workspace leakage, no unwrap/panic in production event code; the WebSocket transport doesn't pin a worker thread indefinitely since it polls once and closes (gRPC's stream_events does — see findings register)</li>
               </ul>
             </div>
             <div class="strengths-col">
@@ -388,6 +408,7 @@ const jsonLd = JSON.stringify({
           <h2>Key evidence</h2>
           <p class="evidence-line">crates/traverse-runtime/src/security.rs · crates/traverse-cli/src/http_api.rs · crates/traverse-mcp/src/stdio_server.rs · crates/traverse-runtime/src/events/broker.rs · specs/030, 031, 036 · SECURITY.md</p>
           <p class="evidence-line" style="margin-top:0.5rem">2026-07-20 update: crates/traverse-cli/src/supply_chain.rs · crates/traverse-cli/src/browser_adapter.rs · crates/traverse-cli/src/main.rs · crates/traverse-registry/src/semver_resolver.rs · packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs · spec 065</p>
+          <p class="evidence-line" style="margin-top:0.5rem">2026-08-17 update: crates/traverse-runtime/src/lib.rs · crates/traverse-runtime/src/inference.rs · crates/traverse-cli/src/grpc_event_transport.rs · crates/traverse-cli/src/http_api.rs · spec 045-governed-model-dependency-resolution · spec 097-websocket-grpc-event-transport</p>
         </div>
       </div>
     </section>
