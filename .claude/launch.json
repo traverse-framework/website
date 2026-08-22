@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "traverse-website",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-l", "8090", "dist"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "8090"],
       "port": 8090,
       "cwd": "."
     }
