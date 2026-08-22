@@ -5,10 +5,11 @@ const _body = `<section class="page-hero">
   <div class="container">
     <div class="page-hero-inner">
       <span class="section-label">Live demo</span>
-      <h1 class="t-h1">Watch an AI agent build a workflow out of real capabilities.</h1>
-      <p class="page-hero-sub">This isn't a mockup. Your browser fetches the live Traverse capability registry, picks a group of related capabilities, and chains them into a real, working pipeline -- the same kind of workflow you could compose today with <code>traverse-cli</code>. Nothing on this page is precomputed or faked.</p>
+      <h1 class="t-h1">Watch a workflow get composed, live, from what's actually published.</h1>
+      <p class="page-hero-sub">The data is real: your browser fetches the live Traverse capability registry and a client-side heuristic -- not a hosted AI model -- groups related capabilities and orders them into a plausible pipeline, the shape of what an AI agent could compose over MCP. Nothing is precomputed; only the WASM execution afterward is simulated, not actually run. Full breakdown of what's real and what's not in <a href="#discover-how-its-built">how this is actually built</a>, below.</p>
       <div class="page-hero-badges">
         <span class="badge badge-accent badge-dot">Live registry data</span>
+        <span class="badge">Heuristic, not an AI model</span>
         <span id="discover-stats" class="badge">querying registry.traverse-framework.com…</span>
       </div>
     </div>
@@ -43,7 +44,7 @@ const _body = `<section class="page-hero">
         <div class="terminal-body discover-log" id="discover-log"></div>
       </div>
       <div class="discover-run-panel">
-        <p class="t-body-sm t-muted"><strong>How to read it:</strong> your <strong>Goal</strong> is the request that starts everything. The <strong>Traverse system</strong> -- the AI agent, its MCP connection, and the runtime -- discovers and validates a matching workflow along the dashed line. The runtime then chains together the right <strong>capabilities</strong> to do the actual work, producing a <strong>Result</strong> along the solid line. Watch each step light up as it runs, and click any capability to open its real, published contract in the registry.</p>
+        <p class="t-body-sm t-muted"><strong>How to read it:</strong> your <strong>Goal</strong> is the request that starts everything. The <strong>Traverse system</strong> -- the AI agent, its MCP connection, and the runtime -- is the architecture a real agent would talk to, discovering and validating a matching workflow along the dashed line. The runtime then chains together the right <strong>capabilities</strong> to do the actual work, producing a <strong>Result</strong> along the solid line. Click any capability to open its real, published contract in the registry. The step-by-step animation shows execution order; it doesn't run the WASM.</p>
         <button id="discover-run" class="btn btn-primary" type="button">Discover another workflow →</button>
       </div>
     </div>
@@ -52,7 +53,7 @@ const _body = `<section class="page-hero">
   </div>
 </section>
 
-<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<section class="section-sm" id="discover-how-its-built" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-header">
       <div class="section-label">How this is actually built</div>
@@ -64,8 +65,8 @@ const _body = `<section class="page-hero">
 </section>`;
 ---
 <SubpageLayout
-  title={"AI Agent Workflow Demo — Traverse Framework"}
-  description={"See a real AI agent discover live capabilities from the Traverse registry and compose them into a working workflow -- right in your browser, no fixtures."}
+  title={"Live Workflow Composition Demo — Traverse Framework"}
+  description={"Watch a client-side heuristic -- not a hosted AI model -- compose a real workflow from the live Traverse capability registry, right in your browser. No fixtures, no precomputed data."}
   canonical={"https://traverse-framework.com/discover.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
