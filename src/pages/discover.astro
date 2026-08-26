@@ -4,12 +4,13 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 const _body = `<section class="page-hero">
   <div class="container">
     <div class="page-hero-inner">
-      <span class="section-label">Live demo</span>
-      <h1 class="t-h1">Watch a workflow get composed, live, from what's actually published.</h1>
-      <p class="page-hero-sub">The data is real: your browser fetches the live Traverse capability registry and a client-side heuristic -- not a hosted AI model -- groups related capabilities and orders them into a plausible pipeline, the shape of what an AI agent could compose over MCP. Nothing is precomputed; only the WASM execution afterward is simulated, not actually run. Full breakdown of what's real and what's not in <a href="#discover-how-its-built">how this is actually built</a>, below.</p>
+      <span class="section-label">Truthful demo mode</span>
+      <h1 class="t-h1">Live catalog data. Heuristic composition. Simulated execution.</h1>
+      <p class="page-hero-sub">Your browser fetches the live Traverse capability catalog. A client-side name-and-namespace heuristic derives a plausible pipeline, then the page simulates its state changes. This page does not invoke published WASM, call an MCP endpoint, run the Traverse runtime, or use an LLM. See <a href="#discover-how-its-built">what is live, derived, and simulated</a>.</p>
       <div class="page-hero-badges">
         <span class="badge badge-accent badge-dot">Live registry data</span>
-        <span class="badge">Heuristic, not an AI model</span>
+        <span class="badge">Derived by a client-side heuristic</span>
+        <span class="badge">Execution states are simulated</span>
         <span id="discover-stats" class="badge">querying registry.traverse-framework.com…</span>
       </div>
     </div>
@@ -22,10 +23,10 @@ const _body = `<section class="page-hero">
       <div id="discover-graph" class="discover-graph-el"></div>
       <div class="discover-legend" aria-label="Graph legend">
         <span class="discover-legend-row">
-          <span class="discover-legend-title">State</span>
+          <span class="discover-legend-title">Simulation</span>
           <span class="discover-legend-item"><span class="discover-legend-swatch is-idle"></span>Not used yet</span>
-          <span class="discover-legend-item"><span class="discover-legend-swatch is-running"></span>Running now</span>
-          <span class="discover-legend-item"><span class="discover-legend-swatch is-complete"></span>Completed</span>
+          <span class="discover-legend-item"><span class="discover-legend-swatch is-running"></span>Simulated active</span>
+          <span class="discover-legend-item"><span class="discover-legend-swatch is-complete"></span>Simulated complete</span>
         </span>
         <span class="discover-legend-row">
           <span class="discover-legend-title">Line</span>
@@ -39,12 +40,12 @@ const _body = `<section class="page-hero">
       <div class="terminal discover-terminal">
         <div class="terminal-header">
           <div class="code-dots"><span></span><span></span><span></span></div>
-          <span class="terminal-title" id="discover-phase-title">agent · discovering workflow</span>
+          <span class="terminal-title" id="discover-phase-title">live catalog · deriving a heuristic pipeline</span>
         </div>
         <div class="terminal-body discover-log" id="discover-log"></div>
       </div>
       <div class="discover-run-panel">
-        <p class="t-body-sm t-muted"><strong>How to read it:</strong> your <strong>Goal</strong> is the request that starts everything. The <strong>Traverse system</strong> -- the AI agent, its MCP connection, and the runtime -- is the architecture a real agent would talk to, discovering and validating a matching workflow along the dashed line. The runtime then chains together the right <strong>capabilities</strong> to do the actual work, producing a <strong>Result</strong> along the solid line. Click any capability to open its real, published contract in the registry. The step-by-step animation shows execution order; it doesn't run the WASM.</p>
+        <p class="t-body-sm t-muted"><strong>How to read it:</strong> the <strong>Goal</strong> is illustrative. The dashed line shows the page deriving an ordered pipeline from live catalog metadata; it is not agent discovery or an MCP exchange. The solid line shows the derived capability sequence and a <strong>simulated result</strong>. Click a capability to open its real published contract. The animation is only a visualization: it does not invoke WASM or execute a workflow.</p>
         <button id="discover-run" class="btn btn-primary" type="button">Discover another workflow →</button>
       </div>
     </div>
@@ -57,8 +58,8 @@ const _body = `<section class="page-hero">
   <div class="container">
     <div class="section-header">
       <div class="section-label">How this is actually built</div>
-      <h2>No server, no LLM call, no fixtures -- just the real catalog.</h2>
-      <p>This page is static (Astro, no backend). On load, it fetches the same public <code>catalog.json</code> that powers the registry's catalog site, groups the current version of each capability by namespace, and orders any namespace with two or more active capabilities into a pipeline (ingest → interpret → decide → act) using a simple verb heuristic on each capability's name. That's the entire "agent" -- a composition heuristic running on live data, not a hosted model deciding anything. Once a workflow is composed, the graph steps each node through <strong>idle → running → completed</strong> to show execution order -- that sequencing is simulated in the browser, not a real invocation of the WASM binaries. Running a composed workflow for real is what <code>traverse-cli serve</code> is for. Click "Discover another workflow" to re-query the registry and see a different set of capabilities get composed.</p>
+      <h2>Three distinct modes, with one live source of truth.</h2>
+      <p><strong>Live:</strong> this static Astro page fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a> and links every card to its published registry contract. <strong>Derived:</strong> it groups current capability versions by namespace and orders a namespace with two or more active capabilities using a simple name-based verb heuristic (ingest → interpret → decide → act). <strong>Simulated:</strong> the graph animates <strong>idle → simulated active → simulated complete</strong>; it does not invoke a WASM artifact, MCP loop, runtime, or model. Use the actual governed runtime and its documented execution entry points when execution evidence is required.</p>
       <a href="/registry.html" class="btn btn-ghost btn-sm" style="margin-top:1rem">Browse the full registry →</a>
     </div>
   </div>
