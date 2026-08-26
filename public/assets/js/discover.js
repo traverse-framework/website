@@ -5,9 +5,7 @@
    uses AntV G6 (window.G6, loaded via CDN script in discover.astro).
 
    Layout is four fixed rows, top to bottom:
-     Goal  ->  [ AI Agent / MCP / Runtime, one combo ]  ->  capability chain  ->  Result
-   The system row is one logical layer (the Traverse system), so it's grouped
-   in a single combo rather than drawn as three independent pipeline stops.
+     Goal  ->  heuristic composition  ->  capability chain  ->  simulated result.
 
    After the workflow is composed, a second pass simulates execution order:
    each node steps through idle -> running -> complete, the same three-state
@@ -36,11 +34,9 @@
   ];
 
   const GOAL_NODE = { id: '__goal', label: 'Goal', shape: 'diamond', size: 26 };
-  const SYSTEM_COMBO = 'system-layer';
   const SYSTEM_NODES = [
-    { id: '__agent', label: 'AI Agent', shape: 'triangle', size: 28 },
-    { id: '__mcp', label: 'MCP', shape: 'diamond', size: 30 },
-    { id: '__runtime', label: 'Runtime', shape: 'hexagon', size: 32 },
+    { id: '__catalog', label: 'Live catalog', shape: 'diamond', size: 30 },
+    { id: '__heuristic', label: 'Name heuristic', shape: 'hexagon', size: 32 },
   ];
   const RESULT_NODE = { id: '__result', label: 'Result', shape: 'diamond', size: 26 };
 
@@ -215,21 +211,19 @@
     nodeMeta.set(GOAL_NODE.id, { kind: 'role', shape: GOAL_NODE.shape, size: GOAL_NODE.size, label: GOAL_NODE.label });
     const goalNode = { id: GOAL_NODE.id, type: GOAL_NODE.shape, data: {} };
 
-    /* System layer: AI Agent, MCP, Runtime -- one logical layer, grouped in
-       a single combo instead of three chained stops. */
+    /* The intermediate layer describes only what this page does: read live
+       catalog metadata and derive an order with a client-side heuristic. */
     const systemNodes = SYSTEM_NODES.map((n) => {
       nodeMeta.set(n.id, { kind: 'role', shape: n.shape, size: n.size, label: n.label });
-      return { id: n.id, type: n.shape, combo: SYSTEM_COMBO, data: {} };
+      return { id: n.id, type: n.shape, data: {} };
     });
-    const systemCombo = { id: SYSTEM_COMBO, type: 'rect', style: comboStyleFor() };
 
     const goalEdgeId = 'goal-edge';
-    const goalEdge = { id: goalEdgeId, source: GOAL_NODE.id, target: '__agent' };
-    edgeIntoNode.set('__agent', goalEdgeId);
+    const goalEdge = { id: goalEdgeId, source: GOAL_NODE.id, target: '__catalog' };
+    edgeIntoNode.set('__catalog', goalEdgeId);
     edgeDashed.set(goalEdgeId, true);
 
-    /* Agent -> mcp -> runtime, inside the same combo. Dashed, same as the
-       goal edge -- still discovery/control flow, not the data pipeline. */
+    /* Catalog -> heuristic is derived metadata flow, not an execution path. */
     const systemEdges = [];
     for (let i = 0; i < SYSTEM_NODES.length - 1; i++) {
       const id = 'system-edge-' + i;
@@ -238,8 +232,7 @@
       edgeDashed.set(id, true);
     }
 
-    /* Workflow: Traverse runtime -> capability chain -> Result.
-       Solid -- this is the actual composed data pipeline. */
+    /* The solid path is a derived pipeline visualization, not execution. */
     const capSteps = chain.map((entry, i) => {
       const c = entry.contract;
       const nodeId = 'cap-' + c.id;
@@ -248,7 +241,7 @@
       nodeMeta.set(nodeId, { kind: 'capability', shape: 'circle', size: 20, label: humanizeName(c.name) });
       positions.set(nodeId, positions.get('__cap-slot-' + i));
       const node = { id: nodeId, type: 'circle', data: {} };
-      const prevId = i === 0 ? '__runtime' : 'cap-' + chain[i - 1].contract.id;
+      const prevId = i === 0 ? '__heuristic' : 'cap-' + chain[i - 1].contract.id;
       const edgeId = 'cap-edge-' + i;
       const edge = { id: edgeId, source: prevId, target: nodeId };
       edgeIntoNode.set(nodeId, edgeId);
@@ -258,7 +251,7 @@
 
     nodeMeta.set(RESULT_NODE.id, { kind: 'role', shape: RESULT_NODE.shape, size: RESULT_NODE.size, label: RESULT_NODE.label });
     const resultNode = { id: RESULT_NODE.id, type: RESULT_NODE.shape, data: {} };
-    const lastCapId = capSteps.length ? capSteps[capSteps.length - 1].node.id : '__runtime';
+    const lastCapId = capSteps.length ? capSteps[capSteps.length - 1].node.id : '__heuristic';
     const resultEdgeId = 'result-edge';
     const resultEdge = { id: resultEdgeId, source: lastCapId, target: RESULT_NODE.id };
     edgeIntoNode.set(RESULT_NODE.id, resultEdgeId);
@@ -267,7 +260,7 @@
     orderedNodeIds = [GOAL_NODE.id, ...SYSTEM_NODES.map((n) => n.id), ...capSteps.map((s) => s.node.id), RESULT_NODE.id];
     nodeState = new Map(orderedNodeIds.map((id) => [id, 'idle']));
 
-    return { goalNode, goalEdge, systemNodes, systemCombo, systemEdges, capSteps, resultNode, resultEdge };
+    return { goalNode, goalEdge, systemNodes, systemEdges, capSteps, resultNode, resultEdge };
   }
 
   function nodeStyleFor(id) {
@@ -346,9 +339,6 @@
     graph.updateEdgeData(
       orderedNodeIds.filter((id) => edgeIntoNode.has(id)).map((id) => edgeStyleFor(edgeIntoNode.get(id), id))
     );
-    if (graph.getComboData().some((c) => c.id === SYSTEM_COMBO)) {
-      graph.updateComboData([{ id: SYSTEM_COMBO, style: comboStyleFor() }]);
-    }
     await graph.draw();
   }
 
@@ -370,7 +360,7 @@
      after that pays a large fixed cost). graph.clear() resets content on
      the same instance without that cost. */
   async function renderGraph(chain) {
-    const { goalNode, goalEdge, systemNodes, systemCombo, systemEdges, capSteps, resultNode, resultEdge } = buildGraphPieces(chain);
+    const { goalNode, goalEdge, systemNodes, systemEdges, capSteps, resultNode, resultEdge } = buildGraphPieces(chain);
 
     if (!graph) {
       graph = new G6.Graph({
@@ -395,7 +385,7 @@
       await graph.clear();
     }
 
-    /* Fixed part -- Goal and the Traverse system layer are the same on every
+    /* Fixed part -- Goal and the page's metadata layer are the same on every
        run, so they render immediately instead of trickling in. Only the
        capability chain (what actually changed) reveals one at a time. */
     graph.addData({
@@ -404,7 +394,7 @@
         ...systemNodes.map((n) => ({ ...n, style: nodeStyleFor(n.id) })),
       ],
       edges: [goalEdge, ...systemEdges].map((e) => ({ ...e, style: edgeStyleFor(e.id, e.target).style })),
-      combos: [systemCombo],
+      combos: [],
     });
     await graph.draw();
     await graph.fitView({ padding: 24 });
@@ -430,11 +420,11 @@
 
   async function simulateExecution() {
     await sleep(200);
-    if (phaseTitleEl) phaseTitleEl.textContent = 'agent · simulating execution';
+    if (phaseTitleEl) phaseTitleEl.textContent = 'simulation · visualizing derived pipeline states';
     logLine('→ simulating execution order -- nothing here invokes the real WASM binaries', 'muted');
     await sleep(200);
 
-    /* Fixed part completes instantly -- Goal and the Traverse system layer
+    /* Fixed metadata steps complete instantly -- Goal and the page's derived layer
        are always reached the same way, nothing interesting to watch there.
        Only the capability chain + Result step one at a time. */
     const fixedIds = [GOAL_NODE.id, ...SYSTEM_NODES.map((n) => n.id)];
@@ -451,7 +441,7 @@
       await paintNode(id);
       await sleep(120);
     }
-    if (phaseTitleEl) phaseTitleEl.textContent = 'agent · run complete';
+    if (phaseTitleEl) phaseTitleEl.textContent = 'simulation · visualization complete';
     logLine('✓ simulated run complete -- every node is now in a state a real execution would leave it in', 'ok');
   }
 
@@ -490,7 +480,7 @@
     runBtn.disabled = true;
     logEl.innerHTML = '';
     cardsEl.innerHTML = '';
-    if (phaseTitleEl) phaseTitleEl.textContent = 'agent · discovering workflow';
+    if (phaseTitleEl) phaseTitleEl.textContent = 'live catalog · deriving a heuristic pipeline';
 
     try {
       logLine('$ fetch registry.traverse-framework.com/catalog.json', 'cmd');
@@ -520,7 +510,7 @@
       await sleep(150);
       logLine('→ ordering by pipeline stage: ingest → interpret → decide → act', 'muted');
       await sleep(150);
-      logLine('→ Goal reaches the Traverse system (agent + mcp + runtime, one layer)', 'muted');
+      logLine('→ live catalog metadata is grouped and ordered by a client-side heuristic', 'muted');
       await sleep(150);
       logLine('✓ workflow composed: ' + picked.chain.map((c) => humanizeName(c.contract.name)).join(' → ') + ' → Result', 'accent');
 
