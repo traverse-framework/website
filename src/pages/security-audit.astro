@@ -40,7 +40,13 @@ const findingsJul20 = [
 // the linked issue's live tracker state, not a snapshot from audit time.
 const findingsAug17 = [
   { sev: 'Medium', domain: 'Portability', loc: 'traverse-runtime/src/lib.rs:10 · inference.rs:590', finding: 'Governed local-inference module (pub mod inference) is compiled unconditionally into traverse-runtime with no wasm32/target gating, despite doing synchronous TcpStream::connect_timeout I/O. The crate\'s own CI checks cargo check -p traverse-runtime --target wasm32-unknown-unknown --no-default-features, which passes (the module type-checks), but any wasm32 embedder that actually calls Runtime::execute_governed_model_dependency gets a raw io::Error(Unsupported) at runtime instead of a typed error, since wasm32-unknown-unknown has no functioning socket backend. Fixed and closed same-day (2026-08-17).', issue: 1065, status: 'Closed' },
-  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/grpc_event_transport.rs:51-183 · http_api.rs:554-607', finding: 'The TLS gRPC EventService (traverse-cli serve --grpc-bind, spec 097-websocket-grpc-event-transport) has no ConcurrencyLimitLayer and no idle/max-duration timeout on stream_events, unlike the HTTP/JSON API beside it, which explicitly bounds concurrency (fixed worker pool, per-connection timeouts, whole-request deadline) to mitigate CWE-400. Any authenticated caller can open unbounded long-lived streams, each holding a tokio::spawned task indefinitely, exhausting server resources with no server-side ceiling.', issue: 1066, status: 'Open' },
+  { sev: 'Medium', domain: 'Security', loc: 'traverse-cli/src/grpc_event_transport.rs:51-183 · http_api.rs:554-607', finding: 'The TLS gRPC EventService (traverse-cli serve --grpc-bind, spec 097-websocket-grpc-event-transport) has no ConcurrencyLimitLayer and no idle/max-duration timeout on stream_events, unlike the HTTP/JSON API beside it, which explicitly bounds concurrency (fixed worker pool, per-connection timeouts, whole-request deadline) to mitigate CWE-400. Any authenticated caller can open unbounded long-lived streams, each holding a tokio::spawned task indefinitely, exhausting server resources with no server-side ceiling. Re-verified 2026-09-04: Semaphore-bounded concurrency + timeout-enforced max stream duration confirmed in current source.', issue: 1066, status: 'Closed' },
+];
+
+// Fourth audit pass — 2026-09-04, commit 8ff01574.
+const findingsSep04 = [
+  { sev: 'High', domain: 'Security', loc: 'traverse-cli/src/http_api.rs:1317, :1341-1352, :1814-1819', finding: 'scopes_optional_for_request bypasses all scope checks whenever identity.subject_id == \'local\' — the literal sentinel used for the unauthenticated-loopback fallback identity. validate_subject_id never reserves \'local\' from the untrusted JWT sub claim, so a remote, signature-verified bearer token with sub:\'local\' also triggers the bypass regardless of the loopback flag, skipping scope checks on any workspace it owns (workspace metadata self-creates with owner_subject = caller\'s subject_id). CWE-863.', issue: 1224, status: 'Open' },
+  { sev: 'Low', domain: 'Performance', loc: 'traverse-runtime/src/executor/wasm.rs:387-397, :626-631', finding: 'WasmExecutor::execute unconditionally re-reads the full WASM binary from disk (fs::read) and re-computes SHA-256 over it up to twice per invocation — once for checksum validation, once again inside compiled_module() as the cache key — even on a compiled-module cache hit. The module cache itself avoids recompilation correctly; the disk I/O + hashing cost upstream of it does not benefit from the cache and scales with binary size on every call.', issue: 1225, status: 'Open' },
 ];
 
 const permanenceMatrix = [
@@ -82,7 +88,7 @@ const statusClass = (s) => ({ Closed: 'status-closed', Merged: 'status-closed', 
 // Computed from the finding data itself, not hand-typed, so the executive
 // summary can never drift from what the findings register actually says.
 // "Closed" here means Closed/Merged/Resolved — any status that isn't Open.
-const allFindings = [...findings, ...findingsJul20, ...findingsAug17];
+const allFindings = [...findings, ...findingsJul20, ...findingsAug17, ...findingsSep04];
 const sevBreakdown = (sev) => {
   const items = allFindings.filter((f) => f.sev === sev);
   const closed = items.filter((f) => f.status !== 'Open' && f.status !== 'Not filed').length;
@@ -95,7 +101,7 @@ const jsonLd = JSON.stringify({
   headline: 'Traverse Permanence & Security Audit',
   description: 'Full-framework analysis of durability/determinism guarantees and security risk vs opportunity in Traverse.',
   datePublished: '2026-07-01',
-  dateModified: '2026-08-17',
+  dateModified: '2026-09-04',
   author: { '@type': 'Organization', name: 'Traverse Framework' },
 });
 ---
@@ -205,7 +211,7 @@ const jsonLd = JSON.stringify({
         <span class="section-label">Security &amp; Permanence</span>
         <h1 style="margin-top:1rem">Traverse Permanence &amp; Security Audit</h1>
         <p class="audit-hero-lead">Full-framework analysis of durability/determinism guarantees and security risk vs. opportunity.</p>
-        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · Initial audit July 2026 · Updated 2026-08-17, commit <a href="https://github.com/traverse-framework/traverse/commit/1104473" target="_blank" rel="noopener">1104473</a></p>
+        <p class="audit-source">Source: specs, crates, CI gates, SECURITY.md · Initial audit July 2026 · Updated 2026-09-04, commit <a href="https://github.com/traverse-framework/traverse/commit/8ff01574" target="_blank" rel="noopener">8ff01574</a></p>
       </div>
     </section>
 
@@ -267,6 +273,17 @@ const jsonLd = JSON.stringify({
                 ))}
                 <tr class="audit-table-divider"><td colspan="6">New findings — audited 2026-08-17, commit 1104473</td></tr>
                 {findingsAug17.map((f) => (
+                  <tr>
+                    <td><span class={`sev-pill ${sevClass(f.sev)}`}>{f.sev}</span></td>
+                    <td>{f.domain}</td>
+                    <td class="evidence-line">{f.loc}</td>
+                    <td>{f.finding}</td>
+                    <td><a href={`https://github.com/traverse-framework/traverse/issues/${f.issue}`} target="_blank" rel="noopener">#{f.issue} →</a></td>
+                    <td><span class={`status-pill ${statusClass(f.status)}`}>{f.status}</span></td>
+                  </tr>
+                ))}
+                <tr class="audit-table-divider"><td colspan="6">New findings — audited 2026-09-04, commit 8ff01574</td></tr>
+                {findingsSep04.map((f) => (
                   <tr>
                     <td><span class={`sev-pill ${sevClass(f.sev)}`}>{f.sev}</span></td>
                     <td>{f.domain}</td>
@@ -405,6 +422,7 @@ const jsonLd = JSON.stringify({
           <p class="evidence-line">crates/traverse-runtime/src/security.rs · crates/traverse-cli/src/http_api.rs · crates/traverse-mcp/src/stdio_server.rs · crates/traverse-runtime/src/events/broker.rs · specs/030, 031, 036 · SECURITY.md</p>
           <p class="evidence-line" style="margin-top:0.5rem">2026-07-20 update: crates/traverse-cli/src/supply_chain.rs · crates/traverse-cli/src/browser_adapter.rs · crates/traverse-cli/src/main.rs · crates/traverse-registry/src/semver_resolver.rs · packages/dotnet/TraverseEmbedder/WasmtimeRuntimeBridge.cs · spec 065</p>
           <p class="evidence-line" style="margin-top:0.5rem">2026-08-17 update: crates/traverse-runtime/src/lib.rs · crates/traverse-runtime/src/inference.rs · crates/traverse-cli/src/grpc_event_transport.rs · crates/traverse-cli/src/http_api.rs · spec 045-governed-model-dependency-resolution · spec 097-websocket-grpc-event-transport</p>
+          <p class="evidence-line" style="margin-top:0.5rem">2026-09-04 update: crates/traverse-cli/src/http_api.rs · crates/traverse-runtime/src/executor/wasm.rs · spec 033-http-json-api</p>
         </div>
       </div>
     </section>
