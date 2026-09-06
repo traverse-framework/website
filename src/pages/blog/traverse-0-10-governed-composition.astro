@@ -1,0 +1,229 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 5, 2026</span>
+      <span class="badge">Release</span>
+      <span class="badge">AI</span>
+      <span class="badge">SDD</span>
+    </div>
+    <h1 class="t-h1">Traverse v0.10: governed composition, and what it means for AI-built software</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>10 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse v0.10.0 is out. It is a minor release — 82 commits since v0.9.1 — and it has one throughline: <strong>governed composition</strong>. The runtime can now plan, schedule, run, and promote a multi-capability workflow through the MCP surface, and it can persist a durable, tamper-evident record of what actually ran.</p>
+
+      <p>This post is a status report, not a launch. I want to be precise about what shipped, what state the project is in today, and why I think this particular release matters for spec-driven development and for building software with AI agents. Where I am making an argument rather than stating a fact, I will say so.</p>
+
+      <div class="callout">
+        Traverse is pre-1.0. v0.10.0 is real, running, spec-governed code, but public API surfaces are not frozen yet, and several of the new subsystems are opt-in builders rather than defaults. I will flag those as they come up.
+      </div>
+
+      <h2 id="state">Where Traverse is today</h2>
+
+      <p>The honest snapshot, as of this release:</p>
+
+      <ul>
+        <li><strong>133 approved, immutable specs</strong> govern the runtime, contracts, registry, the MCP surface, WASM execution, native embedding, event delivery, and durable local storage. Almost every line item in the v0.10 changelog cites a spec number, a Decision, or an ADR — that is not decoration, it is how the project is built.</li>
+        <li><strong>8 crates in the main repo plus the capability registry</strong> (now its own repo). 7 of those 9 are published on crates.io: runtime, contracts, registry, CLI, MCP server, embedder SDK, and the expedition WASM example. The native bridge and Swift host are newer and not yet published.</li>
+        <li><strong>100% coverage is enforced on core logic</strong>, with spec-alignment and supply-chain gates on every PR and a 5-platform CI matrix (Linux x86_64/aarch64, macOS x86_64/arm64, Windows x86_64).</li>
+        <li>The capability registry runs as a <strong>live catalog</strong> at registry.traverse-framework.com, so capabilities can be published, versioned, and consumed independently of the runtime.</li>
+        <li><strong>v1.0.0 is gated, not dated.</strong> It is governed by a milestone-gate spec and checked locally by a script — stable public API surfaces, every published crate live on crates.io, the runtime stress-tested on every supported platform.</li>
+      </ul>
+
+      <h2 id="composition">What v0.10 solves: governed composition</h2>
+
+      <p>Before this release, Traverse could validate and execute a single governed capability, and it could run an <em>authored</em> workflow — one a human wrote and committed. What it could not do was take a goal and assemble the workflow itself, under governance, at runtime. That is the gap v0.10 closes.</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Area</th><th>What landed in v0.10</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Workflow planner</td><td>Plan a multi-capability workflow from a stated goal. Steps chain on schema-shape compatibility rather than declared <code>consumes</code>/<code>emits</code> (spec 113, Decision 62).</td></tr>
+            <tr><td>Proposal lifecycle over MCP</td><td>Propose a runtime-generated workflow, schedule it with bounded deterministic parallelism, then export and promote it back into an authored workflow under governance.</td></tr>
+            <tr><td>Durable orchestration</td><td>Checkpoint and recovery guards, with proven recovery of an explicitly abandoned workflow proposal.</td></tr>
+            <tr><td>Durable trace journal</td><td>Execution traces persisted through the existing append-only, fsync-committed event journal as metadata and hashes only — never raw payloads (spec 079, ADR-0045). Opt-in.</td></tr>
+            <tr><td>Browser-hosted execution</td><td>A governed browser proposal host, plus browser execution of a single verified capability that returns an execution receipt along the validated <code>execute_entrypoint</code> path (spec 023).</td></tr>
+            <tr><td>Verified registry metadata</td><td><code>serve</code> now requires host-supplied registry state; MCP verified capability search over host-owned public metadata; the CLI materializes verified registry artifacts locally (spec 120, ADR-0051).</td></tr>
+            <tr><td>Capability risk metadata</td><td>Effect class, determinism class, field-level data-flow/egress policy, and reliability semantics on every contract, with an <code>is_automatic_eligible()</code> gate and redacted exposure through MCP discovery (spec 109).</td></tr>
+            <tr><td>Publish coverage</td><td>Fail-closed: the declared schema surface must be covered by use cases, each backed by smoke fixtures — schema ⊆ use_cases ⊆ smoke (spec 102 v1.1.0, Decision 58).</td></tr>
+            <tr><td>Native and cross-host</td><td>A bounded native WASI profile with native cross-host fixture evidence and a cross-host CLI fixture runner in CI (spec 181).</td></tr>
+            <tr><td>Connectors</td><td>Universal local connector contracts, runtime mediation of connector invoke requests, and activation of application connector bindings.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The planner deliberately chains on <strong>schema shape</strong>, not on hand-declared wiring. That is a heuristic: two steps whose shapes line up are not guaranteed to be semantically correct together. This is exactly why a runtime-generated plan is a <em>proposal</em>. It only becomes a first-class, reusable artifact after it is exported and promoted into an authored workflow through governance. The runtime composes; a human still signs off before that composition is permanent.</p>
+
+      <h2 id="trace">The durable trace journal</h2>
+
+      <p>If the runtime is going to assemble and run workflows, you need to be able to reconstruct what it did. v0.10 adds <code>DurableTraceJournal</code>, which writes execution traces through the same append-only, fsync-committed event journal the runtime already uses for durable events. The traces are canonical JSON Lines carrying <strong>only non-sensitive metadata and hashes</strong> — never raw payloads — scoped per workspace, and they inherit the journal's crash recovery and whole-segment retention.</p>
+
+      <p>It is opt-in, via a builder on the placement router, and the caller decides whether a failure to write the durable trace should fail open or fail closed. Existing call sites are unaffected. Same story for durable orchestration: the checkpoint and recovery machinery is an opt-in builder, and construction paths that do not ask for it are unchanged.</p>
+
+      <h2 id="sdd">What this means for spec-driven development</h2>
+
+      <p>Traverse is itself a spec-driven-development project. Specs are written, reviewed, approved, and then frozen; a CI gate checks that the code still aligns with them. v0.10 is a fair-sized proof that the method scales: 82 commits, and the changelog reads like an index into the spec directory.</p>
+
+      <p>But SDD has a well-known soft spot. A spec is a document. It does not enforce itself. Once you have the spec, the correspondence between "what we agreed" and "what the code does at runtime" is maintained by review, tests, and discipline — all of which are human, and all of which drift.</p>
+
+      <p>Traverse's contribution is that a capability contract is the <strong>machine-checked, execution-time half</strong> of a spec. As of v0.10, every contract carries an effect class, a determinism class, a field-level data-flow and egress policy, and reliability semantics, and the runtime validates a call against all of it before the WASM module runs. Publishing fails closed if the declared surface is not covered by use cases and smoke fixtures. Manifest egress that is broader than the capability's declared policy is rejected at register time. The planner then composes these contracts into workflows where the chaining itself is validated, and any runtime-generated plan has to pass back through governance to become permanent.</p>
+
+      <p>That is the shape of the thing: SDD produces the intent, and a contract-driven runtime holds the boundary so the intent is still true when the code executes — and still true after an agent, not a person, wired the steps together.</p>
+
+      <h2 id="ai-dev">What this means for AI development</h2>
+
+      <p>The pattern most AI agents use today is raw function calling: here is a list of tools, here are prose descriptions, decide when to call them. It works for lookups and simple transforms. It gets fragile the moment the agent is composing several stateful operations that matter, because nothing in a function definition tells the agent what must be true before a call, what the call guarantees, what it changes, or how it fails.</p>
+
+      <p>v0.10 gives an agent a different surface to build against:</p>
+
+      <ul>
+        <li><strong>Discovery is structured and redacted.</strong> MCP verified capability search returns host-owned, verified metadata — effect class, determinism, egress posture — not a dump of raw contract bodies. The agent sees what it needs to choose correctly.</li>
+        <li><strong>Eligibility is a runtime decision.</strong> The <code>is_automatic_eligible()</code> gate lets the host decide which capabilities can run without a human in the loop, based on the contract's own risk metadata, rather than trusting the agent's judgement or the prompt.</li>
+        <li><strong>Composition is planned and validated below the model.</strong> The agent states a goal; the planner builds the step graph and the runtime schedules it with bounded, deterministic parallelism. The guardrails are not instructions in a system prompt — they are enforced on every execution.</li>
+        <li><strong>The run is reconstructable.</strong> The durable trace journal means "what did the agent actually do" is a query against an fsync-committed log of hashes and metadata, not an exercise in re-reading a transcript.</li>
+      </ul>
+
+      <p>None of this makes the agent smarter. It makes the agent's mistakes bounded and visible, which is the property you need before you let one compose business logic in production.</p>
+
+      <h2 id="tokens">On saving tokens</h2>
+
+      <p>Does v0.10 save tokens? Here is the honest answer: the release ships <strong>no token benchmark</strong>, and I am not going to invent one. What I can point to is where the work moved.</p>
+
+      <p>Three things that previously had to live in a model's context now live in the runtime:</p>
+
+      <ul>
+        <li><strong>Planning and chaining.</strong> The agent no longer has to hold every intermediate schema, write the step graph by hand, and re-plan after each observation. It states a goal; the planner returns a plan.</li>
+        <li><strong>Scheduling.</strong> Bounded deterministic parallel scheduling happens in the runtime. The agent is not running a call → observe → reason → next-call loop for every node in the graph.</li>
+        <li><strong>Reconstruction.</strong> Answering "what happened" is a read against the durable trace journal. Checkpoint and recovery means an abandoned or crashed workflow resumes from its last checkpoint instead of the agent redoing the work — and re-spending the tokens.</li>
+      </ul>
+
+      <p>Every one of those is work an agent would otherwise pay for in generated tokens. Moving it behind the MCP surface means the model states a goal and reads back a result. My claim is that this <em>should</em> reduce how much an agent has to keep in context to run a multi-step capability — but "should" is carrying weight in that sentence until there is a measurement to cite. There is a separate runtime performance change in this release — unchanged WASM binaries are now cached — but that is CPU and load time, not tokens.</p>
+
+      <h2 id="future">Why this could change how software gets built</h2>
+
+      <p>Here is the argument, stated as an argument. If a capability's behavior — its effects, its determinism, its data egress, its failure modes — is machine-checked at the boundary, and if composition is planned and validated by a runtime rather than improvised in a prompt, then an AI agent building multi-step business logic is working inside guardrails that do not depend on how well the prompt was written. That is a different posture from "the agent called some functions and something happened."</p>
+
+      <p>Add portability to that. The same contract runs in the browser (a governed browser host and single-capability execution landed in this release), on a server, in a cloud function, and — along the bounded native WASI profile — natively, with a cross-host fixture runner in CI checking that the results actually match across targets. Write the capability once, govern it once, and let it travel.</p>
+
+      <p>I think that combination — a checked boundary plus a portable unit plus runtime-side composition — is a plausible foundation for letting agents do real work on real systems. v0.10 is a step along that line, not the arrival.</p>
+
+      <h2 id="caveats">What is still later</h2>
+
+      <ul>
+        <li>Durable trace and durable orchestration are <strong>opt-in builders</strong>. They are not on by default.</li>
+        <li>Browser execution is proven for a <strong>single verified capability</strong> that returns a receipt — not the full runtime in the browser.</li>
+        <li>The planner chains on <strong>schema-shape compatibility</strong>. Shape-compatible is not the same as semantically correct, which is why promotion of a runtime-generated plan goes through governance.</li>
+        <li><strong>Publishing is stricter than v0.9.1.</strong> Packages that published cleanly before may now be rejected: use-case surface coverage is fail-closed, and manifest egress broader than the declared policy fails at register time. Contracts without risk metadata get a conservative migration default — review the assigned classes before relying on automatic eligibility.</li>
+        <li><code>serve</code> now requires host-supplied registry state. A host that previously started <code>serve</code> without providing it must now supply it.</li>
+        <li>Authoring telemetry is <strong>off by default</strong>, and usage/resolve telemetry defaults to a no-op sink.</li>
+        <li>Public API surfaces are not frozen. That is the v1.0.0 gate, and it is a gate, not a date.</li>
+      </ul>
+
+      <p>If you want the full detail, the v0.10.0 release notes and changelog in the main repo list every spec, Decision, and ADR behind each line above.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#state">Where Traverse is today</a></li>
+          <li><a href="#composition">What v0.10 solves</a></li>
+          <li><a href="#trace">The durable trace journal</a></li>
+          <li><a href="#sdd">Meaning for spec-driven development</a></li>
+          <li><a href="#ai-dev">Meaning for AI development</a></li>
+          <li><a href="#tokens">On saving tokens</a></li>
+          <li><a href="#future">Why this could change how software gets built</a></li>
+          <li><a href="#caveats">What is still later</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/ai-agents-need-contracts.html">AI agents need contracts, not just function definitions →</a></li>
+          <li><a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic →</a></li>
+          <li><a href="/blog/uma-explained.html">What Universal Microservices Architecture got right →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Read the release</div>
+        <p>Every line item above cites a spec, Decision, or ADR. The full v0.10.0 notes and changelog live in the main repo.</p>
+        <a href="https://github.com/traverse-framework/traverse/releases" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">View releases on GitHub →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Compose capabilities under governance.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:520px;margin-left:auto;margin-right:auto">Traverse validates every capability against its contract, plans workflows on schema shape, and can persist a durable trace of what ran.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Get started →</a>
+      <a href="/use-cases.html" class="btn btn-ghost">See use cases</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"Traverse v0.10: governed composition, and what it means for AI-built software — Traverse Blog"}
+  description={"Traverse v0.10 lets the runtime plan, schedule, run, and promote multi-capability workflows over MCP, and persist a durable, tamper-evident trace of what ran. An honest status report on the project, spec-driven development, and AI development."}
+  canonical={"https://traverse-framework.com/blog/traverse-0-10-governed-composition.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .callout code { background: var(--bg-card); }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; white-space: nowrap; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
