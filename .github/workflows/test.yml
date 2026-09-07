@@ -27,6 +27,19 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  e2e:
+    name: playwright e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
   registry-digest-drift:
     name: registry digest drift (non-blocking)
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
