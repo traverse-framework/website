@@ -1,0 +1,28 @@
+{
+  "component_id": "discover-real-pipeline.summary-aggregate",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "capability_id": "summary.aggregate",
+  "capability_version": "1.0.0",
+  "contract_path": "../../contract.summary-aggregate.json",
+  "wasm_binary_path": "../../aggregate.wasm",
+  "wasm_digest": "sha256:0464da7ebe4784a3b24717b08d26c168b5e901f4d8d5b6efc9693c3323d1d5dd",
+  "runtime_constraints": {
+    "host_api_access": "none",
+    "network_access": "forbidden",
+    "filesystem_access": "none"
+  },
+  "permitted_targets": [
+    "local",
+    "browser"
+  ],
+  "dependencies": [],
+  "connector_requirements": [],
+  "validation_evidence": [
+    {
+      "evidence_type": "checked_in_fixture",
+      "status": "passed",
+      "produced_by": "discover_real_pipeline_demo"
+    }
+  ]
+}

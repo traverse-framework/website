@@ -1,0 +1,28 @@
+{
+  "component_id": "discover-real-pipeline.uncertainty-score",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "capability_id": "uncertainty.score",
+  "capability_version": "1.0.0",
+  "contract_path": "../../contract.uncertainty-score.json",
+  "wasm_binary_path": "../../score.wasm",
+  "wasm_digest": "sha256:f218262588e8889eaacf371fc9df17454be40f901f88f379514fcc27365b1a9b",
+  "runtime_constraints": {
+    "host_api_access": "none",
+    "network_access": "forbidden",
+    "filesystem_access": "none"
+  },
+  "permitted_targets": [
+    "local",
+    "browser"
+  ],
+  "dependencies": [],
+  "connector_requirements": [],
+  "validation_evidence": [
+    {
+      "evidence_type": "checked_in_fixture",
+      "status": "passed",
+      "produced_by": "discover_real_pipeline_demo"
+    }
+  ]
+}

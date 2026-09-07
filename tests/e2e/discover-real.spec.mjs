@@ -46,3 +46,21 @@ test('Real mode fails closed when the artifact digest does not match the pin', a
   await expect(page.locator('#discover-real-badge')).not.toHaveText('Real: executed');
   await expect(page.locator('#discover-real-outcome')).not.toHaveText('completed');
 });
+
+test('Real pipeline executes three published capabilities in order, in the browser', async ({ page }) => {
+  await page.goto('/discover.html');
+  await page.locator('#discover-pipeline-run').click();
+
+  const result = page.locator('#discover-pipeline-result');
+  await expect(result).toBeVisible();
+  await expect(page.locator('#discover-pipeline-badge')).toHaveText('Real: executed (3 capabilities)', { timeout: 30_000 });
+  await expect(result).toHaveAttribute('data-outcome', 'ok');
+
+  for (const nodeId of ['period_finalize', 'summary_aggregate', 'uncertainty_score']) {
+    await expect(page.locator(`#discover-pipeline-node-${nodeId}`)).toHaveAttribute('data-state', 'complete');
+  }
+  await expect(page.locator('#discover-pipeline-outcome')).toHaveText('completed');
+  await expect(page.locator('#discover-pipeline-output-hash')).toContainText('sha256:');
+  await expect(page.locator('#discover-pipeline-log')).toContainText('node 3/3');
+  await expect(page.locator('#discover-pipeline-outputs')).toContainText('uncertainty.score');
+});

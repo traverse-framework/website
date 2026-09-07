@@ -57,3 +57,36 @@ test('discover Real mode is opt-in, single-capability, and fails closed', async 
   // No fabricated success: no catch-all that renders ok.
   assert.doesNotMatch(real, /catch\s*\([^)]*\)\s*\{\s*renderSuccess/);
 });
+
+test('discover Real pipeline is authored, not runtime-discovered, and fails closed', async () => {
+  const page = await read('src/pages/discover.astro');
+  const pipe = await read('src/scripts/discover-real-pipeline.js');
+
+  // It is a real multi-capability execution...
+  assert.match(page, /three-capability pipeline for real/i);
+  assert.match(page, /period\.finalize/);
+  assert.match(page, /summary\.aggregate/);
+  assert.match(page, /uncertainty\.score/);
+  assert.match(pipe, /discover-real-pipeline\.coverage/);
+  assert.match(pipe, /capability_invoked/);
+
+  // ...but the page must NOT claim runtime discovery / selection / an agent.
+  assert.match(page, /authored in the committed bundle/i);
+  assert.match(page, /not discovered or selected at runtime/i);
+  assert.doesNotMatch(page, /(agent|model|planner) (selects|chooses|discovers|picks) (the )?capabilit/i);
+  assert.doesNotMatch(pipe, /label: '(AI Agent|Runtime|MCP|Planner)'/);
+
+  // Three pinned digests, re-checked before success is reported.
+  assert.match(pipe, /sha256:01cb26718120619bed0f2a1c486c1e153e97bd0cdf7810351084cac47359649c/);
+  assert.match(pipe, /sha256:0464da7ebe4784a3b24717b08d26c168b5e901f4d8d5b6efc9693c3323d1d5dd/);
+  assert.match(pipe, /sha256:f218262588e8889eaacf371fc9df17454be40f901f88f379514fcc27365b1a9b/);
+  assert.match(pipe, /!==\s*n\.digest/);
+
+  // Same six fail-closed strings.
+  assert.match(pipe, /real mode unavailable — the governed browser execution host did not load/);
+  assert.match(pipe, /real mode unavailable — could not retrieve the verified registry artifact/);
+  assert.match(pipe, /real mode halted — artifact identity did not match the pinned value/);
+  assert.match(pipe, /real mode halted — the governed host rejected this input against the published contract/);
+  assert.match(pipe, /real mode halted — the runtime declined to authorize this invocation/);
+  assert.match(pipe, /real mode halted — execution did not return a verifiable receipt\. Not reporting this as a success/);
+});
