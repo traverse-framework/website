@@ -5,6 +5,10 @@
 node_modules/
 dist/
 .astro/
+test-results/
+playwright-report/
+blob-report/
+.playwright/
 
 # Logo/favicon PNGs must ship despite the *.png rule
 !public/assets/img/logo/traverse_icon_1024x1024.png
