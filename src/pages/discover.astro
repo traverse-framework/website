@@ -85,6 +85,44 @@ const _body = `<section class="page-hero">
           <pre class="discover-real-trace" id="discover-real-trace">No trace retained.</pre>
         </details>
       </div>
+
+      <div class="discover-real-sub" id="discover-pipeline">
+        <div class="discover-real-head">
+          <div>
+            <h4 class="discover-real-title">&hellip;or run a three-capability pipeline for real</h4>
+            <p class="t-body-sm t-muted discover-real-intro">Executes <strong>three</strong> pinned published capabilities as one governed <code>direct</code>-triggered workflow &mdash; <code>period.finalize</code> &rarr; <code>summary.aggregate</code> &rarr; <code>uncertainty.score</code> &mdash; each node consuming the previous node&rsquo;s output, all real WASM in your browser, one execution event per node. <strong>The capabilities and their order are authored in the committed bundle</strong>, not discovered or selected at runtime; runtime discovery and capability selection are tracked upstream (traverse#1150) and are not part of this page yet.</p>
+          </div>
+          <span class="discover-real-badge" id="discover-pipeline-badge" data-state="idle">Real: not run yet</span>
+        </div>
+        <button id="discover-pipeline-run" class="btn btn-primary" type="button">Run the 3-capability pipeline &rarr;</button>
+
+        <ol class="discover-pipeline-nodes" aria-label="Pipeline nodes">
+          <li id="discover-pipeline-node-period_finalize" data-state="idle"><code>period.finalize@1.0.0</code></li>
+          <li id="discover-pipeline-node-summary_aggregate" data-state="idle"><code>summary.aggregate@1.0.0</code></li>
+          <li id="discover-pipeline-node-uncertainty_score" data-state="idle"><code>uncertainty.score@1.0.0</code></li>
+        </ol>
+
+        <div class="terminal discover-real-terminal">
+          <div class="terminal-header">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span class="terminal-title">real pipeline execution &middot; governed browser host</span>
+          </div>
+          <div class="terminal-body discover-real-log" id="discover-pipeline-log"></div>
+        </div>
+
+        <div class="discover-real-result" id="discover-pipeline-result" data-outcome="idle" hidden>
+          <dl class="discover-real-receipt">
+            <div><dt>Pinned capabilities (in order)</dt><dd class="discover-real-mono" id="discover-pipeline-identity">&mdash;</dd></div>
+            <div><dt>Terminal outcome</dt><dd id="discover-pipeline-outcome">&mdash;</dd></div>
+            <div><dt>Workflow output hash</dt><dd class="discover-real-mono" id="discover-pipeline-output-hash">&mdash;</dd></div>
+          </dl>
+          <div class="discover-pipeline-outputs" id="discover-pipeline-outputs"></div>
+          <details class="discover-real-trace-wrap">
+            <summary>Redacted per-invocation trace</summary>
+            <pre class="discover-real-trace" id="discover-pipeline-trace">No trace retained.</pre>
+          </details>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -94,7 +132,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">How this is actually built</div>
       <h2>Four distinct modes, with one live source of truth.</h2>
-      <p><strong>Live:</strong> this static Astro page fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a> and links every card to its published registry contract. <strong>Derived:</strong> it groups current capability versions by namespace and orders a namespace with two or more active capabilities using a simple name-based verb heuristic (ingest → interpret → decide → act). <strong>Simulated:</strong> the graph animates <strong>idle → simulated active → simulated complete</strong>; it does not invoke a WASM artifact, MCP loop, runtime, or model. <strong>Real (opt in):</strong> the “Run this one for real” button executes a single pinned, digest-verified capability — <code>core/core.calculate-price@1.1.0</code> — as WASM in your browser via <code>traverse-embedder-web</code>, and shows the artifact identity, contract-validation result, terminal outcome, and a redacted trace. It fails closed on a digest mismatch or an unreachable host and never fabricates a success. The composed multi-node pipeline is not executed — that stays derived and simulated.</p>
+      <p><strong>Live:</strong> this static Astro page fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a> and links every card to its published registry contract. <strong>Derived:</strong> it groups current capability versions by namespace and orders a namespace with two or more active capabilities using a simple name-based verb heuristic (ingest → interpret → decide → act). <strong>Simulated:</strong> the graph animates <strong>idle → simulated active → simulated complete</strong>; it does not invoke a WASM artifact, MCP loop, runtime, or model. <strong>Real (opt in):</strong> the “Run this one for real” button executes a single pinned, digest-verified capability — <code>core/core.calculate-price@1.1.0</code> — as WASM in your browser via <code>traverse-embedder-web</code>, and shows the artifact identity, contract-validation result, terminal outcome, and a redacted trace. A second button runs a pinned <strong>three-capability</strong> pipeline (<code>period.finalize</code> → <code>summary.aggregate</code> → <code>uncertainty.score</code>) as one governed workflow, one real execution per node. Both fail closed on a digest mismatch or an unreachable host and never fabricate a success. In every Real run the capabilities and their order are <strong>authored in a committed bundle</strong>, not discovered or selected at runtime. The composed multi-node pipeline is not executed — that stays derived and simulated; runtime discovery and capability selection are tracked upstream (<a href="https://github.com/traverse-framework/traverse/issues/1150">traverse#1150</a>).</p>
       <a href="/registry.html" class="btn btn-ghost btn-sm" style="margin-top:1rem">Browse the full registry →</a>
     </div>
   </div>
@@ -188,6 +226,19 @@ const _body = `<section class="page-hero">
     .discover-real-trace-wrap { font-size: 0.78rem; }
     .discover-real-trace-wrap summary { cursor: pointer; color: var(--fg-muted); }
     .discover-real-trace { margin-top: 0.6rem; max-height: 220px; overflow: auto; font-size: 0.72rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; white-space: pre-wrap; word-break: break-word; }
+    .discover-real-sub { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 1rem; }
+    .discover-real-sub .discover-real-title { font-size: 1rem; }
+    .discover-pipeline-nodes { list-style: none; counter-reset: pn; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .discover-pipeline-nodes li { counter-increment: pn; display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; padding: 0.35rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--fg-muted); }
+    .discover-pipeline-nodes li::before { content: counter(pn); font-family: var(--font-mono); font-size: 0.65rem; width: 1.15rem; height: 1.15rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border); }
+    .discover-pipeline-nodes li[data-state="running"] { border-color: var(--accent); color: var(--accent); }
+    .discover-pipeline-nodes li[data-state="running"]::before { border-color: var(--accent); }
+    .discover-pipeline-nodes li[data-state="complete"] { border-color: var(--success); color: var(--success); }
+    .discover-pipeline-nodes li[data-state="complete"]::before { border-color: var(--success); background: color-mix(in srgb, var(--success) 18%, transparent); }
+    .discover-pipeline-outputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; }
+    .discover-pipeline-out { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; overflow: hidden; }
+    .discover-pipeline-out-cap { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-subtle); margin-bottom: 0.4rem; word-break: break-all; }
+    .discover-pipeline-out pre { margin: 0; font-size: 0.72rem; white-space: pre-wrap; word-break: break-word; max-height: 200px; overflow: auto; }
   </style>
   <Fragment set:html={_body} />
   <script src="https://unpkg.com/@antv/g6@5.1.1/dist/g6.min.js"></script>
@@ -197,6 +248,8 @@ const _body = `<section class="page-hero">
     // its dynamic import of traverse-embedder-web so nothing loads until the
     // visitor clicks "Run this one for real".
     import { initDiscoverReal } from '../scripts/discover-real.js';
+    import { initDiscoverRealPipeline } from '../scripts/discover-real-pipeline.js';
     initDiscoverReal();
+    initDiscoverRealPipeline();
   </script>
 </SubpageLayout>

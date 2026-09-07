@@ -1,0 +1,61 @@
+{
+  "app_id": "discover-real-pipeline",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "workspace_defaults": {
+    "workspace_id": "local-default",
+    "registry_scope": "private"
+  },
+  "components": [
+    {
+      "component_id": "discover-real-pipeline.period-finalize",
+      "version": "1.0.0",
+      "digest": "sha256:01cb26718120619bed0f2a1c486c1e153e97bd0cdf7810351084cac47359649c",
+      "manifest_path": "components/period-finalize/component.manifest.json"
+    },
+    {
+      "component_id": "discover-real-pipeline.summary-aggregate",
+      "version": "1.0.0",
+      "digest": "sha256:0464da7ebe4784a3b24717b08d26c168b5e901f4d8d5b6efc9693c3323d1d5dd",
+      "manifest_path": "components/summary-aggregate/component.manifest.json"
+    },
+    {
+      "component_id": "discover-real-pipeline.uncertainty-score",
+      "version": "1.0.0",
+      "digest": "sha256:f218262588e8889eaacf371fc9df17454be40f901f88f379514fcc27365b1a9b",
+      "manifest_path": "components/uncertainty-score/component.manifest.json"
+    }
+  ],
+  "workflows": [
+    {
+      "workflow_id": "discover-real-pipeline.coverage",
+      "workflow_version": "1.0.0",
+      "path": "workflows/coverage/workflow.json"
+    }
+  ],
+  "model_dependencies": [],
+  "config_schema": {
+    "type": "object",
+    "required": [
+      "workspace_id"
+    ],
+    "properties": {
+      "workspace_id": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  },
+  "default_config": {
+    "workspace_id": "local-default"
+  },
+  "placement_policy": {
+    "preferred_targets": [
+      "browser"
+    ],
+    "allow_fallback": false
+  },
+  "public_surfaces": [
+    "http_json"
+  ]
+}

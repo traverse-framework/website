@@ -1,0 +1,9 @@
+{
+  "coverage_state": "partial",
+  "included_reference_ids": ["obs-2", "obs-1"],
+  "pending_reference_ids": ["unk-1"],
+  "period_key": "2026-08-17",
+  "scope_id": "golden-bc",
+  "watermark": "capture-watermark-001",
+  "policy": { "version": "policy-1" }
+}

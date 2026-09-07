@@ -1,0 +1,70 @@
+{
+  "kind": "workflow_definition",
+  "schema_version": "1.0.0",
+  "id": "discover-real-pipeline.coverage",
+  "name": "coverage",
+  "version": "1.0.0",
+  "lifecycle": "active",
+  "owner": { "team": "traverse-web", "contact": "enrico.piovesan10@gmail.com" },
+  "summary": "Finalize a reporting period, aggregate its references, then score the aggregate's uncertainty -- three published capabilities executed as one deterministic pipeline for the /discover Real-mode demo.",
+  "inputs": {
+    "schema": {
+      "type": "object",
+      "required": ["coverage_state", "included_reference_ids", "pending_reference_ids", "period_key", "scope_id", "watermark", "policy"],
+      "properties": {
+        "coverage_state": { "type": "string" },
+        "included_reference_ids": { "type": "array" },
+        "pending_reference_ids": { "type": "array" },
+        "period_key": { "type": "string" },
+        "scope_id": { "type": "string" },
+        "watermark": { "type": "string" },
+        "policy": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "outputs": {
+    "schema": {
+      "type": "object",
+      "required": ["period", "summary", "uncertainty"],
+      "properties": {
+        "period": { "type": "object" },
+        "summary": { "type": "object" },
+        "uncertainty": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "nodes": [
+    {
+      "node_id": "period_finalize",
+      "capability_id": "period.finalize",
+      "capability_version": "1.0.0",
+      "input": { "from_workflow_input": ["coverage_state", "included_reference_ids", "pending_reference_ids", "period_key", "scope_id", "watermark", "policy"] },
+      "output": { "to_workflow_state": ["coverage_state", "included_reference_ids", "pending_reference_ids", "period_key", "scope_id"], "publish_to_state_as": "period" }
+    },
+    {
+      "node_id": "summary_aggregate",
+      "capability_id": "summary.aggregate",
+      "capability_version": "1.0.0",
+      "input": { "from_workflow_input": ["scope_id", "period_key", "coverage_state", "included_reference_ids", "pending_reference_ids", "policy"] },
+      "output": { "to_workflow_state": ["coverage_state", "included_count", "pending_count"], "publish_to_state_as": "summary" }
+    },
+    {
+      "node_id": "uncertainty_score",
+      "capability_id": "uncertainty.score",
+      "capability_version": "1.0.0",
+      "input": { "from_workflow_input": ["included_count", "pending_count", "coverage_state", "policy"] },
+      "output": { "to_workflow_state": [], "publish_to_state_as": "uncertainty" }
+    }
+  ],
+  "edges": [
+    { "edge_id": "finalize_to_aggregate", "from": "period_finalize", "to": "summary_aggregate", "trigger": "direct" },
+    { "edge_id": "aggregate_to_score", "from": "summary_aggregate", "to": "uncertainty_score", "trigger": "direct" }
+  ],
+  "start_node": "period_finalize",
+  "terminal_nodes": ["uncertainty_score"],
+  "output_projection": ["period", "summary", "uncertainty"],
+  "tags": ["discover", "real-mode", "pipeline", "deterministic"],
+  "governing_spec": "007-workflow-registry-traversal"
+}
