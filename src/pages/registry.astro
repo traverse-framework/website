@@ -1,6 +1,99 @@
 ---
 import SubpageLayout from '@layouts/SubpageLayout.astro';
 
+// Stats are counted from the live catalog at build time so this page can't drift
+// out of sync with the registry. If the fetch fails, the build still succeeds
+// with the last-known-good snapshot below.
+const FALLBACK = {
+  capabilities: 48,
+  versions: 119,
+  deprecated: 34,
+  namespaces: 24,
+  personas: 42,
+  events: 3,
+  featured: [
+    { name: 'core', caps: 18, versions: 38 },
+    { name: 'validation', caps: 4, versions: 18 },
+    { name: 'traverse-starter', caps: 3, versions: 19 },
+    { name: 'doc-approval', caps: 2, versions: 13 },
+    { name: 'review', caps: 2, versions: 2 },
+    { name: 'meeting-notes', caps: 1, versions: 7 },
+    { name: 'formatting', caps: 1, versions: 4 },
+  ],
+  rest: [
+    'approval', 'artifact', 'classification', 'classifier', 'cluster', 'coverage',
+    'embedding', 'location', 'model', 'operations', 'period', 'platform',
+    'retention', 'revision', 'summary', 'uncertainty', 'visual',
+  ],
+};
+
+async function loadStats() {
+  const res = await fetch('https://registry.traverse-framework.com/catalog.json', {
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) throw new Error(`catalog.json HTTP ${res.status}`);
+  const data = await res.json();
+  const caps = Array.isArray(data.capabilities) ? data.capabilities : [];
+
+  const ids = new Set();
+  const nsMap = new Map();
+  let deprecated = 0;
+
+  for (const c of caps) {
+    const ref = String(c.reference || '');
+    const ns = ref.split('/')[0];
+    const id = ref.split('@')[0];
+    if (!ns || !id) continue;
+    ids.add(id);
+    if (c.deprecated) deprecated++;
+    if (!nsMap.has(ns)) nsMap.set(ns, { caps: new Set(), versions: 0 });
+    const e = nsMap.get(ns);
+    e.caps.add(id);
+    e.versions++;
+  }
+
+  const nsList = [...nsMap.entries()]
+    .map(([name, e]) => ({ name, caps: e.caps.size, versions: e.versions }))
+    .sort((a, b) => b.caps - a.caps || b.versions - a.versions || a.name.localeCompare(b.name));
+
+  const isFeatured = (n) => n.caps > 1 || n.versions > 2;
+
+  return {
+    capabilities: ids.size,
+    versions: caps.length,
+    deprecated,
+    namespaces: nsMap.size,
+    personas: Array.isArray(data.personas) ? data.personas.length : 0,
+    events: Array.isArray(data.events) ? data.events.length : 0,
+    featured: nsList.filter(isFeatured),
+    rest: nsList.filter((n) => !isFeatured(n)).map((n) => n.name),
+  };
+}
+
+let stats = FALLBACK;
+try {
+  stats = await loadStats();
+} catch (err) {
+  console.warn(`[registry.astro] using fallback stats — ${err instanceof Error ? err.message : err}`);
+}
+
+const {
+  capabilities, versions, deprecated, namespaces, personas, events, featured, rest,
+} = stats;
+
+const statCards = featured
+  .map(
+    (n) => `      <div class="registry-stat-card">
+        <div class="registry-stat-name">${n.name}</div>
+        <div class="registry-stat-count">${n.caps} ${n.caps === 1 ? 'capability' : 'capabilities'} · ${n.versions} ${n.versions === 1 ? 'version' : 'versions'}</div>
+      </div>`,
+  )
+  .join('\n');
+
+const restLine = rest.length
+  ? `<p class="t-body-sm t-muted" style="margin-top:1rem">Plus ${rest.length} more single-capability namespace${rest.length === 1 ? '' : 's'}: ${rest.map((n) => `<code>${n}</code>`).join(', ')}.</p>`
+  : '';
+
 const _body = `<section class="page-hero">
   <div class="container">
     <div class="page-hero-inner">
@@ -9,8 +102,9 @@ const _body = `<section class="page-hero">
       <p class="page-hero-sub"><code>traverse-framework/registry</code> is a git-based, CI-validated, PR-published registry of capability contracts. It's where <code>traverse-registry</code> — the runtime crate — actually resolves capabilities from. Nothing gets in without a review.</p>
       <div class="page-hero-badges">
         <span class="badge badge-success badge-dot">Shipped</span>
-        <span class="badge">11 capabilities</span>
-        <span class="badge">38 published versions</span>
+        <span class="badge">${capabilities} capabilities</span>
+        <span class="badge">${versions} published versions</span>
+        <span class="badge">${personas} personas</span>
       </div>
     </div>
   </div>
@@ -21,30 +115,12 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">What's actually in it</div>
       <h2>Small and real, not a placeholder catalog.</h2>
-      <p>Counted directly from <code>contract.json</code> files in the repo — 38 published version files across 11 distinct capabilities, 15 of them already deprecated in favor of a newer version. That churn is a feature: it means the immutability and versioning rules are actually being exercised, not just declared.</p>
+      <p>Counted from the live catalog at build time — ${versions} published version files across ${capabilities} distinct capabilities in ${namespaces} namespaces, ${deprecated} of them already deprecated in favor of a newer version, plus ${personas} governed persona${personas === 1 ? '' : 's'} and ${events} event contract${events === 1 ? '' : 's'}. That churn is a feature: it means the immutability and versioning rules are actually being exercised, not just declared.</p>
     </div>
     <div class="registry-stats-grid">
-      <div class="registry-stat-card">
-        <div class="registry-stat-name">validation</div>
-        <div class="registry-stat-count">4 capabilities · 10 versions</div>
-      </div>
-      <div class="registry-stat-card">
-        <div class="registry-stat-name">traverse-starter</div>
-        <div class="registry-stat-count">3 capabilities · 12 versions</div>
-      </div>
-      <div class="registry-stat-card">
-        <div class="registry-stat-name">doc-approval</div>
-        <div class="registry-stat-count">2 capabilities · 9 versions</div>
-      </div>
-      <div class="registry-stat-card">
-        <div class="registry-stat-name">formatting</div>
-        <div class="registry-stat-count">1 capability · 2 versions</div>
-      </div>
-      <div class="registry-stat-card">
-        <div class="registry-stat-name">meeting-notes</div>
-        <div class="registry-stat-count">1 capability · 5 versions</div>
-      </div>
+${statCards}
     </div>
+    ${restLine}
   </div>
 </section>
 
@@ -106,7 +182,7 @@ const _body = `<section class="page-hero">
 ---
 <SubpageLayout
   title={"Registry — Traverse Framework"}
-  description={"The public capability registry for Traverse: 11 capabilities, 38 published versions, git-based and PR-reviewed. Browse the live catalog or read how publishing actually works."}
+  description={`The public capability registry for Traverse: ${capabilities} capabilities, ${versions} published versions, git-based and PR-reviewed. Browse the live catalog or read how publishing actually works.`}
   canonical={"https://traverse-framework.com/registry.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
