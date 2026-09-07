@@ -1,0 +1,49 @@
+{
+  "app_id": "discover-real",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "workspace_defaults": {
+    "workspace_id": "local-default",
+    "registry_scope": "private"
+  },
+  "components": [
+    {
+      "component_id": "discover-real.calculate-price-component",
+      "version": "1.0.0",
+      "digest": "sha256:a046e5d001ae78b8de339d40378e2c22f04384d601a1b801b52cf99a3e44f0b2",
+      "manifest_path": "components/calculate-price/component.manifest.json"
+    }
+  ],
+  "workflows": [
+    {
+      "workflow_id": "discover-real.calculate-price",
+      "workflow_version": "1.0.0",
+      "path": "workflows/calculate-price/workflow.json"
+    }
+  ],
+  "model_dependencies": [],
+  "config_schema": {
+    "type": "object",
+    "required": [
+      "workspace_id"
+    ],
+    "properties": {
+      "workspace_id": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  },
+  "default_config": {
+    "workspace_id": "local-default"
+  },
+  "placement_policy": {
+    "preferred_targets": [
+      "browser"
+    ],
+    "allow_fallback": false
+  },
+  "public_surfaces": [
+    "http_json"
+  ]
+}
