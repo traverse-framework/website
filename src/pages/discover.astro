@@ -6,7 +6,7 @@ const _body = `<section class="page-hero">
     <div class="page-hero-inner">
       <span class="section-label">Truthful demo mode</span>
       <h1 class="t-h1">Live catalog data. Heuristic composition. Simulated execution.</h1>
-      <p class="page-hero-sub">Your browser fetches the live Traverse capability catalog. A client-side name-and-namespace heuristic derives a plausible pipeline, then the page simulates its state changes. This page does not invoke published WASM, call an MCP endpoint, run the Traverse runtime, or use an LLM. See <a href="#discover-how-its-built">what is live, derived, and simulated</a>.</p>
+      <p class="page-hero-sub">Your browser fetches the live Traverse capability catalog. A client-side name-and-namespace heuristic derives a plausible pipeline, then the page simulates its state changes. The composed pipeline above does not invoke published WASM, call an MCP endpoint, run the Traverse runtime, or use an LLM. You can also <a href="#discover-real">run one pinned, verified capability for real</a> — that opt-in path executes its published WASM in your browser and shows a receipt. See <a href="#discover-how-its-built">what is live, derived, simulated, and real</a>.</p>
       <div class="page-hero-badges">
         <span class="badge badge-accent badge-dot">Live registry data</span>
         <span class="badge">Derived by a client-side heuristic</span>
@@ -51,6 +51,41 @@ const _body = `<section class="page-hero">
     </div>
 
     <div class="discover-cards" id="discover-cards"></div>
+
+    <div class="discover-real card" id="discover-real">
+      <div class="discover-real-head">
+        <div>
+          <span class="section-label">Real execution · opt in</span>
+          <h3 class="discover-real-title">Run one pinned capability for real</h3>
+          <p class="t-body-sm t-muted discover-real-intro">This is the only part of this page that executes a governed Traverse capability. It runs <strong>one</strong> pinned, verified capability &mdash; <code>core/core.calculate-price@1.1.0</code> &mdash; <strong>client-side in your browser</strong> via <code>traverse-embedder-web</code>&rsquo;s BundleEmbedder: no sidecar, no network execution, no MCP loop, no LLM. The composed pipeline above stays derived and simulated; nothing here makes it real. If the artifact digest does not match the pinned value, or the host is unreachable, this fails closed &mdash; it never fabricates a success.</p>
+        </div>
+        <span class="discover-real-badge" id="discover-real-badge" data-state="idle">Real: not run yet</span>
+      </div>
+      <button id="discover-real-run" class="btn btn-primary" type="button">Run this one for real &rarr;</button>
+
+      <div class="terminal discover-real-terminal">
+        <div class="terminal-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="terminal-title">real execution &middot; governed browser host</span>
+        </div>
+        <div class="terminal-body discover-real-log" id="discover-real-log"></div>
+      </div>
+
+      <div class="discover-real-result" id="discover-real-result" data-outcome="idle" hidden>
+        <dl class="discover-real-receipt">
+          <div><dt>Pinned artifact / contract</dt><dd id="discover-real-identity">&mdash;</dd></div>
+          <div><dt>Artifact digest</dt><dd class="discover-real-mono" id="discover-real-digest">&mdash;</dd></div>
+          <div><dt>Contract validation</dt><dd id="discover-real-validation">&mdash;</dd></div>
+          <div><dt>Terminal outcome</dt><dd id="discover-real-outcome">&mdash;</dd></div>
+          <div><dt>Output hash</dt><dd class="discover-real-mono" id="discover-real-output-hash">&mdash;</dd></div>
+        </dl>
+        <div class="discover-real-quote" id="discover-real-quote"></div>
+        <details class="discover-real-trace-wrap">
+          <summary>Redacted per-invocation trace</summary>
+          <pre class="discover-real-trace" id="discover-real-trace">No trace retained.</pre>
+        </details>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -58,8 +93,8 @@ const _body = `<section class="page-hero">
   <div class="container">
     <div class="section-header">
       <div class="section-label">How this is actually built</div>
-      <h2>Three distinct modes, with one live source of truth.</h2>
-      <p><strong>Live:</strong> this static Astro page fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a> and links every card to its published registry contract. <strong>Derived:</strong> it groups current capability versions by namespace and orders a namespace with two or more active capabilities using a simple name-based verb heuristic (ingest → interpret → decide → act). <strong>Simulated:</strong> the graph animates <strong>idle → simulated active → simulated complete</strong>; it does not invoke a WASM artifact, MCP loop, runtime, or model. Use the actual governed runtime and its documented execution entry points when execution evidence is required.</p>
+      <h2>Four distinct modes, with one live source of truth.</h2>
+      <p><strong>Live:</strong> this static Astro page fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a> and links every card to its published registry contract. <strong>Derived:</strong> it groups current capability versions by namespace and orders a namespace with two or more active capabilities using a simple name-based verb heuristic (ingest → interpret → decide → act). <strong>Simulated:</strong> the graph animates <strong>idle → simulated active → simulated complete</strong>; it does not invoke a WASM artifact, MCP loop, runtime, or model. <strong>Real (opt in):</strong> the “Run this one for real” button executes a single pinned, digest-verified capability — <code>core/core.calculate-price@1.1.0</code> — as WASM in your browser via <code>traverse-embedder-web</code>, and shows the artifact identity, contract-validation result, terminal outcome, and a redacted trace. It fails closed on a digest mismatch or an unreachable host and never fabricates a success. The composed multi-node pipeline is not executed — that stays derived and simulated.</p>
       <a href="/registry.html" class="btn btn-ghost btn-sm" style="margin-top:1rem">Browse the full registry →</a>
     </div>
   </div>
@@ -116,8 +151,52 @@ const _body = `<section class="page-hero">
     .discover-card-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-subtle); margin-bottom: 0.6rem; }
     .discover-card-summary { line-height: 1.55; margin-bottom: 0.85rem; }
     .discover-card-link { font-size: 0.75rem; color: var(--accent); font-family: var(--font-mono); }
+
+    /* ---- Real execution (opt-in) ---- */
+    .discover-real { margin-top: 1.75rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .discover-real-head { display: flex; gap: 1rem; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+    .discover-real-title { font-size: 1.15rem; font-weight: 650; margin: 0.35rem 0 0.5rem; }
+    .discover-real-intro { max-width: 60ch; margin: 0; }
+    .discover-real-badge {
+      font-family: var(--font-mono); font-size: 0.72rem; white-space: nowrap;
+      padding: 0.3rem 0.6rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); color: var(--fg-muted); background: var(--bg-card);
+    }
+    .discover-real-badge[data-state="running"] { border-color: var(--accent); color: var(--accent); }
+    .discover-real-badge[data-state="ok"] { border-color: var(--success); color: var(--success); }
+    .discover-real-badge[data-state="failed"] { border-color: #e8907d; color: #e8907d; }
+    .discover-real-badge[data-state="unavailable"] { border-color: var(--fg-subtle); color: var(--fg-subtle); }
+    #discover-real-run { align-self: flex-start; }
+    .discover-real-terminal { display: flex; flex-direction: column; }
+    .discover-real-log { min-height: 3.5rem; max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem; }
+    .discover-real-log-line { font-size: 0.78rem; color: #7d99a6; white-space: pre-wrap; word-break: break-word; }
+    .discover-real-log-line.cmd { color: #f2ecdf; }
+    .discover-real-log-line.ok { color: #9ccdb2; }
+    .discover-real-log-line.err { color: #e8907d; }
+    .discover-real-result { border-top: 1px solid var(--border); padding-top: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+    .discover-real-receipt { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem 1.25rem; margin: 0; }
+    .discover-real-receipt dt { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-subtle); margin-bottom: 0.2rem; }
+    .discover-real-receipt dd { margin: 0; font-size: 0.85rem; color: var(--fg); }
+    .discover-real-mono { font-family: var(--font-mono); font-size: 0.72rem; word-break: break-all; }
+    .discover-real-quote { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem 1.25rem; }
+    .discover-real-quote-total { font-size: 1.6rem; font-weight: 700; font-family: var(--font-mono); color: var(--success); }
+    .discover-real-quote-lines { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; margin: 0.6rem 0 0; }
+    .discover-real-quote-lines div { display: flex; gap: 0.4rem; font-size: 0.8rem; }
+    .discover-real-quote-lines dt { color: var(--fg-subtle); }
+    .discover-real-quote-lines dd { margin: 0; font-family: var(--font-mono); }
+    .discover-real-quote-note { font-size: 0.72rem; color: var(--fg-subtle); margin: 0.6rem 0 0; }
+    .discover-real-trace-wrap { font-size: 0.78rem; }
+    .discover-real-trace-wrap summary { cursor: pointer; color: var(--fg-muted); }
+    .discover-real-trace { margin-top: 0.6rem; max-height: 220px; overflow: auto; font-size: 0.72rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; white-space: pre-wrap; word-break: break-word; }
   </style>
   <Fragment set:html={_body} />
   <script src="https://unpkg.com/@antv/g6@5.1.1/dist/g6.min.js"></script>
   <script src="/assets/js/discover.js" defer></script>
+  <script>
+    // Opt-in REAL execution — Astro/Vite bundles this module and code-splits
+    // its dynamic import of traverse-embedder-web so nothing loads until the
+    // visitor clicks "Run this one for real".
+    import { initDiscoverReal } from '../scripts/discover-real.js';
+    initDiscoverReal();
+  </script>
 </SubpageLayout>
