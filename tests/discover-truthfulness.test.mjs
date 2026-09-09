@@ -90,3 +90,34 @@ test('discover Real pipeline is authored, not runtime-discovered, and fails clos
   assert.match(pipe, /real mode halted — the runtime declined to authorize this invocation/);
   assert.match(pipe, /real mode halted — execution did not return a verifiable receipt\. Not reporting this as a success/);
 });
+
+test('discover runtime-discovered mode plans structurally, reviews only, never executes or infers', async () => {
+  const page = await read('src/pages/discover.astro');
+  const disc = await read('src/scripts/discover-discovered.js');
+
+  // It is real runtime discovery + planning...
+  assert.match(page, /discover and plan a workflow from a goal, at runtime/i);
+  assert.match(page, /deterministic browser-local planner/i);
+  assert.match(disc, /browserLocalPlan/);
+  assert.match(disc, /prepareRegistryDependency/);
+  assert.match(disc, /registry_snapshot_digest/);
+
+  // ...structural only — no name / namespace / NL / model inference.
+  assert.match(page, /no capability-name, namespace, natural-language, or model inference/i);
+  assert.doesNotMatch(page, /(AI|LLM|model|agent) (plans|selects|chooses|writes) the workflow/i);
+  // no actual model/prompt usage in the discovered module
+  assert.doesNotMatch(disc, /\bprompt\b|openai|anthropic|\bllm\b|\bgpt-|inference call|chat\.completions/i);
+
+  // Review-only: nothing is executed in this mode; Phase 2 is disclosed as blocked.
+  assert.match(page, /Nothing is executed here/i);
+  assert.match(page, /plan only/i);
+  assert.match(page, /registry#418/);
+  assert.doesNotMatch(disc, /executeBrowserComposedWorkflow\s*\(/); // referenced in a comment only, never called
+  assert.match(disc, /mapping_unconfirmed/);
+
+  // Fail-closed strings for the discovered path.
+  assert.match(disc, /discovered mode unavailable — the governed browser planner did not load/);
+  assert.match(disc, /discovered mode halted — the registry snapshot could not be verified/);
+  assert.match(disc, /discovered mode halted — the planner rejected the inputs/);
+  assert.match(disc, /no structural candidate/);
+});

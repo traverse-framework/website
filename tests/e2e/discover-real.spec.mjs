@@ -64,3 +64,22 @@ test('Real pipeline executes three published capabilities in order, in the brows
   await expect(page.locator('#discover-pipeline-log')).toContainText('node 3/3');
   await expect(page.locator('#discover-pipeline-outputs')).toContainText('uncertainty.score');
 });
+
+test('Runtime-discovered mode plans a real workflow from the live registry (review only)', async ({ page }) => {
+  test.slow(); // fetches the live catalog + prepares artifacts
+  await page.goto('/discover.html');
+  await page.locator('#discover-disc-run').click();
+
+  const result = page.locator('#discover-disc-result');
+  await expect(result).toBeVisible();
+  await expect(page.locator('#discover-disc-badge')).toHaveText('Discovered: planned (review only)', { timeout: 40_000 });
+  await expect(result).toHaveAttribute('data-outcome', 'ok');
+
+  await expect(page.locator('#discover-disc-target')).toHaveText('uncertainty.score@1.0.0');
+  await expect(page.locator('#discover-disc-chain')).toContainText('uncertainty.score@1.0.0');
+  await expect(page.locator('#discover-disc-mappings')).toContainText('mapping_unconfirmed');
+  await expect(page.locator('#discover-disc-log')).toContainText('deterministic, structural');
+  await expect(page.locator('#discover-disc-log')).toContainText('not executed');
+  // review only — no execution outcome element exists in this mode
+  await expect(page.locator('#discover-disc-note')).toContainText('not executed');
+});
