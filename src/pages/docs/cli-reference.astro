@@ -3,32 +3,85 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 import DocsSidebar from '@components/DocsSidebar.astro';
 ---
 
-<SubpageLayout title="CLI Reference — Traverse Framework" description="Current, source-backed reference for traverse-cli and its governed workflows." canonical="https://traverse-framework.com/docs/cli-reference.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+<SubpageLayout title="CLI Reference — Traverse Framework" description="The supported traverse-cli command surface: bundle, app, capability, event, trace, workflow, and expedition commands, with examples and expected output." canonical="https://traverse-framework.com/docs/cli-reference.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
   <div class="docs-layout">
     <DocsSidebar active="/docs/cli-reference.html" />
     <main class="docs-content">
       <div class="section-label">Reference</div>
       <h1 class="t-h1">CLI reference</h1>
-      <p class="t-body t-muted">The current CLI is released with Traverse v0.10.1. Its source-backed reference lives with the runtime so commands and examples can evolve together.</p>
+      <p class="t-body t-muted">The supported <code>traverse-cli</code> command surface as of Traverse v0.10.1. The binary is the source of truth — build the workspace and pass <code>--help</code> at any level for the exact flags and an example invocation in the checkout you have.</p>
       <div class="badges"><span class="badge badge-success badge-dot">v0.10.1</span><span class="badge">traverse-cli</span></div>
+
       <section class="doc-section">
-        <h2 class="t-h2">Start from the current reference</h2>
-        <p class="t-body t-muted">Build the workspace and ask the installed binary for the exact command surface available in that checkout:</p>
-        <pre><code>cargo build
+        <h2 class="t-h2">Start from the installed binary</h2>
+<pre><code>cargo build
 cargo run -p traverse-cli-rs -- --help</code></pre>
-        <p class="t-body t-muted">Use the repository’s <a href="https://github.com/traverse-framework/traverse/blob/main/docs/cli-reference.md">CLI reference</a> for command syntax, arguments, and expected output.</p>
+        <p class="t-body t-muted">Help is available at every level — <code>traverse-cli --help</code>, family level (<code>traverse-cli bundle --help</code>), and subcommand level (<code>traverse-cli app new --help</code>). Help text is written to stderr and the process exits non-zero, consistent with the CLI's error-output behavior.</p>
       </section>
+
       <section class="doc-section">
-        <h2 class="t-h2">Capability authoring and publication</h2>
-        <p class="t-body t-muted">Traverse v0.10.1 supports the governed capability lifecycle: scaffold a package, inspect its contract, validate the executable artifact, and publish a reviewable registry change. Publication records the artifact alongside its registry record and rejects unresolved persona references.</p>
-        <ul><li><a href="https://github.com/traverse-framework/traverse/blob/main/docs/capability-contract-authoring-guide.md">Author a capability contract</a></li><li><a href="https://github.com/traverse-framework/traverse/blob/main/docs/capability-publish.md">Publish a capability</a></li><li><a href="https://github.com/traverse-framework/traverse/blob/main/docs/wasm-agent-authoring-guide.md">Build an executable WASM capability</a></li></ul>
+        <h2 class="t-h2">Supported commands</h2>
+        <table class="ref">
+          <thead><tr><th>Command</th><th>Purpose</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td><code>bundle inspect &lt;manifest-path&gt;</code></td><td>Validate and summarize a registry bundle manifest.</td><td>Prints <code>bundle_id</code>, <code>version</code>, <code>scope</code>, artifact counts, and discovered capability / event / workflow ids.</td></tr>
+            <tr><td><code>bundle register &lt;manifest-path&gt;</code></td><td>Load a registry bundle and register its contents into in-memory registries.</td><td>Prints <code>bundle_id</code>, <code>version</code>, <code>scope</code>, registered counts, and registration record summaries.</td></tr>
+            <tr><td><code>event inspect &lt;contract-path&gt;</code></td><td>Parse and validate an event contract.</td><td>Prints <code>id</code>, <code>version</code>, lifecycle, classification, and publisher / subscriber counts and ids.</td></tr>
+            <tr><td><code>trace inspect &lt;trace-path&gt;</code></td><td>Parse and summarize a runtime trace artifact.</td><td>Prints <code>trace_id</code>, <code>execution_id</code>, <code>request_id</code>, governing spec, state-machine validation, transition counts, and terminal outcome.</td></tr>
+            <tr><td><code>workflow inspect &lt;workflow-path&gt;</code></td><td>Parse and summarize a workflow definition.</td><td>Prints <code>id</code>, <code>version</code>, lifecycle, start node, terminal nodes, node / edge counts, and edges.</td></tr>
+            <tr><td><code>expedition execute &lt;request-path&gt; [--trace-out &lt;path&gt;]</code></td><td>Execute the canonical expedition workflow through the runtime.</td><td>Prints <code>request_id</code>, <code>execution_id</code>, <code>capability_id</code>, <code>status</code>, <code>trace_ref</code>, and result fields such as <code>plan_id</code>.</td></tr>
+          </tbody>
+        </table>
       </section>
+
+      <section class="doc-section" id="app">
+        <h2 class="t-h2">App commands</h2>
+        <p class="t-body t-muted">The local-dev app setup flow. It consumes an <a href="/docs/app-manifest.html">app manifest</a>. It is a local-dev surface, not an HTTP registration endpoint or a runtime admin API.</p>
+        <table class="ref">
+          <thead><tr><th>Command</th><th>Purpose</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td><code>app new &lt;app-id&gt; [--register --workspace &lt;id&gt;]</code></td><td>Scaffold a governed app bundle under <code>apps/&lt;app-id&gt;</code>.</td><td>Creates <code>app.manifest.json</code>, <code>workspace.config.json</code>, component / workflow directories, and a README. <code>--register</code> rejects the initial incomplete scaffold.</td></tr>
+            <tr><td><code>app validate --manifest &lt;path&gt; --json</code></td><td>Validate an app manifest and emit setup evidence without writing state. Read-only.</td><td>JSON with <code>status: validated</code>, app identity, component / workflow ids, verified WASM digests, public surfaces, model readiness, and runtime references.</td></tr>
+            <tr><td><code>app register --manifest &lt;path&gt; --workspace &lt;id&gt; --json</code></td><td>Validate, then atomically persist local workspace registration state.</td><td>JSON with <code>status: registered</code> or <code>already_registered</code>, <code>state_scope: workspace_persisted</code>, <code>state_path</code>, and digest evidence.</td></tr>
+            <tr><td><code>app activate --manifest &lt;path&gt; --workspace &lt;id&gt; --host-activation &lt;path&gt; --json</code></td><td>Resolve declared connector bindings and every required contract against host-installed executable artifacts.</td><td>JSON with <code>status: activated</code>, connector evidence, selected package identity / digest / ABI / placement / constraints, and eligibility evidence. Writes an immutable <code>activation.json</code> with no configuration values.</td></tr>
+          </tbody>
+        </table>
+        <p class="t-body t-muted">Registration state is written under <code>.traverse/workspaces/&lt;workspace-id&gt;/apps/&lt;app-id&gt;/&lt;version&gt;/</code>. Re-registering unchanged state is idempotent. A host runtime must consume the activation record and fail closed if the selected artifact drifts, rather than re-resolving at execution time.</p>
+      </section>
+
       <section class="doc-section">
-        <h2 class="t-h2">Bundles, events, and apps</h2>
-        <p class="t-body t-muted">The CLI also exposes bundle, registry, event, and app workflows. Use the checked-in documentation for stable instructions and <code>--help</code> for the precise surface in the version you have installed.</p>
-        <ul><li><a href="https://github.com/traverse-framework/traverse/blob/main/docs/getting-started.md">Getting started</a></li><li><a href="https://github.com/traverse-framework/traverse/blob/main/docs/event-contract-authoring-guide.md">Event contract authoring</a></li><li><a href="https://github.com/traverse-framework/traverse/blob/main/docs/app-consumable-entry-path.md">App-consumable entry path</a></li></ul>
+        <h2 class="t-h2">Capability package commands</h2>
+        <p class="t-body t-muted">These consume a <a href="/docs/app-manifest.html">capability package manifest</a>.</p>
+        <table class="ref">
+          <thead><tr><th>Command</th><th>Purpose</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td><code>capability new &lt;capability-id&gt;</code></td><td>Scaffold a governed WASM capability package under <code>capabilities/&lt;capability-id&gt;</code>.</td><td>Creates a loadable <code>kind: capability_package</code> manifest, a contract with authorable input / output fields, a <code>#![no_std]</code> WASI guest stub, and a sample runtime request. (<code>component new</code> is retired and redirects here.)</td></tr>
+            <tr><td><code>capability-package inspect &lt;manifest-path&gt;</code></td><td>Load and summarize a capability package manifest.</td><td>Prints <code>package_id</code>, <code>package_version</code>, <code>capability_id</code>, binary location, digest, and model / workflow references.</td></tr>
+            <tr><td><code>capability-package execute &lt;manifest-path&gt; &lt;request-path&gt;</code></td><td>Load a capability package and execute it against a runtime request.</td><td>Prints <code>request_id</code>, <code>execution_id</code>, <code>package_id</code>, <code>capability_id</code>, <code>trace_ref</code>, <code>status</code>, and result fields.</td></tr>
+          </tbody>
+        </table>
       </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Stable public surface</h2>
+        <p class="t-body t-muted">These families are the documented surface for the current release line — the commands a downstream developer should rely on from the terminal:</p>
+        <p class="t-body t-muted"><code>bundle inspect</code>, <code>bundle register</code>, <code>app new</code>, <code>app validate</code>, <code>app register</code>, <code>capability new</code>, <code>capability-package inspect</code>, <code>capability-package execute</code>, <code>event inspect</code>, <code>trace inspect</code>, <code>workflow inspect</code>, <code>expedition execute</code>.</p>
+        <p class="t-body t-muted">Inspect and execute commands print structured summaries to stdout. <code>serve</code> prints a listening address and stays active. Errors go to stderr with a non-zero exit code. Paths under <code>contracts/examples/</code>, <code>workflows/examples/</code>, <code>examples/</code>, <code>scripts/ci/</code>, and <code>target/</code> are reference assets and test helpers, not a product API.</p>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Federation (partial, deferred by design)</h2>
+        <p class="t-body t-muted">The <code>federation</code> family implements manual multi-instance registry federation only — <code>federation peers</code> (peer listing and status), <code>federation sync</code> (manual trigger), <code>federation status</code> (peer sync summary). Automatic sync, a central coordinator, automatic conflict resolution, and a streaming sync transport do not exist. Do not build workflows that depend on them.</p>
+      </section>
+
+      <div class="src-link">
+        Canonical source: <a href="https://github.com/traverse-framework/traverse/blob/main/docs/cli-reference.md">docs/cli-reference.md</a>,
+        checked against live <code>--help</code> output and <code>scripts/ci/repository_checks.sh</code>.
+        Related: <a href="https://github.com/traverse-framework/traverse/blob/main/docs/capability-contract-authoring-guide.md">capability contract authoring</a>,
+        <a href="https://github.com/traverse-framework/traverse/blob/main/docs/event-contract-authoring-guide.md">event contract authoring</a>,
+        <a href="https://github.com/traverse-framework/traverse/blob/main/docs/getting-started.md">getting started</a>.
+      </div>
     </main>
   </div>
-  <style is:global>.docs-content{max-width:820px}.docs-content h1{margin:.4rem 0 .75rem}.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.25rem 0 2.5rem}.doc-section{border-top:1px solid var(--border);padding:2rem 0}.doc-section p{margin:.75rem 0 1rem}.doc-section li{margin:.55rem 0}pre{overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem}</style>
+  <style is:global>.docs-content{max-width:820px}.docs-content h1{margin:.4rem 0 .75rem}.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.25rem 0 2.5rem}.doc-section{border-top:1px solid var(--border);padding:2rem 0}.doc-section:first-of-type{border-top:none}.doc-section h2{margin-bottom:.5rem}.doc-section p{margin:.75rem 0 1rem}.doc-section li{margin:.4rem 0}pre{overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;font-size:.82rem;line-height:1.6}pre code{color:var(--fg)}table.ref{width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0}table.ref th{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--border);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-muted)}table.ref td{padding:.55rem .7rem;border-bottom:1px solid var(--border);color:var(--fg-muted);vertical-align:top}table.ref tr:last-child td{border-bottom:none}table.ref code{font-family:var(--font-mono);font-size:.85em;color:var(--accent)}.src-link{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.85rem;color:var(--fg-muted);line-height:1.8}</style>
 </SubpageLayout>

@@ -1,0 +1,99 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+import DocsSidebar from '@components/DocsSidebar.astro';
+---
+
+<SubpageLayout title="WASM I/O Contract — Traverse Framework" description="The normative stdin/stdout JSON contract for WASM-backed capability execution in Traverse: how the runtime passes input, captures output, the deny-by-default execution boundary, and every failure mode." canonical="https://traverse-framework.com/docs/wasm-io-contract.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+  <div class="docs-layout">
+    <DocsSidebar active="/docs/wasm-io-contract.html" />
+    <main class="docs-content">
+      <div class="section-label">Reference</div>
+      <h1 class="t-h1">WASM capability I/O contract</h1>
+      <p class="t-body t-muted">This is the normative stdin/stdout JSON contract for WASM-backed capabilities executed through the <code>WasmExecutor</code> in <code>traverse-runtime</code>. A capability author writes to this boundary; the payload <em>shape</em> on each side is defined by the capability's approved contract.</p>
+      <div class="badges"><span class="badge badge-success badge-dot">v0.10.1</span><span class="badge">stdin / stdout JSON</span></div>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Runtime behavior</h2>
+        <p class="t-body t-muted">To execute a governed WASM capability the runtime:</p>
+        <ol>
+          <li>verifies the resolved capability artifact type is <code>Wasm</code></li>
+          <li>loads the <code>.wasm</code> binary from <code>wasm_binary_path</code></li>
+          <li>verifies the configured SHA-256 digest when <code>wasm_checksum</code> is present</li>
+          <li>serializes the runtime input payload as JSON</li>
+          <li>passes that JSON to the module through WASI stdin</li>
+          <li>captures WASI stdout as the module's result channel</li>
+          <li>parses stdout as JSON and returns that value as the execution result</li>
+        </ol>
+        <p class="t-body t-muted">Each invocation uses a fresh Wasmtime store. The runtime does not preserve mutable WASM process state across calls.</p>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Input contract</h2>
+        <p class="t-body t-muted">The input payload is serialized with <code>serde_json</code> and written to stdin as UTF-8 JSON bytes. Authors should assume:</p>
+        <ul>
+          <li>stdin contains exactly one JSON value — the governed runtime input</li>
+          <li>the payload shape is defined by the approved capability contract, not by ad hoc host conventions</li>
+          <li>input is read from stdin only — not environment variables, files, or network bootstrapping</li>
+        </ul>
+        <p class="t-body t-muted">The runtime does not add framing, headers, or side-channel metadata around the JSON payload.</p>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Output contract</h2>
+        <p class="t-body t-muted">The result must be written to stdout as valid UTF-8 JSON. Authors should assume:</p>
+        <ul>
+          <li>stdout is the authoritative result channel</li>
+          <li>the emitted JSON value becomes the runtime result payload</li>
+          <li>the output shape must satisfy the capability's governed output contract</li>
+        </ul>
+        <p class="t-body t-muted">If stdout is not valid JSON, execution fails with <code>OutputDeserializationFailed</code>.</p>
+        <div class="callout"><strong>v0.10.1:</strong> the native executor accepts a WASI <code>proc_exit(0)</code> as successful completion — a capability that writes its JSON result and then exits cleanly now returns that result as intended. Nonzero process exits are still rejected. See the <a href="/changelog.html">changelog</a>.</div>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Execution boundary</h2>
+        <p class="t-body t-muted">The current WASM execution path is deny-by-default:</p>
+        <ul>
+          <li>stdin is provided and stdout is captured</li>
+          <li>no ambient filesystem authority is granted</li>
+          <li>no ambient network authority is granted</li>
+          <li>no ambient environment-variable contract is granted</li>
+        </ul>
+        <p class="t-body t-muted">Treat any dependency on extra host authority as unsupported unless Traverse explicitly documents and governs it elsewhere.</p>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Failure modes</h2>
+        <p class="t-body t-muted">The execution path fails explicitly — these are supported behaviors and should not be masked with fallback bootstrap logic — when:</p>
+        <ul>
+          <li>the resolved capability is not a WASM artifact</li>
+          <li><code>wasm_binary_path</code> is missing</li>
+          <li>the binary cannot be loaded from disk</li>
+          <li>the configured checksum does not match the loaded binary</li>
+          <li>the module cannot be compiled or linked</li>
+          <li>the module traps or otherwise fails during execution</li>
+          <li>stdout cannot be parsed as JSON</li>
+        </ul>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Authoring guidance</h2>
+        <ul>
+          <li>read the governed input from stdin</li>
+          <li>write exactly the governed result JSON to stdout</li>
+          <li>keep the host interaction model narrow and explicit</li>
+          <li>validate the binary digest after rebuilding the deterministic fixture</li>
+          <li>treat stdin/stdout JSON as the stable execution boundary unless a newer approved spec says otherwise</li>
+        </ul>
+      </section>
+
+      <div class="src-link">
+        Canonical source: <a href="https://github.com/traverse-framework/traverse/blob/main/docs/wasm-io-contract.md">docs/wasm-io-contract.md</a>,
+        grounded in <code>crates/traverse-runtime/src/executor/wasm.rs</code> and its executor tests.
+        Guided authoring: <a href="https://github.com/traverse-framework/traverse/blob/main/docs/wasm-agent-authoring-guide.md">wasm-agent-authoring-guide.md</a>,
+        <a href="https://github.com/traverse-framework/traverse/blob/main/docs/wasm-microservice-authoring-guide.md">wasm-microservice-authoring-guide.md</a>.
+      </div>
+    </main>
+  </div>
+  <style is:global>.docs-content{max-width:820px}.docs-content h1{margin:.4rem 0 .75rem}.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.25rem 0 2.5rem}.doc-section{border-top:1px solid var(--border);padding:2rem 0}.doc-section:first-of-type{border-top:none}.doc-section h2{margin-bottom:.5rem}.doc-section p{margin:.75rem 0 1rem}.doc-section li{margin:.4rem 0}.doc-section ul,.doc-section ol{padding-left:1.25rem;color:var(--fg-muted);font-size:.9375rem;line-height:1.7}pre{overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;font-size:.8rem;line-height:1.6}pre code{color:var(--fg)}.callout{background:color-mix(in srgb,var(--accent) 6%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:8px;padding:1rem 1.25rem;margin:1.25rem 0;font-size:.875rem;color:var(--fg-muted);line-height:1.6}.callout strong{color:var(--fg)}.src-link{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.85rem;color:var(--fg-muted);line-height:1.8}</style>
+</SubpageLayout>

@@ -1,0 +1,123 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+import DocsSidebar from '@components/DocsSidebar.astro';
+---
+
+<SubpageLayout title="App & Package Manifests — Traverse Framework" description="Field reference for the two Traverse manifest kinds: the app manifest (app.manifest.json) that describes an app bundle, and the capability package manifest that describes one executable WASM capability." canonical="https://traverse-framework.com/docs/app-manifest.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+  <div class="docs-layout">
+    <DocsSidebar active="/docs/app-manifest.html" />
+    <main class="docs-content">
+      <div class="section-label">Reference</div>
+      <h1 class="t-h1">App &amp; package manifests</h1>
+      <p class="t-body t-muted">Traverse has two manifest kinds. An <strong>app manifest</strong> (<code>app.manifest.json</code>) describes an app bundle — its components, workflows, configuration, placement policy, and optional state machine. A <strong>capability package manifest</strong> describes a single executable WASM capability: its contract, binary, and execution constraints.</p>
+      <div class="badges"><span class="badge badge-success badge-dot">v0.10.1</span><span class="badge">schema_version 1.0.0</span></div>
+
+      <section class="doc-section">
+        <h2 class="t-h2">App manifest</h2>
+        <p class="t-body t-muted"><code>traverse-cli app new &lt;app-id&gt;</code> scaffolds a bundle with an <code>app.manifest.json</code>, a workspace config, component and workflow directories, and a README. <code>traverse-cli app validate</code>, <code>app register</code>, and <code>app activate</code> all consume this file — see the <a href="/docs/cli-reference.html#app">CLI reference</a>.</p>
+        <table class="ref">
+          <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>app_id</code></td><td>Stable identifier for the app.</td></tr>
+            <tr><td><code>version</code></td><td>Semver version of the app bundle.</td></tr>
+            <tr><td><code>schema_version</code></td><td>Manifest schema version. Currently <code>1.0.0</code>.</td></tr>
+            <tr><td><code>workspace_defaults</code></td><td><code>workspace_id</code> and <code>registry_scope</code> (for example <code>private</code>) used when none is supplied on the command line.</td></tr>
+            <tr><td><code>components[]</code></td><td>Each declares a <code>component_id</code>, <code>version</code>, the verified WASM <code>digest</code> (<code>sha256:…</code>), and a <code>manifest_path</code> to the component manifest inside the bundle.</td></tr>
+            <tr><td><code>workflows[]</code></td><td>Each declares a <code>workflow_id</code>, <code>workflow_version</code>, and a <code>path</code> to the workflow definition.</td></tr>
+            <tr><td><code>model_dependencies[]</code></td><td>Abstract model interfaces the app requires. Empty when the app is fully deterministic.</td></tr>
+            <tr><td><code>config_schema</code></td><td>A JSON Schema for the app's runtime configuration object. <code>traverse-cli app validate</code> checks <code>default_config</code> against it.</td></tr>
+            <tr><td><code>default_config</code></td><td>The configuration values applied when a host supplies none. Must satisfy <code>config_schema</code>.</td></tr>
+            <tr><td><code>placement_policy</code></td><td><code>preferred_targets[]</code> (for example <code>["local"]</code> or <code>["browser"]</code>) and <code>allow_fallback</code> (boolean).</td></tr>
+            <tr><td><code>public_surfaces[]</code></td><td>Which surfaces the app exposes: <code>cli</code>, <code>http_json</code>, <code>mcp</code>.</td></tr>
+            <tr><td><code>state_machine</code></td><td>Optional runtime-owned state machine. Full field reference on the <a href="/docs/state-machine.html">App state machine</a> page.</td></tr>
+          </tbody>
+        </table>
+<pre><code>&#123;
+  "app_id": "traverse-starter",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "workspace_defaults": &#123; "workspace_id": "local-default", "registry_scope": "private" &#125;,
+  "components": [
+    &#123;
+      "component_id": "traverse-starter.process-component",
+      "version": "1.0.0",
+      "digest": "sha256:2c6690fd00432f8bff4366d4852395af22a3c766517020532590bab1fba1ab34",
+      "manifest_path": "components/process/component.manifest.json"
+    &#125;
+  ],
+  "workflows": [
+    &#123; "workflow_id": "traverse-starter.process", "workflow_version": "1.0.0", "path": "workflows/process/workflow.json" &#125;
+  ],
+  "model_dependencies": [],
+  "config_schema": &#123;
+    "type": "object",
+    "required": ["workspace_id"],
+    "properties": &#123; "workspace_id": &#123; "type": "string" &#125; &#125;,
+    "additionalProperties": false
+  &#125;,
+  "default_config": &#123; "workspace_id": "local-default" &#125;,
+  "placement_policy": &#123; "preferred_targets": ["local"], "allow_fallback": false &#125;,
+  "public_surfaces": ["cli", "http_json"]
+&#125;</code></pre>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Capability package manifest</h2>
+        <p class="t-body t-muted"><code>traverse-cli capability new &lt;capability-id&gt;</code> scaffolds a governed WASM capability package: a loadable manifest, a contract with authorable input/output fields, a <code>#![no_std]</code> WASI guest stub, and a sample runtime request. The repository keeps a canonical template under <code>examples/templates/executable-capability-package/</code>.</p>
+        <table class="ref">
+          <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>kind</code></td><td>Always <code>capability_package</code>.</td></tr>
+            <tr><td><code>schema_version</code></td><td>Manifest schema version. Currently <code>1.0.0</code>.</td></tr>
+            <tr><td><code>package_id</code> / <code>version</code></td><td>Package identity and semver version.</td></tr>
+            <tr><td><code>summary</code></td><td>One-line statement of the package's governed purpose.</td></tr>
+            <tr><td><code>capability_ref</code></td><td>The governed capability this package implements: <code>id</code>, <code>version</code>, and <code>contract_path</code> to the contract JSON.</td></tr>
+            <tr><td><code>known_compositions[]</code></td><td>Optional advisory list of <code>workflow_id</code> / <code>workflow_version</code> pairs the package participates in. Legacy <code>workflow_refs</code> is accepted only during the schema-v1 migration window.</td></tr>
+            <tr><td><code>source</code></td><td>Colocated source: <code>path</code>, <code>language</code>, and <code>entry</code> symbol.</td></tr>
+            <tr><td><code>binary</code></td><td>Colocated artifact: <code>path</code>, <code>format</code> (<code>wasm</code>), <code>expected_digest</code>, and <code>abi_version</code>.</td></tr>
+            <tr><td><code>constraints</code></td><td>Explicit execution limits: <code>host_api_access</code>, <code>network_access</code>, <code>filesystem_access</code>. The current WASM path is deny-by-default — see the <a href="/docs/wasm-io-contract.html">I/O contract</a>.</td></tr>
+            <tr><td><code>model_dependencies[]</code></td><td>Abstract model interfaces the implementation depends on, each with an <code>interface</code> name and a <code>purpose</code>.</td></tr>
+          </tbody>
+        </table>
+<pre><code>&#123;
+  "kind": "capability_package",
+  "schema_version": "1.0.0",
+  "package_id": "example.domain.replace-me",
+  "version": "0.1.0",
+  "summary": "Replace this summary with the governed executable capability package purpose.",
+  "capability_ref": &#123;
+    "id": "example.domain.replace-me",
+    "version": "1.0.0",
+    "contract_path": "../../../contracts/examples/replace-me/contract.json"
+  &#125;,
+  "known_compositions": [
+    &#123; "workflow_id": "example.domain.replace-me-workflow", "workflow_version": "1.0.0" &#125;
+  ],
+  "source": &#123; "path": "./src/implementation.rs", "language": "rust", "entry": "run" &#125;,
+  "binary": &#123;
+    "path": "./artifacts/package.wasm",
+    "format": "wasm",
+    "expected_digest": "fnv1a64:dffc31d6401c84d6",
+    "abi_version": "1.0.0"
+  &#125;,
+  "constraints": &#123; "host_api_access": "none", "network_access": "forbidden", "filesystem_access": "none" &#125;,
+  "model_dependencies": [
+    &#123; "interface": "replace-me-interface-v1", "purpose": "Replace this text with the abstract model dependency purpose." &#125;
+  ]
+&#125;</code></pre>
+        <div class="callout">The template ships a tiny deterministic WASM fixture and a colocated <code>build-fixture.sh</code> so packaging, inspection, and smoke validation stay runnable without a full external WASM toolchain. The build command must write the binary into <code>./artifacts/</code>, be deterministic, and print the path it built.</div>
+      </section>
+
+      <div class="src-link">
+        Canonical source:
+        <a href="https://github.com/traverse-framework/traverse/blob/main/docs/executable-package-template.md">docs/executable-package-template.md</a>,
+        <a href="https://github.com/traverse-framework/traverse/blob/main/docs/app-consumable-consumer-bundle.md">docs/app-consumable-consumer-bundle.md</a>,
+        and the templates under
+        <a href="https://github.com/traverse-framework/traverse/tree/main/examples/applications">examples/applications/</a>
+        and
+        <a href="https://github.com/traverse-framework/traverse/tree/main/examples/templates/executable-capability-package">examples/templates/executable-capability-package/</a>.
+      </div>
+    </main>
+  </div>
+  <style is:global>.docs-content{max-width:820px}.docs-content h1{margin:.4rem 0 .75rem}.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.25rem 0 2.5rem}.doc-section{border-top:1px solid var(--border);padding:2rem 0}.doc-section:first-of-type{border-top:none}.doc-section h2{margin-bottom:.5rem}.doc-section p{margin:.75rem 0 1rem}.doc-section li{margin:.4rem 0}.doc-section ul,.doc-section ol{padding-left:1.25rem;color:var(--fg-muted);font-size:.9375rem;line-height:1.7}pre{overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;font-size:.8rem;line-height:1.6}pre code{color:var(--fg)}table.ref{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}table.ref th{text-align:left;padding:.55rem .75rem;border-bottom:1px solid var(--border);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-muted)}table.ref td{padding:.55rem .75rem;border-bottom:1px solid var(--border);color:var(--fg-muted);vertical-align:top}table.ref tr:last-child td{border-bottom:none}table.ref code{font-family:var(--font-mono);font-size:.82em;color:var(--accent)}.callout{background:color-mix(in srgb,var(--accent) 6%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:8px;padding:1rem 1.25rem;margin:1.25rem 0;font-size:.875rem;color:var(--fg-muted);line-height:1.6}.callout strong{color:var(--fg)}.src-link{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.85rem;color:var(--fg-muted);line-height:1.8}</style>
+</SubpageLayout>
