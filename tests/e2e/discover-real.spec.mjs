@@ -65,7 +65,7 @@ test('Real pipeline executes three published capabilities in order, in the brows
   await expect(page.locator('#discover-pipeline-outputs')).toContainText('uncertainty.score');
 });
 
-test('Runtime-discovered mode plans a real workflow from the live registry (review only)', async ({ page }) => {
+test('Runtime-discovered mode: plan from the live registry, review, then composed-execute', async ({ page }) => {
   test.slow(); // fetches the live catalog + prepares artifacts
   await page.goto('/discover.html');
   await page.locator('#discover-disc-run').click();
@@ -75,11 +75,18 @@ test('Runtime-discovered mode plans a real workflow from the live registry (revi
   await expect(page.locator('#discover-disc-badge')).toHaveText('Discovered: planned (review only)', { timeout: 40_000 });
   await expect(result).toHaveAttribute('data-outcome', 'ok');
 
-  await expect(page.locator('#discover-disc-target')).toHaveText('uncertainty.score@1.0.0');
-  await expect(page.locator('#discover-disc-chain')).toContainText('uncertainty.score@1.0.0');
+  await expect(page.locator('#discover-disc-target')).toHaveText('uncertainty.score@1.1.0');
+  await expect(page.locator('#discover-disc-chain')).toContainText('uncertainty.score@1.1.0');
   await expect(page.locator('#discover-disc-mappings')).toContainText('mapping_unconfirmed');
   await expect(page.locator('#discover-disc-log')).toContainText('deterministic, structural');
-  await expect(page.locator('#discover-disc-log')).toContainText('not executed');
-  // review only — no execution outcome element exists in this mode
-  await expect(page.locator('#discover-disc-note')).toContainText('not executed');
+
+  // explicit review gate, then real composed execution
+  const exec = page.locator('#discover-disc-exec');
+  await expect(exec).toBeVisible();
+  await exec.click();
+  await expect(page.locator('#discover-disc-badge')).toHaveText('Discovered: executed', { timeout: 40_000 });
+  await expect(result).toHaveAttribute('data-outcome', 'executed');
+  await expect(page.locator('#discover-disc-trace')).toContainText('terminal: succeeded');
+  await expect(page.locator('#discover-disc-trace')).toContainText('uncertainty.score@1.1.0');
+  await expect(page.locator('#discover-disc-log')).toContainText('executed offline in your browser');
 });
