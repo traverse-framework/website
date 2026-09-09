@@ -1,0 +1,131 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+import DocsSidebar from '@components/DocsSidebar.astro';
+---
+
+<SubpageLayout title="App State Machine — Traverse Framework" description="Reference for the runtime-owned state machine declared in a Traverse app manifest: states, invoke blocks, transitions, conditional routing, and the error events the runtime emits." canonical="https://traverse-framework.com/docs/state-machine.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+  <div class="docs-layout">
+    <DocsSidebar active="/docs/state-machine.html" />
+    <main class="docs-content">
+      <div class="section-label">Reference</div>
+      <h1 class="t-h1">App state machine</h1>
+      <p class="t-body t-muted">A Traverse app manifest may declare a runtime-owned <code>state_machine</code>. Clients render the current state and send command events; the runtime owns the transition logic so it is not duplicated in every client. This page documents the manifest schema and the runtime's transition semantics.</p>
+      <div class="badges"><span class="badge badge-success badge-dot">v0.10.1</span><span class="badge">app.manifest.json</span></div>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Where it lives</h2>
+        <p class="t-body t-muted">The state machine is an optional <code>state_machine</code> block inside <a href="/docs/app-manifest.html">the app manifest</a> (<code>app.manifest.json</code>). It is validated by <code>traverse-cli app validate</code>, which rejects an invalid state machine before the app can be registered.</p>
+        <table class="ref">
+          <thead><tr><th>Field</th><th>Required</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>initial_state</code></td><td>Yes</td><td>The <code>id</code> of the state a new session starts in. Must name a declared state.</td></tr>
+            <tr><td><code>states[]</code></td><td>Yes</td><td>The declared states. Each <code>id</code> must be unique and non-empty. Every state must be reachable from <code>initial_state</code>, and every transition <code>to</code> must name a declared state.</td></tr>
+            <tr><td><code>list_context_fields[]</code></td><td>No</td><td>Dot-paths rooted at <code>output</code>. The HTTP/JSON session-listing API projects only these fields into each session's <code>context</code>; clients render them but never compute them.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">States</h2>
+        <p class="t-body t-muted">Each entry in <code>states[]</code> has an <code>id</code>, an optional <code>invoke</code> block, and a list of <code>transitions</code>.</p>
+        <table class="ref">
+          <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>Unique, non-empty identifier for the state.</td></tr>
+            <tr><td><code>invoke.capability_id</code></td><td>When present, the runtime invokes this capability on entry to the state. Must reference a capability provided by a component declared in the same app manifest.</td></tr>
+            <tr><td><code>invoke.input_from</code></td><td>Explicit source of the capability input. The first supported value is <code>command.payload</code> — the payload carried on the command event that entered the state.</td></tr>
+            <tr><td><code>transitions[]</code></td><td>The events this state responds to and where each one leads.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Transitions</h2>
+        <p class="t-body t-muted">A transition names an event (<code>on</code>) and a target state (<code>to</code>). Events are either command events sent by a client (for example <code>submit</code>, <code>reset</code>, <code>retry</code>) or the runtime outcome events <code>capability_succeeded</code> and <code>capability_failed</code> emitted after an <code>invoke</code>.</p>
+        <table class="ref">
+          <thead><tr><th>Field</th><th>Required</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>on</code></td><td>Yes</td><td>The event that triggers the transition.</td></tr>
+            <tr><td><code>to</code></td><td>Yes</td><td>The state to move to. Must be a declared state.</td></tr>
+            <tr><td><code>condition</code></td><td>No</td><td>A predicate evaluated against capability output. See <a href="#conditional">Conditional transitions</a>.</td></tr>
+            <tr><td><code>with_last_payload</code></td><td>No</td><td>Defaults to <code>false</code>. When <code>true</code>, the transition re-uses the payload from the previous command instead of requiring a fresh one — used for <code>retry</code> into an <code>invoke</code> state.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Example: linear flow</h2>
+        <p class="t-body t-muted">The <code>traverse-starter</code> app: an idle state accepts <code>submit</code>, a processing state invokes a capability, and success or failure routes to a results or error state. The error state offers <code>retry</code> (re-using the last payload) and <code>reset</code>.</p>
+<pre><code>&#123;
+  "state_machine": &#123;
+    "initial_state": "idle",
+    "list_context_fields": ["output.title", "output.status", "output.suggestedNextAction"],
+    "states": [
+      &#123; "id": "idle", "transitions": [&#123; "on": "submit", "to": "processing" &#125;] &#125;,
+      &#123;
+        "id": "processing",
+        "invoke": &#123; "capability_id": "traverse-starter.process", "input_from": "command.payload" &#125;,
+        "transitions": [
+          &#123; "on": "capability_succeeded", "to": "results" &#125;,
+          &#123; "on": "capability_failed", "to": "error" &#125;
+        ]
+      &#125;,
+      &#123; "id": "results", "transitions": [&#123; "on": "reset", "to": "idle" &#125;] &#125;,
+      &#123;
+        "id": "error",
+        "transitions": [
+          &#123; "on": "retry", "to": "processing", "with_last_payload": true &#125;,
+          &#123; "on": "reset", "to": "idle" &#125;
+        ]
+      &#125;
+    ]
+  &#125;
+&#125;</code></pre>
+      </section>
+
+      <section class="doc-section" id="conditional">
+        <h2 class="t-h2">Conditional transitions</h2>
+        <p class="t-body t-muted">A <code>capability_succeeded</code> transition may carry a <code>condition</code> that is evaluated against the capability output. This lets the runtime branch on a result without the client re-implementing the routing logic.</p>
+<pre><code>&#123;
+  "on": "capability_succeeded",
+  "condition": &#123; "field": "output.confidence_score", "op": "gte", "value": 0.85 &#125;,
+  "to": "auto_approved"
+&#125;</code></pre>
+        <ul>
+          <li><code>condition.field</code> — a non-empty dot path rooted at <code>output</code>.</li>
+          <li><code>condition.op</code> — one of the operators below.</li>
+          <li><code>condition.value</code> — required for every operator except <code>exists</code>.</li>
+        </ul>
+        <table class="ref">
+          <thead><tr><th>Operator</th><th>Matches when the field value…</th></tr></thead>
+          <tbody>
+            <tr><td><code>eq</code></td><td>equals <code>value</code></td></tr>
+            <tr><td><code>neq</code></td><td>does not equal <code>value</code></td></tr>
+            <tr><td><code>gt</code> / <code>gte</code></td><td>is greater than / greater than or equal to <code>value</code></td></tr>
+            <tr><td><code>lt</code> / <code>lte</code></td><td>is less than / less than or equal to <code>value</code></td></tr>
+            <tr><td><code>in</code></td><td>is contained in the array <code>value</code></td></tr>
+            <tr><td><code>exists</code></td><td>is present and not null</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="doc-section">
+        <h2 class="t-h2">Evaluation order and error events</h2>
+        <p class="t-body t-muted">For a given <code>on</code> event, transitions are evaluated in manifest order:</p>
+        <ol>
+          <li>Conditional transitions first, in the order they appear. The first one whose condition matches wins.</li>
+          <li>An unconditional transition for the same event is a fallback, evaluated only after every conditional transition has failed to match.</li>
+        </ol>
+        <p class="t-body t-muted">If nothing matches a <code>capability_succeeded</code> event, the runtime emits a structured <code>no_matching_transition</code> error event and leaves the session state unchanged. If an operator cannot be evaluated because the output value and the condition value have incompatible types, it emits <code>condition_type_error</code> and likewise retains the invoking state. Both events carry the capability output and the execution identifiers so a client can diagnose the result without re-deriving routing.</p>
+        <div class="callout"><strong>Not in scope for the manifest slice.</strong> HTTP command-dispatch and state-subscription endpoints, multi-session listing semantics, and durable execution of state-machine sessions are governed by separate specs and surfaces — see the HTTP/JSON API spec.</div>
+      </section>
+
+      <div class="src-link">
+        Canonical source: <a href="https://github.com/traverse-framework/traverse/blob/main/docs/app-state-machine-runtime.md">docs/app-state-machine-runtime.md</a>,
+        spec <a href="https://github.com/traverse-framework/traverse/blob/main/specs/052-app-state-machine/spec.md">052-app-state-machine</a>,
+        and spec <a href="https://github.com/traverse-framework/traverse/blob/main/specs/053-conditional-state-transitions/spec.md">053-conditional-state-transitions</a>.
+      </div>
+    </main>
+  </div>
+  <style is:global>.docs-content{max-width:820px}.docs-content h1{margin:.4rem 0 .75rem}.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.25rem 0 2.5rem}.doc-section{border-top:1px solid var(--border);padding:2rem 0}.doc-section:first-of-type{border-top:none}.doc-section h2{margin-bottom:.5rem}.doc-section p{margin:.75rem 0 1rem}.doc-section li{margin:.4rem 0}.doc-section ul,.doc-section ol{padding-left:1.25rem;color:var(--fg-muted);font-size:.9375rem;line-height:1.7}pre{overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;font-size:.8rem;line-height:1.6}pre code{color:var(--fg)}table.ref{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}table.ref th{text-align:left;padding:.55rem .75rem;border-bottom:1px solid var(--border);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-muted)}table.ref td{padding:.55rem .75rem;border-bottom:1px solid var(--border);color:var(--fg-muted);vertical-align:top}table.ref tr:last-child td{border-bottom:none}table.ref code{font-family:var(--font-mono);font-size:.82em;color:var(--accent)}.callout{background:color-mix(in srgb,var(--accent) 6%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:8px;padding:1rem 1.25rem;margin:1.25rem 0;font-size:.875rem;color:var(--fg-muted);line-height:1.6}.callout strong{color:var(--fg)}.src-link{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.85rem;color:var(--fg-muted);line-height:1.8}</style>
+</SubpageLayout>
