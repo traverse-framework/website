@@ -240,3 +240,35 @@ test('buildSnapshot skips deprecated and pins a self-consistent releaseTag', asy
   assert.equal(snap.capabilities[0].id, 'a.one');
   assert.match(snap.releaseTag, /^catalog-[0-9a-f]{16}$/);
 });
+
+test('discovered mode plans AND composed-executes against the live registry (@1.1.0 pure_read)', { skip: !process.env.CHECK_REGISTRY && 'set CHECK_REGISTRY=1 for the networked end-to-end check' }, async () => {
+  const { executeBrowserComposedWorkflow } = await import('traverse-embedder-web');
+  const raw = await (await fetch('https://registry.traverse-framework.com/catalog.json', { cache: 'no-store' })).json();
+  const snapshot = await buildSnapshot(raw);
+  const identity = await snapshotIdentity(snapshot);
+
+  const MIRROR = 'https://registry.traverse-framework.com';
+  const fetcher = { async fetch(url) {
+    let u = url; const m = url.match(/\/artifacts\/([^/]+)\/([^/]+)$/);
+    if (m && url.startsWith('https://github.com/')) u = `${MIRROR}/artifacts/${m[1]}/${m[2]}`;
+    const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); return new Uint8Array(await r.arrayBuffer());
+  } };
+  const store = new MemoryRegistryCacheStore();
+  const deps = [];
+  for (const r of [['period', 'period.finalize'], ['summary', 'summary.aggregate'], ['uncertainty', 'uncertainty.score']]) {
+    const ref = { namespace: r[0], id: r[1], versionRange: '1.1.0' };
+    await prepareRegistryDependency(store, snapshot, ref, fetcher);
+    deps.push(await resolveRegistryDependencyOffline(store, ref));
+  }
+  const res = await browserLocalPlan(
+    identity, snapshot, deps,
+    { capability_id: 'uncertainty.score', capability_version: '1.1.0' },
+    { coverage_state: 'partial', period_key: '2026-08-17', scope_id: 'golden-bc', watermark: 'w', policy: { version: 'p1' }, included_reference_ids: ['a', 'b'], pending_reference_ids: ['c'] },
+    'local-default', { app_id: 'discover-discovered', version: '1.0.0', schema_version: '1.0.0' },
+  );
+  assert.ok(res.proposals.length >= 1);
+  const reviewed = { ...res.proposals[0], mapping_unconfirmed: false };
+  const trace = await executeBrowserComposedWorkflow(reviewed, store, snapshot);
+  assert.equal(trace.terminal_state, 'succeeded', JSON.stringify(trace));
+  assert.ok(trace.node_outcomes.every((o) => o.status === 'succeeded'));
+});

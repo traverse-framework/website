@@ -19,13 +19,15 @@ const REGISTRY_BASE = 'https://registry.traverse-framework.com';
 const CONTRACT_SCHEMA_VERSION = '1.0.0';
 
 /* Committed goal: a structured Spec-113 target + starting facts. No natural
-   language -- the target is an exact capability identity. */
+   language -- the target is an exact capability identity. The candidates are
+   the pure_read / deterministic (`is_automatic_eligible`) @1.1.0 releases;
+   the planner and the composed-execution handoff both require that class. */
 const GOAL = Object.freeze({
-  target: { capability_id: 'uncertainty.score', capability_version: '1.0.0' },
+  target: { capability_id: 'uncertainty.score', capability_version: '1.1.0' },
   candidate_refs: [
-    { namespace: 'period', id: 'period.finalize', versionRange: '1.0.0' },
-    { namespace: 'summary', id: 'summary.aggregate', versionRange: '1.0.0' },
-    { namespace: 'uncertainty', id: 'uncertainty.score', versionRange: '1.0.0' },
+    { namespace: 'period', id: 'period.finalize', versionRange: '1.1.0' },
+    { namespace: 'summary', id: 'summary.aggregate', versionRange: '1.1.0' },
+    { namespace: 'uncertainty', id: 'uncertainty.score', versionRange: '1.1.0' },
   ],
   starting_facts: {
     coverage_state: 'partial',
@@ -44,6 +46,10 @@ const FAIL = {
   snapshot: { badge: 'Discovered: failed (snapshot)', line: '✗ discovered mode halted — the registry snapshot could not be verified (%s). Refusing to plan over unverified metadata.' },
   plan: { badge: 'Discovered: failed (plan)', line: '✗ discovered mode halted — the planner rejected the inputs (%s).' },
   empty: { badge: 'Discovered: no candidate', line: '✗ no structural candidate — the planner found no capability chain from the stated goal and facts. This is a real "no plan" outcome, not an error.' },
+  exec_identity: { badge: 'Discovered: failed (identity)', line: '✗ execution halted — a reviewed node no longer matches the verified snapshot or prepared artifact (%s). Refusing to run drifted content.' },
+  exec_authorization: { badge: 'Discovered: failed (authorization)', line: '✗ execution halted — the local runtime declined to authorize a node (%s). This is a real governance decision, not an error.' },
+  exec_invalid: { badge: 'Discovered: failed (invalid)', line: '✗ execution halted — the reviewed proposal failed structural validation (%s).' },
+  exec_failed: { badge: 'Discovered: run failed', line: '✗ a node returned an error during real execution (%s). Later nodes were not started. Not reporting this as a success.' },
 };
 
 /* BrowserPlanError codes -> which fail bucket. */
@@ -51,6 +57,17 @@ function classifyPlanError(code) {
   if (/snapshot/.test(code)) return 'snapshot';
   return 'plan';
 }
+
+/* ComposedWorkflowError codes -> which fail bucket. */
+function classifyExecError(code) {
+  if (code === 'composed_workflow_approval_required') return 'exec_authorization';
+  if (code === 'composed_workflow_proposal_invalid') return 'exec_invalid';
+  if (/snapshot|missing_capability|evidence_mismatch|digest_drift|contract_invalid|registry_rejected/.test(code)) return 'exec_identity';
+  return 'exec_failed';
+}
+
+/* Set between the plan click and the execute click. */
+let pending = null;
 
 function el(id) { return document.getElementById(id); }
 function setBadge(text, state) { const b = el('discover-disc-badge'); if (b) { b.textContent = text; b.dataset.state = state; } }
@@ -163,10 +180,53 @@ function renderProposal(proposal, truncated) {
   const noteEl = el('discover-disc-note');
   if (noteEl) {
     noteEl.textContent = (truncated ? 'Candidate search hit the plan bound; showing the first proposal. ' : '') +
-      'This proposal is not executed. Every mapping is unconfirmed until a reviewer clears it, and composed execution ' +
-      'is blocked upstream (registry#418) until published capabilities carry a pure_read risk classification.';
+      'Every mapping is unconfirmed. Executing clears them for this run and hands the reviewed proposal to the local ' +
+      'governed runtime — it runs only exact, prepared, digest-verified pure_read components, offline, and fails closed.';
   }
-  line('✓ proposal derived structurally: ' + proposal.proposal.nodes.map((n) => n.capability_id).join(' → ') + ' — review only, not executed', 'ok');
+
+  const execBtn = el('discover-disc-exec');
+  if (execBtn) execBtn.hidden = false;
+
+  line('✓ proposal derived structurally: ' + proposal.proposal.nodes.map((n) => n.capability_id).join(' → ') + ' — review, then execute', 'ok');
+}
+
+function renderTrace(trace) {
+  const panel = el('discover-disc-result');
+  if (panel) panel.dataset.outcome = trace.terminal_state === 'succeeded' ? 'executed' : 'failed';
+  setBadge(trace.terminal_state === 'succeeded' ? 'Discovered: executed' : 'Discovered: run failed', trace.terminal_state === 'succeeded' ? 'ok' : 'failed');
+
+  const traceEl = el('discover-disc-trace');
+  if (traceEl) {
+    traceEl.innerHTML =
+      '<div class="discover-disc-sub-h">Redacted per-node trace · terminal: ' + trace.terminal_state + '</div>' +
+      '<ol class="discover-disc-chain">' + trace.node_outcomes.map((o) =>
+        '<li data-state="' + (o.status === 'succeeded' ? 'complete' : (o.status === 'failed' ? 'failed' : 'idle')) + '">' +
+        '<code>' + o.capability_id + '@' + o.capability_version + '</code> — ' + o.status +
+        (o.failure_class ? ' (' + o.failure_class + ')' : '') + '</li>').join('') + '</ol>' +
+      '<p class="discover-real-quote-note">Governed execution returns only per-node status + failure class — no raw inputs, outputs, or payload bytes (Spec 1277 FR-007).</p>';
+  }
+  line(trace.terminal_state === 'succeeded'
+    ? '✓ real composed run complete — ' + trace.node_outcomes.map((o) => o.capability_id).join(' → ') + ' executed offline in your browser'
+    : '✗ real composed run failed at ' + (trace.node_outcomes.find((o) => o.status === 'failed') || {}).capability_id,
+    trace.terminal_state === 'succeeded' ? 'ok' : 'err');
+}
+
+async function runExecute(btn) {
+  if (!pending) return;
+  btn.disabled = true;
+  setBadge('Discovered: executing…', 'running');
+  line('$ confirm mappings & hand the reviewed proposal to executeBrowserComposedWorkflow (offline, governed)', 'cmd');
+
+  const reviewed = { ...pending.proposal, mapping_unconfirmed: false };
+  try {
+    const trace = await pending.exec(reviewed, pending.store, pending.snapshot);
+    renderTrace(trace);
+  } catch (err) {
+    const code = err && err.code ? err.code : String(err && err.name || 'error');
+    fail(classifyExecError(code), (code + (err && err.node_id ? ' @ ' + err.node_id : '')).slice(0, 80));
+    console.error('[discover-discovered] execution refused', err);
+  }
+  btn.disabled = true; // one run per plan
 }
 
 async function runDiscovered(btn) {
@@ -187,7 +247,12 @@ async function runDiscovered(btn) {
     btn.disabled = false;
     return;
   }
-  const { MemoryRegistryCacheStore, prepareRegistryDependency, resolveRegistryDependencyOffline, browserLocalPlan, BrowserPlanError } = mod;
+  const { MemoryRegistryCacheStore, prepareRegistryDependency, resolveRegistryDependencyOffline, browserLocalPlan, BrowserPlanError, executeBrowserComposedWorkflow } = mod;
+  pending = null;
+  const execBtn = el('discover-disc-exec');
+  if (execBtn) { execBtn.hidden = true; execBtn.disabled = false; }
+  const traceEl = el('discover-disc-trace');
+  if (traceEl) traceEl.innerHTML = '';
 
   line('$ fetch ' + CATALOG_URL, 'cmd');
   let catalog;
@@ -241,6 +306,7 @@ async function runDiscovered(btn) {
     btn.disabled = false;
     return;
   }
+  pending = { store, snapshot, proposal: res.proposals[0], exec: executeBrowserComposedWorkflow };
   renderProposal(res.proposals[0], res.plan_search_truncated);
   btn.disabled = false;
 }
@@ -258,4 +324,13 @@ export function initDiscoverDiscovered() {
       btn.disabled = false;
     });
   });
+  const execBtn = el('discover-disc-exec');
+  if (execBtn) {
+    execBtn.addEventListener('click', () => {
+      runExecute(execBtn).catch((err) => {
+        console.error('[discover-discovered] unexpected (exec)', err);
+        fail('exec_failed', 'unexpected');
+      });
+    });
+  }
 }
