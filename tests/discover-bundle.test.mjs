@@ -150,3 +150,93 @@ test('BundleEmbedder runs the pinned 3-node pipeline, each node consuming the pr
   // summary.aggregate -> uncertainty.score: counts drive the score
   assert.equal(out.uncertainty.reason_code, 'pending_fraction');
 });
+
+/* ---- discover-discovered: browser-local planning (Spec 1277 Phase 1) ---- */
+
+import {
+  MemoryRegistryCacheStore, prepareRegistryDependency, resolveRegistryDependencyOffline,
+  browserLocalPlan, BrowserPlanError,
+} from 'traverse-embedder-web';
+import { snapshotIdentity, buildSnapshot } from '../src/scripts/discover-discovered.js';
+
+const pipe = new URL('public/bundles/discover-real-pipeline/', root);
+const readBytes = async (name) => new Uint8Array(await readFile(new URL(name, pipe)));
+const sha = async (bytes) => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
+
+async function planningFixture() {
+  // Build a small SyncedPublicRegistryState from the vendored pipeline artifacts.
+  const files = [
+    { ns: 'period', id: 'period.finalize', wasm: 'finalize.wasm', contract: 'contract.period-finalize.json' },
+    { ns: 'summary', id: 'summary.aggregate', wasm: 'aggregate.wasm', contract: 'contract.summary-aggregate.json' },
+    { ns: 'uncertainty', id: 'uncertainty.score', wasm: 'score.wasm', contract: 'contract.uncertainty-score.json' },
+  ];
+  const bytesByUrl = new Map();
+  const capabilities = [];
+  for (const f of files) {
+    const wasmBytes = await readBytes(f.wasm);
+    const contractBytes = new Uint8Array(await readFile(new URL(f.contract, pipe)));
+    const artifactUrl = `https://x/artifacts/${f.ns}.${f.id}-1.0.0/${f.wasm}`;
+    const contractUrl = `https://x/artifacts/${f.ns}.${f.id}-1.0.0/contract.json`;
+    bytesByUrl.set(artifactUrl, wasmBytes);
+    bytesByUrl.set(contractUrl, contractBytes);
+    capabilities.push({
+      namespace: f.ns, id: f.id, version: '1.0.0',
+      digest: await sha(wasmBytes), artifactUrl,
+      contractUrl, contractDigest: await sha(contractBytes),
+      deprecated: false,
+    });
+  }
+  const snapshot = { releaseTag: 'fixture-1', capabilities };
+  const identity = await snapshotIdentity(snapshot);
+  const fetcher = { async fetch(url) { const b = bytesByUrl.get(url); if (!b) throw new Error('404 ' + url); return b; } };
+  const store = new MemoryRegistryCacheStore();
+  const deps = [];
+  for (const c of capabilities) {
+    const ref = { namespace: c.namespace, id: c.id, versionRange: '1.0.0' };
+    await prepareRegistryDependency(store, snapshot, ref, fetcher);
+    deps.push(await resolveRegistryDependencyOffline(store, ref));
+  }
+  return { snapshot, identity, deps };
+}
+
+const DISC_TARGET = { capability_id: 'uncertainty.score', capability_version: '1.0.0' };
+const DISC_FACTS = {
+  coverage_state: 'partial', included_reference_ids: ['obs-2', 'obs-1'], pending_reference_ids: ['unk-1'],
+  period_key: '2026-08-17', scope_id: 'golden-bc', watermark: 'capture-watermark-001', policy: { version: 'policy-1' },
+};
+const DISC_MANIFEST = { app_id: 'discover-discovered', version: '1.0.0', schema_version: '1.0.0' };
+
+test('browserLocalPlan derives a real structural proposal from a goal (Phase 1)', async () => {
+  const { snapshot, identity, deps } = await planningFixture();
+  const res = await browserLocalPlan(identity, snapshot, deps, DISC_TARGET, DISC_FACTS, 'local-default', DISC_MANIFEST);
+  assert.equal(res.proposals.length >= 1, true, 'expected at least one proposal');
+  const p = res.proposals[0];
+  assert.deepEqual(p.proposal.nodes.map((n) => n.capability_id), ['summary.aggregate', 'uncertainty.score']);
+  assert.equal(p.mapping_unconfirmed, true, 'mappings must be unconfirmed');
+  // node-2 gets included_count / pending_count from node-1's output, policy from facts
+  const m = p.proposal.mappings.filter((x) => x.to_node_id === 'node-2');
+  assert.ok(m.some((x) => x.from_field === 'included_count' && x.source === 'capability_output'));
+  assert.ok(m.some((x) => x.from_field === 'policy' && x.source === 'starting_facts'));
+});
+
+test('browserLocalPlan fails closed on a tampered snapshot', async () => {
+  const { snapshot, identity, deps } = await planningFixture();
+  const tampered = { ...snapshot, capabilities: snapshot.capabilities.slice(0, 2) }; // digest no longer matches identity
+  await assert.rejects(
+    () => browserLocalPlan(identity, tampered, deps, DISC_TARGET, DISC_FACTS, 'local-default', DISC_MANIFEST),
+    (err) => err instanceof BrowserPlanError && /snapshot/.test(err.code),
+  );
+});
+
+test('buildSnapshot skips deprecated and pins a self-consistent releaseTag', async () => {
+  const catalog = {
+    capabilities: [
+      { deprecated: false, contract: { namespace: 'a', id: 'a.one', version: '1.0.0', artifact: { digest: 'sha256:aa', url: 'u1' } }, contract_url: 'c1', contract_digest: 'sha256:cc' },
+      { deprecated: true, contract: { namespace: 'a', id: 'a.two', version: '1.0.0', artifact: { digest: 'sha256:bb', url: 'u2' } }, contract_url: 'c2', contract_digest: 'sha256:dd' },
+    ],
+  };
+  const snap = await buildSnapshot(catalog);
+  assert.equal(snap.capabilities.length, 1);
+  assert.equal(snap.capabilities[0].id, 'a.one');
+  assert.match(snap.releaseTag, /^catalog-[0-9a-f]{16}$/);
+});

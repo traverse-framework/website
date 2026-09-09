@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "astro": "^5.0.0",
-    "traverse-embedder-web": "0.7.0"
+    "traverse-embedder-web": "0.9.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"
