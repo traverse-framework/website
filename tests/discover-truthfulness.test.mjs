@@ -5,127 +5,47 @@ import test from 'node:test';
 const root = new URL('..', import.meta.url);
 const read = (path) => readFile(new URL(path, root), 'utf8');
 
-test('discover clearly separates live catalog, heuristic, and simulation modes', async () => {
+test('/discover states the mechanism honestly and cannot drift back into over-claiming', async () => {
   const page = await read('src/pages/discover.astro');
-  const script = await read('public/assets/js/discover.js');
+  const flow = await read('src/scripts/discover.js');
+  const graph = await read('src/scripts/discover-graph.js');
 
-  assert.match(page, /Live catalog data\. Heuristic composition\. Simulated execution\./);
-  assert.match(page, /does not invoke published WASM, call an MCP endpoint, run the Traverse runtime, or use an LLM/i);
-  assert.match(page, /catalog\.json/);
-  assert.match(script, /Live catalog/);
-  assert.match(script, /Name heuristic/);
-  assert.match(script, /simulation · visualizing derived pipeline states/);
-  assert.doesNotMatch(page, /AI agent, its MCP connection, and the runtime/i);
-  assert.doesNotMatch(script, /label: 'AI Agent'/);
-  assert.doesNotMatch(script, /label: 'MCP'/);
-  assert.doesNotMatch(script, /label: 'Runtime'/);
-});
+  // --- What the page claims it does ---
+  assert.match(page, /Watch a goal get planned and executed — for real\./);
+  assert.match(page, /deterministic structural planner/i);
+  assert.match(page, /no capability-name matching, no natural language, and no model/i);
+  assert.match(page, /no backend, no simulation/i);
+  assert.match(page, /The browser proposes\. The runtime decides\./);
+  assert.match(page, /untrusted/i);
+  assert.match(page, /it never fabricates a success/i);
+  assert.match(page, /Spec 1277|1277-browser-local-workflow-composition/);
 
-test('discover Real mode is opt-in, single-capability, and fails closed', async () => {
-  const page = await read('src/pages/discover.astro');
-  const real = await read('src/scripts/discover-real.js');
-
-  // Opt-in, clearly labelled, single pinned capability -- not the pipeline.
-  assert.match(page, /Run this one for real/);
-  assert.match(page, /core\/core\.calculate-price@1\.1\.0/);
-  assert.match(page, /composed multi-node pipeline is not executed/i);
-  assert.match(page, /stays derived and simulated/i);
-  assert.doesNotMatch(page, /composed (multi-node )?pipeline (is|runs|becomes) (now )?real/i);
-  assert.doesNotMatch(page, /real agent|runtime authority|MCP loop (executes|runs)/i);
-
-  // The simulated-path disclaimer stays present and is scoped to the pipeline.
-  assert.match(page, /composed pipeline above does not invoke published WASM/i);
-
-  // Real module: pinned digest is re-checked before it can report success.
-  assert.match(real, /sha256:a046e5d001ae78b8de339d40378e2c22f04384d601a1b801b52cf99a3e44f0b2/);
-  assert.match(real, /!==\s*PINNED_WASM_DIGEST/);
-  assert.match(real, /capability_result/);
-  assert.match(real, /releaseEvidence/);
-
-  // "executed" / "real run complete" is only claimed in the success path, which
-  // is guarded by the digest check and the capability_result event above.
-  assert.match(real, /real run complete .* executed in your browser/);
-
-  // All six fail-closed states are present with their distinct copy.
-  assert.match(real, /real mode unavailable — the governed browser execution host did not load/);
-  assert.match(real, /real mode unavailable — could not retrieve the verified registry artifact/);
-  assert.match(real, /real mode halted — artifact identity did not match the pinned value/);
-  assert.match(real, /real mode halted — the governed host rejected this input against the published contract/);
-  assert.match(real, /real mode halted — the runtime declined to authorize this invocation/);
-  assert.match(real, /real mode halted — execution did not return a verifiable receipt\. Not reporting this as a success/);
-
-  // No fabricated success: no catch-all that renders ok.
-  assert.doesNotMatch(real, /catch\s*\([^)]*\)\s*\{\s*renderSuccess/);
-});
-
-test('discover Real pipeline is authored, not runtime-discovered, and fails closed', async () => {
-  const page = await read('src/pages/discover.astro');
-  const pipe = await read('src/scripts/discover-real-pipeline.js');
-
-  // It is a real multi-capability execution...
-  assert.match(page, /three-capability pipeline for real/i);
-  assert.match(page, /period\.finalize/);
-  assert.match(page, /summary\.aggregate/);
-  assert.match(page, /uncertainty\.score/);
-  assert.match(pipe, /discover-real-pipeline\.coverage/);
-  assert.match(pipe, /capability_invoked/);
-
-  // ...but the page must NOT claim runtime discovery / selection / an agent.
-  assert.match(page, /authored in the committed bundle/i);
-  assert.match(page, /not discovered or selected at runtime/i);
-  assert.doesNotMatch(page, /(agent|model|planner) (selects|chooses|discovers|picks) (the )?capabilit/i);
-  assert.doesNotMatch(pipe, /label: '(AI Agent|Runtime|MCP|Planner)'/);
-
-  // Three pinned digests, re-checked before success is reported.
-  assert.match(pipe, /sha256:01cb26718120619bed0f2a1c486c1e153e97bd0cdf7810351084cac47359649c/);
-  assert.match(pipe, /sha256:0464da7ebe4784a3b24717b08d26c168b5e901f4d8d5b6efc9693c3323d1d5dd/);
-  assert.match(pipe, /sha256:f218262588e8889eaacf371fc9df17454be40f901f88f379514fcc27365b1a9b/);
-  assert.match(pipe, /!==\s*n\.digest/);
-
-  // Same six fail-closed strings.
-  assert.match(pipe, /real mode unavailable — the governed browser execution host did not load/);
-  assert.match(pipe, /real mode unavailable — could not retrieve the verified registry artifact/);
-  assert.match(pipe, /real mode halted — artifact identity did not match the pinned value/);
-  assert.match(pipe, /real mode halted — the governed host rejected this input against the published contract/);
-  assert.match(pipe, /real mode halted — the runtime declined to authorize this invocation/);
-  assert.match(pipe, /real mode halted — execution did not return a verifiable receipt\. Not reporting this as a success/);
-});
-
-test('discover runtime-discovered mode: structural plan, explicit review gate, governed offline execution, no inference', async () => {
-  const page = await read('src/pages/discover.astro');
-  const disc = await read('src/scripts/discover-discovered.js');
-
-  // Real runtime discovery + planning...
-  assert.match(page, /discover, plan, and execute a workflow from a goal, at runtime/i);
-  assert.match(page, /deterministic browser-local planner/i);
-  assert.match(disc, /browserLocalPlan/);
-  assert.match(disc, /prepareRegistryDependency/);
-  assert.match(disc, /registry_snapshot_digest/);
-
-  // ...structural only — no name / namespace / NL / model inference.
-  assert.match(page, /no capability-name, namespace, natural-language, or model inference/i);
-  assert.doesNotMatch(page, /(AI|LLM|model|agent) (plans|selects|chooses|writes) the workflow/i);
-  assert.doesNotMatch(disc, /\bprompt\b|openai|anthropic|\bllm\b|\bgpt-|inference call|chat\.completions/i);
-
-  // Explicit review gate: mappings are unconfirmed and a SEPARATE action confirms
-  // them; execution never runs off the plan click.
-  assert.match(disc, /mapping_unconfirmed/);
-  assert.match(disc, /mapping_unconfirmed:\s*false/); // cleared only in runExecute, the confirm step
-  assert.match(page, /Confirm mappings &amp; execute for real/);
-  assert.match(page, /every mapping <code>unconfirmed<\/code>/i);
-
-  // Governed, offline, fail-closed execution; browser is an untrusted proposer.
-  assert.match(disc, /executeBrowserComposedWorkflow/);
-  assert.match(page, /local governed runtime/i);
-  assert.match(page, /untrusted proposer/i);
-  assert.match(page, /never fabricates a success/i);
+  // --- What it must NOT claim ---
+  assert.doesNotMatch(page, /\bAI agent\b/i);
+  assert.doesNotMatch(page, /heuristic composition/i);
+  assert.doesNotMatch(page, /simulated (execution|active|complete)/i);
   assert.doesNotMatch(page, /the browser (executes|runs|is) the (runtime|authority)/i);
+  assert.doesNotMatch(page, /(AI|LLM|model|agent) (plans|selects|chooses|writes) the workflow/i);
 
-  // Fail-closed strings — planning and execution.
-  assert.match(disc, /discovered mode unavailable — the governed browser planner did not load/);
-  assert.match(disc, /discovered mode halted — the registry snapshot could not be verified/);
-  assert.match(disc, /discovered mode halted — the planner rejected the inputs/);
-  assert.match(disc, /no structural candidate/);
-  assert.match(disc, /execution halted — the local runtime declined to authorize a node/);
-  assert.match(disc, /a node returned an error during real execution/);
+  // --- The flow module actually does what the copy says ---
+  assert.match(flow, /browserLocalPlan/);
+  assert.match(flow, /executeBrowserComposedWorkflow/);
+  assert.match(flow, /prepareRegistryDependency/);
+  assert.match(flow, /registry_snapshot_digest/);
+  // review gate: mapping_unconfirmed is only cleared in the confirm/execute step
+  const clears = [...flow.matchAll(/mapping_unconfirmed:\s*false/g)];
+  assert.equal(clears.length, 1, 'mapping_unconfirmed must be cleared in exactly one place — the execute step');
+  assert.match(flow.slice(flow.indexOf('async function doExecute')), /mapping_unconfirmed:\s*false/);
+  // no model / prompt / NL parsing anywhere in the flow or the graph
+  assert.doesNotMatch(flow, /\bprompt\b|openai|anthropic|\bllm\b|\bgpt-|chat\.completions/i);
+  assert.doesNotMatch(graph, /\bprompt\b|openai|anthropic|\bllm\b/i);
+
+  // --- Fail-closed strings present ---
+  assert.match(flow, /could not retrieve the live registry catalog or a verified artifact/);
+  assert.match(flow, /the registry snapshot could not be verified/);
+  assert.match(flow, /the planner rejected the inputs/);
+  assert.match(flow, /the local runtime declined to authorize a node/);
+  assert.match(flow, /a node returned an error during real execution/);
+  assert.match(flow, /No structural candidate/);
+  assert.doesNotMatch(flow, /catch\s*\([^)]*\)\s*\{\s*renderTrace/); // no catch-all that paints success
 });
