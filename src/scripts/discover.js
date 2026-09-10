@@ -21,6 +21,20 @@ const CONTRACT_SCHEMA_VERSION = '1.0.0';
    No natural language: the target is an exact capability identity. */
 const GOALS = [
   {
+    id: 'docapproval',
+    label: 'Review a document for approval',
+    blurb: 'From the document text alone the planner chains doc-approval.analyze (extract type, parties, amounts, a confidence) into doc-approval.recommend (approve or route, with a rationale).',
+    kind: 'chain',
+    target: { capability_id: 'doc-approval.recommend', capability_version: '1.4.0' },
+    candidate_refs: [
+      { namespace: 'doc-approval', id: 'doc-approval.analyze', versionRange: '1.4.0' },
+      { namespace: 'doc-approval', id: 'doc-approval.recommend', versionRange: '1.4.0' },
+    ],
+    starting_facts: {
+      document: 'INVOICE\nVendor: Acme Corp\nBill to: Globex Industries\nInvoice #: AC-20481\nTotal due: $4,200.00\nDue date: 2026-10-01\nTerms: Net 30',
+    },
+  },
+  {
     id: 'price',
     label: 'Price a quote',
     blurb: 'One line item, two units at $50, a versioned pricing config with no discounts or tax — target core.calculate-price.',
@@ -36,20 +50,6 @@ const GOALS = [
         version: '1.0', currency: 'USD', rounding: 'half_up', decimal_places: 2,
         discount_rules: [], tax_rules: [],
       },
-    },
-  },
-  {
-    id: 'docapproval',
-    label: 'Review a document for approval',
-    blurb: 'From the document text alone the planner chains doc-approval.analyze (extract type, parties, amounts, a confidence) into doc-approval.recommend (approve or route, with a rationale).',
-    kind: 'chain',
-    target: { capability_id: 'doc-approval.recommend', capability_version: '1.4.0' },
-    candidate_refs: [
-      { namespace: 'doc-approval', id: 'doc-approval.analyze', versionRange: '1.4.0' },
-      { namespace: 'doc-approval', id: 'doc-approval.recommend', versionRange: '1.4.0' },
-    ],
-    starting_facts: {
-      document: 'INVOICE\nVendor: Acme Corp\nBill to: Globex Industries\nInvoice #: AC-20481\nTotal due: $4,200.00\nDue date: 2026-10-01\nTerms: Net 30',
     },
   },
   {
