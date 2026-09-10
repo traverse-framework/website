@@ -21,26 +21,9 @@ const CONTRACT_SCHEMA_VERSION = '1.0.0';
    No natural language: the target is an exact capability identity. */
 const GOALS = [
   {
-    id: 'coverage',
-    label: 'Score the uncertainty of a reporting period',
-    blurb: 'Target: uncertainty.score. Facts: a partial coverage state with two included and one pending reference.',
-    kind: 'chain',
-    target: { capability_id: 'uncertainty.score', capability_version: '1.1.0' },
-    candidate_refs: [
-      { namespace: 'summary', id: 'summary.aggregate', versionRange: '1.1.0' },
-      { namespace: 'uncertainty', id: 'uncertainty.score', versionRange: '1.1.0' },
-    ],
-    starting_facts: {
-      coverage_state: 'partial',
-      period_key: '2026-08-17',
-      scope_id: 'golden-bc',
-      policy: { version: 'policy-1' },
-    },
-  },
-  {
     id: 'price',
-    label: 'Price a small quote',
-    blurb: 'Target: core.calculate-price. Facts: one line item, a versioned pricing config.',
+    label: 'Price a quote',
+    blurb: 'One line item, two units at $50, a versioned pricing config with no discounts or tax — target core.calculate-price.',
     kind: 'single',
     target: { capability_id: 'core.calculate-price', capability_version: '1.2.0' },
     candidate_refs: [
@@ -56,16 +39,29 @@ const GOALS = [
     },
   },
   {
-    id: 'noplan',
-    label: 'A goal with no structural path',
-    blurb: 'Target: core.calculate-price. Facts: only a currency — nothing produces the line items or pricing config it needs.',
-    kind: 'none',
-    target: { capability_id: 'core.calculate-price', capability_version: '1.2.0' },
+    id: 'docapproval',
+    label: 'Review a document for approval',
+    blurb: 'From the document text alone the planner chains doc-approval.analyze (extract type, parties, amounts, a confidence) into doc-approval.recommend (approve or route, with a rationale).',
+    kind: 'chain',
+    target: { capability_id: 'doc-approval.recommend', capability_version: '1.4.0' },
     candidate_refs: [
-      { namespace: 'core', id: 'core.calculate-price', versionRange: '1.2.0' },
-      { namespace: 'summary', id: 'summary.aggregate', versionRange: '1.1.0' },
+      { namespace: 'doc-approval', id: 'doc-approval.analyze', versionRange: '1.4.0' },
+      { namespace: 'doc-approval', id: 'doc-approval.recommend', versionRange: '1.4.0' },
     ],
-    starting_facts: { currency: 'USD' },
+    starting_facts: {
+      document: 'INVOICE\nVendor: Acme Corp\nBill to: Globex Industries\nInvoice #: AC-20481\nTotal due: $4,200.00\nDue date: 2026-10-01\nTerms: Net 30',
+    },
+  },
+  {
+    id: 'luhn',
+    label: 'Check a card number',
+    blurb: 'Does a 16-digit number pass the Luhn checksum? Facts: one number string — target validation.validate-luhn.',
+    kind: 'single',
+    target: { capability_id: 'validation.validate-luhn', capability_version: '1.2.0' },
+    candidate_refs: [
+      { namespace: 'validation', id: 'validation.validate-luhn', versionRange: '1.2.0' },
+    ],
+    starting_facts: { number: '4242424242424242' },
   },
 ];
 
