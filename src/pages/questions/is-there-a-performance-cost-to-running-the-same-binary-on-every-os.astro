@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is there a performance cost to running the same binary on every OS?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "There's a real, non-zero WASM sandboxing and contract-validation overhead compared to calling a native function directly in-process — that's the price of the sandbox and the governance, not of cross-OS portability specifically. The execution itself, once compiled, runs at near-native speed under Wasmtime; the overhead is at the boundary (input/output validation, contract checks, trace writing), not in the computation.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-traverse-performance.html', label: "What is Traverse's performance like?" },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact in Traverse?' },
+  { href: '/questions/how-is-traverse-different-from-a-shared-rust-library.html', label: 'Why not just use a shared Rust library instead of Traverse?' },
+];
+---
+<QuestionLayout
+  title="Is there a performance cost to running the same binary on every OS?"
+  description="The portability itself is essentially free — WASM execution runs at near-native speed under Wasmtime on every OS. The real overhead is at the governance boundary: contract validation and trace writing, not the cross-platform part."
+  canonical="https://traverse-framework.com/questions/is-there-a-performance-cost-to-running-the-same-binary-on-every-os.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Worth separating two different costs that get conflated under "performance overhead," because only one of them has anything to do with cross-OS portability.</p>
+
+  <p><strong>Cross-OS portability itself is essentially free.</strong> Wasmtime compiles WASM to native machine code ahead of execution and runs it at close to native speed, on Windows, macOS, or Linux alike — there's no interpretation layer or per-OS translation step slowing things down because the binary happens to be portable. The "same binary everywhere" property doesn't trade away raw execution speed.</p>
+
+  <p><strong>The governance layer has a real, separate cost.</strong> Contract validation on the way in, postcondition checks on the way out, and writing a structured trace artifact for every execution are actual work the runtime does that a bare function call wouldn't. That cost exists whether you're running on one OS or five — it's the price of getting enforced correctness and an audit trail, not the price of portability.</p>
+
+  <h2>Whether that tradeoff is worth it</h2>
+  <p>For a capability called occasionally — a pricing calculation, an eligibility check — the governance overhead is very unlikely to be the bottleneck in your system. For something called in an extremely tight hot loop at very high frequency, the validation and tracing cost is worth actually measuring against your latency budget before committing. There's no substitute for benchmarking your specific capability and call pattern; see <a href="/questions/what-is-traverse-performance.html">Traverse's performance</a> page for what's measured today, and treat anything not measured there as genuinely unmeasured rather than assumed fine.</p>
+</QuestionLayout>
