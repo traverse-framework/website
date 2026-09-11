@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can different operating systems see different behavior from the same capability?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Not from the capability's own logic, which is sandboxed WASM with no OS-visible branching. The one place behavior can legitimately differ is in a host-implemented call the capability's contract declares — if the host implements that call differently per OS, that's a property of the host's implementation, not of the capability, and it's visible in the contract as a named dependency rather than hidden.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-traverse-capabilities-call-native-os-apis.html', label: 'Can Traverse capabilities call native OS APIs?' },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/questions/how-do-ci-pipelines-test-traverse-across-operating-systems.html', label: 'How does Traverse verify cross-OS behavior actually matches?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+];
+---
+<QuestionLayout
+  title="Can different operating systems see different behavior from the same capability?"
+  description="Not from the capability's own sandboxed logic. The only legitimate source of difference is a host-implemented call the contract declares — and that dependency is visible in the contract, not hidden inside the capability."
+  canonical="https://traverse-framework.com/questions/do-different-operating-systems-see-different-behavior-from-the-same-capability.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The capability's own code can't see which OS it's running on, so it structurally can't branch on it — there's no API inside the WASM sandbox that exposes "what operating system is this," and nothing to condition behavior on even if a developer wanted to. Given the same input and the same contract, a capability's own logic produces the same output regardless of host OS, because that logic has no OS-dependent path to take.</p>
+
+  <h2>The one legitimate exception</h2>
+  <p>If a capability's contract declares a host call — something like a system clock read or a lookup the host implements — then the behavior of that specific call depends on how the host application implements it, and a host implementation genuinely could differ across operating systems (a timezone lookup implemented one way on Windows and another on Linux, say). That's not the capability behaving inconsistently; it's a declared external dependency whose implementation is the host's responsibility, and it's visible in the contract's <code>host_calls</code> list rather than buried invisibly in the capability's logic.</p>
+
+  <p>In practice, most well-scoped capabilities (pricing rules, eligibility checks, validation logic) have no legitimate reason to declare any host calls at all, which is exactly what keeps them behaviorally identical everywhere. If you're seeing inconsistent results across operating systems for the same capability and the same input, the contract's declared dependencies — not the capability's own logic — are the first place to look.</p>
+</QuestionLayout>

@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the difference between "portable" and "cross-platform"?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: '"Cross-platform" usually describes a tool that ships a UI across multiple operating systems from one codebase. "Portable" describes an artifact — like a WASM binary — that runs unmodified wherever a compatible runtime exists, independent of any particular UI or deployment target. Traverse capabilities are portable in this second sense, which is a narrower and more precise claim than "cross-platform" implies.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/is-webassembly-cross-platform.html', label: 'Is WebAssembly cross-platform?' },
+  { href: '/questions/is-traverse-a-cross-platform-framework.html', label: 'Is Traverse a cross-platform framework?' },
+  { href: '/questions/what-does-device-independent-mean-in-traverse.html', label: 'What does "device-independent" mean in Traverse?' },
+  { href: '/blog/cross-platform-rarely-means-what-it-sounds-like.html', label: 'Why "cross-platform" rarely means what it sounds like' },
+];
+---
+<QuestionLayout
+  title='What is the difference between "portable" and "cross-platform"?'
+  description="Cross-platform usually means one UI codebase across several operating systems. Portable means an artifact runs unmodified wherever a compatible runtime exists, independent of UI. Traverse capabilities are portable in the second, narrower sense."
+  canonical="https://traverse-framework.com/questions/what-is-the-difference-between-portable-and-cross-platform.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>They get used interchangeably in casual conversation, but they're pointing at different things, and the difference matters when you're evaluating a tool against a real requirement.</p>
+
+  <p>"Cross-platform" is almost always a claim about a UI or an application: one codebase, one team, shipping to multiple operating systems or devices. Flutter, Electron, Tauri, and React Native are all cross-platform in this sense — the thing being made portable is the app's rendered surface and the framework that produces it.</p>
+
+  <p>"Portable" is a claim about an artifact, independent of any UI at all. A WebAssembly binary is portable because any conformant WASM runtime executes it identically, regardless of what's hosting that runtime — a browser, a native process, an embedded device. Nothing about "portable" implies there's a UI involved, or that the artifact was designed with any particular deployment target in mind.</p>
+
+  <h2>Why Traverse leans on the second word</h2>
+  <p>A Traverse capability is portable in the strict sense: the WASM binary and its contract carry no assumptions about a host, and any conformant executor can run it. It is not, on its own, "cross-platform" in the UI sense, because it has no UI to be cross-platform about. Calling it "cross-platform" without qualification invites people to compare it to Flutter on UI grounds, which is a comparison it was never trying to win. "Portable business logic that pairs with whatever UI framework you choose" is a longer sentence, but it's the accurate one — and the <a href="/blog/cross-platform-rarely-means-what-it-sounds-like.html">longer piece on this</a> goes through why most "cross-platform" claims in the industry are quietly making the same UI-only promise.</p>
+</QuestionLayout>

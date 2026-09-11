@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can a team that does not write Rust still use Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes, as a consumer of capabilities — calling a capability over HTTP through the browser adapter, or via an embedder, requires no Rust at all, just JSON in and out. Authoring a new capability currently does require Rust, since that's the language capabilities compile from. A Python SDK is on the roadmap as planned, not yet shipped.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust to use Traverse?' },
+  { href: '/questions/can-i-use-traverse-with-python.html', label: 'Can I use Traverse with Python?' },
+  { href: '/docs/guides/react-integration.html', label: 'React Integration guide' },
+  { href: '/questions/what-is-traverse-roadmap.html', label: 'What is the Traverse roadmap?' },
+];
+---
+<QuestionLayout
+  title="Can a team that doesn't write Rust still use Traverse?"
+  description="Yes, as a consumer — calling a capability needs no Rust, just JSON over HTTP or an embedder call. Authoring a new capability does require Rust today; a Python SDK is planned, not shipped yet."
+  canonical="https://traverse-framework.com/questions/can-non-rust-teams-use-traverse.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Depends whether your team is consuming capabilities or authoring them, and those have very different Rust requirements.</p>
+
+  <p><strong>Consuming a capability</strong> requires no Rust whatsoever. If you're calling into a capability from a React app, you're sending a plain JSON request to the local browser adapter and reading a JSON response back — the <a href="/docs/guides/react-integration.html">React integration guide</a> covers this in full and never touches Rust or WASM directly. The same is true from any language that can make an HTTP request or bind against an embedder's API.</p>
+
+  <p><strong>Authoring a new capability</strong> is a different story today: capabilities compile from Rust to WebAssembly, so writing a new one currently means writing Rust. There isn't yet a path to author a capability directly in Python, JavaScript, or another language and have Traverse compile it — a Python SDK is explicitly on the roadmap as a planned, not-yet-shipped item, aimed specifically at teams that don't write Rust and want to call existing capabilities more idiomatically, or eventually contribute to them.</p>
+
+  <h2>A practical split for a mixed team</h2>
+  <p>A common shape: one or two people comfortable with Rust write and maintain the capabilities and their contracts, while the rest of the team — frontend, data, ML — consumes them as a plain API. That's not a workaround; it matches how the contract boundary is meant to work. The contract is the interface a non-Rust consumer needs to understand; the Rust implementation behind it is an internal detail they don't have to touch.</p>
+</QuestionLayout>

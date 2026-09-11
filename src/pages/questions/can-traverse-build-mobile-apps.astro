@@ -1,0 +1,45 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I build a mobile app with Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Not as a shipped, public path yet, and we would rather say that plainly than let you find out mid-project. Android has a working runtime bridge (Chicory-based) with no public release. iOS is blocked: no WASM engine currently exposes the resource-control APIs a certified native embedder needs for App Store distribution, though a separate wasmi feasibility spike proved a workaround runs on a physical iPhone. Neither is a shipped SDK today.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/does-traverse-support-windows-macos-and-linux.html', label: 'Does Traverse support Windows, macOS, and Linux?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/blog/native-ios-runtime-foundation.html', label: 'Native iOS without a JIT: a hands-on feasibility proof' },
+  { href: '/questions/what-is-traverse-roadmap.html', label: 'What is the Traverse roadmap?' },
+];
+---
+<QuestionLayout
+  title="Can I build a mobile app with Traverse?"
+  description="Not as a shipped path yet. Android and .NET/WinUI embedders are working code in progress with no public release; iOS is blocked on the WASM engine ecosystem. Here's the exact status, honestly."
+  canonical="https://traverse-framework.com/questions/can-traverse-build-mobile-apps.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Not as a shipped, public path today — and we'd rather tell you that up front than have you find out after committing to it. Traverse's mature, shipped targets are native (Windows, macOS, Linux) and the browser. Mobile is genuinely being worked on, but "in progress" and "blocked" mean different things, and it matters which one applies to which platform.</p>
+
+  <h2>Android — in progress, unreleased</h2>
+  <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to a specific Chicory version. Bundle validation and lifecycle types are in place. What's missing is Compose reference-app integration, which is tracked by its own open issue, and a public release. If you want to help move it forward, that issue is the place to look.</p>
+
+  <h2>iOS — blocked, not just unfinished</h2>
+  <p>This one is stuck on something outside the project's control, not a backlog item waiting its turn. As of the last candidate engine screen, none of WasmKit, WAMR, Wasmtime, or Wasmer exposed the public, documented resource-control APIs a certified native embedder baseline requires — for reasons ranging from missing resource-control APIs to no supported iOS profile to JIT/entitlement conflicts with App Store distribution.</p>
+  <p>A separate feasibility spike found a workaround: embedding the <code>wasmi</code> interpreter directly through a Rust static library and a narrow C-compatible bridge, with the host enforcing memory and fuel limits, verified running on a physical iPhone. That's a real, working proof — <a href="/blog/native-ios-runtime-foundation.html">we wrote up the full technical detail</a> — but it's a foundation for a future runtime path, not a shipped SDK you can npm-install or add via Swift Package Manager today.</p>
+
+  <h2>.NET / WinUI — in progress, unreleased</h2>
+  <p>The same shape as Android: <code>packages/dotnet/TraverseEmbedder</code> has a working Wasmtime .NET-backed bridge. Request marshalling, event subscriptions, evidence publication, and the shared conformance suite are still open work.</p>
+
+  <p>If your app's core problem is mobile UI, Traverse isn't that tool yet. If you're building a desktop or browser app today and want the same governed business logic ready to extend to mobile once these ship, the contract you write now doesn't change when the mobile embedder does. Track live status on the <a href="/platforms.html">Platforms page</a> — it's the same page we link internally, not a separate marketing version.</p>
+</QuestionLayout>

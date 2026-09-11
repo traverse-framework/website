@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: "What happens if Traverse doesn't support my platform yet?",
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Your capability and its contract don't change when a new executor ships — only the host adapter does. So the practical answer is: write the capability now against a shipped target (native or browser), and when your platform's embedder ships, the same WASM binary and contract move over without a rewrite. For a platform that's genuinely blocked (iOS today), the honest move is to design around the shipped targets and revisit once the blocker clears.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+  { href: '/questions/what-is-traverse-roadmap.html', label: 'What is the Traverse roadmap?' },
+  { href: '/questions/can-traverse-build-mobile-apps.html', label: 'Can I build a mobile app with Traverse?' },
+  { href: '/questions/what-does-device-independent-mean-in-traverse.html', label: 'What does "device-independent" mean in Traverse?' },
+];
+---
+<QuestionLayout
+  title="What happens if Traverse doesn't support my platform yet?"
+  description="Your capability and contract don't change when a new executor ships — only the host adapter does. Write against a shipped target now, and the same binary moves over once your platform's embedder lands."
+  canonical="https://traverse-framework.com/questions/what-happens-if-traverse-doesnt-support-my-platform-yet.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>This comes up most often around mobile, but the answer generalizes to any target that isn't shipped yet: edge, cloud, or a platform not on the roadmap at all. The reassuring part is structural, not aspirational — a Traverse capability's WASM binary and contract don't reference a specific host. What changes between platforms is the executor that loads and runs that binary, which lives outside the capability entirely.</p>
+
+  <p>Practically: write and test your capability today against a target that's actually shipped — native (Windows, macOS, Linux) or the browser. When an executor for your target platform ships (an Android embedder, say, or the eventual edge executor), the exact same binary and contract are what that new executor loads. You're not rewriting the capability; you're gaining a new place to run the one you already have.</p>
+
+  <h2>What if the platform is genuinely blocked, not just unshipped?</h2>
+  <p>iOS is the honest example here — blocked on the WASM engine ecosystem lacking a certifiable resource-control API, not simply unprioritized. In that case, the reasonable move is to design your system around the platforms that are actually available now, keep the capability platform-agnostic (which it already is by construction), and treat mobile as a target you'll extend to once the blocker clears rather than one you build around today. Watching <a href="/platforms.html">Platforms</a> is the way to know exactly when that changes — it's the same page used internally to track it, not a rounded-up public version.</p>
+</QuestionLayout>

@@ -1,0 +1,122 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 10, 2026</span>
+      <span class="badge">Roadmap</span>
+      <span class="badge">Honesty</span>
+    </div>
+    <h1 class="t-h1">The v1.0 gates: why we won't call this done until it's actually done</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>It would be easy to slap a "v1.0" tag on this project right now. The core runtime works. 133 governing specs are approved. Three crates are coverage-gated in CI. People are building real things with it. By a lot of projects' standards, that's already a 1.0.</p>
+
+      <p>I'd rather not do that, and I want to explain why, because it connects directly to everything else on this site about not overselling platform support.</p>
+
+      <h2 id="ten-gates">Ten gates, not a vibe</h2>
+
+      <p>The v1.0 milestone for this project isn't a date or a feeling — it's ten explicit, named requirements, published on the roadmap, that all have to be true at the same time. A few of them: every crate actually published on crates.io, not just buildable from source. A five-platform CI stress matrix that actually exercises the cross-platform claim instead of assuming the architecture guarantees it. An MCP library surface, not just the stdio subprocess most people are using today. 100% coverage on every governed path, not just the three core crates that are gated now. Zero open P0/P1 bugs.</p>
+
+      <p>None of those are met as a complete set right now. Some are close. Some — the full CI matrix, specifically — are real, tracked gaps, not rounding errors.</p>
+
+      <h2 id="why-not-round-up">Why I don't round up</h2>
+
+      <p>The tempting move is obvious: call it 1.0 anyway, because "1.0" signals stability and stability is what gets adoption. I've watched other projects do exactly that, and I've been burned by exactly that as a user — building against a "1.0" that turned out to mean "we felt ready," not "we verified the specific things a 1.0 label is supposed to promise."</p>
+
+      <div class="callout">A version number is a claim, same as "runs on any OS" is a claim. If I'm going to hold myself to evidence for one, I have to hold myself to it for the other.</div>
+
+      <p>So instead, the roadmap lists exactly which gates are met and which aren't, with the actual milestone document linked, not summarized into a vaguer "coming soon." If cross-platform CI coverage is the thing you're relying on before you trust this in production, you can go check whether it's actually there yet, instead of trusting a badge.</p>
+
+      <h2 id="what-this-means-for-you">What this means if you're evaluating Traverse today</h2>
+
+      <p>It means v0.10.1 is real, useful, and — for its shipped scope — solid: native execution, the CLI, the MCP server, the browser adapter, all functional and used in the examples on this site. It also means you should read "shipped" as "shipped for what it claims" and not assume everything you'd expect from a 1.0 project is already in place. The <a href="/roadmap.html">roadmap</a> is written to make that distinction checkable, not to be skimmed past.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#ten-gates">Ten gates, not a vibe</a></li>
+          <li><a href="#why-not-round-up">Why I don't round up</a></li>
+          <li><a href="#what-this-means-for-you">What this means for you</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/does-traverse-run-on-any-os-honest-answer.html">"Does this work on any OS?" — the honest answer →</a></li>
+          <li><a href="/blog/traverse-0-10-governed-composition.html">Traverse v0.10: governed composition →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Read the actual gates</div>
+        <p>All ten, published, with what's met and what isn't.</p>
+        <a href="/roadmap.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Roadmap →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Check the gates yourself.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Ten explicit requirements, tracked in the open, not rounded up.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/roadmap.html" class="btn btn-primary">Roadmap →</a>
+      <a href="/security-audit.html" class="btn btn-ghost">Security audit</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"The v1.0 gates: why we won't call this done until it's actually done — Traverse Blog"}
+  description={"Traverse's v1.0 milestone is ten explicit, checkable gates, not a date or a feeling. None are met as a complete set yet, and the roadmap says exactly which ones aren't."}
+  canonical={"https://traverse-framework.com/blog/the-v1-gates-why-we-wont-call-this-done.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

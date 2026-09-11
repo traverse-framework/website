@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is WebAssembly cross-platform?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes — that's the point of the format. A WASM binary is a portable instruction set, not machine code for a specific CPU or OS, so any conformant runtime executes it the same way. That's necessary but not sufficient for building a real cross-platform system: WASM alone gives you a portable binary, not a way to describe what it does, validate it, or trace what happened when it ran. Traverse adds that layer on top.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/blog/wasm-business-logic.html', label: 'What WASM actually gives you for business logic' },
+  { href: '/questions/can-traverse-run-without-wasm.html', label: 'Can Traverse run without WASM?' },
+];
+---
+<QuestionLayout
+  title="Is WebAssembly cross-platform?"
+  description="Yes, by design — a WASM binary runs identically in any conformant runtime. That's the foundation Traverse's OS portability is built on, though it isn't the whole story on its own."
+  canonical="https://traverse-framework.com/questions/is-webassembly-cross-platform.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes. WebAssembly is a formally specified binary instruction format, not native code tied to a particular processor or operating system. Any runtime that implements the spec — a browser, Wasmtime, Wasmer, a custom embedder — executes a given <code>.wasm</code> file the same way. You compile once; you don't recompile per target the way you would for native machine code.</p>
+
+  <p>This is different from, say, a Java <code>.jar</code>, which needs a JVM present and configured per platform, or a native binary, which needs a separate build per OS and CPU architecture entirely. WASM's portability is closer to "the artifact itself doesn't know or care what's hosting it."</p>
+
+  <h2>Why that's not the full answer for building a real system</h2>
+  <p>A raw WASM binary is portable, but it's also just a file with some exported function names. It doesn't tell you what those functions expect as input, what they guarantee as output, what permissions they need, or whether a given execution actually behaved correctly. Two different callers could invoke it with incompatible assumptions and both technically "work," right up until they don't.</p>
+
+  <p>That's the gap Traverse fills on top of WASM's portability: a contract that declares inputs, outputs, preconditions, and postconditions, a runtime that enforces the contract on every execution, and a trace artifact recording what actually happened. The portability is WebAssembly's contribution. The governance — the part that makes it safe to build a real, auditable system out of that portability — is Traverse's.</p>
+</QuestionLayout>

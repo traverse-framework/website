@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does capability versioning work when it runs on multiple platforms?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Versioning belongs to the capability and its contract, not to any particular host platform — there is exactly one version number, tracked in the registry, regardless of how many executors (native, browser) load that version. A native host and a browser host can be pinned to different versions of the same capability id if they update on different schedules, but neither host maintains its own separate version history.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-contract-versioning.html', label: 'What is contract versioning in Traverse?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/what-is-the-contract-lifecycle.html', label: 'What is the contract lifecycle in Traverse?' },
+  { href: '/questions/can-i-run-the-same-business-logic-in-browser-and-native-apps.html', label: 'Can I run the same business logic in a browser app and a native app?' },
+];
+---
+<QuestionLayout
+  title="How does capability versioning work across multiple platforms?"
+  description="Versioning belongs to the capability and its registry entry, not to any host platform. Native and browser executors reference the same version history — a host just pins to whichever version it's ready for."
+  canonical="https://traverse-framework.com/questions/how-does-versioning-work-across-platforms.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Versioning is a property of the capability and the registry entry that tracks it — <code>namespace.name</code> plus a semantic version — not something each host platform tracks independently. There's one version history for a given capability id, whether it's ever loaded by a native executor, a browser embedder, both, or eventually a mobile one.</p>
+
+  <p>What can legitimately differ between hosts is which version each one has currently pinned. A native backend might already be running <code>pricing.eligibility-check@2.1.0</code> while a browser deployment is still serving <code>2.0.0</code>, if the rollout schedules haven't caught up with each other. That's a normal, visible fact about your deployment — the trace artifact for each execution records exactly which version ran — not a hidden inconsistency.</p>
+
+  <h2>Why this matters for cross-platform rollout</h2>
+  <p>Because versioning lives with the capability, not the platform, a breaking contract change is a single decision with a single new version number, applied everywhere at once conceptually — you then choose, per host, when to actually adopt it. There's no scenario where "the Windows version of this rule" and "the browser version of this rule" silently diverge into separately-numbered lineages; if they're both running capability <code>X</code>, they're both running some version of the same tracked history, and you can always tell which one from the trace.</p>
+</QuestionLayout>

@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Should I build a Progressive Web App or use Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "They're not alternatives — a PWA is a delivery model for your UI (any device with a browser, installable, offline-capable to varying degrees), while Traverse governs the business logic underneath any UI, PWA included. A PWA's frontend can call a Traverse capability through the Web embedder SDK the same way any browser-hosted app does.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/cross-platform-rarely-means-what-it-sounds-like.html', label: 'Why "cross-platform" rarely means what it sounds like' },
+  { href: '/questions/does-traverse-work-offline.html', label: 'Does Traverse work offline?' },
+  { href: '/questions/what-is-the-browser-adapter.html', label: 'What is the browser adapter?' },
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri' },
+];
+---
+<QuestionLayout
+  title="Should I build a Progressive Web App or use Traverse?"
+  description="They answer different questions. A PWA is how your UI gets delivered — installable, works across devices with a browser. Traverse governs the logic underneath that UI. A PWA's frontend can call a Traverse capability directly."
+  canonical="https://traverse-framework.com/questions/how-do-i-choose-between-a-progressive-web-app-and-traverse.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>This isn't really an either/or, because a PWA and Traverse answer different questions. A Progressive Web App is a delivery and packaging model: your web app becomes installable, gets an app icon, and can work offline to whatever degree the specific browser and OS combination supports — with real, honestly-should-be-mentioned variance, since PWA capability support (background sync, push notifications, install prompts) differs meaningfully between, say, desktop Chrome and iOS Safari.</p>
+
+  <p>Traverse doesn't compete with any of that — it has no opinion on how your app gets installed or delivered. What it governs is the logic your PWA's frontend calls into. That logic is a WASM capability with an enforced contract, loadable directly through the Web embedder SDK, which is exactly the same mechanism any browser-hosted app uses — a PWA is still, under the hood, a web page, so nothing about "progressive" changes how it talks to a Traverse capability.</p>
+
+  <h2>Where this actually helps a PWA specifically</h2>
+  <p>PWAs lean hard on working offline, and Traverse capabilities execute locally by default with no network round trip required — see <a href="/questions/does-traverse-work-offline.html">does Traverse work offline</a>. That's a natural fit: a PWA's offline-first UI calling a capability that's also, by construction, offline-capable, rather than a UI promising offline behavior undermined by logic that secretly needs a server round trip.</p>
+</QuestionLayout>

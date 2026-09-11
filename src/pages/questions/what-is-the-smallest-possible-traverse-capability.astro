@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the smallest possible Traverse capability?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A minimal capability is a small compiled WASM module — typically kilobytes, not megabytes — plus a contract declaring one input, one output, and no host calls or permissions at all. There is no minimum complexity requirement; a single pure function with a well-defined precondition and postcondition is a complete, valid, portable capability.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-long-to-get-started.html', label: 'How long does it take to get started with Traverse?' },
+  { href: '/questions/how-do-i-write-a-capability-contract.html', label: 'How do I write a capability contract?' },
+  { href: '/questions/how-is-traverse-different-from-docker.html', label: 'How is Traverse different from Docker?' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+---
+<QuestionLayout
+  title="What is the smallest possible Traverse capability?"
+  description="A small WASM module — typically kilobytes — plus a contract with one input, one output, and no declared permissions. There's no minimum complexity: a single pure function is a complete, valid capability."
+  canonical="https://traverse-framework.com/questions/what-is-the-smallest-possible-traverse-capability.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>There's no floor on complexity. A capability doesn't need multiple functions, elaborate state, or a workflow around it to be valid — a single pure computation, like rounding a currency amount to the correct number of decimal places for a given jurisdiction, is a complete capability on its own: one input schema, one output schema, no preconditions beyond basic type validity, no postconditions beyond "the output matches the schema," and no declared host calls at all.</p>
+
+  <p>Because it declares no <code>network_access</code>, <code>filesystem_access</code>, or <code>host_calls</code>, its contract is close to the shortest one you can write, and the compiled WASM module for a function that small is typically a matter of kilobytes — nowhere near the size of even a minimal container image, which is part of what makes it practical to load directly in a browser tab.</p>
+
+  <h2>Why size matters here specifically</h2>
+  <p>A capability this small is cheap to compile, cheap to validate, cheap to load, and fast to execute — there's very little sandboxing overhead to amortize when the computation itself is trivial. It's also the right place to start if you're evaluating Traverse for the first time: write one small, genuinely useful pure function as a capability, run it through the <a href="/docs/quickstart.html">quickstart</a> path, and get a feel for the contract-and-trace mechanics before committing a larger, more consequential rule to the same pattern.</p>
+</QuestionLayout>

@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I run the same business logic in a browser app and a native app?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes — this is the combination with the most complete, shipped Traverse support today. The same WASM capability and contract are loaded by the native executor (Windows, macOS, Linux) and by the Web embedder SDK in the browser, with no separate implementation or build for either.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/questions/what-is-the-browser-adapter.html', label: 'What is the browser adapter?' },
+  { href: '/docs/guides/react-integration.html', label: 'React Integration guide' },
+  { href: '/questions/how-do-i-share-business-logic-between-web-and-desktop.html', label: 'How do I share business logic between a web app and a desktop app?' },
+];
+---
+<QuestionLayout
+  title="Can I run the same business logic in a browser app and a native app?"
+  description="Yes — native and browser are Traverse's two most complete, shipped targets. The same WASM capability and contract are loaded by both, unmodified, with no separate build per target."
+  canonical="https://traverse-framework.com/questions/can-i-run-the-same-business-logic-in-browser-and-native-apps.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes, and out of every platform combination people ask about, this is the one with the most mature, complete support today — more so even than native-to-native across different desktop OSes, because it's the pairing the project has spent the most shipped effort on. Native execution (Windows, macOS, Linux) through <code>traverse-runtime</code>'s Wasmtime-backed executor and browser execution through the Web embedder SDK both load the identical WASM binary and contract. Nothing about the capability changes between the two.</p>
+
+  <p>What differs is only the transport getting a request to the capability. A native host calls it in-process through an embedder. A browser page either talks to a local browser adapter over HTTP (the pattern the <a href="/docs/guides/react-integration.html">React integration guide</a> walks through) or, as of the more recent releases, executes a single verified capability directly in the browser's own WASM host and gets back a signed trace receipt. Either way, the capability itself — and critically, its result for a given input — is unchanged.</p>
+
+  <h2>Where this is genuinely useful</h2>
+  <p>The common case: a validation or pricing rule needs to run instantly in a web form for UX (no round trip to a server) and also needs to run identically in your native backend or CLI tooling for the authoritative check. With a shared capability, both are guaranteed to agree, because they're executing the same binary — there's no "the frontend's copy of the rule is slightly out of date" failure mode to debug, because there's no second copy.</p>
+</QuestionLayout>

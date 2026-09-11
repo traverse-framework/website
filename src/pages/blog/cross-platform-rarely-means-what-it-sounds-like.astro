@@ -1,0 +1,129 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 10, 2026</span>
+      <span class="badge">Industry</span>
+      <span class="badge">Portability</span>
+    </div>
+    <h1 class="t-h1">Why "cross-platform" rarely means what it sounds like</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>"Cross-platform" is one of those words that sounds precise and isn't. Every framework that uses it means something slightly different by it, and the gap between what it implies and what it delivers is usually where a project's second rewrite comes from. Worth being specific about what each one actually promises, because "cross-platform" alone tells you almost nothing.</p>
+
+      <h2 id="flutter">Flutter: cross-platform UI, single language</h2>
+      <p>Flutter's promise is real and well-delivered: one Dart codebase, native-feeling widgets on desktop, mobile, and web. What it doesn't promise is that your business logic is usable outside a Flutter app. That logic is Dart. If your backend needs the same rule, you're porting it — by hand, into a different language, hoping the port stays faithful as the rule changes.</p>
+
+      <h2 id="electron">Electron and Tauri: cross-platform desktop, browser-based</h2>
+      <p>Electron and Tauri both mean "cross-platform desktop," specifically — neither targets mobile. Electron bundles its own Chromium per app, which is why an Electron app's install size raises eyebrows; Tauri uses the OS's system web view instead, which is lighter but means your app's rendering can vary slightly by OS, since it's not the same engine everywhere. Both are honest about being desktop-only. The logic-reuse gap is the same as Flutter's: your JS or Rust lives inside that app.</p>
+
+      <h2 id="react-native">React Native: cross-platform mobile, with real per-platform seams</h2>
+      <p>React Native's "learn once, write anywhere" tagline is more careful than most, and for good reason — the framework itself acknowledges that native modules, platform-specific styling quirks, and OS-level API differences mean a nontrivial React Native app usually has real iOS-specific and Android-specific code somewhere. It's a meaningfully smaller rewrite than fully native, not a zero rewrite.</p>
+
+      <h2 id="pwas">Progressive Web Apps: cross-platform with an asterisk that keeps growing</h2>
+      <p>PWAs promise "any device with a browser," which is the broadest-sounding claim of the group — and also the one with the most fine print. Background processing, push notifications, and deep OS integration vary by platform and browser vendor, and iOS Safari has historically lagged in exactly the capabilities that make a PWA feel native. "Works everywhere" quietly becomes "works everywhere, to varying degrees of well."</p>
+
+      <h2 id="the-pattern">The pattern underneath all of them</h2>
+      <p>Every one of these tools is honest about the layer it actually controls — Flutter controls rendering, Electron controls the desktop shell, React Native controls the mobile bridge, PWAs control browser delivery — and every one of them is quieter about what it doesn't control, which is almost always the business logic living inside that layer. That's not a knock on any of them individually. It's what happens when "cross-platform" gets used as a single word for a UI-layer promise, without a separate word for the logic-layer question underneath it.</p>
+
+      <div class="callout">The honest framing isn't "which of these is the real cross-platform tool." It's "which layer are you actually asking about" — the UI, or the logic underneath it. They're different problems with different honest answers.</div>
+
+      <h2 id="where-traverse-fits">Where this leaves Traverse</h2>
+      <p>Traverse doesn't compete on the UI-layer question at all — it has no UI. What it answers is the logic-layer question specifically: is this one rule identical, governed, and auditable everywhere it's invoked, independent of which UI framework called it. Native — Windows, macOS, Linux — is shipped and mature. The browser is shipped, with a stated scope. Mobile embedders are real, working, unreleased code on Android and .NET, and honestly blocked on iOS pending the WASM engine ecosystem. That's a narrower claim than "cross-platform" usually implies, on purpose, because the narrower claim is the one that's actually true today. The full platform-by-platform status, evidence-linked, is on <a href="/platforms.html">Platforms</a>, and the deeper comparison against the UI-layer frameworks named here is on the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform app frameworks</a> page.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#flutter">Flutter</a></li>
+          <li><a href="#electron">Electron and Tauri</a></li>
+          <li><a href="#react-native">React Native</a></li>
+          <li><a href="#pwas">Progressive Web Apps</a></li>
+          <li><a href="#the-pattern">The pattern underneath all of them</a></li>
+          <li><a href="#where-traverse-fits">Where this leaves Traverse</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/does-traverse-run-on-any-os-honest-answer.html">"Does this work on any OS?" — the honest answer →</a></li>
+          <li><a href="/blog/same-binary-three-operating-systems.html">Same binary, three operating systems →</a></li>
+          <li><a href="/blog/logic-duplication.html">Why I stopped writing the same business logic four times →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">See the full comparison</div>
+        <p>Where Traverse and cross-platform UI frameworks actually overlap, and where they don't.</p>
+        <a href="/compare/vs-cross-platform-frameworks.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the comparison →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Keep your UI framework. Govern the logic underneath it.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">See where Traverse fits next to the tool you're already using.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/compare/vs-cross-platform-frameworks.html" class="btn btn-primary">Read the comparison →</a>
+      <a href="/docs/quickstart.html" class="btn btn-ghost">Quickstart</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"Why \"cross-platform\" rarely means what it sounds like — Traverse Blog"}
+  description={"Flutter, Electron, Tauri, React Native, and PWAs each mean something different by \"cross-platform,\" and all of them are quieter about the business-logic layer underneath the UI they control."}
+  canonical={"https://traverse-framework.com/blog/cross-platform-rarely-means-what-it-sounds-like.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

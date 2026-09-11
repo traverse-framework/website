@@ -1,0 +1,167 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="compare-hero">
+  <div class="container">
+    <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
+    <h1>Traverse vs. Raw WASM Runtimes (Wasmtime, WasmEdge, Wasmer)</h1>
+    <p class="compare-hero-lead">Wasmtime, WasmEdge, and Wasmer execute WASM binaries fast and portably across operating systems. Traverse isn't a competitor to them — it's built on top of Wasmtime specifically, adding the contract, registry, and trace layer a raw runtime deliberately doesn't provide.</p>
+  </div>
+</section>
+
+<main class="container">
+  <div class="toc-aside">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#what-runtimes-solve">What a WASM runtime solves</a></li>
+      <li><a href="#what-traverse-adds">What Traverse adds on top</a></li>
+      <li><a href="#key-differences">Key differences</a></li>
+      <li><a href="#when-to-use">When to use which</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <div class="content-section" id="what-runtimes-solve">
+    <h2>What a WASM runtime solves</h2>
+    <p>Wasmtime, WasmEdge, and Wasmer all solve the same core problem: take a <code>.wasm</code> binary and execute it, fast, safely, and identically regardless of the host OS. They differ in focus — Wasmtime is the Bytecode Alliance's reference-grade, standards-first implementation; WasmEdge targets edge and cloud-native workloads with extensions for AI inference; Wasmer emphasizes broad language embedding and its own package registry. All three are genuinely excellent at running a WASM binary correctly and quickly.</p>
+    <p>None of them, by design, know or care what the binary they're running is supposed to do, what inputs are valid, or what should be true when it finishes. That's out of scope for a runtime — it's an execution engine, not a governance layer.</p>
+  </div>
+
+  <div class="content-section" id="what-traverse-adds">
+    <h2>What Traverse adds on top</h2>
+    <p>Traverse doesn't replace a WASM runtime — <code>traverse-runtime</code>'s native executor is built on Wasmtime specifically. What Traverse adds sits above that execution layer: a machine-readable contract describing a capability's inputs, outputs, preconditions, and postconditions; a registry that makes capabilities discoverable by contract rather than by hardcoded import; and a trace artifact recording what happened on every single execution — what ran, what was validated, what the result was.</p>
+    <p>Where Wasmtime answers "run this binary correctly," Traverse answers "was this specific execution allowed, valid, and auditable." Different layer, same underlying binary.</p>
+    <div class="highlight-callout"><strong>The distinction:</strong> a raw runtime is infrastructure. Traverse is what you'd build on top of that infrastructure if you needed enforced correctness and an audit trail — which most direct <code>wasmtime run</code> use cases don't need, and most governed business-logic systems do.</div>
+  </div>
+
+  <div class="content-section" id="key-differences">
+    <h2>Key differences</h2>
+    <table class="diff-table">
+      <thead><tr><th>Dimension</th><th>Raw WASM runtime</th><th>Traverse</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>What it is</td>
+          <td>An execution engine for WASM binaries</td>
+          <td class="highlight">A governance layer built on top of a WASM execution engine (Wasmtime)</td>
+        </tr>
+        <tr>
+          <td>Input/output validation</td>
+          <td>None — the runtime executes whatever the binary's exported functions accept</td>
+          <td class="highlight">Enforced against a declared JSON Schema contract before and after execution</td>
+        </tr>
+        <tr>
+          <td>Discovery</td>
+          <td>You call a known module by file path or handle</td>
+          <td class="highlight">Capabilities are discoverable through a queryable registry by contract, not hardcoded reference</td>
+        </tr>
+        <tr>
+          <td>Execution record</td>
+          <td>None built in — whatever your own code logs</td>
+          <td class="highlight">A structured trace artifact per execution: capability, version, validation results, timing</td>
+        </tr>
+        <tr>
+          <td>Cross-OS behavior</td>
+          <td>Identical, by the WASM spec itself</td>
+          <td class="highlight">Identical, inherited from the underlying runtime, plus contract enforcement identical everywhere too</td>
+        </tr>
+        <tr>
+          <td>Primary use</td>
+          <td>Embed WASM execution into any application, with full control over the surrounding logic</td>
+          <td class="highlight">Govern business logic that needs enforced correctness and an audit trail across multiple callers</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section" id="when-to-use">
+    <h2>When to use which</h2>
+    <div class="when-grid">
+      <div class="when-card">
+        <h3>Use a raw WASM runtime directly when</h3>
+        <ul>
+          <li>You're building your own governance or plugin system from scratch</li>
+          <li>You need fine-grained control over host imports and resource limits that a higher-level layer would abstract away</li>
+          <li>The workload doesn't need a contract, a registry, or a trace — just fast, sandboxed execution</li>
+        </ul>
+      </div>
+      <div class="when-card accent-border">
+        <h3>Use Traverse when</h3>
+        <ul>
+          <li>You want contract enforcement and traces without building that layer yourself on top of Wasmtime</li>
+          <li>Multiple callers (an app, a backend, an AI agent) need to discover and invoke the same governed capability</li>
+          <li>A rule needs to be auditable — what ran, with what inputs, under which contract version</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="verdict">
+    <h2>The verdict</h2>
+    <p>This isn't really a choice between alternatives — it's a choice about which layer of the stack you're working at. If you're building infrastructure and want direct control over WASM execution, use Wasmtime, WasmEdge, or Wasmer directly; they're excellent at exactly that. If you're building a business system and want contracts, discovery, and audit trails without reimplementing that layer yourself, Traverse gives you that on top of Wasmtime rather than instead of it.</p>
+  </div>
+
+  <div class="compare-nav">
+    <a href="/compare.html">← All comparisons</a>
+    <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs Cross-Platform App Frameworks →</a>
+    <a href="/compare/vs-serverless.html">Traverse vs Serverless Functions →</a>
+  </div>
+</main>
+
+<section class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">See the governance layer in action.</div>
+      <div class="t-body t-muted">Build and inspect a governed bundle in the quickstart.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart</a>
+      <a href="https://github.com/traverse-framework/traverse" class="btn btn-ghost btn-lg" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Traverse vs Raw WASM Runtimes (Wasmtime, WasmEdge, Wasmer) · Traverse Framework"
+  description="Wasmtime, WasmEdge, and Wasmer execute WASM binaries fast and portably. Traverse is built on top of Wasmtime, adding the contract, registry, and trace layer a raw runtime deliberately leaves out."
+  canonical="https://traverse-framework.com/compare/vs-wasm-runtimes.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Compare', href: '/compare.html' }]}
+>
+  <style is:global slot="head">
+    .compare-hero { padding: 4.5rem 0 3.5rem; position: relative; }
+    .compare-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%); pointer-events: none; }
+    .compare-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.25rem; font-family: var(--font-display); max-width: 760px; }
+    .compare-hero-lead { font-size: 1.1rem; color: var(--fg-muted); max-width: 640px; line-height: 1.75; }
+    .toc-aside { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .toc-aside h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.75rem; font-family: var(--font-display); }
+    .toc-aside ol { margin: 0; padding-left: 1.25rem; }
+    .toc-aside li { font-size: 0.88rem; color: var(--fg-muted); margin-bottom: 0.35rem; line-height: 1.5; }
+    .toc-aside li a { color: var(--fg-muted); text-decoration: none; transition: color 0.15s; }
+    .toc-aside li a:hover { color: var(--accent); }
+    .content-section { margin: 3.5rem 0; }
+    .content-section h2 { font-size: 1.6rem; font-weight: 600; font-family: var(--font-display); margin-bottom: 1rem; padding-top: 1rem; }
+    .content-section p { color: var(--fg-muted); line-height: 1.8; margin-bottom: 1rem; max-width: 720px; }
+    .diff-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.92rem; }
+    .diff-table th { background: var(--bg-elevated); border: 1px solid var(--border); padding: 0.75rem 1rem; text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .diff-table th:first-child { width: 24%; }
+    .diff-table td { border: 1px solid var(--border); padding: 0.85rem 1rem; vertical-align: top; line-height: 1.6; color: var(--fg-muted); }
+    .diff-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .diff-table td:first-child { font-weight: 500; color: var(--fg); font-family: var(--font-display); font-size: 0.88rem; }
+    .diff-table td.highlight { color: var(--accent); }
+    .when-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+    .when-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .when-card h3 { font-size: 1rem; font-weight: 600; font-family: var(--font-display); margin-bottom: 0.75rem; }
+    .when-card ul { margin: 0; padding-left: 1.1rem; }
+    .when-card li { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.65; margin-bottom: 0.4rem; }
+    .when-card.accent-border { border-color: var(--accent); }
+    .highlight-callout { background: var(--bg-elevated); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; font-size: 0.95rem; color: var(--fg-muted); line-height: 1.75; max-width: 720px; }
+    .highlight-callout strong { color: var(--fg); }
+    .compare-nav { display: flex; gap: 1rem; margin: 3rem 0; flex-wrap: wrap; }
+    .compare-nav a { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; text-decoration: none; color: var(--fg-muted); font-size: 0.88rem; transition: border-color 0.15s, color 0.15s; }
+    .compare-nav a:hover { border-color: var(--accent); color: var(--accent); }
+    @media (max-width: 640px) { .when-grid { grid-template-columns: 1fr; } .diff-table { font-size: 0.82rem; } .diff-table th, .diff-table td { padding: 0.6rem 0.75rem; } }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is Traverse suitable for a cross-platform desktop app?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "For the business-logic layer, yes — native Windows, macOS, and Linux support is Traverse's most mature, shipped target. For the UI itself, no, since Traverse has no UI layer; pair it with a desktop UI framework (Tauri is a particularly natural fit, since both are Rust) and let Traverse govern the logic that framework calls into.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri' },
+  { href: '/questions/can-i-use-traverse-with-tauri.html', label: 'Can I use Traverse with Tauri?' },
+  { href: '/questions/does-traverse-support-windows-macos-and-linux.html', label: 'Does Traverse support Windows, macOS, and Linux?' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+---
+<QuestionLayout
+  title="Is Traverse suitable for a cross-platform desktop app?"
+  description="For the logic behind the app, yes — native desktop is Traverse's most mature target. For the UI itself, pair it with a desktop UI framework; Tauri is the most natural fit since both are Rust."
+  canonical="https://traverse-framework.com/questions/is-traverse-suitable-for-a-cross-platform-desktop-app.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Split the question in two, because the honest answer is different for each half. For the business logic behind a desktop app — the rules, calculations, and validations the UI calls into — yes, unreservedly. Native (Windows, macOS, Linux) is Traverse's default, most mature, shipped target, and a capability built for it needs no OS-specific code to run identically on all three.</p>
+
+  <p>For the desktop app's UI itself, Traverse isn't the tool — it has no windowing system, no widget library, nothing that paints a screen. You'll still pick a UI framework: Tauri, Electron, Flutter, or a native toolkit per OS if you want that level of control.</p>
+
+  <h2>Which UI framework pairs best</h2>
+  <p>Tauri is the most natural fit specifically, because its backend is Rust — the same language Traverse capabilities compile from. A Tauri command can call directly into the public <code>traverse-embedder</code> crate with no FFI boundary to cross. Electron works too, through its Chromium-based renderer, which is already a WASM host. Flutter's Dart runtime doesn't host WASM the same way, so pairing there typically goes through a native plugin bridging to a <code>traverse-embedder</code>-based process instead of an in-process call.</p>
+
+  <p>The <a href="/compare/vs-cross-platform-frameworks.html">full comparison</a> walks through the Tauri pairing with a real code example, if that's the combination you're considering.</p>
+</QuestionLayout>

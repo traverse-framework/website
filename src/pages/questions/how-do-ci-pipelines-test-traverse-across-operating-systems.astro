@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does Traverse verify a capability actually behaves the same across operating systems?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The v1.0 milestone gates explicitly require a five-platform CI stress matrix, alongside 100% coverage on governed paths and zero open P0/P1 bugs, before that claim is considered fully proven rather than architecturally expected. As of the current release, core crates are coverage-gated, but the full cross-platform CI matrix is one of the gates not yet met as a complete set.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/is-traverse-production-ready.html', label: 'Is Traverse production ready?' },
+  { href: '/questions/what-is-traverse-roadmap.html', label: 'What is the Traverse roadmap?' },
+  { href: '/questions/does-traverse-support-windows-macos-and-linux.html', label: 'Does Traverse support Windows, macOS, and Linux?' },
+  { href: '/security-audit.html', label: 'Security audit' },
+];
+---
+<QuestionLayout
+  title="How does Traverse verify cross-OS behavior actually matches?"
+  description="Architecturally, same-binary execution should behave identically everywhere. The v1.0 milestone treats that as a claim to prove, not assume — a five-platform CI stress matrix is one of ten explicit v1.0 gates, and it isn't fully met yet."
+  canonical="https://traverse-framework.com/questions/how-do-ci-pipelines-test-traverse-across-operating-systems.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>It's a fair thing to be skeptical about: "the same binary runs identically everywhere" is an architectural claim, and architectural claims are exactly the kind of thing that should be verified rather than asserted. Traverse's own v1.0 milestone treats it that way — a five-platform CI stress matrix is one of ten explicit, named gates the project has set for calling itself v1.0, alongside every crate published on crates.io, an MCP library surface beyond the stdio subprocess, 100% coverage on governed paths, and zero open P0/P1 bugs.</p>
+
+  <p>As of the current release, the honest state is partial: <code>traverse-contracts</code>, <code>traverse-registry</code>, and <code>traverse-runtime</code> are coverage-gated in CI, meaning their core logic can't merge without passing tests. The full five-platform stress matrix is not yet in place as a complete gate — it's tracked, named, and required before v1.0, not silently assumed to already be true.</p>
+
+  <h2>Why this matters more than it might seem</h2>
+  <p>A framework that claims cross-platform consistency without a CI matrix actually exercising every claimed platform is trusting the architecture to hold, not proving it does on every release. Naming the gap explicitly — as the v1.0 milestone does — is different from pretending it's already closed. If cross-platform reliability is load-bearing for your decision, that's a real, fair thing to weigh, and <a href="/roadmap.html">the roadmap</a> is where to watch it close rather than assume it already has.</p>
+</QuestionLayout>

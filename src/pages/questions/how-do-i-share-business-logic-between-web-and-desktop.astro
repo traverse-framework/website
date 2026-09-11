@@ -1,0 +1,41 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I share business logic between a web app and a desktop app?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Write the rule once as a Traverse capability, compile it to WASM with a contract, and let your web app load it through the Web embedder SDK or local browser adapter while your desktop app loads the identical bundle through a native embedder — most naturally traverse-embedder inside a Tauri app if you want both in Rust end to end.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-i-run-the-same-business-logic-in-browser-and-native-apps.html', label: 'Can I run the same business logic in a browser app and a native app?' },
+  { href: '/questions/can-i-use-traverse-with-tauri.html', label: 'Can I use Traverse with Tauri?' },
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri' },
+  { href: '/docs/guides/react-integration.html', label: 'React Integration guide' },
+];
+---
+<QuestionLayout
+  title="How do I share business logic between a web app and a desktop app?"
+  description="Write the rule once as a Traverse capability. Your web app loads it through the browser embedder or adapter; your desktop app loads the identical bundle natively — the two never drift because there's only one implementation."
+  canonical="https://traverse-framework.com/questions/how-do-i-share-business-logic-between-web-and-desktop.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>This is the exact shape of problem Traverse was built around, so the answer is fairly direct: write the rule once as a Rust capability, compile it to a WASM binary, attach a contract, and register it into a bundle. From there, your web app and your desktop app each load that one bundle through whichever executor matches their host — they're not two implementations that happen to agree, they're one implementation two hosts both call.</p>
+
+  <h2>The web side</h2>
+  <p>Your web frontend talks to the capability either through the local browser adapter over a simple HTTP request (the pattern the <a href="/docs/guides/react-integration.html">React integration guide</a> covers step by step) or, for a single pre-published capability, directly through the Web embedder SDK's verified execution path in the browser's native WASM host.</p>
+
+  <h2>The desktop side</h2>
+  <p>Your desktop app embeds the same bundle through a native host. If you're building that desktop app in Tauri, this is close to seamless — Tauri's backend is already Rust, so a Tauri command calls straight into the public <code>traverse-embedder</code> crate with no bridge in between (see the worked example in the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform frameworks</a> comparison). If your desktop app is Electron, its renderer is a Chromium page and can use the same Web embedder path the browser app uses.</p>
+
+  <p>Either way, the guarantee you get is structural, not procedural: the web app and the desktop app can't drift apart on this rule, because there's no second copy of it to drift.</p>
+</QuestionLayout>

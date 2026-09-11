@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I share business logic between an iOS app and an Android app with Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Not through a shipped Traverse SDK on both sides today. Android has a working, unreleased Kotlin runtime bridge. iOS is blocked on the WASM engine ecosystem lacking a certifiable resource-control API, though a feasibility spike proved a workaround runs on a physical iPhone. The capability and contract you write today carry over unchanged once both embedders ship — the logic-sharing goal is real, just not deliverable across both mobile OSes yet.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-traverse-build-mobile-apps.html', label: 'Can I build a mobile app with Traverse?' },
+  { href: '/blog/native-ios-runtime-foundation.html', label: 'Native iOS without a JIT: a hands-on feasibility proof' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+];
+---
+<QuestionLayout
+  title="Can I share business logic between an iOS app and an Android app with Traverse?"
+  description="Not through a shipped SDK on both platforms today. Android has a working, unreleased embedder. iOS is blocked on the WASM engine ecosystem. The contract you write now carries over once both ship."
+  canonical="https://traverse-framework.com/questions/can-i-share-logic-between-ios-and-android-apps.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>This is exactly the problem Traverse is built to eventually solve for mobile, and it's worth being precise about the word "eventually," because it isn't there yet for both platforms simultaneously.</p>
+
+  <p>On Android, <code>packages/kotlin/TraverseEmbedder</code> has a working runtime bridge built on Chicory, with bundle validation and lifecycle handling done. What's left is Compose reference-app integration and a public release — real, tracked, in-progress work, not a stalled idea.</p>
+
+  <p>On iOS, the situation is different in kind, not just degree: it's blocked, not just unfinished. As of the last engine screen, none of the major WASM runtimes (WasmKit, WAMR, Wasmtime, Wasmer) expose the resource-control APIs a certified native embedder needs to clear App Store review. A separate feasibility spike found a workaround — embedding the <code>wasmi</code> interpreter through a Rust static library with host-enforced memory and fuel limits — and it runs clean on a physical iPhone, which is a real result. It's not a shipped SDK you can add to an Xcode project today, though.</p>
+
+  <h2>What you can do about it now</h2>
+  <p>Write the shared rule as a well-scoped Traverse capability today, targeting the platforms that are already shipped — native desktop and the browser, for testing and for any web-based surface your product has. The contract doesn't change when a mobile embedder ships; the work isn't wasted, it's just not deployable to both phones yet. Watch <a href="/platforms.html">Platforms</a> for exactly when that changes, rather than guessing from a roadmap date.</p>
+</QuestionLayout>

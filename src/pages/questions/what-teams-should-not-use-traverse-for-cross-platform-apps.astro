@@ -1,0 +1,42 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'When should a team NOT use Traverse for a cross-platform app?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "When you need a native mobile UI shipped soon (Traverse has no UI layer and mobile embedders are unreleased or blocked), when your team is not willing to write the logic in Rust and cannot wait for the planned Python SDK, when the logic in question lives in exactly one place and is unlikely to need reuse, or when your platform target is iOS specifically and you cannot wait on the WASM-engine blocker.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-traverse-build-mobile-apps.html', label: 'Can I build a mobile app with Traverse?' },
+  { href: '/questions/can-non-rust-teams-use-traverse.html', label: 'Can a team that does not write Rust still use Traverse?' },
+  { href: '/blog/logic-duplication.html', label: 'Why I stopped writing the same business logic four times' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="When should a team NOT use Traverse for a cross-platform app?"
+  description="An honest list: shipping a mobile UI soon, a team unwilling to write Rust and unable to wait for the planned Python SDK, logic that lives in exactly one place, or an iOS-specific timeline that can't wait on the WASM-engine blocker."
+  canonical="https://traverse-framework.com/questions/what-teams-should-not-use-traverse-for-cross-platform-apps.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Most of this site makes the case for when Traverse fits. It's at least as useful to be specific about when it doesn't, since a mismatched tool costs more than a missing feature.</p>
+
+  <ul>
+    <li><strong>You need a native mobile UI on a near-term timeline.</strong> Traverse has no UI layer at all, and its own mobile embedders are either unreleased, working code (Android, .NET) or genuinely blocked (iOS). If mobile is the product, not just a future extension, a mobile-first UI framework is the right starting point today.</li>
+    <li><strong>Your team can't write Rust and can't wait.</strong> Authoring a new capability requires Rust today. A Python SDK is planned but not shipped. If nobody on the team can pick up Rust and the timeline doesn't allow waiting for that SDK, this isn't the right tool yet for writing new logic — though the team can still consume existing capabilities over plain JSON without touching Rust.</li>
+    <li><strong>The logic genuinely lives in exactly one place.</strong> If a rule is never called from more than one runtime, never needs an audit trail, and isn't drifting because there's only one copy of it, the contract-authoring overhead buys you very little. <a href="/blog/logic-duplication.html">The case for Traverse</a> is specifically about logic that's duplicated or at risk of duplicating.</li>
+    <li><strong>Your target is specifically iOS, on a timeline that can't absorb the blocker.</strong> This is worth saying plainly rather than hoping it resolves in time — see <a href="/platforms.html">Platforms</a> for the actual, current status before committing a deadline to it.</li>
+  </ul>
+
+  <p>None of this is a knock on the project — a tool that's honest about its worst fit is more trustworthy about its best one.</p>
+</QuestionLayout>

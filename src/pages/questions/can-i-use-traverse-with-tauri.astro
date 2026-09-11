@@ -1,0 +1,39 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I use Traverse with Tauri?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes, and it's a particularly natural pairing since Tauri's backend is Rust, the same language Traverse capabilities compile from. A Tauri command calls into a governed capability through the public traverse-embedder crate, so the desktop window Tauri renders is backed by the same contract-enforced logic your web app and backend already call.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri (full comparison)' },
+  { href: '/questions/how-is-traverse-different-from-electron.html', label: 'How is Traverse different from Electron?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+---
+<QuestionLayout
+  title="Can I use Traverse with Tauri?"
+  description="Yes. Tauri's Rust backend is a natural host for the public traverse-embedder crate, so a Tauri command can call a governed capability directly, with no FFI or language bridge involved."
+  canonical="https://traverse-framework.com/questions/can-i-use-traverse-with-tauri.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes — of the cross-platform desktop frameworks, Tauri is the most natural fit, because its backend is already Rust. There's no FFI boundary or language bridge to cross: a Tauri command function can call the public <code>traverse-embedder</code> crate directly, the same way a native CLI tool would, and return the result to the frontend like any other Tauri command.</p>
+
+  <p>The practical shape: initialize a <code>BundleEmbedder</code> once at app startup, hold it in Tauri's shared state, and call <code>submit_and_await</code> (or the async equivalent your embedder version exposes) from inside a <code>#[tauri::command]</code> handler. Your Tauri frontend never knows the difference — it just gets a JSON result back — but the logic behind that result is the same governed, contract-enforced WASM binary your web dashboard, backend, or AI agent calls.</p>
+
+  <p>Why bother, instead of just writing the rule in Rust directly inside the Tauri command? Because a plain function has no contract, no enforced pre/postconditions, and no trace artifact. If that rule needs to be provably identical across your desktop app and three other callers — or if it's the kind of rule (pricing, eligibility, compliance) where drift between copies would actually cost you — wrapping it as a Traverse capability gets you the governance for free everywhere it's called, Tauri included.</p>
+
+  <p>For the full worked example, including the actual command code, see the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform app frameworks</a> comparison.</p>
+</QuestionLayout>

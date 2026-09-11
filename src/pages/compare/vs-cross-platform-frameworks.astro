@@ -1,0 +1,218 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="compare-hero">
+  <div class="container">
+    <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
+    <h1>Traverse vs. Cross-Platform App Frameworks</h1>
+    <p class="compare-hero-lead">Flutter, Electron, Tauri, React Native, and .NET MAUI solve UI portability: one codebase, one native-feeling app across operating systems. Traverse solves a layer underneath that — one governed business-logic binary that behaves identically no matter which UI framework, backend, or AI agent is calling it. They're not really competing, and you can use them together.</p>
+  </div>
+</section>
+
+<main class="container">
+  <div class="toc-aside">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#what-they-solve">What cross-platform UI frameworks solve</a></li>
+      <li><a href="#what-traverse-solves">What Traverse solves</a></li>
+      <li><a href="#key-differences">Key differences</a></li>
+      <li><a href="#when-to-use">When to use which</a></li>
+      <li><a href="#together">Running Traverse inside a Tauri app</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <div class="content-section" id="what-they-solve">
+    <h2>What cross-platform UI frameworks solve</h2>
+    <p>Flutter, Electron, Tauri, React Native, and .NET MAUI all attack the same problem from different angles: write your UI once, ship a native-feeling app on Windows, macOS, Linux, iOS, and Android without hand-building five separate front ends. Flutter and React Native compile or interpret down to native widgets. Electron and Tauri wrap a web view (Electron ships its own Chromium; Tauri uses the OS's own web renderer, which is why its binaries are smaller). .NET MAUI shares one XAML-based UI layer across desktop and mobile.</p>
+    <p>All of them are genuinely good at this. It's a hard, well-understood problem, and each one has years of tooling, hot-reload workflows, and platform-specific escape hatches built up around it.</p>
+    <p>What none of them do is govern what happens once your button's <code>onPressed</code> handler fires. The business logic behind that tap — the pricing rule, the eligibility check, the discount calculation — is just more Dart, JavaScript, or C#, living inside that one app. If your backend, your web dashboard, and your AI agent need the exact same rule, you're re-implementing it in each of their languages and hoping the copies don't drift.</p>
+  </div>
+
+  <div class="content-section" id="what-traverse-solves">
+    <h2>What Traverse solves</h2>
+    <p>Traverse doesn't compete for the UI layer at all — it has none. What it governs is the rule itself. You write a capability once in Rust, compile it to WebAssembly, and attach a contract that declares its inputs, outputs, preconditions, and postconditions. The runtime validates all of that before and after execution, and produces a structured trace artifact every time the capability runs.</p>
+    <p>That WASM binary is device-independent: it executes locally by default, on whatever client loaded it, and the client can heuristically delegate part of the work to a server when its own context calls for it — not because someone chose "server" as a fixed deployment target ahead of time. The two shipped hosts for that binary today are native (Windows, macOS, Linux, through <code>traverse-runtime</code>'s Wasmtime-backed executor) and the browser (through the public Web embedder SDK). Android and .NET/WinUI embedders are real, working code without a public release yet; iOS is blocked on the WASM-engine ecosystem lacking a certifiable resource-control API — see <a href="/platforms.html">Platforms</a> for the evidence.</p>
+    <div class="highlight-callout"><strong>The distinction:</strong> a UI framework decides how your app looks and behaves on each OS. Traverse decides whether a specific rule inside that app is consistent, governed, and auditable everywhere it's called from — including places that have no UI at all, like a batch job or an MCP-connected AI agent.</div>
+  </div>
+
+  <div class="content-section" id="key-differences">
+    <h2>Key differences</h2>
+    <table class="diff-table">
+      <thead><tr><th>Dimension</th><th>Flutter / Electron / Tauri / MAUI</th><th>Traverse</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Primary unit</td>
+          <td>A widget tree or DOM — the thing the user sees and touches</td>
+          <td class="highlight">A governed WASM capability — the rule the app calls into, with no UI of its own</td>
+        </tr>
+        <tr>
+          <td>OS reach, shipped today</td>
+          <td>Windows, macOS, Linux, iOS, and Android are all shipped and mature for every framework in this group</td>
+          <td class="highlight">Windows, macOS, Linux (native) and browser are shipped. Android and .NET/WinUI embedders are in progress, unreleased. iOS is blocked on the WASM engine ecosystem — see Platforms.</td>
+        </tr>
+        <tr>
+          <td>Contract enforcement</td>
+          <td>None built in — your logic runs as written, with whatever validation you hand-code</td>
+          <td class="highlight">Preconditions and postconditions are declared in a machine-readable contract and enforced by the runtime, not by convention</td>
+        </tr>
+        <tr>
+          <td>Execution record</td>
+          <td>Whatever logging you add yourself</td>
+          <td class="highlight">A structured trace artifact on every execution — capability, version, inputs validated, outputs validated, timing</td>
+        </tr>
+        <tr>
+          <td>Reuse outside the app</td>
+          <td>The logic is Dart, JS, or C# inside that app; using it from a backend or AI pipeline means porting it to another language</td>
+          <td class="highlight">The same WASM binary and contract are callable from the CLI, an MCP-connected AI agent, or another app, unmodified</td>
+        </tr>
+        <tr>
+          <td>Primary use</td>
+          <td>Ship one native-feeling UI across operating systems and devices</td>
+          <td class="highlight">Keep one business rule byte-for-byte identical everywhere it's invoked, UI or not</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section" id="when-to-use">
+    <h2>When to use which</h2>
+    <div class="when-grid">
+      <div class="when-card">
+        <h3>Use a cross-platform UI framework when</h3>
+        <ul>
+          <li>Users need a real native or native-feeling app on desktop and mobile</li>
+          <li>You want one team shipping UI once instead of five native codebases</li>
+          <li>The business logic behind the UI is simple enough to live in one place, in one language</li>
+          <li>You don't need that logic callable from outside this one app</li>
+        </ul>
+      </div>
+      <div class="when-card accent-border">
+        <h3>Use Traverse when</h3>
+        <ul>
+          <li>A rule has to produce the same result in the app, the backend, and an AI pipeline</li>
+          <li>Compliance requires a reproducible, auditable record of what ran and why</li>
+          <li>Logic drift between rewritten copies is already causing production bugs</li>
+          <li>You want contracts enforced before execution, not hoped for in code review</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="together">
+    <h2>Running Traverse inside a Tauri app</h2>
+    <p>Tauri is the most natural pairing here, because its backend is Rust — the same language Traverse capabilities compile from. The UI stays exactly what Tauri already gives you (a native window rendering your web frontend); a Tauri command just calls into the same governed capability your web dashboard and your AI agent call, through the public <code>traverse-embedder</code> crate.</p>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">src-tauri/src/commands.rs</span></div>
+      <div class="code-body"><span class="tok-key">use</span> traverse_embedder::{BundleEmbedder, EmbedderConfig, TraverseEmbedderApi};
+<span class="tok-key">use</span> tauri::State;
+
+<span class="tok-comment">// Initialized once at app startup, shared across every window</span>
+<span class="tok-key">pub struct</span> AppState {
+    <span class="tok-key">pub</span> embedder: BundleEmbedder,
+}
+
+<span class="tok-attr">#[tauri::command]</span>
+<span class="tok-key">async fn</span> <span class="tok-fn">check_discount_eligibility</span>(
+    state: State&lt;'_, AppState&gt;,
+    customer_id: String,
+    cart_total: f64,
+) -&gt; Result&lt;serde_json::Value, String&gt; {
+    <span class="tok-key">let</span> input = serde_json::json!({
+        <span class="tok-str">"customer_id"</span>: customer_id,
+        <span class="tok-str">"cart_total"</span>: cart_total,
+    });
+
+    <span class="tok-comment">// Same bundle the web dashboard and the backend call — one contract, one result</span>
+    state.embedder
+        .<span class="tok-fn">submit_and_await</span>(<span class="tok-str">"promotions.check-eligibility"</span>, &amp;input)
+        .<span class="tok-fn">await</span>
+        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())
+}</div>
+    </div>
+    <p style="margin-top:1.25rem">Tauri's frontend calls <code>check_discount_eligibility</code> like any other Tauri command — it has no idea the answer came from a governed WASM capability instead of hand-written Rust. The window renders whatever Tauri already renders. The rule underneath it is the exact same binary running in your web app and your CI pipeline.</p>
+  </div>
+
+  <div class="content-section" id="verdict">
+    <h2>The verdict</h2>
+    <p>These aren't competitors, because they're not solving the same problem. A UI framework decides how your app looks and feels on five different operating systems. Traverse decides whether one specific rule inside that app is trustworthy, auditable, and identical everywhere it runs — including the places that never had a UI to begin with.</p>
+    <p>If your app's logic is simple, lives in one place, and never needs to run outside that app, you probably don't need Traverse — the UI framework you already picked is enough. If a rule inside that app is load-bearing enough that drift between copies would actually hurt (pricing, eligibility, compliance, anything an AI agent also needs to call), that's the rule worth pulling into a governed capability, while the framework you already chose keeps doing what it's good at.</p>
+  </div>
+
+  <div class="compare-nav">
+    <a href="/compare.html">← All comparisons</a>
+    <a href="/compare/vs-serverless.html">Traverse vs Serverless Functions →</a>
+    <a href="/compare/vs-microservices.html">Traverse vs Microservices →</a>
+  </div>
+</main>
+
+<section class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Keep your UI framework. Govern the logic underneath it.</div>
+      <div class="t-body t-muted">See the exact platform matrix, or start with the quickstart.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/platforms.html" class="btn btn-ghost btn-lg">Platform status →</a>
+      <a href="/docs/quickstart.html" class="btn btn-primary btn-lg">Quickstart</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Traverse vs Cross-Platform App Frameworks (Flutter, Electron, Tauri, .NET MAUI) · Traverse Framework"
+  description="Flutter, Electron, Tauri, and .NET MAUI give you one UI codebase across operating systems. Traverse gives you one governed business-logic binary across operating systems, UI framework, and AI pipeline. Here's the honest boundary between the two."
+  canonical="https://traverse-framework.com/compare/vs-cross-platform-frameworks.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Compare', href: '/compare.html' }]}
+>
+  <style is:global slot="head">
+    .compare-hero { padding: 4.5rem 0 3.5rem; position: relative; }
+    .compare-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%); pointer-events: none; }
+    .compare-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.25rem; font-family: var(--font-display); max-width: 760px; }
+    .compare-hero-lead { font-size: 1.1rem; color: var(--fg-muted); max-width: 640px; line-height: 1.75; }
+
+    .toc-aside { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .toc-aside h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.75rem; font-family: var(--font-display); }
+    .toc-aside ol { margin: 0; padding-left: 1.25rem; }
+    .toc-aside li { font-size: 0.88rem; color: var(--fg-muted); margin-bottom: 0.35rem; line-height: 1.5; }
+    .toc-aside li a { color: var(--fg-muted); text-decoration: none; transition: color 0.15s; }
+    .toc-aside li a:hover { color: var(--accent); }
+
+    .content-section { margin: 3.5rem 0; }
+    .content-section h2 { font-size: 1.6rem; font-weight: 600; font-family: var(--font-display); margin-bottom: 1rem; padding-top: 1rem; }
+    .content-section p { color: var(--fg-muted); line-height: 1.8; margin-bottom: 1rem; max-width: 720px; }
+    .content-section ul { color: var(--fg-muted); line-height: 1.8; margin: 0 0 1rem 1.25rem; max-width: 720px; }
+
+    .diff-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.92rem; }
+    .diff-table th { background: var(--bg-elevated); border: 1px solid var(--border); padding: 0.75rem 1rem; text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .diff-table th:first-child { width: 24%; }
+    .diff-table td { border: 1px solid var(--border); padding: 0.85rem 1rem; vertical-align: top; line-height: 1.6; color: var(--fg-muted); }
+    .diff-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .diff-table td:first-child { font-weight: 500; color: var(--fg); font-family: var(--font-display); font-size: 0.88rem; }
+    .diff-table td.highlight { color: var(--accent); }
+
+    .when-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+    .when-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .when-card h3 { font-size: 1rem; font-weight: 600; font-family: var(--font-display); margin-bottom: 0.75rem; }
+    .when-card ul { margin: 0; padding-left: 1.1rem; }
+    .when-card li { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.65; margin-bottom: 0.4rem; }
+    .when-card.accent-border { border-color: var(--accent); }
+
+    .highlight-callout { background: var(--bg-elevated); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; font-size: 0.95rem; color: var(--fg-muted); line-height: 1.75; max-width: 720px; }
+    .highlight-callout strong { color: var(--fg); }
+
+    .compare-nav { display: flex; gap: 1rem; margin: 3rem 0; flex-wrap: wrap; }
+    .compare-nav a { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; text-decoration: none; color: var(--fg-muted); font-size: 0.88rem; transition: border-color 0.15s, color 0.15s; }
+    .compare-nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .when-grid { grid-template-columns: 1fr; }
+      .diff-table { font-size: 0.82rem; }
+      .diff-table th, .diff-table td { padding: 0.6rem 0.75rem; }
+    }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

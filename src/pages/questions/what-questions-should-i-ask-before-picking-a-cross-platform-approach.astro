@@ -1,0 +1,48 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What should I ask before picking a cross-platform approach?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Separate the UI question from the logic question first. Then ask which operating systems you need today versus later, whether any rule needs to be provably identical across more than one caller, whether you need an audit trail of what executed and why, and whether your team can write the language the tool actually requires. Most cross-platform disappointments come from skipping the first question.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/cross-platform-rarely-means-what-it-sounds-like.html', label: 'Why "cross-platform" rarely means what it sounds like' },
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri' },
+  { href: '/questions/is-traverse-a-cross-platform-framework.html', label: 'Is Traverse a cross-platform framework?' },
+  { href: '/questions/what-teams-should-not-use-traverse-for-cross-platform-apps.html', label: 'When should a team NOT use Traverse?' },
+];
+---
+<QuestionLayout
+  title="What should I ask before picking a cross-platform approach?"
+  description="Separate the UI question from the logic question, then check OS timeline, reuse requirements, audit needs, and language constraints. Most cross-platform disappointments trace back to skipping the first split."
+  canonical="https://traverse-framework.com/questions/what-questions-should-i-ask-before-picking-a-cross-platform-approach.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Almost every regretted "cross-platform" choice traces back to one missing step at the start: nobody separated the UI question from the logic question, so the team evaluated one tool against requirements that actually belonged to two different layers. Do that split first, then work through the rest.</p>
+
+  <h2>1. Is this a UI decision, a logic decision, or both?</h2>
+  <p>If you need a native-feeling UI across operating systems, you're choosing between Flutter, Electron, Tauri, React Native, or .NET MAUI — that's a UI-layer decision, and none of those tools govern the business logic underneath the UI any differently than plain application code would. If you're choosing how to keep a rule consistent across an app, a backend, and maybe an AI agent, that's a logic-layer decision, and the UI framework you eventually pick is mostly irrelevant to it.</p>
+
+  <h2>2. Which operating systems do you need, and by when?</h2>
+  <p>"Eventually, everything" is not a real requirement. Write down which platforms are needed for launch versus which are aspirational, and check each candidate tool's actual, current — not roadmapped — support for exactly those. <a href="/platforms.html">Evidence-linked status pages</a>, where a tool publishes one, are worth more than a marketing page's platform-logo row.</p>
+
+  <h2>3. Does any rule need to be provably identical across more than one caller?</h2>
+  <p>If a pricing or eligibility rule only ever lives in one app, in one language, you don't need a governance layer for it — a plain function is fine. If it needs to produce the same answer in a web app, a backend, and an AI pipeline, that's specifically the problem a contract-governed capability solves and a UI framework doesn't.</p>
+
+  <h2>4. Do you need an audit trail of what actually ran?</h2>
+  <p>Compliance, financial logic, and AI-agent-invoked actions often need a record of what executed, with what inputs, under which contract version. Most UI frameworks and plain function calls produce none of that by default; it has to be built or bolted on.</p>
+
+  <h2>5. Can your team write the language the tool actually requires?</h2>
+  <p>Flutter means Dart. React Native and Electron mean JavaScript/TypeScript. .NET MAUI means C#. Authoring a new Traverse capability means Rust today. Pick based on what your team can actually staff and maintain, not on which tool has the best marketing page — the fourth or fifth rewrite of a "temporary" prototype is usually where a language mismatch that got waved away the first time finally gets paid for.</p>
+</QuestionLayout>

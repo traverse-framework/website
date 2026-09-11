@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I use Traverse in a monorepo with multiple apps targeting different platforms?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes — that's a common shape for this to fit well, since a shared registry bundle sitting alongside a web app, a native CLI, and a desktop shell in one repo means every app pulls from the same capabilities and contracts rather than each maintaining its own copy or import path.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/how-do-i-package-a-capability-for-multiple-platforms.html', label: 'How do I package a capability for multiple platforms?' },
+  { href: '/questions/how-do-i-share-business-logic-between-web-and-desktop.html', label: 'How do I share business logic between a web app and a desktop app?' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+---
+<QuestionLayout
+  title="Can I use Traverse in a monorepo with multiple apps targeting different platforms?"
+  description="Yes — a shared registry bundle sitting alongside a web app, a native CLI, and a desktop shell in one repo is a natural fit, since every app references the same capabilities and contracts instead of maintaining separate copies."
+  canonical="https://traverse-framework.com/questions/can-i-use-traverse-in-a-monorepo-with-multiple-apps.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes, and it's one of the more natural places for this pattern to pay off quickly. Put your registry bundle — the capabilities, their contracts, and any events or workflows — in a shared location in the monorepo, and have your web app, native tooling, and desktop shell each depend on it through whichever executor matches their platform (the Web embedder SDK for the web app, <code>traverse-embedder</code> for the native and desktop targets).</p>
+
+  <p>The practical benefit inside a monorepo specifically: a change to a capability's contract is one commit, reviewed once, and every app in the repo picks it up the next time it builds against the updated bundle. There's no separate PR per app to keep three reimplementations in sync, because there aren't three reimplementations — there's one bundle multiple apps reference.</p>
+
+  <h2>What to actually structure</h2>
+  <p>A reasonable layout: a top-level <code>capabilities/</code> or <code>bundles/</code> directory holding your registry bundle(s), separate from each app's own directory. Each app's build or dev script points its executor at that shared path rather than vendoring a copy. CI can validate the bundle once, independent of which apps happen to consume it, using the same <code>bundle inspect</code>/validate commands shown in the <a href="/docs/quickstart.html">quickstart</a>.</p>
+</QuestionLayout>
