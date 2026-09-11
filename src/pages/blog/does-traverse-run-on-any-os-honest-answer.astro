@@ -1,0 +1,128 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 10, 2026</span>
+      <span class="badge">Honesty</span>
+      <span class="badge">Platforms</span>
+    </div>
+    <h1 class="t-h1">"Does this work on any OS?" — the question I get the most, answered without the marketing gloss</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Some version of "does Traverse work on any OS" comes up in almost every conversation I have about this project — GitHub issues, Discord, people I meet who ask what I've been building. It's a fair question, and it deserves a real answer instead of a slide with a checkmark next to five platform logos. So here's the one I actually give.</p>
+
+      <h2 id="short-answer">The short answer</h2>
+
+      <p>For native desktop — Windows, macOS, Linux — yes, unreservedly. Write a capability once, compile it to WASM, and <code>traverse-runtime</code>'s Wasmtime-backed executor runs the identical binary on all three. That's the most mature, most heavily used path through the project, and I'll say "yes" to that one without an asterisk.</p>
+
+      <p>For the browser, also yes, with a real but honest scope: the Web embedder SDK loads a bundle, verifies it, and executes it directly in the browser's native WASM host. As of the last release there's a governed path for running a single verified capability and getting a trace receipt back. What it doesn't do yet is arbitrary conditional or event-driven workflow execution in-browser — linear, directly-triggered pipelines only, for now.</p>
+
+      <p>For mobile, the honest answer is "not yet, and here's exactly why." That's the part most cross-platform marketing skips, so let me not skip it.</p>
+
+      <h2 id="why-mobile-is-different">Why mobile gets a different answer</h2>
+
+      <p>Android has a real, working runtime bridge — built on Chicory, with bundle validation and lifecycle handling in place. What's missing is the reference-app integration and a public release, both tracked as open work, not vaporware.</p>
+
+      <p>iOS is the one that actually stops me from saying "any OS" cleanly. We went through a formal screen of the available WASM engines — WasmKit, WAMR, Wasmtime, Wasmer — looking for one that exposes the resource-control APIs a certified native embedder needs to pass App Store review. None of them currently do, for a mix of reasons: missing resource-control surface, no supported iOS profile, or JIT and entitlement conflicts with App Store distribution rules. That's not "we haven't gotten to it." That's genuinely blocked on something outside this project.</p>
+
+      <p>We didn't just stop there and shrug. A feasibility spike embedded the <code>wasmi</code> interpreter directly through a Rust static library and a narrow C bridge, with the host enforcing memory and fuel limits by hand, and it ran clean on a physical iPhone. That's a real, verified result — I wrote up the full technical account separately — but it's a foundation for a future path, not something you can add to an Xcode project today.</p>
+
+      <h2 id="why-i-answer-it-this-way">Why I keep answering it this way instead of rounding up</h2>
+
+      <p>It would be easier, in a pitch, to say "runs on any OS" and let the listener assume mobile is covered. Most people wouldn't check until they'd already started building. I've been on the other end of that kind of claim from other tools — the finding-out-later part is what actually costs you time and trust, not the narrower truth up front.</p>
+
+      <p>So the answer stays specific: full support for Windows, macOS, and Linux, shipped. Real support for the browser, shipped with a stated scope. Real, working, unreleased code for Android and .NET/WinUI. A blocked, evidence-backed status for iOS, with a documented workaround that isn't a product yet. Anyone can go check every one of those claims against the actual crates and issues on <a href="/platforms.html">the Platforms page</a> — it's the same page I link when someone asks me this in person.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#short-answer">The short answer</a></li>
+          <li><a href="#why-mobile-is-different">Why mobile gets a different answer</a></li>
+          <li><a href="#why-i-answer-it-this-way">Why I keep answering it this way</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/same-binary-three-operating-systems.html">Same binary, three operating systems →</a></li>
+          <li><a href="/blog/native-ios-runtime-foundation.html">Native iOS without a JIT: a hands-on feasibility proof →</a></li>
+          <li><a href="/blog/cross-platform-rarely-means-what-it-sounds-like.html">Why "cross-platform" rarely means what it sounds like →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Read the FAQ version</div>
+        <p>The same answer, structured for a quick lookup instead of a story.</p>
+        <a href="/questions/what-framework-runs-business-logic-on-any-os.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the answer →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Check the claims yourself.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Every platform, scored against a real crate, package, or blocking issue in the repo.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/platforms.html" class="btn btn-primary">Platform status →</a>
+      <a href="/docs/quickstart.html" class="btn btn-ghost">Quickstart</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"\"Does this work on any OS?\" — the honest answer — Traverse Blog"}
+  description={"The question I get the most, answered without the marketing gloss: full native support on Windows, macOS, and Linux, honest scope on browser, and exactly why mobile is a different story."}
+  canonical={"https://traverse-framework.com/blog/does-traverse-run-on-any-os-honest-answer.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

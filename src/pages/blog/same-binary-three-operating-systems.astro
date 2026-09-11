@@ -1,0 +1,131 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 10, 2026</span>
+      <span class="badge">Portability</span>
+      <span class="badge">Native</span>
+    </div>
+    <h1 class="t-h1">Same binary, three operating systems: what "write once" actually means</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>A teammate asked me last week whether Traverse "runs on any OS." I gave the honest answer, which took about four sentences and included the word "blocked" once. They looked a little disappointed. I get it — "yes, any OS" is a much better sentence than what I actually said. It's also not true for most tools that say it, and I'd rather be the tool that says the true thing.</p>
+
+      <p>So here's the actual mechanics of what happens when the same capability runs on Windows, macOS, and Linux, and why that part of the claim is one I'll make without hedging.</p>
+
+      <h2 id="what-actually-runs">What actually runs</h2>
+
+      <p>You write a capability once, in Rust. You compile it to WebAssembly. That produces a single <code>.wasm</code> file — a binary instruction format, not machine code for any particular CPU or OS. <code>traverse-runtime</code> loads that file into a Wasmtime-backed <code>WasmExecutor</code>, validates the request against the capability's contract, runs it in a sandbox, checks the output against the contract's postconditions, and writes a trace.</p>
+
+      <p>Every step of that is identical on Windows, macOS, and Linux, because none of it touches the host OS directly. The WASM sandbox doesn't see a filesystem, a network socket, or a thread unless the contract explicitly grants it and the host wires up the import. There's no "Windows build" of your capability and no <code>#[cfg(target_os = "linux")]</code> branch hiding somewhere. It's the same file, byte for byte, on all three.</p>
+
+      <div class="callout">This is also, not coincidentally, why the sandbox exists in the first place. The moment a capability starts making raw system calls, it stops being portable — the whole reason OS-independence holds is that the boundary between "my logic" and "the host" is explicit and narrow.</div>
+
+      <h2 id="not-magic">Why this isn't a Traverse trick</h2>
+
+      <p>I want to be clear this part isn't clever engineering on our side. It's what WebAssembly is for. Any conformant WASM runtime executes a given binary the same way, by design, regardless of the host it's embedded in. Traverse's job on top of that is the governance layer — the contract, the registry, the validation, the trace — not the portability itself. If you stripped Traverse away entirely and just ran raw <code>wasmtime run capability.wasm</code> on all three operating systems, you'd already get the same execution behavior. We're not reinventing that; we're making it safe to build a real system on top of.</p>
+
+      <h2 id="what-i-wont-claim">What I won't claim next to this</h2>
+
+      <p>Here's the part that made my teammate less excited. "Runs on any OS" quietly implies "runs on your phone too," and that's not true yet. Android has a working Kotlin runtime bridge with no public release. iOS is <em>blocked</em> — not behind, not deprioritized, actually blocked — because no WASM engine we've evaluated currently exposes the resource-control APIs a certified native embedder needs to pass App Store review. We found a workaround that runs on a physical iPhone using a different engine entirely, and that's a real result, but it's a research spike, not something you can ship today.</p>
+
+      <p>I could stop mentioning that and let "any OS" imply more than it delivers. Plenty of tools do exactly that, and most people won't check until they've already built on the assumption. I'd rather lose the cleaner sentence and keep the trust.</p>
+
+      <h2 id="the-actual-claim">The claim I'll actually make</h2>
+
+      <p>Write the capability once. It runs, unmodified, on Windows, macOS, and Linux, natively, today — and in the browser, through the Web embedder SDK, with its own honestly-scoped limits. That's real, it's shipped, and I'll say it plainly. Mobile is coming, at different speeds, for reasons outside our control on one of the two platforms. The full, evidence-linked status of every target — not a rounded-up version of it — lives on the <a href="/platforms.html">Platforms page</a>, and I'd rather you read that before you build on top of any of this than find out later.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-actually-runs">What actually runs</a></li>
+          <li><a href="#not-magic">Why this isn't a Traverse trick</a></li>
+          <li><a href="#what-i-wont-claim">What I won't claim next to this</a></li>
+          <li><a href="#the-actual-claim">The claim I'll actually make</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic →</a></li>
+          <li><a href="/blog/native-ios-runtime-foundation.html">Native iOS without a JIT: a hands-on feasibility proof →</a></li>
+          <li><a href="/blog/logic-duplication.html">Why I stopped writing the same business logic four times →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">See the real matrix</div>
+        <p>Every platform, scored against a real crate or a real blocking issue — not a roadmap.</p>
+        <a href="/platforms.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Platform status →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">See it run on your own machine.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">The quickstart builds the same binary the CLI runs on Linux, macOS, and Windows alike.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Quickstart →</a>
+      <a href="https://github.com/traverse-framework/traverse" class="btn btn-ghost" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"Same binary, three operating systems: what \"write once\" actually means — Traverse Blog"}
+  description={"What actually happens when a Traverse capability runs identically on Windows, macOS, and Linux, and an honest accounting of what that claim doesn't yet cover."}
+  canonical={"https://traverse-framework.com/blog/same-binary-three-operating-systems.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ul, .post-prose ol { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose strong { color: var(--fg); font-weight: 600; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
