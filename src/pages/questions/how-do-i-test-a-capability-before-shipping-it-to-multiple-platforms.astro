@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I test a capability before shipping it to multiple platforms?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Test the capability once, against its contract, independent of any platform — since the sandboxed WASM binary has no OS-dependent behavior to test per platform in the first place. Validate the bundle with the CLI, exercise it through the native executor with representative inputs, and check the trace output; a capability with no declared host calls needs no further per-OS test pass beyond confirming the executor itself works on that host.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-ci-pipelines-test-traverse-across-operating-systems.html', label: 'How does Traverse verify cross-OS behavior actually matches?' },
+  { href: '/questions/do-different-operating-systems-see-different-behavior-from-the-same-capability.html', label: 'Can different operating systems see different behavior from the same capability?' },
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact in Traverse?' },
+  { href: '/docs/guides/cross-os-capability.html', label: 'Write once, run on Windows, macOS, Linux, and the browser' },
+];
+---
+<QuestionLayout
+  title="How do I test a capability before shipping it to multiple platforms?"
+  description="Test the capability once, against its contract — the sandboxed binary has no OS-dependent behavior to test per platform. Validate the bundle, exercise representative inputs, and check the trace; that's the whole test surface for a well-scoped capability."
+  canonical="https://traverse-framework.com/questions/how-do-i-test-a-capability-before-shipping-it-to-multiple-platforms.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The reassuring answer is that "test it for each platform" mostly collapses into "test it once," because a capability with no declared host calls has no OS-dependent code path for a platform-specific test to catch. Your test plan should center on the contract, not the target.</p>
+
+  <h2>What to actually test</h2>
+  <ul>
+    <li><strong>Validate the bundle.</strong> The CLI's bundle inspection checks that contracts are well-formed and referenced modules exist — run this before anything else.</li>
+    <li><strong>Exercise the contract's edge cases.</strong> Valid inputs at the boundary of your preconditions, invalid inputs that should be rejected, and the postconditions you expect on success. This is testing the capability's logic, and it's identical regardless of which executor eventually runs it.</li>
+    <li><strong>Read the trace, don't just check the output.</strong> A trace artifact confirms <code>contract_validated</code>, <code>preconditions_met</code>, and <code>postconditions_met</code> explicitly — catching a case where the output happened to look right but a precondition was silently skipped.</li>
+  </ul>
+
+  <h2>What's left to test per platform</h2>
+  <p>Realistically, very little: that the executor itself is correctly installed and configured on that host (a native binary that runs, a browser embedder that loads), and — if the capability's contract declares any host calls — that the specific host implementation of those calls behaves correctly on that platform, since that's the one place OS-specific code could legitimately exist. For a capability with an empty <code>host_calls</code> list, there's genuinely nothing else to test per OS beyond confirming the runtime environment itself is set up. The <a href="/docs/guides/cross-os-capability.html">cross-OS capability guide</a> shows this in practice, comparing trace output from a native run against a browser run of the same bundle.</p>
+</QuestionLayout>

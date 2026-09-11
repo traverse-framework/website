@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can an AI agent call the same capability my app uses, regardless of OS?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes. An MCP-connected agent discovers and invokes a capability through traverse-mcp against the registry, which is the same capability and contract your native or browser-hosted app calls directly. The agent gets the identical enforced behavior and trace as any other caller, independent of which OS is hosting the runtime the agent is talking to.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-does-the-mcp-server-work.html', label: 'How does the Traverse MCP server work?' },
+  { href: '/questions/how-do-ai-agents-discover-capabilities.html', label: 'How do AI agents discover capabilities?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/docs/guides/mcp-setup.html', label: 'MCP Server Setup' },
+];
+---
+<QuestionLayout
+  title="Can an AI agent call the same capability my app uses, regardless of OS?"
+  description="Yes — an MCP-connected agent invokes the same capability and contract your native or browser app calls, through traverse-mcp against the registry, getting identical enforced behavior independent of the host OS."
+  canonical="https://traverse-framework.com/questions/can-ai-agents-call-the-same-capability-regardless-of-os.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes, and this is one of the more concrete payoffs of the whole "one binary, one contract" model. <code>traverse-mcp</code> exposes capabilities from your registry as tools over the Model Context Protocol. When an AI agent — Claude or another MCP-compatible client — discovers and calls a capability, it's invoking the identical contract-governed WASM binary your web app, your native backend, or your CLI would call. Not a reimplementation exposed as a tool description; the same execution path, producing the same trace.</p>
+
+  <p>Because that binary is device-independent to begin with, the OS hosting the MCP server itself is beside the point — the agent's call goes through the registry and the runtime, and the underlying execution behaves the same way whether that host happens to be Windows, macOS, or Linux.</p>
+
+  <h2>Why that matters more for agents than for a typical app</h2>
+  <p>An AI agent calling a capability is exactly the situation where "the agent got a slightly different answer than the human-facing app because they're calling two different implementations" is a genuinely bad failure mode — invisible until it causes a wrong decision. Because the agent and the app are calling the same binary under the same contract, that specific failure mode is structurally ruled out rather than something you have to test for. See the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a> to wire this up directly.</p>
+</QuestionLayout>

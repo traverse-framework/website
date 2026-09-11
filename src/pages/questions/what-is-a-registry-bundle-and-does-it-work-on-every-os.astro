@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is a registry bundle, and does it work on every OS?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A registry bundle is a manifest plus the capability contracts, WASM modules, event contracts, and workflow definitions it groups together into one deployable, CLI-validated unit. It has no OS-specific content, so the identical bundle is what every shipped executor — native or browser — loads.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/how-do-i-package-a-capability-for-multiple-platforms.html', label: 'How do I package a capability for multiple platforms?' },
+  { href: '/docs/concepts.html', label: 'Core Concepts: Traverse Docs' },
+  { href: '/docs/guides/cross-os-capability.html', label: 'Write once, run on Windows, macOS, Linux, and the browser' },
+];
+---
+<QuestionLayout
+  title="What is a registry bundle, and does it work on every OS?"
+  description="A manifest plus contracts, WASM modules, events, and workflows, grouped into one deployable unit. It has no OS-specific content, so the same bundle is what every shipped executor loads, native or browser."
+  canonical="https://traverse-framework.com/questions/what-is-a-registry-bundle-and-does-it-work-on-every-os.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>A registry bundle is the deployable unit a Traverse runtime actually loads: a top-level manifest describing what's inside, a <code>capabilities/</code> directory holding each capability's contract and compiled WASM module, an <code>events/</code> directory for event contracts, and a <code>workflows/</code> directory for any workflow definitions that compose those capabilities together. The CLI validates the whole bundle — checking that contracts are well-formed and that referenced modules actually exist — before it's registered.</p>
+
+  <p>None of that content is OS-specific. A manifest is JSON. A contract is JSON. A capability module is a portable WASM binary. There's nothing in a bundle's structure that would need to differ if it were being loaded on Windows versus loaded in a browser tab — which is exactly why it doesn't.</p>
+
+  <h2>So yes — one bundle, every shipped target</h2>
+  <p>The same bundle a native executor loads through <code>traverse-cli-rs -- bundle inspect</code> is the same file the Web embedder SDK loads and digest-verifies before executing a capability in a browser. There's no "browser bundle" and "native bundle" as separate build artifacts — see the <a href="/docs/guides/cross-os-capability.html">cross-OS capability guide</a> for a step-by-step walkthrough that inspects one bundle and then runs it through both.</p>
+</QuestionLayout>
