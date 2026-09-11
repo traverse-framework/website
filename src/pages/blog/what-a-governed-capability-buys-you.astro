@@ -1,0 +1,124 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 10, 2026</span>
+      <span class="badge">Contracts</span>
+      <span class="badge">Architecture</span>
+    </div>
+    <h1 class="t-h1">What a governed capability buys you that a shared library doesn't</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>The most common pushback I get on Traverse, from Rust teams specifically, is some version of: "couldn't I just put this in a shared crate?" It's a good question, and the honest answer is usually yes — right up until it isn't. Here's where the line actually sits.</p>
+
+      <h2 id="the-crate-case">The case for just using a crate</h2>
+
+      <p>If your whole system is Rust, a shared crate gets you real code reuse with none of the ceremony: no contract to write, no WASM compilation step, no sandbox overhead. Every service imports the crate, calls the function, done. For a team that's fully Rust and has no reason to expect that to change, I will tell you honestly: don't reach for Traverse. You don't need it yet.</p>
+
+      <h2 id="where-it-breaks">Where it breaks down</h2>
+
+      <p>The crate approach starts to strain the moment a caller outside your Rust ecosystem needs the same logic. Your frontend is JavaScript. Someone wants to call the rule from Python for a data pipeline. An AI agent needs to invoke it as a tool. None of them can just <code>use</code> your crate. Each one now needs its own binding: an FFI layer, a WASM build of the crate compiled separately for that purpose, or a network service wrapping it — and you're maintaining integration surface per caller, which is exactly the duplication problem you were trying to avoid in the first place, just moved one level up.</p>
+
+      <p>There's a second, quieter problem even within an all-Rust system: a crate's public function signature is a type contract, not a behavioral one. Nothing stops a caller from passing a technically well-typed but semantically invalid input. Nothing records, later, what was actually passed and returned when something goes wrong in production. You get compile-time safety and approximately nothing at runtime.</p>
+
+      <h2 id="what-changes">What a governed capability changes</h2>
+
+      <p>A Traverse capability compiles to WASM instead of a native crate, which sounds like a downgrade in a Rust-only world and is actually the thing that makes it callable from everywhere else — any WASM-hosting environment loads it through the same interface, with no per-language binding to maintain. The contract attached to it isn't just types; it's declared preconditions and postconditions the runtime actually checks on every call, and a trace artifact that records what happened, every time, without anyone remembering to add a log line.</p>
+
+      <div class="callout">A shared crate answers "can multiple Rust services call this function." A governed capability answers "can I prove, after the fact, exactly what ran, with what inputs, and whether it was valid" — for any caller, in any language.</div>
+
+      <h2 id="the-real-tradeoff">The real tradeoff, stated plainly</h2>
+
+      <p>Writing a contract is more upfront work than writing a function signature. WASM sandboxing has real, measurable overhead compared to an in-process native call. Neither of those costs disappears because the benefits sound good. Pay them for the logic where drift, misuse, or an unexplained failure would actually cost you — pricing, eligibility, compliance, anything an AI agent might call unsupervised. Don't pay them for logic that's genuinely internal to one Rust service with no other callers in sight. Most systems have both kinds of logic in them; the skill is telling which is which before you've built four divergent copies of the wrong one.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#the-crate-case">The case for just using a crate</a></li>
+          <li><a href="#where-it-breaks">Where it breaks down</a></li>
+          <li><a href="#what-changes">What a governed capability changes</a></li>
+          <li><a href="#the-real-tradeoff">The real tradeoff, stated plainly</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related posts</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-is-traverse-different-from-a-shared-rust-library.html">Why not just use a shared Rust library? →</a></li>
+          <li><a href="/blog/logic-duplication.html">Why I stopped writing the same business logic four times →</a></li>
+          <li><a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Write your first contract</div>
+        <p>See the anatomy of a capability contract and what the runtime enforces.</p>
+        <a href="/docs/concepts.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Core concepts →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">See a real contract, end to end.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">The quickstart inspects a real, governed bundle in under 15 minutes.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/docs/quickstart.html" class="btn btn-primary">Quickstart →</a>
+      <a href="https://github.com/traverse-framework/traverse" class="btn btn-ghost" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"What a governed capability buys you that a shared library doesn't — Traverse Blog"}
+  description={"A shared crate gets Rust callers code reuse with no ceremony. It breaks down the moment a non-Rust caller, or an audit requirement, shows up. Here's exactly where that line sits."}
+  canonical={"https://traverse-framework.com/blog/what-a-governed-capability-buys-you.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
