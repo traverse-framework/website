@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How is Traverse different from Electron?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Electron ships a desktop app by bundling Chromium and Node.js, so your JavaScript logic and your UI both live inside that one packaged app. Traverse has no UI or app-shell layer — it's a contract-governed WASM runtime for the logic behind whatever shell you use, whether that's Electron, a web app, a CLI, or an AI agent, all calling the same binary.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri (full comparison)' },
+  { href: '/questions/how-is-traverse-different-from-flutter.html', label: 'How is Traverse different from Flutter?' },
+  { href: '/questions/what-is-the-browser-adapter.html', label: 'What is the browser adapter?' },
+  { href: '/blog/wasm-business-logic.html', label: 'What WASM actually gives you for business logic' },
+];
+---
+<QuestionLayout
+  title="How is Traverse different from Electron?"
+  description="Electron packages a desktop app around Chromium and Node.js. Traverse has no app shell at all — it governs the business logic that shell (or any other host) calls into, as a portable, contract-enforced WASM binary."
+  canonical="https://traverse-framework.com/questions/how-is-traverse-different-from-electron.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Electron solves desktop packaging: it bundles Chromium and Node.js so a web app can ship as a native-feeling Windows, macOS, or Linux application, with your JavaScript running the UI and the logic behind it in the same process. That's a genuinely useful, mature approach, and it's why so many desktop tools (VS Code among them) are built on it.</p>
+
+  <p>Traverse isn't a packaging tool and doesn't produce an app shell at all. It's a runtime for one specific layer: business logic that needs to behave identically no matter what's calling it. You write a capability in Rust, compile it to WASM, attach a contract, and the runtime enforces that contract before and after every execution — whether the caller is an Electron app, a plain web page, a CLI, or an AI agent over MCP.</p>
+
+  <h2>The practical difference</h2>
+  <p>In Electron, your business logic is just more JavaScript inside the bundle — no separate enforcement, no built-in trace of what ran and why, and no path to reuse that logic from a non-Electron caller without copying the code. In Traverse, the logic is a WASM binary with a machine-readable contract, discoverable through a registry, producing a structured trace on every execution, and callable identically from Electron or from anywhere else.</p>
+
+  <p>They're not mutually exclusive. An Electron app can call into a Traverse capability the same way a browser tab does — through the browser adapter or an embedder — for the specific rules where consistency and auditability actually matter, while Electron keeps doing the packaging and windowing work it's built for. The <a href="/compare/vs-cross-platform-frameworks.html">full comparison</a> covers the pattern in more depth, with a concrete example using Tauri (Electron's Rust-based sibling).</p>
+</QuestionLayout>

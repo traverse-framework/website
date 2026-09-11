@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does Traverse support Windows, macOS, and Linux?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes. Native — Linux, macOS, and Windows — is Traverse's default and most mature target. traverse-runtime's NativeExecutor, ThreadPoolExecutor, and Wasmtime-backed WasmExecutor all run the same way on each OS, and a capability's WASM binary needs no OS-specific code or build flag to move between them.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/questions/can-traverse-run-without-wasm.html', label: 'Can Traverse run without WASM?' },
+  { href: '/questions/what-is-the-traverse-cli.html', label: 'What is the Traverse CLI?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="Does Traverse support Windows, macOS, and Linux?"
+  description="Native — Linux, macOS, and Windows — is Traverse's default, most mature, shipped target. The same WASM binary runs on all three through traverse-runtime's Wasmtime-backed executor."
+  canonical="https://traverse-framework.com/questions/does-traverse-support-windows-macos-and-linux.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes, and it's the target Traverse is built around first. <code>traverse-runtime</code> ships a <code>NativeExecutor</code>, a <code>ThreadPoolExecutor</code>, and a Wasmtime-backed <code>WasmExecutor</code> for sandboxed capability execution — all of it running identically whether the host is Linux, macOS, or Windows. There's no OS-specific branch in your capability code and no separate build target per operating system; you compile the capability to WASM once, and the same binary is what every native host executes.</p>
+
+  <p>This is also what the CLI itself runs on, and what every quickstart walks through. If you clone the <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">traverse</a> repo and run <code>cargo build</code> on any of the three, you're building and exercising the exact same code path.</p>
+
+  <h2>What "supports" means here specifically</h2>
+  <p>Native support covers full orchestration: registering capabilities into the registry, discovering them by contract, validating inputs and outputs, executing the WASM binary in a sandbox, emitting declared events, and writing a trace artifact. None of that is stubbed or partial on any of the three operating systems — it's the same crate, the same code, the same behavior.</p>
+
+  <p>What native support does <em>not</em> mean is a native GUI toolkit. Traverse governs the logic layer; it doesn't paint windows. If you're pairing it with a UI, you'll bring your own — the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform app frameworks</a> comparison walks through what that pairing looks like with Tauri specifically.</p>
+
+  <h2>Where the story is different</h2>
+  <p>Mobile is not the same shipped status as desktop. Android and .NET/WinUI have real, working runtime bridges in progress with no public release yet, and iOS is currently blocked on the WASM engine ecosystem lacking a certifiable resource-control API for App Store distribution. See the <a href="/platforms.html">Platforms</a> page for the full breakdown with links to the actual blocking issues.</p>
+</QuestionLayout>

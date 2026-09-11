@@ -1,0 +1,42 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What operating systems does Traverse support?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Windows, macOS, and Linux are shipped natively today, plus the browser as a fourth, non-OS context. Android and .NET/WinUI have working embedders in progress with no public release. iOS is blocked on the WASM engine ecosystem lacking a certifiable resource-control API.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/does-traverse-support-windows-macos-and-linux.html', label: 'Does Traverse support Windows, macOS, and Linux?' },
+  { href: '/questions/can-traverse-build-mobile-apps.html', label: 'Can I build a mobile app with Traverse?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="What operating systems does Traverse support?"
+  description="A quick, current status table: Windows, macOS, and Linux are shipped natively. The browser is shipped, scoped. Android and .NET are in progress. iOS is blocked. Full detail and evidence on the Platforms page."
+  canonical="https://traverse-framework.com/questions/what-operating-systems-does-traverse-support.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Short answer, as of the current release:</p>
+  <ul>
+    <li><strong>Windows, macOS, Linux</strong> — shipped. This is the default, most mature target, running through <code>traverse-runtime</code>'s native executors.</li>
+    <li><strong>Browser</strong> — shipped, with real scope limits (linear pipelines, verified single-capability execution today). Not an operating system, but the fourth context a capability genuinely runs in unmodified.</li>
+    <li><strong>Android</strong> — in progress. A working Kotlin runtime bridge exists; no public release yet.</li>
+    <li><strong>.NET / WinUI</strong> — in progress. A working Wasmtime .NET-backed bridge exists; no public release yet.</li>
+    <li><strong>iOS</strong> — blocked. No WASM engine currently exposes the resource-control APIs a certified native embedder needs for App Store distribution. A feasibility spike proved a workaround exists on a physical device, but it isn't a shipped SDK.</li>
+  </ul>
+
+  <p>This list is deliberately shorter than what most cross-platform tooling claims, because it's scored against real crates and blocking issues rather than a roadmap. For the full breakdown — including which crate implements each target and links to the actual blocking issues — see the <a href="/platforms.html">Platforms</a> page, which is the same page the team uses internally, not a separate marketing version. For the fuller "how does this actually work" answer, see <a href="/questions/what-framework-runs-business-logic-on-any-os.html">what framework lets me write business logic once and run it on any OS</a>.</p>
+</QuestionLayout>

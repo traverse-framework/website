@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I avoid rewriting business logic for every platform?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Compile the logic once to a WASM binary, attach a machine-readable contract describing its inputs, outputs, and required conditions, and let a runtime that understands that contract execute the same binary on every platform instead of reimplementing the logic in each platform’s native language.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/logic-duplication.html', label: 'Why I stopped writing the same business logic four times' },
+  { href: '/blog/wasm-business-logic.html', label: 'What WASM actually gives you for business logic' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+];
+---
+<QuestionLayout
+  title="How do I avoid rewriting business logic for every platform?"
+  description="Compile the rule once to WASM, attach a machine-readable contract, and let a runtime that understands the contract execute the same binary everywhere — instead of reimplementing the logic per platform and hoping the copies stay in sync."
+  canonical="https://traverse-framework.com/questions/how-do-i-avoid-rewriting-business-logic-for-every-platform.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The usual failure mode looks like this: a pricing rule starts in the backend. Someone needs it in the frontend for instant feedback, so it gets reimplemented in JavaScript. Then the mobile app needs it, so it's rewritten again in Swift or Kotlin. Then an AI agent or a data pipeline needs it, and now there are four copies of the same rule, in four languages, maintained by however many people remembered to update all four when the tax rate changed. They drift. Bugs show up in one copy and not another. Nobody's entirely sure which copy is the real one.</p>
+
+  <p>The structural fix isn't discipline or documentation — it's removing the possibility of a second copy existing. Compile the rule once, to a format that isn't tied to any single host language, and make every caller execute that same artifact instead of their own reimplementation.</p>
+
+  <h2>What that looks like concretely</h2>
+  <p>WebAssembly is the format that makes this practical: it's a binary instruction format any conformant runtime can execute, independent of the language it was compiled from or the host it runs in. Traverse adds the two pieces raw WASM doesn't give you — a contract (what the capability needs, what it guarantees, what must be true before and after it runs) and a runtime that enforces that contract on every single execution, not just the first one someone tested.</p>
+
+  <p>Concretely: you write the rule once in Rust, compile it to a WASM capability, and register it. From then on, your web app, your backend, your mobile app (where a shipped embedder exists), and an AI agent over MCP all call the same binary and get the same enforced result. There's no second implementation to drift, because there's no second implementation.</p>
+
+  <h2>What this doesn't solve</h2>
+  <p>It doesn't remove the need for platform-specific UI — you still build a native-feeling frontend for each platform if that's what your product needs. And it isn't free: writing a contract and thinking through preconditions and postconditions is more upfront work than just calling a function. It's worth it specifically for the logic that's genuinely shared, genuinely important, and genuinely getting reimplemented right now. If a rule only ever lives in one place, none of this applies — see <a href="/blog/logic-duplication.html">why I stopped writing the same business logic four times</a> for the fuller version of this argument.</p>
+</QuestionLayout>

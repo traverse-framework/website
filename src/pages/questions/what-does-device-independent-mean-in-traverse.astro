@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does "device-independent" mean in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "A device-independent capability is a WASM binary that runs unmodified on any client that loads it — the runtime doesn't recompile or branch per host. Execution happens locally on that client by default; the client can heuristically delegate a subset of the work to a server based on its own context (resource constraints, latency), rather than the capability being pinned to a fixed deployment target chosen ahead of time.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-traverse.html', label: 'What is Traverse?' },
+  { href: '/questions/how-do-placement-targets-work.html', label: 'How do placement targets work in Traverse?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/docs/concepts.html', label: 'Core Concepts: Traverse Docs' },
+];
+---
+<QuestionLayout
+  title='What does "device-independent" mean in Traverse?'
+  description="A device-independent capability is a WASM binary that runs unmodified on any client that loads it, executing locally by default and delegating to a server only when the client's own context calls for it."
+  canonical="https://traverse-framework.com/questions/what-does-device-independent-mean-in-traverse.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>"Device-independent" describes the capability itself, not just where it happens to be deployed. A Traverse capability compiles to a single WASM binary. That binary carries its own contract — inputs, outputs, preconditions, postconditions — and any conformant WASM host can load and run it without recompiling it or maintaining a separate build per target. The same file that runs on your laptop through the CLI is the same file the browser embedder loads.</p>
+
+  <p>The independence goes further than "the binary is portable," though. Execution happens on the client by default — wherever the capability was loaded — and the client decides, using its own heuristics (things like resource constraints or latency), whether to run the whole thing locally or delegate some subset of it to a server. That decision isn't baked into the capability at authoring time. It isn't a fixed "this capability runs in the cloud" flag someone set once. It's evaluated live, by the client, against its own current context.</p>
+
+  <h2>Why this is a meaningfully different model from "pick a target"</h2>
+  <p>Earlier placement-oriented models (including Traverse's own older documentation) framed this as choosing a target — browser, edge, cloud, ai-pipeline — ahead of time, the way you'd pick a deployment region. The device-independent framing inverts that. The capability doesn't know or care where it will run. The client does, and it decides at the moment of execution, not at build time.</p>
+
+  <p>In practice, right now, that means <code>local</code> (native) and <code>browser</code> are the two contexts with a real, shipped executor behind this model — see <a href="/platforms.html">Platforms</a> for the honest, evidence-linked state of every target. The concept itself — one binary, client-decided execution — is what's designed to extend as more executors ship.</p>
+
+  <h2>Why it matters for "any OS"</h2>
+  <p>This is the underlying reason a Traverse capability can move between Windows, macOS, Linux, and the browser without a rewrite: the binary was never written with an assumption about its host baked in. Contrast that with typical application code, which usually has at least implicit OS assumptions (file paths, threading models, UI toolkit) baked into it from the start.</p>
+</QuestionLayout>

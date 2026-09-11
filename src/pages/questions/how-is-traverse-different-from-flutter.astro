@@ -1,0 +1,41 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How is Traverse different from Flutter?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Flutter is a UI framework: it renders a widget tree to native-feeling screens on Windows, macOS, Linux, iOS, Android, and the web from one Dart codebase. Traverse has no UI layer at all — it governs the business logic underneath any UI, as a contract-enforced WASM capability that's also callable from a backend, a CLI, or an AI agent, not just from inside one Flutter app.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri (full comparison)' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/questions/how-is-traverse-different-from-a-plugin-system.html', label: 'How is Traverse different from a plugin system?' },
+  { href: '/questions/what-is-a-wasm-capability.html', label: 'What is a WASM capability in Traverse?' },
+];
+---
+<QuestionLayout
+  title="How is Traverse different from Flutter?"
+  description="Flutter renders a UI across operating systems from one Dart codebase. Traverse has no UI at all — it governs the business logic underneath the UI as a contract-enforced, reusable WASM capability."
+  canonical="https://traverse-framework.com/questions/how-is-traverse-different-from-flutter.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Flutter and Traverse aren't really in the same category, even though they both get pulled into "cross-platform" conversations. Flutter is a UI framework: you write widgets in Dart, and Flutter's engine renders them consistently on Windows, macOS, Linux, iOS, Android, and the web. It's shipped, mature, and genuinely good at exactly that.</p>
+
+  <p>Traverse has no rendering engine and no widget system. What it governs is what happens behind the UI — the pricing calculation, the eligibility check, the validation rule your Flutter app's button press eventually calls into. That logic compiles once to WebAssembly with a machine-readable contract, and the same binary is callable from your Flutter app, your backend, your CLI, or an MCP-connected AI agent, all getting the identical result because it's the identical binary — not a Dart implementation and a separate server-side reimplementation that can drift apart.</p>
+
+  <h2>Where the OS-reach honestly differs</h2>
+  <p>Worth saying directly: Flutter's OS coverage is broader today. It ships on desktop, mobile, and web, all mature. Traverse's device-independent WASM capabilities run natively on Windows, macOS, and Linux and in the browser today; Android and .NET/WinUI embedders are in progress without a public release, and iOS is blocked on the WASM engine ecosystem. See <a href="/platforms.html">Platforms</a> for the specifics.</p>
+
+  <h2>Using them together</h2>
+  <p>A Flutter app can call into a Traverse capability the same way any other host does — through an embedder or an HTTP adapter, depending on the target. The Flutter shell keeps rendering the UI it's good at; the rule underneath gets a contract, an enforcement point, and a trace artifact it wouldn't otherwise have. The full breakdown, including a concrete integration example, is on the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform app frameworks</a> comparison page.</p>
+</QuestionLayout>
