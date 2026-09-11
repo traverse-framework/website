@@ -1,0 +1,162 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+import DocsSidebar from '@components/DocsSidebar.astro';
+
+const _docsBefore = `<div class="docs-layout">`;
+const _docsAfter = `
+  <main class="docs-content">
+    <div style="margin-bottom:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem">Guide</div>
+      <h1 class="t-h1" style="margin-bottom:0.75rem">Write one capability, run it on Windows, macOS, Linux, and the browser</h1>
+      <p class="t-body t-muted">A hands-on walkthrough of the actual mechanism behind "any OS": one contract, one WASM binary, no per-platform branch. You'll inspect the shipped example bundle, understand why the same commands work on every native OS, and see the same capability load in a browser.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap">
+        <span class="badge badge-success badge-dot">v0.10.1</span>
+        <span class="badge">~15 minutes</span>
+        <span class="badge">Rust 1.94+</span>
+      </div>
+    </div>
+
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">01</div>
+        <span class="step-label">Build once</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Build the runtime and the example bundle</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">These are the exact same three commands regardless of whether you're on Windows, macOS, or Linux. Nothing here branches on OS — there's no separate quickstart per platform, because there's nothing platform-specific to instruct.</p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">any OS — same three commands</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> git clone https://github.com/traverse-framework/traverse.git</span></div>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cd traverse</span></div>
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo build</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-contracts v0.10.1</span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-registry v0.10.1</span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-runtime v0.10.1</span></div>
+          <div class="terminal-line"><span class="terminal-out">    Finished dev profile</span></div>
+        </div>
+      </div>
+      <p class="t-body t-muted" style="margin-top:1rem">Cargo and rustc are cross-platform build tooling by design — this is the same reason your Rust host binary doesn't need a Windows-specific or Linux-specific variant. The interesting part isn't this step; it's what happens next.</p>
+    </div>
+
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">02</div>
+        <span class="step-label">Inspect the bundle</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Inspect the shipped capability bundle</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">The expedition example ships as a registry bundle: a manifest, contracts, and WASM modules. Inspecting it shows you exactly what the runtime will load — the same output on every OS, because it's reading the same files.</p>
+      <div class="terminal">
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">any OS — identical output</span></div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli-rs -- bundle inspect examples/expedition/registry-bundle/manifest.json</span></div>
+          <div class="terminal-line"><span class="terminal-out"></span></div>
+          <div class="terminal-line"><span class="terminal-out">Bundle: expedition-planning</span></div>
+          <div class="terminal-line"><span class="terminal-out accent">  capabilities: 6</span></div>
+          <div class="terminal-line"><span class="terminal-out accent">  events: 5</span></div>
+          <div class="terminal-line"><span class="terminal-out accent">  workflows: 1</span></div>
+          <div class="terminal-line"><span class="terminal-out">  plan-expedition v1.0.0 ... valid</span></div>
+        </div>
+      </div>
+      <div class="info-box"><strong>Nothing here is OS-conditional.</strong> The manifest, the contracts, and the compiled WASM modules are plain files with no embedded platform assumptions — that's what makes step 3 unremarkable instead of requiring a rewrite.</div>
+    </div>
+
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">03</div>
+        <span class="step-label">Run natively</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Run it through the native executor</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">The native executor is Wasmtime-backed, and Wasmtime compiles the WASM module to native machine code for whichever host it's running on — a step that happens transparently, with no action required from you regardless of which OS you're on.</p>
+      <div class="arch-diagram">
+        <div><span class="arch-box">Your terminal (Windows, macOS, or Linux)</span></div>
+        <div style="margin-left:2.5rem"><span class="arch-arrow">↓</span></div>
+        <div style="margin-left:2.5rem"><span class="arch-box accent">traverse-runtime · NativeExecutor · WasmExecutor (Wasmtime)</span></div>
+        <div style="margin-left:2.5rem"><span class="arch-arrow">↓</span></div>
+        <div style="margin-left:2.5rem"><span class="arch-box">plan-expedition.wasm — same binary on every host</span></div>
+      </div>
+      <p class="t-body t-muted">Follow the maintained repository quickstart for the exact run command for your setup — the point to notice is that the command itself doesn't fork by OS. If you have access to more than one operating system, running the identical command against the identical bundle is the fastest way to see this claim verified rather than asserted.</p>
+    </div>
+
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">04</div>
+        <span class="step-label">Run in the browser</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Load the same bundle in a browser</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">The Web embedder SDK loads the same bundle — not a rebuilt or re-exported version of it — and executes the WASM module directly in the browser's own WebAssembly host. This is the same digest-verified artifact the native executor ran in step 3.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">load-in-browser.js (conceptual)</span></div>
+        <div class="code-body"><span class="tok-key">import</span> { TraverseEmbedder } <span class="tok-key">from</span> <span class="tok-str">'traverse-embedder-web'</span>;
+
+<span class="tok-comment">// Same bundle path as the CLI inspected in step 2</span>
+<span class="tok-key">const</span> embedder = <span class="tok-key">await</span> TraverseEmbedder.<span class="tok-fn">init</span>(<span class="tok-str">'./bundles/expedition'</span>);
+<span class="tok-key">const</span> result = <span class="tok-key">await</span> embedder.<span class="tok-fn">submit</span>(<span class="tok-str">'plan-expedition'</span>, { destination: <span class="tok-str">'kilimanjaro'</span> });</div>
+      </div>
+      <div class="info-box"><strong>Scope note:</strong> this in-browser path handles linear, directly-triggered pipelines — conditional and event-driven workflow edges aren't executed in-browser yet. See the <a href="/docs/guides/react-integration.html" style="color:var(--accent)">React integration guide</a> for the fuller, request/response pattern via the local browser adapter, which has no such scope limit.</div>
+    </div>
+
+    <div class="doc-step">
+      <div class="step-marker">
+        <div class="step-circle">05</div>
+        <span class="step-label">Confirm identical behavior</span>
+      </div>
+      <h2 class="t-h2" style="margin-bottom:0.75rem">Confirm it with the trace, not by eye</h2>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Don't take "identical behavior" on faith — the trace artifact from each run tells you exactly what executed. Compare the <code>capability</code>, <code>version</code>, and <code>output</code> fields from a native run against a browser run with the same input; they should match exactly, because it's the same binary either way.</p>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">trace artifact (either host)</span></div>
+        <div class="code-body"><span class="tok-section">{</span>
+  <span class="tok-key">"capability"</span>: <span class="tok-str">"expedition.planning.plan-expedition"</span>,
+  <span class="tok-key">"version"</span>: <span class="tok-str">"1.0.0"</span>,
+  <span class="tok-key">"contract_validated"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"preconditions_met"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"postconditions_met"</span>: <span class="tok-bool">true</span>
+<span class="tok-section">}</span></div>
+      </div>
+    </div>
+
+    <div style="padding-top:2rem">
+      <h2 class="t-h2" style="margin-bottom:1rem">Next steps</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <a href="/compare/vs-cross-platform-frameworks.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Pair with a desktop UI</div>
+          <div class="t-body-sm t-muted">Call this same capability from a Tauri command.</div>
+        </a>
+        <a href="/platforms.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">Platform status</div>
+          <div class="t-body-sm t-muted">The full, evidence-linked matrix beyond this guide's two targets.</div>
+        </a>
+        <a href="/docs/guides/mcp-setup.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
+          <div class="t-label t-accent" style="margin-bottom:0.5rem">MCP Setup</div>
+          <div class="t-body-sm t-muted">Expose the same capability to an AI agent as a governed tool.</div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+`;
+---
+<SubpageLayout
+  title="Write one capability, run it on Windows, macOS, Linux, and the browser — Traverse Docs"
+  description="A hands-on guide to the actual mechanism behind Traverse's OS portability: inspect a real bundle, run it natively, load the identical binary in a browser, and confirm the match from the trace instead of by eye."
+  canonical="https://traverse-framework.com/docs/guides/cross-os-capability.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}
+>
+  <style is:global slot="head">
+    .docs-content{max-width:820px}
+    .step-marker { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); flex-shrink: 0; }
+    .step-label { font-size: 0.72rem; color: var(--fg-muted); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; }
+    .doc-step { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .doc-step:last-child { border-bottom: none; }
+    .info-box { background: color-mix(in srgb, var(--accent) 6%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-size: 0.875rem; color: var(--fg-muted); line-height: 1.6; }
+    .info-box strong { color: var(--fg); }
+    .arch-diagram { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.25rem 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 2.2; }
+    .arch-box { display: inline-block; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 5px; padding: 0.2rem 0.65rem; color: var(--fg); }
+    .arch-box.accent { border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); }
+    .arch-arrow { color: var(--fg-muted); margin: 0 0.5rem; }
+  </style>
+  <Fragment set:html={_docsBefore} />
+  <DocsSidebar active="/docs/guides/cross-os-capability.html" />
+  <Fragment set:html={_docsAfter} />
+</SubpageLayout>
