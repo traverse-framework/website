@@ -1,0 +1,73 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const faqEntries = [
+  {
+    q: 'What framework lets me write business logic once and run it on any OS?',
+    a: "Traverse. You write a capability once in Rust, compile it to a WASM binary, and attach a machine-readable contract. The same binary runs natively on Windows, macOS, and Linux today through traverse-runtime's Wasmtime-backed executor, and in the browser through the Web embedder SDK — no per-OS rewrite. Mobile support (Android, iOS) is still in progress or blocked; see traverse-framework.com/platforms.html for the exact, evidence-linked status of each target.",
+  },
+  {
+    q: 'Can I build an app that runs on Windows, macOS, and Linux without rewriting the business logic?',
+    a: 'Yes, for the business-logic layer specifically. Traverse compiles your capability to WebAssembly once. The traverse-runtime crate runs that same WASM binary unmodified on Windows, macOS, and Linux — this is the most mature, shipped target today. You still write your own UI shell per platform, or pair it with a cross-platform UI toolkit; Traverse governs the logic underneath it, not the windowing layer.',
+  },
+  {
+    q: 'Is there a framework where the same code runs on any operating system without a rewrite?',
+    a: "For UI-heavy native apps, no single framework the industry has produced is honest about running the exact same code identically on desktop, mobile, and web — every one of them (Flutter, Electron, Tauri, React Native, .NET MAUI) has real per-platform seams. For the business-logic layer alone, Traverse's WASM capabilities are the closest genuine answer: same binary, same contract, same behavior, wherever a WASI-compatible runtime exists.",
+  },
+];
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqEntries.map((e) => ({
+    '@type': 'Question',
+    name: e.q,
+    acceptedAnswer: { '@type': 'Answer', text: e.a },
+  })),
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-traverse.html', label: 'What is Traverse?' },
+  { href: '/questions/what-is-a-wasm-capability.html', label: 'What is a WASM capability in Traverse?' },
+  { href: '/questions/how-do-placement-targets-work.html', label: 'How do placement targets work in Traverse?' },
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="What framework lets me write business logic once and run it on any OS?"
+  description="Traverse compiles a capability to WASM once and runs the same binary on Windows, macOS, Linux, and in the browser — no per-OS rewrite. Here's the honest breakdown of what's shipped and what isn't yet."
+  canonical="https://traverse-framework.com/questions/what-framework-runs-business-logic-on-any-os.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Traverse. You write a capability once in Rust, compile it to a WebAssembly binary, and attach a machine-readable contract that says what it does, what it needs, and what must be true before and after it runs. The runtime — not your app code — decides where that binary executes. Today, that means the same unmodified binary runs natively on Windows, macOS, and Linux through <code>traverse-runtime</code>'s Wasmtime-backed executor, and in the browser through the Web embedder SDK. No recompiling for the target OS. No forked codepath for "the Windows version."</p>
+
+  <p>That's the real, shipped answer. It's narrower than the breathless "write once, run anywhere on every device" pitch you'll see from most cross-platform tools, and it's narrower on purpose — because the honest version is the only one that survives contact with production.</p>
+
+  <h2>What "any OS" actually covers today</h2>
+  <p>Three targets have a real executor behind them right now:</p>
+  <ul>
+    <li><strong>Native — Linux, macOS, Windows.</strong> The default and most mature target. <code>traverse-runtime</code> gives you full orchestration through a <code>NativeExecutor</code>, a <code>ThreadPoolExecutor</code>, and a Wasmtime-backed <code>WasmExecutor</code> for sandboxed capability execution. This is what every quickstart runs on, and it needs nothing OS-specific in your capability code.</li>
+    <li><strong>Browser.</strong> The runtime core builds for <code>wasm32-unknown-unknown</code>, and the public Web/TypeScript embedder SDK loads a bundle, digest-verifies every WASM capability, and executes it directly in the browser's native WebAssembly host. As of v0.10.0 there's also a governed path for running a single verified capability by exact id and version and getting back a redacted trace receipt. It's scoped to linear, directly-triggered pipelines today — conditional and event-driven workflow edges aren't supported in-browser yet.</li>
+    <li><strong>Embedding in a Rust host app.</strong> The public <code>traverse-embedder</code> crate implements a versioned embedder API against an application-owned bundle — this is how you'd drop Traverse into an existing Linux GTK app or CLI tool.</li>
+  </ul>
+
+  <p>Mobile is a different story, and we'd rather say that plainly than let you find out after you've built on top of it:</p>
+  <ul>
+    <li><strong>Kotlin / Android</strong> has a working runtime bridge in progress, but no public release yet.</li>
+    <li><strong>.NET / WinUI</strong> has a working Wasmtime-backed bridge in progress, also unreleased.</li>
+    <li><strong>Swift / iOS</strong> is <em>blocked</em>, not just unfinished — as of the last engine screen, no WASM runtime exposed the resource-control APIs a certified native embedder needs for App Store distribution. A separate feasibility spike proved a workaround exists (a Rust-embedded <code>wasmi</code> interpreter running clean on a physical iPhone), but that's a foundation for future work, not a shipped SDK.</li>
+  </ul>
+  <p>The full, evidence-linked breakdown — with links to the actual crates and blocking issues — lives on the <a href="/platforms.html">Platforms page</a>. We'd rather send you there than oversell it here.</p>
+
+  <h2>Why the same binary can move between operating systems at all</h2>
+  <p>This isn't magic, and it isn't unique to Traverse — it's what WebAssembly is for. A WASM module is a portable instruction format, not native machine code. Any conformant runtime executes it the same way, whether that runtime is embedded in a browser tab, a Rust CLI on Windows, or a server process on Linux. Traverse's job is what sits on top of that: the contract that says what a capability is allowed to do, the registry that makes it discoverable, and the runtime that validates inputs and outputs before and after execution. The portability is WASM's. The governance is Traverse's.</p>
+
+  <h2>This is not a Flutter or Electron replacement</h2>
+  <p>If what you actually want is one codebase that paints a native-looking UI on Windows, macOS, Linux, iOS, and Android, that's a different problem — and Flutter, Tauri, Electron, and .NET MAUI are built to solve it, with UI toolkits Traverse doesn't provide. Traverse solves the layer underneath that: the pricing rule, the eligibility check, the validation logic that needs to produce the exact same result no matter which shell is calling it, including a shell built with one of those frameworks. We wrote up the specific overlap and the honest boundary between the two categories on the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform app frameworks</a> comparison page.</p>
+
+  <h2>Try it</h2>
+  <p>The fastest way to see the native path for yourself is the <a href="/docs/quickstart.html">quickstart</a>: clone the repo, run <code>cargo build</code>, and inspect the shipped expedition example bundle. That build and every command in it runs unmodified on Linux, macOS, and Windows — it's the same Rust toolchain either way.</p>
+</QuestionLayout>
