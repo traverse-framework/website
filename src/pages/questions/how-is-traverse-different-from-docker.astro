@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How is Traverse different from Docker?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Docker packages an entire environment — OS layer, dependencies, runtime — so a service behaves consistently across hosts, at the cost of shipping megabytes to gigabytes per image and needing a container runtime everywhere it runs. Traverse capabilities are WASM binaries, typically kilobytes, with no OS layer at all, governed by a contract instead of an image manifest, and able to run inside a browser tab — somewhere a container fundamentally cannot.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/compare/vs-serverless.html', label: 'Traverse vs Serverless Functions' },
+  { href: '/compare/vs-microservices.html', label: 'Traverse vs Microservices' },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+];
+---
+<QuestionLayout
+  title="How is Traverse different from Docker?"
+  description="Docker packages a whole environment to make a service portable across hosts. Traverse capabilities are WASM binaries with no OS layer at all, governed by a contract, and able to run somewhere a container can't: inside a browser tab."
+  canonical="https://traverse-framework.com/questions/how-is-traverse-different-from-docker.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Both Docker and Traverse are answers to "make this run consistently somewhere else," but they solve it at completely different layers. Docker packages an entire environment — the OS userland, your dependencies, your runtime, your app — into an image, so the same image behaves the same way on any host with a compatible container runtime installed. That's a heavyweight but very general solution: it works for basically any application, regardless of language or architecture.</p>
+
+  <p>A Traverse capability doesn't package an environment at all — it doesn't need one. It's a WASM binary, sandboxed by the WASM spec itself rather than by container namespaces, with no OS layer, no base image, and typically no dependency footprint beyond what the sandbox already provides. Where a minimal container image is tens of megabytes, a Traverse capability is usually kilobytes.</p>
+
+  <h2>The one Docker structurally cannot do</h2>
+  <p>A container needs a container runtime — Docker Engine, containerd, something implementing the OCI spec — running on the host. That rules out running a container inside a browser tab, full stop. A Traverse capability runs there today, through the Web embedder SDK, because a WASM binary only needs a WASM host, and every modern browser already is one.</p>
+
+  <p>They're also governed differently: a container's contract with the world is effectively "this image, this entrypoint, these exposed ports" — no built-in enforcement of what the code inside actually does to its inputs. A Traverse capability's contract declares preconditions, postconditions, and permissions, and the runtime checks all of it on every execution, producing a trace. If you need "runs the same everywhere, including places without a container runtime, with enforced input/output guarantees," that's the Traverse case. If you need "package this entire arbitrary service so ops can deploy it anywhere," that's still Docker's job — and the two aren't mutually exclusive; a Traverse-embedding service can absolutely ship inside a container.</p>
+</QuestionLayout>

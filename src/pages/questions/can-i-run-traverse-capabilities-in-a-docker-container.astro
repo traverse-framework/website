@@ -1,0 +1,37 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I run Traverse capabilities inside a Docker container?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes. A Traverse capability's WASM binary runs on the native Linux executor, so packaging that host process in a container is unremarkable — it's the same native target running inside a Linux container as running directly on a Linux host, just with the usual containerization benefits layered on top for deployment and orchestration.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-is-traverse-different-from-docker.html', label: 'How is Traverse different from Docker?' },
+  { href: '/compare/vs-serverless.html', label: 'Traverse vs Serverless Functions' },
+  { href: '/questions/does-traverse-support-windows-macos-and-linux.html', label: 'Does Traverse support Windows, macOS, and Linux?' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+---
+<QuestionLayout
+  title="Can I run Traverse capabilities inside a Docker container?"
+  description="Yes — package a native-target host process that embeds traverse-runtime or traverse-embedder inside a Linux container exactly as you'd containerize any other Rust service. There's no Traverse-specific containerization step."
+  canonical="https://traverse-framework.com/questions/can-i-run-traverse-capabilities-in-a-docker-container.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes, and there's nothing special about it. A Traverse capability's WASM binary runs through the native executor, which is a Rust process using Wasmtime under the hood — the same kind of process you'd containerize for any other Rust service. Build your host application (the one embedding <code>traverse-runtime</code> or <code>traverse-embedder</code> and loading your registry bundle), put it in a minimal base image, and run it the way you'd run any containerized Rust binary.</p>
+
+  <p>This is, in fact, exactly the pattern shown in the <a href="/compare/vs-serverless.html">Traverse vs. Serverless Functions</a> comparison: the same <code>traverse-embedder</code>-based host that runs on your desktop or in a container also runs inside an AWS Lambda function, because none of those hosts require anything Traverse-specific to accommodate it. WASM execution, contract validation, and trace generation all happen the same way regardless of whether the process is bare-metal, containerized, or serverless — the container just answers "how does this process get deployed," which is orthogonal to what's running inside it.</p>
+
+  <p>One thing containerizing doesn't change: the capability's own sandbox permissions (network, filesystem, host calls) are still governed by its contract, not by whatever the container's own permissions happen to allow. A container with broad filesystem access doesn't loosen what a capability inside it is allowed to touch — the WASM sandbox boundary is enforced independently of the container boundary around it.</p>
+</QuestionLayout>

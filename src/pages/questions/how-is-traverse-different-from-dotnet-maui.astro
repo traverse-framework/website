@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How is Traverse different from .NET MAUI?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: ".NET MAUI shares one XAML-based UI layer across Windows, macOS, iOS, and Android, all shipped and mature. Traverse has no UI layer — it governs the business logic underneath, as a WASM capability callable from a MAUI app, a backend, or an AI agent alike. Traverse's own .NET/WinUI embedder is real, working code, but unreleased, which is worth knowing if you're specifically looking to pair the two today.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri (full comparison)' },
+  { href: '/questions/can-i-use-traverse-with-dotnet-maui.html', label: 'Can I use Traverse with .NET MAUI today?' },
+  { href: '/questions/how-is-traverse-different-from-flutter.html', label: 'How is Traverse different from Flutter?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="How is Traverse different from .NET MAUI?"
+  description=".NET MAUI shares one UI layer across Windows, macOS, iOS, and Android. Traverse has no UI at all — it governs the logic underneath, though its own .NET/WinUI embedder is unreleased today."
+  canonical="https://traverse-framework.com/questions/how-is-traverse-different-from-dotnet-maui.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>.NET MAUI is Microsoft's answer to shipping one UI codebase across Windows, macOS, iOS, and Android, using a shared XAML-based layer over each platform's native controls. It's a mature, shipped UI framework, with all four of those platforms genuinely supported today.</p>
+
+  <p>Traverse doesn't have a UI layer to compare against MAUI's at all. What it governs is the logic behind whatever UI you're using — the rule that runs when a MAUI page's button is tapped. That logic compiles once to a WASM capability with an enforced contract, callable identically from the MAUI app, a backend service, or an AI agent, rather than being C# code that only exists inside that one app.</p>
+
+  <h2>The honest caveat if you want to pair them today</h2>
+  <p>Calling a Traverse capability directly from a MAUI app on iOS or Android runs into the same mobile-embedder status covered elsewhere on this site: the <code>.NET/WinUI</code> embedder (built on a Wasmtime .NET bridge) is real, working code, but it's unreleased, and it's specifically the Windows/WinUI side of .NET — not yet the cross-platform MAUI runtime targeting iOS and Android. So pairing the two cleanly on Windows desktop is closer than pairing them on MAUI's mobile targets today. See <a href="/platforms.html">Platforms</a> for the exact, current state before you plan around it.</p>
+</QuestionLayout>

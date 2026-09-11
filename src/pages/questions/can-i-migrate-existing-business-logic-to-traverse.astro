@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I migrate existing business logic into Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes, in the sense that you re-express the logic as a Rust capability compiled to WASM with a contract — Traverse doesn't ingest existing code from another language automatically. The practical path is picking one duplicated, drifting, or hard-to-audit rule, rewriting just that rule as a governed capability, and pointing your existing callers at it, rather than migrating an entire codebase at once.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/logic-duplication.html', label: 'Why I stopped writing the same business logic four times' },
+  { href: '/questions/how-do-i-write-a-capability-contract.html', label: 'How do I write a capability contract?' },
+  { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust to use Traverse?' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+---
+<QuestionLayout
+  title="Can I migrate existing business logic into Traverse?"
+  description="Yes — by re-expressing the rule as a Rust capability with a contract, one rule at a time, rather than an automated code-ingestion process or a whole-codebase migration."
+  canonical="https://traverse-framework.com/questions/can-i-migrate-existing-business-logic-to-traverse.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>There's no automatic converter that takes your existing JavaScript, Python, or C# business rule and produces a Traverse capability — you re-implement the rule in Rust, compile it to WASM, and write the contract that describes it. That's real, deliberate work, not a checkbox migration, and it's worth being upfront about that instead of implying otherwise.</p>
+
+  <p>Where it pays off is when you're not migrating "the codebase" but one specific rule that's currently duplicated, drifting, or hard to audit — a pricing calculation reimplemented in three services, an eligibility check nobody's fully sure is consistent across the app and the backend. You rewrite that one rule as a governed capability, define its contract precisely (including the edge cases the old scattered copies probably handled inconsistently), and update your existing callers to invoke the capability instead of their own local implementation.</p>
+
+  <h2>A reasonable order of operations</h2>
+  <p>Start with the rule that's causing the most actual pain from drift, not the most complex one. Write its contract first — inputs, outputs, preconditions, postconditions — since that step alone often surfaces inconsistencies between the existing copies that nobody had written down before. Then implement it once in Rust, compile it, and swap one caller over at a time, verifying the trace output matches what you expect before removing the old implementation it replaced.</p>
+
+  <p>You don't need to know Rust deeply to consume a capability once it exists — see <a href="/questions/do-i-need-rust.html">do I need to know Rust to use Traverse</a> — but writing the capability itself does require it, since that's the language capabilities compile from today.</p>
+</QuestionLayout>

@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: "Why not just put the business logic in a shared Rust library instead of using Traverse?",
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "A shared Rust crate gets you code reuse across Rust callers, but every non-Rust host still needs an FFI binding, there's no enforced contract, and there's no execution trace. A Traverse capability compiles to WASM instead of a native library, so any WASM-hosting caller — Rust, JavaScript, an AI agent over MCP — invokes the exact same binary through one interface, with preconditions and postconditions enforced and every execution recorded.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-avoid-rewriting-business-logic-for-every-platform.html', label: 'How do I avoid rewriting business logic for every platform?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact in Traverse?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+];
+---
+<QuestionLayout
+  title="Why not just use a shared Rust library instead of Traverse?"
+  description="A shared crate reuses code across Rust callers only, with no enforced contract and no execution trace. A Traverse capability compiles to WASM instead, so any host can call the same binary through one governed interface."
+  canonical="https://traverse-framework.com/questions/how-is-traverse-different-from-a-shared-rust-library.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>It's a fair question, because a plain shared library is the simpler-sounding answer to "stop duplicating this logic." Put the pricing rule in a crate, publish it internally, have every Rust service depend on it. For a team that's 100% Rust and never needs the rule outside that ecosystem, that's a reasonable, lighter-weight choice — genuinely, don't reach for Traverse if that's your whole situation.</p>
+
+  <p>The gap shows up at the edges. A shared crate is native code: your JavaScript frontend, your Python data pipeline, and your AI agent can't call it directly. Each of those needs its own FFI binding, a WASM build of the crate compiled separately, or a network hop to a service that wraps it — and now you're maintaining integration surface for every non-Rust caller. A crate also has no built-in contract: nothing stops a caller from passing invalid input, and nothing records what actually happened when it ran, beyond whatever logging you added yourself.</p>
+
+  <h2>What a Traverse capability does differently</h2>
+  <p>A capability compiles to WebAssembly instead of a native library, so it's not Rust-caller-only — any WASM-hosting environment can load it: a browser, a native host through <code>traverse-embedder</code>, an AI agent through MCP, all through the same interface. The contract attached to it declares preconditions and postconditions the runtime actually enforces, not just documents. And every execution produces a trace artifact — what ran, with what inputs, validated against which contract, with what result.</p>
+
+  <p>The honest tradeoff: a contract is more upfront work than a public function signature, and there's real WASM sandboxing overhead compared to a direct native call. Worth it specifically when the rule needs to be called from outside Rust, needs enforced correctness, or needs an audit trail. Not worth it for logic that's genuinely internal to one Rust service.</p>
+</QuestionLayout>

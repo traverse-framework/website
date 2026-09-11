@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is Traverse a cross-platform framework?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "It's a cross-platform framework for business logic specifically, not for building UIs. Traverse capabilities compile once and run unmodified on Windows, macOS, Linux, and in the browser today, with mobile embedders in progress or blocked. It doesn't render a UI on any of those platforms — pair it with whatever UI framework you're already using.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Traverse vs Flutter, Electron, and Tauri' },
+  { href: '/questions/what-operating-systems-does-traverse-support.html', label: 'What operating systems does Traverse support?' },
+  { href: '/questions/what-is-traverse.html', label: 'What is Traverse?' },
+];
+---
+<QuestionLayout
+  title="Is Traverse a cross-platform framework?"
+  description="Yes, for business logic specifically — not for UI. The same WASM capability runs unmodified on Windows, macOS, Linux, and in the browser today; it doesn't render anything, and pairs with whatever UI framework you already use."
+  canonical="https://traverse-framework.com/questions/is-traverse-a-cross-platform-framework.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Depends what you mean by "cross-platform," and that word carries more assumptions than it seems to. If you mean "one codebase that renders a native-feeling UI on multiple operating systems" — the Flutter/Electron/Tauri sense — no, Traverse doesn't do that and isn't trying to. It has no UI layer at all.</p>
+
+  <p>If you mean "one piece of logic that produces the same result no matter which operating system, UI framework, or non-UI caller invokes it" — yes, precisely and by design. You write a capability once, compile it to WASM, attach a contract, and the runtime enforces that contract wherever the binary executes. Today that's natively on Windows, macOS, and Linux, and in the browser; the same binary, no per-OS branch.</p>
+
+  <h2>Why the distinction matters</h2>
+  <p>Calling Traverse "cross-platform" without that qualifier invites the wrong comparison — stacking it against Flutter feature-for-feature on UI, where it simply has nothing to offer, since it isn't a UI tool. The honest framing is that it's cross-platform for the layer underneath the UI, and it's meant to pair with a UI framework, not replace one. The <a href="/compare/vs-cross-platform-frameworks.html">full comparison</a> spells out exactly where that boundary sits and how the two categories combine.</p>
+</QuestionLayout>

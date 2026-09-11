@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I package a capability for multiple platforms?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "You don't package it differently per platform — that's the point of compiling to WASM. You build the capability once into a registry bundle (a manifest plus its contract, WASM module, and any events or workflows it participates in), and the same bundle is what every executor — native or browser — loads. Platform-specific packaging only exists one layer up, in the host application that embeds Traverse.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/docs/concepts.html', label: 'Core Concepts: Traverse Docs' },
+];
+---
+<QuestionLayout
+  title="How do I package a capability for multiple platforms?"
+  description="You don't build a separate package per platform. One registry bundle — manifest, contract, WASM module — is what every executor loads, native or browser alike. Platform-specific packaging happens one layer up, in the host app."
+  canonical="https://traverse-framework.com/questions/how-do-i-package-a-capability-for-multiple-platforms.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>You don't, in the sense of maintaining separate build outputs per target — and that's a deliberate design choice, not an oversight. A capability's WASM binary and its contract are compiled once and grouped, along with any events or workflows it participates in, into a registry bundle: a manifest plus a <code>capabilities/</code> directory holding each capability's contract and module. That bundle is what gets loaded, unchanged, by whichever executor is running it — the native <code>WasmExecutor</code> or the browser's Web embedder SDK.</p>
+
+  <p>The CLI validates a bundle before it's registered, and that validation doesn't vary by target platform either, because the bundle itself has no platform-specific content to validate differently.</p>
+
+  <h2>Where platform-specific packaging actually happens</h2>
+  <p>It exists, just one layer up — in the host application, not in the capability. A native desktop app embedding <code>traverse-embedder</code> gets built and distributed the normal way for Windows, macOS, or Linux (an installer, a container image, a plain binary). A web app loads the same bundle through the Web embedder SDK as a static asset served alongside the rest of your frontend. Neither of those steps touches or duplicates the bundle itself — they just point their respective executor at the same file.</p>
+
+  <p>Practically: build your bundle once with <code>cargo run -p traverse-cli-rs -- bundle inspect</code> (or the equivalent build step for your capability), confirm it validates, and treat "does this run on platform X" as a question about whether an executor for X exists yet — see <a href="/platforms.html">Platforms</a> — not a question about whether you need a platform-specific build of your own capability.</p>
+</QuestionLayout>

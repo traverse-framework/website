@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the WASM sandbox?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The WASM sandbox is the default-deny execution boundary a WebAssembly module runs inside: no filesystem access, no network access, no ability to spawn threads or call host system functions unless the host explicitly grants it. Traverse capabilities declare exactly what they need in their contract, and the runtime enforces that boundary at execution time.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/is-webassembly-cross-platform.html', label: 'Is WebAssembly cross-platform?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+  { href: '/blog/wasm-business-logic.html', label: 'What WASM actually gives you for business logic' },
+  { href: '/questions/what-is-traverse-security-model.html', label: "What is Traverse's security model?" },
+];
+---
+<QuestionLayout
+  title="What is the WASM sandbox?"
+  description="A default-deny execution boundary: no filesystem, no network, no host calls unless explicitly granted in the contract. It's also part of why the same capability can move safely between operating systems."
+  canonical="https://traverse-framework.com/questions/what-is-the-wasm-sandbox.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>By default, a WebAssembly module can't do anything to the outside world. No reading or writing files, no opening network sockets, no spawning threads, no calling arbitrary host functions. It takes inputs, runs pure computation over its own linear memory, and returns outputs. Anything beyond that has to be explicitly imported by the host — the module can't reach out and grab a capability the host didn't hand it.</p>
+
+  <p>In Traverse, what a capability is allowed to reach outside the sandbox is declared in its contract — things like <code>network_access</code>, <code>filesystem_access</code>, and <code>host_api_access</code>, each defaulting to denied. If a capability tries to do something its contract doesn't declare, the runtime rejects it at the boundary, not somewhere downstream after damage is done.</p>
+
+  <h2>Why this matters for cross-OS portability specifically</h2>
+  <p>Every one of those boundary-crossing operations — file paths, socket APIs, thread models — is exactly where OS differences usually leak into application code. A sandbox that denies all of it by default means a capability that never touches the sandbox boundary genuinely has no OS-specific behavior baked in. It's not that Traverse specially handles Windows-vs-Linux filesystem quirks; it's that a well-scoped capability never has to.</p>
+
+  <p>The sandbox is also a testability property, not just a security one: logic that can't produce side effects is logic you can test in isolation, without mocking a filesystem or a network. That's a separate benefit from portability, but it comes from the same design decision.</p>
+</QuestionLayout>

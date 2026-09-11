@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I use Traverse with Electron?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Yes. An Electron app's renderer process is a Chromium web page, so it can call a Traverse capability the same way any browser page does — through the Web embedder SDK or the local browser adapter. Electron's main process, being a Node.js process, can also shell out to or bind against a native traverse-embedder host if you want the capability running outside the renderer.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-i-use-traverse-with-tauri.html', label: 'Can I use Traverse with Tauri?' },
+  { href: '/questions/how-is-traverse-different-from-electron.html', label: 'How is Traverse different from Electron?' },
+  { href: '/questions/what-is-the-browser-adapter.html', label: 'What is the browser adapter?' },
+  { href: '/docs/guides/react-integration.html', label: 'React Integration guide' },
+];
+---
+<QuestionLayout
+  title="Can I use Traverse with Electron?"
+  description="Yes — Electron's renderer is a Chromium page, so it calls Traverse capabilities the same way any browser-hosted app does, through the Web embedder SDK or the local browser adapter."
+  canonical="https://traverse-framework.com/questions/can-i-use-traverse-with-electron.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes. Electron's renderer process is, under the hood, a Chromium browser page rendering your web frontend — which means it's already a real WASM host. A Traverse capability loaded through the Web embedder SDK runs there exactly the way it would in a plain browser tab: no Electron-specific adaptation needed. The <a href="/docs/guides/react-integration.html">React integration guide</a> applies directly if your Electron app's renderer is a React app, since the pattern (talk to the local browser adapter over HTTP, or load the embedder SDK directly) doesn't care that Chromium happens to be wrapped in a desktop shell.</p>
+
+  <p>If you'd rather run the capability outside the renderer — say, in Electron's Node.js-based main process, closer to the OS — that process can shell out to a native host running <code>traverse-embedder</code>, or communicate with a locally running <code>traverse-cli</code> adapter over IPC, the same pattern the Lambda and Tauri integration examples use elsewhere on this site.</p>
+
+  <h2>Why you'd bother, instead of just writing the rule in JavaScript</h2>
+  <p>The same reason as any other host: a plain JS function in your renderer has no enforced contract and produces no trace. If the rule behind that Electron app's UI also needs to run identically in your backend or be callable by an AI agent, wrapping it as a governed capability means all of those callers get the same binary and the same enforced result — instead of a JS copy in the app and a second implementation everywhere else.</p>
+</QuestionLayout>

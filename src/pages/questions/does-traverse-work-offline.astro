@@ -1,0 +1,40 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does Traverse work offline?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, for the capability execution itself — a capability executes locally by default, on whatever client loaded it, with no network round trip required to run the WASM binary, validate its contract, or produce a trace. Native and browser executors both run entirely on-device unless a capability specifically declares and is granted network access.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-does-device-independent-mean-in-traverse.html', label: 'What does "device-independent" mean in Traverse?' },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/questions/how-do-placement-targets-work.html', label: 'How do placement targets work in Traverse?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+];
+---
+<QuestionLayout
+  title="Does Traverse work offline?"
+  description="Yes — execution is local by default on whatever client loaded the capability, with no network round trip required to run it, validate its contract, or produce a trace, unless the capability itself declares and is granted network access."
+  canonical="https://traverse-framework.com/questions/does-traverse-work-offline.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes, and this follows directly from how execution is modeled, not as a special offline mode bolted on afterward. A Traverse capability is device-independent: it executes locally, on whatever client loaded it, by default. There's no built-in requirement to phone home to a server to run the WASM binary, validate its contract, or generate a trace artifact — all of that happens in-process, on the machine that's already holding the bundle.</p>
+
+  <p>Concretely: the native executor runs entirely on the host it's installed on. The browser embedder, once it's loaded a bundle and its WASM module, executes that capability directly in the browser's own WebAssembly host — no request leaves the machine unless the capability's own logic makes one.</p>
+
+  <h2>The one place network involvement is real</h2>
+  <p>If a capability's contract declares <code>network_access</code> as required — because the rule genuinely needs to call out to something, a tax rate table or an external lookup — then yes, that specific capability needs connectivity for that specific call. That's a property of the capability, not of the runtime generally, and it's visible in the contract before you ever run it, rather than a surprise at execution time. Most capabilities, especially the pricing/eligibility/validation category this project is built around, have no legitimate reason to need network access at all, and their contracts reflect that with <code>network_access: forbidden</code>.</p>
+
+  <p>Worth noting separately: the client's ability to <em>heuristically delegate</em> part of a capability's work to a server (covered in <a href="/questions/what-does-device-independent-mean-in-traverse.html">what "device-independent" means</a>) is an optional decision the client can make based on its own context — not a requirement. Offline, that heuristic simply doesn't fire, and execution stays local.</p>
+</QuestionLayout>

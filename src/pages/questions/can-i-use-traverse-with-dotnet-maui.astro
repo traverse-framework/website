@@ -1,0 +1,37 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I use Traverse with .NET MAUI today?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Partially. Traverse's .NET embedder uses a working Wasmtime .NET-backed bridge targeting WinUI, which covers MAUI's Windows target. Request marshalling, event subscriptions, and reference-app integration for the rest of the .NET embedder are still open work, and there's no public release yet, so treat this as close but not a drop-in dependency for a shipping MAUI app across all four of its platforms.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-is-traverse-different-from-dotnet-maui.html', label: 'How is Traverse different from .NET MAUI?' },
+  { href: '/questions/can-traverse-build-mobile-apps.html', label: 'Can I build a mobile app with Traverse?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+  { href: '/questions/what-is-traverse-roadmap.html', label: 'What is the Traverse roadmap?' },
+];
+---
+<QuestionLayout
+  title="Can I use Traverse with .NET MAUI today?"
+  description="Partially. The .NET/WinUI embedder has a working Wasmtime-backed bridge, but it's unreleased open work — covering MAUI's Windows target more than its iOS and Android targets. Here's the exact status."
+  canonical="https://traverse-framework.com/questions/can-i-use-traverse-with-dotnet-maui.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Partially, and worth being precise about which part. <code>packages/dotnet/TraverseEmbedder</code> has a working runtime bridge backed by Wasmtime .NET, targeting WinUI — which is MAUI's Windows rendering target specifically, not the cross-platform MAUI runtime as a whole. Request marshalling, event subscriptions, evidence publication, and the shared cross-SDK conformance suite are still open work, and there's no public release of the package yet.</p>
+
+  <p>So if your MAUI app's Windows build is what you care about pairing with Traverse right now, the underlying pieces exist and are progressing. If you need the same integration working identically on MAUI's iOS and Android targets, that runs into the same mobile-embedder status as any other approach: iOS is blocked on the WASM engine ecosystem, and Android has its own separate, also-unreleased Kotlin bridge that isn't specifically wired for MAUI's Android target.</p>
+
+  <p>The honest recommendation: if you're starting a MAUI project today and want Traverse in it eventually, structure your business logic as a well-scoped capability with a clean contract now. That work carries forward unchanged once the embedder ships — the contract doesn't change when the host does. Track exactly when it does on the <a href="/platforms.html">Platforms page</a> rather than guessing from a roadmap date.</p>
+</QuestionLayout>

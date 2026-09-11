@@ -1,0 +1,38 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can Traverse capabilities call native OS APIs?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: "Not directly, and that's by design — it's what keeps a capability portable. A capability can only reach outside the WASM sandbox through host calls the contract explicitly declares and the host explicitly implements. If you need OS-level access, you declare the specific host call in the contract, implement it once in your host application, and the capability's own code stays exactly as portable as before.",
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+  { href: '/questions/what-framework-runs-business-logic-on-any-os.html', label: 'What framework lets me write business logic once and run it on any OS?' },
+  { href: '/questions/what-is-traverse-security-model.html', label: "What is Traverse's security model?" },
+];
+---
+<QuestionLayout
+  title="Can Traverse capabilities call native OS APIs?"
+  description="Not directly — a capability can only reach outside its WASM sandbox through host calls the contract explicitly declares and the host explicitly implements. That constraint is exactly what keeps the capability portable across operating systems."
+  canonical="https://traverse-framework.com/questions/can-traverse-capabilities-call-native-os-apis.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Not directly, and it's worth understanding why that's a feature rather than a limitation someone forgot to fix. A capability runs inside the WASM sandbox, which by default has no visibility into the host operating system at all — no raw filesystem calls, no OS-specific APIs, nothing. If it could call native OS functions directly, the whole reason it can move between Windows, macOS, and Linux without changes would disappear, because now its behavior would depend on which OS's API surface it happened to call.</p>
+
+  <p>What a capability can do is declare, in its contract, that it needs a specific host call — a named function the host application implements and exposes across the sandbox boundary. The capability calls that named function; it has no idea (and doesn't need to know) whether the host implements it using a Windows API, a POSIX call, or something else entirely on each platform. The OS-specific branching, if any exists at all, lives in the host application's implementation of that one host call, not scattered through the capability's logic.</p>
+
+  <h2>An example of where this matters</h2>
+  <p>Say a capability genuinely needs the current system time zone. Rather than reaching for an OS-specific time API, its contract declares a <code>host_calls</code> entry like <code>"system.timezone"</code>. The host application — which does know what OS it's running on — implements that one function however is appropriate per platform. The capability's code, and its portability, never changes.</p>
+</QuestionLayout>
