@@ -1,0 +1,48 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I publish a capability to the Traverse registry?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Author a capability contract and WASM artifact in the traverse-framework/registry repo, meet the coverage and CI gates, and open a PR that uses the documented publish path so artifact digests and URLs survive review. After merge, the capability appears in the next public catalog release — there is no side-door upload.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/how-do-i-write-a-capability-contract.html', label: 'How do I write a capability contract?' },
+  { href: '/questions/what-is-the-smallest-possible-traverse-capability.html', label: 'What is the smallest possible Traverse capability?' },
+  { href: '/questions/how-do-i-contribute-to-traverse.html', label: 'How do I contribute to Traverse?' },
+];
+---
+<QuestionLayout
+  title="How do I publish a capability to the Traverse registry?"
+  description="Publishing is a PR into the public registry repo: contract, WASM artifact, coverage gates, and digest-stable publish metadata — not a private upload form."
+  canonical="https://traverse-framework.com/questions/how-do-i-publish-a-capability-to-the-registry.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The Traverse registry is a git repository with CI, not a free-form CDN. A capability becomes public when a pull request merges with a valid contract, a digest-addressed WASM artifact, and the publish metadata the pipeline expects.</p>
+
+  <h2>The path that survives review</h2>
+  <ol>
+    <li>Work in <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a>. Read <code>CONTRIBUTING.md</code> before scaffolding.</li>
+    <li>Add the capability source (Rust tests included) and the contract that describes inputs, outputs, and placement expectations.</li>
+    <li>Use the documented <code>traverse-cli</code> capability publish / scaffold path so <code>artifact.digest</code> and <code>artifact.url</code> are produced correctly — hand-edited digests usually fail CI.</li>
+    <li>Meet the coverage gates the registry enforces (function coverage at 100%, line/region thresholds in the CONTRIBUTING notes).</li>
+    <li>Run the repo's pre-PR check script, open a PR with <code>## Governing Spec</code> and <code>## Validation</code> filled, and wait for CI.</li>
+  </ol>
+
+  <h2>What "published" means</h2>
+  <p>After merge, the capability is part of the catalog the next index release ships to <a href="https://registry.traverse-framework.com" target="_blank" rel="noopener">registry.traverse-framework.com</a>. Callers discover it by reference (name@version) and verify the artifact digest. There is no maintainer-only upload that skips the PR.</p>
+
+  <h2>A good first publish</h2>
+  <p>If you want a tiny first capability rather than inventing a domain model, see the labeled starter <a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485 (text.slugify)</a>. Keep Unicode transliteration modest, document limits, and stay inside the issue's one-PR ask.</p>
+</QuestionLayout>

@@ -1,0 +1,161 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 14, 2026</span>
+      <span class="badge">Community</span>
+      <span class="badge">Open source</span>
+    </div>
+    <h1 class="t-h1">The first external contributor door — without the hype</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>For a while, Traverse looked like a project you could only watch. Specs, CI gates, CLA, approved-governance — that machinery is real, and it also reads like a locked door if you are standing outside with a first PR in your head.</p>
+
+      <p>This week we deliberately opened a small door. Not a "join the community" campaign. A few labeled tickets you can finish in one PR, with an honest done-when, and without inventing a new platform adapter from a blank page.</p>
+
+      <div class="callout">
+        Short version: the door is <code>help wanted</code> / <code>good first issue</code> tickets with a one-PR ask. We already had a first external PR land in the overlap (MCP client configs). Timing meant a duplicate closed; the next picks are still open. That is the whole story — no star charts, no fake contributor counts.
+      </div>
+
+      <h2 id="what-we-opened">What we opened</h2>
+
+      <p>Four concrete asks, sized for a second person who has not memorized the repo:</p>
+
+      <ul>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1361" target="_blank" rel="noopener">traverse#1361</a> — a tiny TypeScript consume of <code>traverse-embedder-web</code> (load → submit → print events).</li>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> — an honest Python script that shells out to a <em>real</em> CLI verb against a checked-in package.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485</a> — publish a small <code>text.slugify</code> capability through the normal registry path.</li>
+        <li><a href="https://github.com/traverse-framework/claude-skills/issues/8" target="_blank" rel="noopener">claude-skills#8</a> — update the capability-author skill so new <code>use_cases</code> follow the full user-story format.</li>
+      </ul>
+
+      <p>There is also an org-wide search if those four are taken: labeled <a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22help+wanted%22&amp;type=issues" target="_blank" rel="noopener">help wanted</a> and <a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22&amp;type=issues" target="_blank" rel="noopener">good first issue</a>. The contribute FAQ on the site points at the same path.</p>
+
+      <h2 id="what-happened-first">What happened first</h2>
+
+      <p>Before those tickets had been sitting long, someone from outside the maintainer set opened a PR with Cursor and Claude Desktop MCP launcher snippets — CLA signed, <code>stdio</code> made explicit, absolute binary path documented. Useful work. It closed as a duplicate because the same surface had already merged from the maintainer side in the same hour. That is not a failure of the door; it is what a busy overlap looks like when you finally make the ask concrete.</p>
+
+      <p>We left a pointer at the still-open issues. Nobody has claimed #1361, #1362, or registry#485 yet as I write this. If you want the next first contribution, comment on one of those and take it.</p>
+
+      <h2 id="what-this-is-not">What this is not</h2>
+
+      <ul>
+        <li><strong>Not a metrics launch.</strong> I am not going to invent a contributor graph or a "community momentum" number. One solid external PR attempt and a few open doors is the true state.</li>
+        <li><strong>Not "build us a placement target."</strong> Large platform work needs an issue and direction first. The first door is docs, examples, and one small registry publish — things you can validate locally without redesigning the runtime.</li>
+        <li><strong>Not a lowering of the gates.</strong> CLA still applies. PR bodies still need <code>## Governing Spec</code> and <code>## Validation</code>. CI still has to go green. The door is small on purpose so the gates stay real.</li>
+      </ul>
+
+      <h2 id="how-to-walk-through">How to walk through it</h2>
+
+      <ol>
+        <li>Pick one labeled issue. Comment that you are taking it.</li>
+        <li>Read that repo's <code>CONTRIBUTING.md</code> (start with the core <a href="https://github.com/traverse-framework/traverse/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">traverse one</a>).</li>
+        <li>Keep the PR to the issue's one-PR ask. Link the issue. Prefer <code>no-spec-needed</code> when the ticket says so.</li>
+        <li>Run the local validation the ticket names. Open the PR. Wait for CI.</li>
+      </ol>
+
+      <p>If something in the ticket is wrong — a CLI verb that drifted, a path that moved — say so in the PR. Correcting the ask is part of contributing. Inventing a parallel API is not.</p>
+
+      <div class="callout">
+        I would rather have three boring, green, honest first PRs than one flashy demo that cannot be reproduced. The door is sized for the boring ones.
+      </div>
+
+      <h2 id="why-bother">Why bother writing this down</h2>
+
+      <p>Because "we welcome contributions" is empty until there is a ticket with a done-when. And because the first person who tried already taught us the failure mode we care about: duplicate work when maintainer and outsider land on the same gap. Labeling the next gaps in public is how we avoid wasting the next person's evening.</p>
+
+      <p>If you only have ten minutes: open the help-wanted search, read one issue end to end, and decide whether the done-when is something you can finish this week. If yes, claim it. If not, leave it for someone else — that is also useful.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-we-opened">What we opened</a></li>
+          <li><a href="#what-happened-first">What happened first</a></li>
+          <li><a href="#what-this-is-not">What this is not</a></li>
+          <li><a href="#how-to-walk-through">How to walk through it</a></li>
+          <li><a href="#why-bother">Why bother writing this down</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-do-i-contribute-to-traverse.html">How do I contribute to Traverse? →</a></li>
+          <li><a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22&amp;type=issues" target="_blank" rel="noopener">good first issue search →</a></li>
+          <li><a href="/blog/what-discover-proves.html">What /discover proves →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Pick a ticket</div>
+        <p>One-PR asks. Real CLI. No invented metrics.</p>
+        <a href="/questions/how-do-i-contribute-to-traverse.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Contribute FAQ →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Small door. Real gates.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Claim one labeled issue. Ship the done-when. Leave the platform redesigns for later.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22help+wanted%22&amp;type=issues" class="btn btn-primary" target="_blank" rel="noopener">Browse help wanted →</a>
+      <a href="/questions/how-do-i-contribute-to-traverse.html" class="btn btn-ghost">Contribute FAQ</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"The first external contributor door — without the hype — Traverse Blog"}
+  description={"We labeled a few one-PR help-wanted tickets so a first external contributor has a real door — not a campaign, not fake metrics, and not a platform redesign from scratch."}
+  canonical={"https://traverse-framework.com/blog/first-external-contributor-door.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
