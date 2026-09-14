@@ -1,0 +1,48 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [
+  { href: '/questions/can-i-use-traverse-with-react.html', label: 'Can I use Traverse with React?' },
+  { href: '/questions/what-is-the-browser-adapter.html', label: 'What is the browser adapter?' },
+  { href: '/questions/does-traverse-require-a-backend.html', label: 'Does Traverse require a backend?' },
+  { href: '/docs/guides/react-integration.html', label: 'React integration guide' },
+];
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I embed Traverse in a web app?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Install traverse-embedder-web from npm, load a checked-in or fetched capability bundle, call BundleEmbedder.init and submit (or the smallest public API that matches the package README), and handle embedder events. The browser is the WebAssembly host; the SDK enforces the same import allowlist and digest checks as the native path for the surfaces it supports. Linear direct-triggered pipelines are the shipped browser scope today.',
+    },
+  }],
+});
+---
+<QuestionLayout
+  title="How do I embed Traverse in a web app?"
+  description="Use the traverse-embedder-web npm package: load a digest-verified bundle, init the embedder, submit work, listen for events. Browser-local WASM with contract checks — linear pipelines today."
+  canonical="https://traverse-framework.com/questions/how-do-i-embed-traverse-in-a-web-app.html"
+  category="Platforms and Portability"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>For a browser or bundler-based app, the public path is the <code>traverse-embedder-web</code> package on npm. The browser already is a WebAssembly host; the SDK compiles bundled modules, checks imports against the host-ABI allowlist, and runs JSON in / JSON out through a minimal WASI shim. You do not ship a separate native sidecar for that path.</p>
+
+  <h2>Minimal shape</h2>
+  <ol>
+    <li>Depend on <code>traverse-embedder-web</code> at a published version that matches the release notes you care about.</li>
+    <li>Load a capability bundle (checked-in starter, or artifacts you fetched and whose digests you verified).</li>
+    <li>Call <code>BundleEmbedder.init</code>, then <code>submit</code> (or the smallest public API documented in the package README).</li>
+    <li>Print or handle one or two embedder events so you know the call completed or failed closed.</li>
+  </ol>
+  <p>Prefer patterns already shown in <code>packages/web/TraverseEmbedder/README.md</code> and any <code>examples/react-integration/</code> in the core repo over inventing a parallel loader.</p>
+
+  <h2>What this path covers today</h2>
+  <p>Shipped browser scope is single verified capabilities and linear <code>direct</code>-triggered pipelines. Conditional or event-driven workflow edges are rejected at initialization rather than silently mis-executed. Native <code>local</code> remains the most mature placement target; see <a href="/platforms.html">Platforms</a> for the evidence-linked matrix.</p>
+
+  <h2>First-contributor example</h2>
+  <p>If you want a copy-paste Node/TS consume that does not require reading embedder internals end to end, that is exactly <a href="https://github.com/traverse-framework/traverse/issues/1361" target="_blank" rel="noopener">traverse#1361</a> — still open as a one-PR ask when this page was written.</p>
+</QuestionLayout>

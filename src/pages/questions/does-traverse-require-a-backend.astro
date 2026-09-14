@@ -1,0 +1,42 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [
+  { href: '/questions/what-does-the-discover-page-do.html', label: 'What does the /discover page do?' },
+  { href: '/questions/how-do-i-embed-traverse-in-a-web-app.html', label: 'How do I embed Traverse in a web app?' },
+  { href: '/questions/does-traverse-work-offline.html', label: 'Does Traverse work offline?' },
+  { href: '/questions/how-do-placement-targets-work.html', label: 'How do placement targets work?' },
+];
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does Traverse require a backend?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No Traverse cloud backend is required for the shipped local and browser paths. Native local execution and the web embedder run on your machine or in the user’s tab. You may still fetch a public registry catalog and artifacts over HTTPS, then verify digests and execute offline. Planned edge and cloud placement targets are specified but not released as a hosted Traverse service.',
+    },
+  }],
+});
+---
+<QuestionLayout
+  title="Does Traverse require a backend?"
+  description="No hosted Traverse backend is required for local or browser execution. Fetch registry artifacts if you want, verify digests, run locally. Edge/cloud placement is planned — not a managed service today."
+  canonical="https://traverse-framework.com/questions/does-traverse-require-a-backend.html"
+  category="Platforms and Portability"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Short answer: you do not need a Traverse-operated backend to run the paths that ship today. The runtime and the web embedder are libraries and binaries you run yourself. The public site’s <a href="/discover.html">/discover</a> flow is deliberately “no backend, no simulation” for that reason.</p>
+
+  <h2>What you might still talk to over the network</h2>
+  <p>Optional HTTPS fetches of a registry catalog and capability artifacts (for example from <a href="https://registry.traverse-framework.com" target="_blank" rel="noopener">registry.traverse-framework.com</a>). After digests are verified, execution does not need a live authority. MCP clients talk to a <code>traverse-mcp</code> process you launch locally over stdio — that process is yours, not a SaaS control plane.</p>
+
+  <h2>What is not shipped</h2>
+  <p><code>edge</code> and <code>cloud</code> placement targets are specified and unreleased. There is no claim of a multi-tenant Traverse cloud that hosts your capabilities for you. If your product needs a server, that server is your app’s — calling Traverse locally or embedding the same WASM — not a hidden Traverse dependency.</p>
+
+  <h2>When a backend still makes sense</h2>
+  <p>Secrets, durable multi-user state, and connectors that must not run in the browser still belong on infrastructure you control. Traverse’s job there is the same contract-checked capability binary, placed where your threat model allows — not replacing your hosting decision.</p>
+</QuestionLayout>
