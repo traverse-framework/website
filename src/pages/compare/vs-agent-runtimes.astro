@@ -1,0 +1,180 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="compare-hero">
+  <div class="container">
+    <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
+    <h1>Traverse vs. AI Agent Runtimes (LangChain, LlamaIndex, AutoGen, CrewAI)</h1>
+    <p class="compare-hero-lead">Agent frameworks orchestrate LLM reasoning, tool loops, memory, and multi-agent workflows. Traverse isn't a competitor to them — it's a governed capability runtime those agents can call. Same relationship as Traverse sitting on Wasmtime: different layer, same stack.</p>
+  </div>
+</section>
+
+<main class="container">
+  <div class="toc-aside">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#what-agent-runtimes-solve">What agent runtimes solve</a></li>
+      <li><a href="#what-traverse-adds">What Traverse adds — and where it sits</a></li>
+      <li><a href="#key-differences">Key differences</a></li>
+      <li><a href="#when-to-use">When to use which</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <div class="content-section" id="what-agent-runtimes-solve">
+    <h2>What agent runtimes and orchestrators solve</h2>
+    <p>LangChain, LlamaIndex, AutoGen, CrewAI, and the many custom agent loops built on raw model APIs all attack the same problem: get a language model to plan, call tools, remember context, and (sometimes) coordinate with other agents until a task is done. The details differ — LangChain is a graph of chains and tools; LlamaIndex leans on retrieval and indexes; AutoGen and CrewAI emphasize multi-agent conversation — but the job is the same. The framework owns the reasoning loop.</p>
+    <p>That loop is real work. An orchestrator decides which tool to call, with what arguments, in what order, and when to stop. It holds short-term memory, retries failed calls, routes between specialists, and turns a user goal into a sequence of model-and-tool steps. If you are building an agent product, you need something in this category. Traverse does not provide it, and is not trying to.</p>
+    <p>What these frameworks do not, by design, govern is the tool on the other side of the call. A tool is usually a Python function, an HTTP endpoint, or a JSON schema the model fills in. Isolation is whatever the host process already has. Discovery is a list you assembled in code or a prompt. Audit is whatever you logged yourself. That is a reasonable default when the tool is a search, a calculator, or a one-off script. It is a gap when the tool is a business rule that also has to run in an app, stay valid against a contract, and leave an artifact you can reconstruct later.</p>
+  </div>
+
+  <div class="content-section" id="what-traverse-adds">
+    <h2>What Traverse adds — and where it sits</h2>
+    <p>Traverse is the layer the agent calls, not the layer that decides to call. A capability is a WASM binary with a machine-readable contract: inputs, outputs, preconditions, postconditions. The runtime validates the request before execution, runs the binary in a sandbox (native path: Wasmtime, via <code>traverse-runtime</code>), validates the result after, and emits a trace. Apps and agents hit the same capability. The orchestrator still owns planning, memory, and retries.</p>
+    <p>Discovery is a registry query, not a hardcoded import. The public catalog is on the order of ~82 capabilities, ~185 signed versions, and ~31 domains — useful as a size check, not a growth story. An MCP-connected agent can search that metadata today. What it can actually execute through the packaged agent surface is narrower; see the limits below.</p>
+    <p>The two shipped hosts for that binary are native (Linux, macOS, Windows) and the browser (the public Web embedder SDK). Edge and cloud placement are on the <a href="/platforms.html">platforms</a> roadmap; they are not shipped. The living-proof claim is modest: the same contract-governed capability can be called from an app embedder and from an agent session. That is the UMA / C-DAD idea in practice — device-independent business logic — not a separate “agent platform.”</p>
+    <div class="highlight-callout"><strong>The distinction:</strong> an agent runtime decides <em>what to try next</em>. Traverse decides whether a specific capability was allowed to run, whether the I/O matched its contract, and whether that execution left a reconstructable record. LangChain (or AutoGen, or a loop you wrote) still owns the former. Traverse owns the latter. See also <a href="/compare/vs-function-calling.html">Traverse vs AI function calling</a> for the contract-vs-definition cut, and <a href="/compare/vs-wasm-runtimes.html">Traverse vs raw WASM runtimes</a> for the Wasmtime layering.</div>
+    <p>The packaged agent entrypoint is <code>traverse-mcp</code> on stdio. The flow is discover → inspect contract → execute → public trace summary; the real command list lives on <a href="/agents.html">For AI Agents</a>. One protocol caveat, same as the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>: today's binary speaks Traverse's line-delimited JSON commands (<code>list_entrypoints</code>, <code>execute_entrypoint</code>, and the rest), not stock MCP JSON-RPC <code>tools/list</code> / <code>tools/call</code>. A generic off-the-shelf MCP client still needs an adapter in front.</p>
+    <div class="highlight-callout"><strong>Honest limits, today.</strong> Stdio is the packaged bootstrap mode — there is also an in-process Rust library surface, but the ready-to-run entrypoint is the stdio subprocess. One example content group is shipped for agent discovery and execution: <code>core-runtime-example</code> (the expedition / <code>plan-expedition</code> workflow). Broader multi-domain agent discovery is not built yet. Execution responses carry a redacted public trace summary, not the full internal runtime trace.</div>
+  </div>
+
+  <div class="content-section" id="key-differences">
+    <h2>Key differences</h2>
+    <table class="diff-table">
+      <thead><tr><th>Dimension</th><th>Agent runtime / orchestrator</th><th>Traverse</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Primary job</td>
+          <td>Plan, reason, call tools, manage memory, coordinate agents until a goal is done</td>
+          <td class="highlight">Execute one governed capability: contract in, sandbox, contract out, trace</td>
+        </tr>
+        <tr>
+          <td>Tool / capability contract</td>
+          <td>A function name, description, and parameter schema the model fills in</td>
+          <td class="highlight">A machine-readable contract with preconditions and postconditions, enforced by the runtime before and after execution</td>
+        </tr>
+        <tr>
+          <td>Execution isolation</td>
+          <td>Whatever the host process already has — usually the agent's own Python/Node runtime</td>
+          <td class="highlight">WASM sandbox (native: Wasmtime). The capability cannot reach host APIs the embedder did not grant</td>
+        </tr>
+        <tr>
+          <td>Discovery</td>
+          <td>A tool list you assembled in code, a prompt, or the framework's registry</td>
+          <td class="highlight">A queryable capability registry by contract. Agent execution today is limited to the shipped example content group; the public catalog is larger and searchable</td>
+        </tr>
+        <tr>
+          <td>Audit / trace</td>
+          <td>Framework logs and whatever you add around model calls</td>
+          <td class="highlight">A structured trace per execution. Public agent responses include a redacted summary, not the full internal trace</td>
+        </tr>
+        <tr>
+          <td>Portability of business logic</td>
+          <td>The tool is usually bound to that agent's language and process. Reuse in an app or another runtime is a rewrite</td>
+          <td class="highlight">Same WASM binary and contract for app, native, and browser callers today; edge/cloud placement is not shipped</td>
+        </tr>
+        <tr>
+          <td>Who owns the reasoning loop</td>
+          <td>The agent framework — chains, graphs, multi-agent conversation, retries</td>
+          <td class="highlight">Not Traverse. Traverse does not plan, remember, or pick the next tool. It runs the one it was asked to run, or refuses</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section" id="when-to-use">
+    <h2>When to use which</h2>
+    <div class="when-grid">
+      <div class="when-card">
+        <h3>Use an agent framework when</h3>
+        <ul>
+          <li>You need a reasoning loop: plan, call tools, observe, retry, stop</li>
+          <li>The product is multi-agent conversation, retrieval-augmented generation, or a graph of LLM steps</li>
+          <li>The tools are lookups, searches, or one-off functions that do not need a shared contract across an app and an agent</li>
+          <li>You are already invested in LangChain, LlamaIndex, AutoGen, CrewAI, or a loop you own — and it is doing that job</li>
+        </ul>
+      </div>
+      <div class="when-card accent-border">
+        <h3>Use Traverse when</h3>
+        <ul>
+          <li>The thing the agent calls is a business rule that must also run in an app, not only inside the agent process</li>
+          <li>Invalid inputs should fail before the binary runs, and outputs should be checked against a declared contract</li>
+          <li>You need a sandbox around that rule, and a trace you can point at later — even if the public summary is redacted</li>
+          <li>Discovery should be a registry query rather than a stale tool list copied into a prompt</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight-callout">They compose. Keep the orchestrator. Point selected tools at Traverse capabilities over <code>traverse-mcp</code> (stdio today; adapter required for stock MCP clients). The agent still reasons. The capability still has a contract. See the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a> and <a href="/docs/quickstart.html">quickstart</a>.</div>
+  </div>
+
+  <div class="content-section" id="verdict">
+    <h2>The verdict</h2>
+    <p>This is not a bake-off for “best AI agent platform.” LangChain, LlamaIndex, AutoGen, CrewAI, and custom agent loops are orchestrators. Traverse is not one, and does not replace them. Use an agent framework for reasoning and orchestration. Use Traverse when the tools in that loop must be contract-governed, sandboxed, discoverable, and auditable — including when the same rule is called from an application, not only from the agent.</p>
+    <p>If the tool is a search or a calculator, a function definition in the orchestrator is enough. If the tool is eligibility, pricing, or anything you would be unhappy to reimplement per caller, that is the Traverse layer. The <a href="/registry.html">registry</a> is where published capabilities live; <a href="/agents.html">For AI Agents</a> is the honest MCP surface, including what is not shipped yet.</p>
+  </div>
+
+  <div class="compare-nav">
+    <a href="/compare.html">← All comparisons</a>
+    <a href="/compare/vs-function-calling.html">Traverse vs AI Function Calling →</a>
+    <a href="/compare/vs-wasm-runtimes.html">Traverse vs Raw WASM Runtimes →</a>
+  </div>
+</main>
+
+<section class="cta-band">
+  <div class="cta-band-glow"></div>
+  <div class="container" style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap">
+    <div>
+      <div class="t-h3" style="margin-bottom:0.5rem">Connect an agent to a governed capability.</div>
+      <div class="t-body t-muted">Stdio server, real command list, honest limits — then the quickstart for the bundle itself.</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary btn-lg">For AI Agents</a>
+      <a href="/docs/guides/mcp-setup.html" class="btn btn-ghost btn-lg">MCP setup</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Traverse vs AI Agent Runtimes (LangChain, AutoGen, CrewAI) · Traverse Framework"
+  description="Agent frameworks (LangChain, AutoGen, CrewAI) orchestrate LLM reasoning. Traverse is a governed capability runtime they can call, not a replacement."
+  canonical="https://traverse-framework.com/compare/vs-agent-runtimes.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Compare', href: '/compare.html' }]}
+>
+  <style is:global slot="head">
+    .compare-hero { padding: 4.5rem 0 3.5rem; position: relative; }
+    .compare-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--accent-dim) 0%, transparent 70%); pointer-events: none; }
+    .compare-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.25rem; font-family: var(--font-display); max-width: 760px; }
+    .compare-hero-lead { font-size: 1.1rem; color: var(--fg-muted); max-width: 640px; line-height: 1.75; }
+    .toc-aside { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .toc-aside h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.75rem; font-family: var(--font-display); }
+    .toc-aside ol { margin: 0; padding-left: 1.25rem; }
+    .toc-aside li { font-size: 0.88rem; color: var(--fg-muted); margin-bottom: 0.35rem; line-height: 1.5; }
+    .toc-aside li a { color: var(--fg-muted); text-decoration: none; transition: color 0.15s; }
+    .toc-aside li a:hover { color: var(--accent); }
+    .content-section { margin: 3.5rem 0; }
+    .content-section h2 { font-size: 1.6rem; font-weight: 600; font-family: var(--font-display); margin-bottom: 1rem; padding-top: 1rem; }
+    .content-section p { color: var(--fg-muted); line-height: 1.8; margin-bottom: 1rem; max-width: 720px; }
+    .diff-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.92rem; }
+    .diff-table th { background: var(--bg-elevated); border: 1px solid var(--border); padding: 0.75rem 1rem; text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .diff-table th:first-child { width: 24%; }
+    .diff-table td { border: 1px solid var(--border); padding: 0.85rem 1rem; vertical-align: top; line-height: 1.6; color: var(--fg-muted); }
+    .diff-table tr:nth-child(even) td { background: var(--bg-elevated); }
+    .diff-table td:first-child { font-weight: 500; color: var(--fg); font-family: var(--font-display); font-size: 0.88rem; }
+    .diff-table td.highlight { color: var(--accent); }
+    .when-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+    .when-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .when-card h3 { font-size: 1rem; font-weight: 600; font-family: var(--font-display); margin-bottom: 0.75rem; }
+    .when-card ul { margin: 0; padding-left: 1.1rem; }
+    .when-card li { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.65; margin-bottom: 0.4rem; }
+    .when-card.accent-border { border-color: var(--accent); }
+    .highlight-callout { background: var(--bg-elevated); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; font-size: 0.95rem; color: var(--fg-muted); line-height: 1.75; max-width: 720px; }
+    .highlight-callout strong { color: var(--fg); }
+    .compare-nav { display: flex; gap: 1rem; margin: 3rem 0; flex-wrap: wrap; }
+    .compare-nav a { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; text-decoration: none; color: var(--fg-muted); font-size: 0.88rem; transition: border-color 0.15s, color 0.15s; }
+    .compare-nav a:hover { border-color: var(--accent); color: var(--accent); }
+    @media (max-width: 640px) { .when-grid { grid-template-columns: 1fr; } .diff-table { font-size: 0.82rem; } .diff-table th, .diff-table td { padding: 0.6rem 0.75rem; } }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

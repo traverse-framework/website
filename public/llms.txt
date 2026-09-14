@@ -34,6 +34,6 @@ Traverse is not a web framework, an agent-orchestration framework, or a general 
 ## Optional
 
 - [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims.
-- [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html)
+- [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html), [vs agent runtimes](https://traverse-framework.com/compare/vs-agent-runtimes.html), [vs WASM runtimes](https://traverse-framework.com/compare/vs-wasm-runtimes.html)
 - [About](https://traverse-framework.com/about.html): project history and motivation.
 - [GitHub](https://github.com/traverse-framework/traverse): source, issues, and the 73 approved governing specs.

@@ -3,6 +3,7 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 
 const pages = [
   { href: '/compare/vs-function-calling.html', title: 'Traverse vs AI Function Calling', desc: 'Function definitions describe a shape. Contracts govern behavior, before and after execution.' },
+  { href: '/compare/vs-agent-runtimes.html', title: 'Traverse vs AI Agent Runtimes', desc: 'LangChain, LlamaIndex, AutoGen, CrewAI, and custom agent loops orchestrate LLM reasoning. Traverse is a governed capability runtime those agents can call — not a replacement.' },
   { href: '/compare/vs-microservices.html', title: 'Traverse vs Microservices', desc: 'Microservices split logic by team boundary. Traverse splits it by capability, running as one portable binary.' },
   { href: '/compare/vs-serverless.html', title: 'Traverse vs Serverless Functions', desc: 'Serverless solves deployment and scaling. Traverse solves contract governance and portability. Different problems.' },
   { href: '/compare/vs-cross-platform-frameworks.html', title: 'Traverse vs Cross-Platform App Frameworks', desc: "Flutter, Electron, Tauri, and .NET MAUI solve UI portability. Traverse solves business-logic portability underneath them." },
@@ -11,7 +12,7 @@ const pages = [
 ---
 <SubpageLayout
   title={"Compare — Traverse Framework"}
-  description={"How Traverse compares to AI function calling, microservices, and serverless functions."}
+  description={"How Traverse compares to AI function calling, agent runtimes, microservices, serverless functions, and WASM runtimes."}
   canonical={"https://traverse-framework.com/compare.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
