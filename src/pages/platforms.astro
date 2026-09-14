@@ -39,7 +39,7 @@ const _body = `<section class="page-hero">
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
         <p>Three things are true here, all shipped. First, the runtime core builds for <code>wasm32-unknown-unknown</code> with native adapters excluded — contracts, registry resolution, routing, traces, and events all run in a browser or edge-WASM guest with your own executor behind <code>CapabilityExecutor</code>. Second: the public <strong>Web/TypeScript embedder SDK</strong> (<code>traverse-embedder-web</code>), shipped in v0.8.0, loads a bundle, digest-verifies every WASM capability, and executes it directly in the browser's native WebAssembly host through a minimal WASI <code>preview1</code> shim — no nested engine, no server sidecar. Third, added in v0.10.0: a governed browser-hosted path for executing a single <em>verified</em> capability by exact id and version, either through <code>traverse-cli serve</code>'s verified-entrypoint endpoint or along the validated <code>execute_entrypoint</code> flow, returning a result plus a redacted trace receipt (specs 023, 115).</p>
-        <p>Scope it honestly: in-browser workflow execution via the embedder SDK is limited to linear, <code>direct</code>-triggered pipelines — event-driven and conditional edges are rejected at <code>init</code> — the verified-entrypoint path runs one pre-published capability at a time against already-synced registry state rather than an arbitrary live-registry lookup, and <code>traverse-embedder-web</code> is packaged for npm but not yet published. The runtime's <code>requested_target</code> placement router still resolves only <code>local</code>; browser execution is reached through these SDKs and endpoints, not by requesting a <code>browser</code> target.</p>
+        <p>Scope it honestly: in-browser workflow execution via the embedder SDK is limited to linear, <code>direct</code>-triggered pipelines — event-driven and conditional edges are rejected at <code>init</code> — and the verified-entrypoint path runs one pre-published capability at a time against already-synced registry state rather than an arbitrary live-registry lookup. <code>traverse-embedder-web</code> is published to npm. The runtime's <code>requested_target</code> placement router still resolves only <code>local</code>; browser execution is reached through these SDKs and endpoints, not by requesting a <code>browser</code> target.</p>
         <div class="platform-row-links">
           <a href="https://github.com/traverse-framework/traverse/blob/main/packages/web/TraverseEmbedder/README.md" target="_blank" rel="noopener">Web embedder SDK README →</a>
           <a href="https://github.com/traverse-framework/traverse/blob/main/specs/115-browser-verified-entrypoint-execution/spec.md" target="_blank" rel="noopener">Verified entrypoint execution spec (115) →</a>
@@ -61,13 +61,15 @@ const _body = `<section class="page-hero">
       <div class="platform-row">
         <div class="platform-row-head">
           <h2 id="swift-ios">Swift / iOS</h2>
-          <span class="badge badge-danger badge-dot">Blocked</span>
+          <span class="badge badge-accent badge-dot">In progress</span>
         </div>
-        <p>The formal certification path is blocked, as of a screen dated July 19, 2026: no candidate WASM engine currently exposes the public, documented resource-control APIs required for a certified native embedder baseline. WasmKit, WAMR, Wasmtime, and Wasmer were all screened and rejected — for missing resource-control APIs, no supported iOS profile, or JIT/entitlement conflicts with App Store distribution. The <code>packages/swift/TraverseEmbedder</code> package has a <code>WasmKitRuntimeBridge</code> implemented, but evidence publication and reference-app integration are explicitly tracked as blocked, not in progress.</p>
-        <p>Separately, a feasibility spike proved a workaround: embedding the <code>wasmi</code> interpreter directly via a Rust static library and a narrow C-compatible bridge, with the host enforcing memory and fuel limits — verified running on a physical iPhone. That's a real result, but it's a foundation for a future runtime path, not a shipped SDK.</p>
+        <p>The engine blocker recorded here as of July 19, 2026 is resolved. The wasmi feasibility spike below was adopted the next day: ADR-0014 selected the <code>wasmi</code> Apple runtime profile, ADR-0015 governed a production Swift <code>wasmi</code> C ABI, and Spec 074 (Approved) now defines the resource-control certification conditions. <code>packages/swift/TraverseEmbedder</code> ships a production <code>WasmiHostBridgeClient</code> backed by <code>TraverseSwiftHost</code> — a released XCFramework wrapping the <code>wasmi</code> interpreter behind a narrow C ABI — that enforces host-owned artifact-size, memory, fuel-per-invocation, and I/O limits on every call. The earlier <code>WasmKitRuntimeBridge</code>/<code>WasmKitBridgeClient</code> path, which never exposed those controls, is now deprecated and kept only for source compatibility.</p>
+        <p>What's still open: the host-neutral Certified/Preview classification across all platforms (production platform certification) is still in Draft pending governance approval, and there's no shipped iOS reference-app integration yet — so this is real, resource-bounded execution verified on device, not yet a certified public release.</p>
         <div class="platform-row-links">
           <a href="/blog/native-ios-runtime-foundation.html">Read the wasmi feasibility write-up →</a>
           <a href="https://github.com/traverse-framework/traverse/blob/main/packages/swift/TraverseEmbedder/README.md" target="_blank" rel="noopener">Swift embedder README →</a>
+          <a href="https://github.com/traverse-framework/traverse/blob/main/docs/adr/0015-production-swift-wasmi-c-abi.md" target="_blank" rel="noopener">ADR-0015: production Swift wasmi C ABI →</a>
+          <a href="https://github.com/traverse-framework/traverse/blob/main/specs/074-swift-native-resource-control-certification/spec.md" target="_blank" rel="noopener">Spec 074: resource-control certification →</a>
         </div>
       </div>
 
@@ -76,7 +78,7 @@ const _body = `<section class="page-hero">
           <h2 id="kotlin-android">Kotlin / Android</h2>
           <span class="badge badge-accent badge-dot">In progress</span>
         </div>
-        <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to Chicory 1.7.5. Bundle validation and lifecycle types are in place. Compose reference-app integration is tracked by a separate open issue and hasn't landed yet — no public release.</p>
+        <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to Chicory 1.7.5. Bundle validation, lifecycle types, and the no-sidecar Compose reference-app integration have all landed — but there's still no published Maven artifact.</p>
         <div class="platform-row-links">
           <a href="https://github.com/traverse-framework/traverse/blob/main/packages/kotlin/TraverseEmbedder/README.md" target="_blank" rel="noopener">Kotlin embedder README →</a>
         </div>
@@ -87,7 +89,7 @@ const _body = `<section class="page-hero">
           <h2 id="dotnet-winui">.NET / WinUI</h2>
           <span class="badge badge-accent badge-dot">In progress</span>
         </div>
-        <p><code>packages/dotnet/TraverseEmbedder</code> has a working <code>WasmtimeRuntimeBridge</code> pinned to Wasmtime .NET 44.0.0. Request marshalling, event subscriptions, evidence publication, the shared conformance suite, and WinUI reference-app integration remain tracked as open work — no public release.</p>
+        <p><code>packages/dotnet/TraverseEmbedder</code> has a working <code>WasmtimeRuntimeBridge</code> pinned to Wasmtime .NET 44.0.0. Request marshalling, event subscriptions, evidence publication, the shared conformance suite, and the no-sidecar WinUI reference-app integration have all landed — but there's still no published NuGet package.</p>
         <div class="platform-row-links">
           <a href="https://github.com/traverse-framework/traverse/blob/main/packages/dotnet/TraverseEmbedder/README.md" target="_blank" rel="noopener">.NET embedder README →</a>
         </div>
@@ -136,7 +138,7 @@ const _body = `<section class="page-hero">
 ---
 <SubpageLayout
   title={"Platforms — Traverse Framework"}
-  description={"Where Traverse actually runs today: native, browser, and Rust are shipped. Swift/iOS is blocked. Kotlin and .NET are in progress. Scored honestly, with evidence."}
+  description={"Where Traverse actually runs today: native, browser, and Rust are shipped. Swift/iOS, Kotlin, and .NET are in progress. Scored honestly, with evidence."}
   canonical={"https://traverse-framework.com/platforms.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >

@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What operating systems does Traverse support?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Windows, macOS, and Linux are shipped natively today, plus the browser as a fourth, non-OS context. Android and .NET/WinUI have working embedders in progress with no public release. iOS is blocked on the WASM engine ecosystem lacking a certifiable resource-control API.',
+      text: 'Windows, macOS, and Linux are shipped natively today, plus the browser as a fourth, non-OS context. Android, .NET/WinUI, and iOS all have working embedder bridges in progress with no certified public release yet — the earlier iOS engine blocker (no WASM runtime exposed the resource-control APIs a certified native embedder needs) is resolved by a production wasmi-based bridge verified on a physical iPhone.',
     },
   }],
 });
@@ -23,7 +23,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What operating systems does Traverse support?"
-  description="A quick, current status table: Windows, macOS, and Linux are shipped natively. The browser is shipped, scoped. Android and .NET are in progress. iOS is blocked. Full detail and evidence on the Platforms page."
+  description="A quick, current status table: Windows, macOS, and Linux are shipped natively. The browser is shipped, scoped. Android, .NET, and iOS are all in progress with working bridges. Full detail and evidence on the Platforms page."
   canonical="https://traverse-framework.com/questions/what-operating-systems-does-traverse-support.html"
   category="Question"
   relatedLinks={relatedLinks}
@@ -35,7 +35,7 @@ const relatedLinks = [
     <li><strong>Browser</strong> — shipped, with real scope limits (linear pipelines, verified single-capability execution today). Not an operating system, but the fourth context a capability genuinely runs in unmodified.</li>
     <li><strong>Android</strong> — in progress. A working Kotlin runtime bridge exists; no public release yet.</li>
     <li><strong>.NET / WinUI</strong> — in progress. A working Wasmtime .NET-backed bridge exists; no public release yet.</li>
-    <li><strong>iOS</strong> — blocked. No WASM engine currently exposes the resource-control APIs a certified native embedder needs for App Store distribution. A feasibility spike proved a workaround exists on a physical device, but it isn't a shipped SDK.</li>
+    <li><strong>iOS</strong> — in progress, not blocked. The earlier engine blocker (no WASM runtime exposed the resource-control APIs a certified native embedder needs for App Store distribution) is resolved: a production <code>WasmiHostBridgeClient</code>, backed by a released <code>TraverseSwiftHost</code> XCFramework wrapping a <code>wasmi</code> interpreter, does real resource-bounded execution verified on a physical iPhone (ADR-0014, ADR-0015, Spec 074 approved). It isn't a certified public release yet — reference-app integration and cross-platform certification haven't landed.</li>
   </ul>
 
   <p>This list is deliberately shorter than what most cross-platform tooling claims, because it's scored against real crates and blocking issues rather than a roadmap. For the full breakdown — including which crate implements each target and links to the actual blocking issues — see the <a href="/platforms.html">Platforms</a> page, which is the same page the team uses internally, not a separate marketing version. For the fuller "how does this actually work" answer, see <a href="/questions/what-framework-runs-business-logic-on-any-os.html">what framework lets me write business logic once and run it on any OS</a>.</p>

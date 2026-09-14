@@ -30,9 +30,9 @@ const _docsAfter = `
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cd traverse</span></div>
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo build</span></div>
           <div class="terminal-line"><span class="terminal-out"></span></div>
-          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-contracts v0.10.1</span></div>
-          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-registry v0.10.1</span></div>
-          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-runtime v0.10.1</span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-contracts v0.10.0</span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-registry v0.20.0</span></div>
+          <div class="terminal-line"><span class="terminal-out">   Compiling traverse-runtime v0.10.0</span></div>
           <div class="terminal-line"><span class="terminal-out">    Finished dev profile</span></div>
         </div>
       </div>
@@ -93,7 +93,7 @@ const _docsAfter = `
 <span class="tok-key">const</span> embedder = <span class="tok-key">await</span> TraverseEmbedder.<span class="tok-fn">init</span>(<span class="tok-str">'./bundles/expedition'</span>);
 <span class="tok-key">const</span> result = <span class="tok-key">await</span> embedder.<span class="tok-fn">submit</span>(<span class="tok-str">'plan-expedition'</span>, { destination: <span class="tok-str">'kilimanjaro'</span> });</div>
       </div>
-      <div class="info-box"><strong>Scope note:</strong> this in-browser path handles linear, directly-triggered pipelines — conditional and event-driven workflow edges aren't executed in-browser yet. See the <a href="/docs/guides/react-integration.html" style="color:var(--accent)">React integration guide</a> for the fuller, request/response pattern via the local browser adapter, which has no such scope limit.</div>
+      <div class="info-box"><strong>Scope note:</strong> this in-browser path handles linear, directly-triggered pipelines — conditional and event-driven workflow edges aren't executed in-browser yet. See the <a href="/docs/guides/react-integration.html" style="color:var(--accent)">React integration guide</a> for the fuller, request/response pattern via the local <code>traverse-cli serve</code> HTTP/JSON API, which has no such scope limit.</div>
     </div>
 
     <div class="doc-step">
@@ -128,7 +128,7 @@ const _docsAfter = `
         </a>
         <a href="/docs/guides/mcp-setup.html" class="card card-accent-hover" style="text-decoration:none;padding:1.25rem">
           <div class="t-label t-accent" style="margin-bottom:0.5rem">MCP Setup</div>
-          <div class="t-body-sm t-muted">Expose the same capability to an AI agent as a governed tool.</div>
+          <div class="t-body-sm t-muted">Run the same capability behind the traverse-mcp stdio server.</div>
         </a>
       </div>
     </div>

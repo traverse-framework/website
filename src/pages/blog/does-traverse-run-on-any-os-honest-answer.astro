@@ -37,15 +37,19 @@ const _body = `
 
       <p>Android has a real, working runtime bridge — built on Chicory, with bundle validation and lifecycle handling in place. What's missing is the reference-app integration and a public release, both tracked as open work, not vaporware.</p>
 
-      <p>iOS is the one that actually stops me from saying "any OS" cleanly. We went through a formal screen of the available WASM engines — WasmKit, WAMR, Wasmtime, Wasmer — looking for one that exposes the resource-control APIs a certified native embedder needs to pass App Store review. None of them currently do, for a mix of reasons: missing resource-control surface, no supported iOS profile, or JIT and entitlement conflicts with App Store distribution rules. That's not "we haven't gotten to it." That's genuinely blocked on something outside this project.</p>
+      <p>iOS was the one that actually stopped me from saying "any OS" cleanly, and for a while that was a real, evidence-backed blocker: a formal screen of the available WASM engines — WasmKit, WAMR, Wasmtime, Wasmer — found none of them exposing the resource-control APIs a certified native embedder needs to pass App Store review.</p>
 
-      <p>We didn't just stop there and shrug. A feasibility spike embedded the <code>wasmi</code> interpreter directly through a Rust static library and a narrow C bridge, with the host enforcing memory and fuel limits by hand, and it ran clean on a physical iPhone. That's a real, verified result — I wrote up the full technical account separately — but it's a foundation for a future path, not something you can add to an Xcode project today.</p>
+      <div class="callout">
+        <strong>Update:</strong> that engine blocker is resolved. The <code>wasmi</code> feasibility spike below was adopted the next day: ADR-0014 selected the <code>wasmi</code> Apple runtime profile and ADR-0015 governed a production Swift <code>wasmi</code> C ABI. <code>packages/swift/TraverseEmbedder</code> now ships a production <code>WasmiHostBridgeClient</code> backed by the released <code>TraverseSwiftHost</code> XCFramework, enforcing host-owned memory and fuel limits on every call — verified on a physical iPhone. What's still open is a certified public release and a shipped reference-app integration, not the engine question. See <a href="/platforms.html">Platforms</a> for the current, evidence-linked status.
+      </div>
+
+      <p>The feasibility spike itself embedded the <code>wasmi</code> interpreter directly through a Rust static library and a narrow C bridge, with the host enforcing memory and fuel limits by hand, and it ran clean on a physical iPhone. I wrote up the full technical account separately — at the time it was a foundation for a future path; it's now the production bridge described above.</p>
 
       <h2 id="why-i-answer-it-this-way">Why I keep answering it this way instead of rounding up</h2>
 
       <p>It would be easier, in a pitch, to say "runs on any OS" and let the listener assume mobile is covered. Most people wouldn't check until they'd already started building. I've been on the other end of that kind of claim from other tools — the finding-out-later part is what actually costs you time and trust, not the narrower truth up front.</p>
 
-      <p>So the answer stays specific: full support for Windows, macOS, and Linux, shipped. Real support for the browser, shipped with a stated scope. Real, working, unreleased code for Android and .NET/WinUI. A blocked, evidence-backed status for iOS, with a documented workaround that isn't a product yet. Anyone can go check every one of those claims against the actual crates and issues on <a href="/platforms.html">the Platforms page</a> — it's the same page I link when someone asks me this in person.</p>
+      <p>So the answer stays specific: full support for Windows, macOS, and Linux, shipped. Real support for the browser, shipped with a stated scope. Real, working, unreleased code for Android and .NET/WinUI. A production, on-device-verified <code>wasmi</code> bridge for iOS, without a certified public release yet. Anyone can go check every one of those claims against the actual crates and issues on <a href="/platforms.html">the Platforms page</a> — it's the same page I link when someone asks me this in person.</p>
 
     </article>
 

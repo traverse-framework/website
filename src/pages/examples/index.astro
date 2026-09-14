@@ -3,7 +3,7 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 ---
 <SubpageLayout
   title={"Examples — Traverse Framework"}
-  description={"Six real, runnable Traverse examples — hello-world, expedition, doc-approval, meeting-notes, traverse-starter, and the Swift/iOS feasibility proof — not one illustrative snippet."}
+  description={"Six real, runnable Traverse examples — hello-world, expedition, doc-approval, meeting-notes, traverse-starter, and the Swift/iOS wasmi host example — not one illustrative snippet."}
   canonical={"https://traverse-framework.com/examples.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
@@ -128,9 +128,9 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
           <div class="example-card">
             <div class="example-card-top">
               <h3>swift-wasmi-proof</h3>
-              <span class="badge badge-subtle badge-dot">Feasibility proof</span>
+              <span class="badge badge-accent badge-dot">In progress</span>
             </div>
-            <p>Not a capability domain — a native iOS host feasibility spike. Proves a Swift app can call a Rust-hosted <code>wasmi</code> interpreter with host-owned memory and fuel limits, verified on a physical iPhone.</p>
+            <p>Not a capability domain — a native iOS host example. Calls the production <code>wasmi</code> Apple runtime ABI (<code>TraverseSwiftHost</code>) with host-owned memory and fuel limits, verified on a physical iPhone. Real, resource-bounded execution — not yet a certified public release.</p>
             <a href="/blog/native-ios-runtime-foundation.html">Read the write-up →</a>
           </div>
 

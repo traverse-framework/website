@@ -18,7 +18,7 @@ const findings = [
   { sev: 'Medium', domain: 'Permanence', loc: 'data_store.rs', finding: 'Reconciled 2026-07-20: MemoryDataStore is actually #[cfg(test)]-only, not a shipped adapter. The real gap is that the one production adapter, LocalFileDataStore, has zero call sites anywhere in the workspace — fully defined, fully unwired — plus no integrity hash on records. Resolved 2026-07-27.', issue: 788, status: 'Closed' },
   { sev: 'Medium', domain: 'Permanence', loc: 'trace/store.rs:8-11', finding: 'Reconciled 2026-07-20: confirmed TraceStore is a plain in-memory HashMap — a distinct subsystem from the event broker durability gap already fixed in #593. All trace/audit history is lost on restart. Resolved 2026-07-21.', issue: 789, status: 'Closed' },
   { sev: 'Medium', domain: 'Governance', loc: 'approved-specs.json · 022', finding: 'Resolved 2026-07-20: spec 022 is now formally marked Superseded (2026-07-18, decision-log Decision 25) — never approved, no implementation ever referenced it. Specs 057, 058, and 059 are all Approved and now have real implementations (the traverse-embedder crate, traverse-runtime/src/workflows.rs, and traverse-cli/src/http_api.rs\'s command dispatch). The original "CI-required" claim no longer holds either — MCP is not referenced in any current .github/workflows/*.yml.', issue: null, status: 'Resolved' },
-  { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated.', issue: 594, status: 'Closed' },
+  { sev: 'Medium', domain: 'Governance', loc: 'ci/coverage-targets.txt', finding: '100% coverage enforced only for contracts/registry/runtime — CLI (~9k LOC http_api) and MCP ungated. Fixed: coverage floors now enforced for traverse-cli-rs (87%) and traverse-mcp (98%) via #621.', issue: 594, status: 'Closed' },
   { sev: 'Low', domain: 'Security', loc: 'SECURITY.md:11', finding: 'Vulnerability reporting path points to a stale personal SUPPORT.md path (cogolo).', issue: 595, status: 'Closed' },
   { sev: 'Low', domain: 'Architecture', loc: 'spec 051 · crates/traverse-registry', finding: 'Registry extraction approved but not executed — dual-source risk with capability publish targeting external repo. Resolved 2026-07-21.', issue: 627, status: 'Closed' },
 ];
@@ -51,9 +51,9 @@ const findingsSep04 = [
 
 const permanenceMatrix = [
   { g: 'Deterministic execution (same inputs → same outputs)', spec: 'Yes (constitution + NFRs)', impl: 'Partial — WASM/expedition strong; inference/Ollama non-deterministic', gap: 'No formal determinism test suite across executors' },
-  { g: 'Immutable governing specs', spec: 'Yes (approved-specs.json)', impl: 'Yes — registry marks immutable', gap: 'Some approved specs still say Status: Draft in headers' },
+  { g: 'Immutable governing specs', spec: 'Yes (approved-specs.json)', impl: 'Yes — registry marks immutable', gap: 'None currently — no approved spec\'s header still says Status: Draft' },
   { g: 'Artifact integrity (signature + checksum)', spec: 'Yes (030, 031)', impl: 'Ed25519 real; Sigstore stub; checksum optional', gap: 'Production path can skip checksum; Sigstore false confidence' },
-  { g: 'Event replay / recovery', spec: 'Yes (036)', impl: 'In-process cursor replay + retention prune', gap: 'No durable log; restart loses buffer; default 5m window' },
+  { g: 'Event replay / recovery', spec: 'Yes (036)', impl: 'DurableEventJournal (spec 067) backs replay beyond the in-memory window', gap: 'In-memory retention window still defaults to 5m before falling back to the durable journal' },
   { g: 'Audit trail permanence', spec: 'Partial (030 NFR-003, 035 audit JSONL)', impl: 'HTTP audit JSONL; execution traces in-memory/export', gap: 'No tamper-evident, append-only, long-retention audit store' },
   { g: 'Identity-bound evidence', spec: 'Yes (030 FR-006)', impl: 'Derived identity on request path', gap: 'Events/subscriptions omit subject_id — audit cannot attribute emitters' },
   { g: 'App / workspace state durability', spec: 'Partial (032, 052)', impl: 'LocalFileDataStore + .traverse workspace state', gap: 'No multi-node durability; no record integrity seals' },
@@ -62,24 +62,16 @@ const permanenceMatrix = [
 
 const crates = [
   { name: 'traverse-contracts', maturity: 'Mature', coverage: '100% gated', risk: 'Low' },
-  { name: 'traverse-registry', maturity: 'Mature (extraction pending)', coverage: '100% gated', risk: 'Med — dual home' },
+  { name: 'traverse-registry', maturity: 'Mature (extracted to its own repo, consumed as a published crate)', coverage: 'External — not in this workspace\'s gate', risk: 'Low — dual-source risk resolved' },
   { name: 'traverse-runtime', maturity: 'Core / mature', coverage: '100% gated', risk: 'Med — security defaults' },
-  { name: 'traverse-cli', maturity: 'Real, monolithic', coverage: 'Ungated', risk: 'High — 9k LOC HTTP TCB' },
-  { name: 'traverse-mcp', maturity: 'Functional (docs say stub)', coverage: 'Ungated', risk: 'High if exposed' },
+  { name: 'traverse-cli', maturity: 'Real, monolithic', coverage: '87% gated', risk: 'High — 15k LOC HTTP TCB' },
+  { name: 'traverse-mcp', maturity: 'Functional (docs say stub)', coverage: '98% gated', risk: 'High if exposed' },
   { name: 'traverse-expedition-wasm', maturity: 'Reference binary', coverage: 'Ungated', risk: 'Low' },
 ];
 
 const roadmap = [
-  { p: 'Flip production security default + real JWT verify', why: 'Closes the two highest exploit paths before any network exposure', effort: 'M' },
-  { p: 'Replace Sigstore stub; add runtime checksum to verify_artifact', why: 'Makes artifact permanence/integrity claims honest', effort: 'M' },
-  { p: 'Durable event journal + configurable long retention', why: 'Turns 036 replay from session recovery into real permanence', effort: 'L' },
-  { p: 'Propagate subject_id/actor_id into TraverseEvent + filters', why: 'Enables attributable audit and multi-tenant event isolation', effort: 'S' },
-  { p: 'MCP auth boundary + redacted traces', why: 'Prevents local-tool surface from becoming full execution authority', effort: 'S' },
-  { p: 'Coverage-gate CLI http_api + MCP', why: 'Largest TCB is currently outside the 100% coverage constitution claim', effort: 'M' },
-  { p: 'Execute registry extraction (051) cleanly', why: 'Removes dual-source permanence risk for governed artifacts', effort: 'L' },
+  { p: 'Raise CLI (87%) and MCP (98%) coverage floors to the 100% standard held by contracts/runtime/embedder', why: 'Largest TCB is gated but still below the 100% coverage constitution claim', effort: 'M' },
   { p: 'First connector plugin + SQLite data adapter', why: 'Unlocks durable external I/O without expanding host ABI surface', effort: 'M' },
-  { p: 'Formal threat model + fix SECURITY.md reporting path', why: 'Documents trust boundaries operators currently must infer', effort: 'S' },
-  { p: 'Approve or decouple 022; implement or defer 057–059', why: 'Closes governance drift between approved registry and shipped code', effort: 'M' },
 ];
 
 const sevClass = (s) => ({ Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low' }[s] || 'sev-low');
@@ -218,7 +210,7 @@ const jsonLd = JSON.stringify({
     <section class="section-sm">
       <div class="container">
         <div class="verdict-callout">
-          <strong>Verdict:</strong> Traverse has a strong specification and governance layer, but is correctly labeled pre-production. Security controls are partially implemented with dangerous defaults (dev mode, unverified JWTs, stub Sigstore). Permanence is strongest for immutable specs and Ed25519 artifact signing; weakest for durable audit, long-retention replay, and identity-bound event evidence.
+          <strong>Verdict:</strong> Traverse has a strong specification and governance layer. The dangerous defaults this audit originally flagged — dev-mode default, unverified JWTs, stub Sigstore — have since shipped real fixes (production is now the default security posture, JWT signatures are verified, and Sigstore verification is real). Remaining gaps are narrower: CLI and MCP are coverage-gated but below the 100% floor held by contracts/runtime/embedder, and the approved connector-plugin architecture (spec 039) still has no shipped connector.
         </div>
 
         <div class="audit-stats">
@@ -240,7 +232,7 @@ const jsonLd = JSON.stringify({
 
         <div class="audit-section">
           <h2>Spec vs. implementation readiness</h2>
-          <p class="audit-section-note">Isolation (WASM sandbox + WASI deny-by-default) is specified, implemented, and close to production-ready. CI gates (coverage, supply-chain, contractual checks) are specified and implemented for 3 of 6 crates, but not production-ready across the workspace — the CLI's ~9k-line HTTP surface and the MCP server both ship outside the coverage gate.</p>
+          <p class="audit-section-note">Isolation (WASM sandbox + WASI deny-by-default) is specified, implemented, and close to production-ready. CI gates (coverage, supply-chain, contractual checks) now cover all 6 workspace crates in <code>ci/coverage-targets.txt</code>, but not all at the 100% floor — the CLI's ~15k-line HTTP surface is gated at 87% and the MCP server at 98%, both below the 100% standard held by contracts, runtime, and the embedder.</p>
         </div>
 
         <div class="audit-section">
@@ -391,19 +383,19 @@ const jsonLd = JSON.stringify({
           <div class="boundary-grid">
             <div class="boundary-card">
               <h3>HTTP API (serve)</h3>
-              <p>Broadest attack surface. Dev defaults, unverified JWT, optional unauthenticated mode. Also the richest permanence surface (registration, traces, sessions).</p>
+              <p>Broadest attack surface. Production is now the default security posture and JWT signatures are verified; an explicit opt-in is required to run in development mode. Also the richest permanence surface (registration, traces, sessions).</p>
             </div>
             <div class="boundary-card">
               <h3>MCP stdio</h3>
-              <p>Implicit local trust only. Full execute + trace export with no credential check. Safe as an IDE child process; unsafe if redirected or remotely bridged.</p>
+              <p>Bearer-token auth is now enforced (<code>StdioAuthMode::BearerRequired</code>). Safe as an IDE child process; still worth scrutiny if redirected or remotely bridged.</p>
             </div>
             <div class="boundary-card">
               <h3>WASM guest</h3>
-              <p>Wasmtime isolation + WASI deny-by-default is solid. Host ABI whitelist exists but traverse_host::* functions are not linked yet.</p>
+              <p>Wasmtime isolation + WASI deny-by-default is solid. The <code>traverse_host::emit_event</code> and <code>traverse_host::connector_invoke</code> host functions are now linked, with connector calls denied by default until a host integration supplies an activated binding adapter.</p>
             </div>
             <div class="boundary-card">
               <h3>Artifact / supply chain</h3>
-              <p>Ed25519 works. Sigstore and checksum gates are incomplete. Publish/sync trusts the external registry path before extraction completes.</p>
+              <p>Ed25519 and Sigstore (Rekor/Fulcio) verification are both real, and checksum validation is enforced in <code>verify_artifact</code>. The registry has since been extracted to its own repo and is consumed as a published crate, removing the dual-source risk.</p>
             </div>
           </div>
         </div>
@@ -411,9 +403,8 @@ const jsonLd = JSON.stringify({
         <div class="audit-section">
           <h2>Recommended next moves</h2>
           <ol class="move-list">
-            <li><span class="move-num">1</span><p>Treat all network-facing surfaces as non-production until JWT crypto verification and Production-default security ship.</p></li>
-            <li><span class="move-num">2</span><p>Add a durable event/audit journal if compliance or multi-restart recovery is a product requirement — in-memory 5-minute replay is not permanence.</p></li>
-            <li><span class="move-num">3</span><p>Close governance holes: approve or decouple spec 022; coverage-gate CLI/MCP; finish or explicitly defer specs 051/057–059.</p></li>
+            <li><span class="move-num">1</span><p>JWT crypto verification, production-default security, real Sigstore verification, and a durable event journal have all since shipped (#580, #588, #589, #593) — the remaining gap is raising the CLI (87%) and MCP (98%) coverage floors to the 100% standard held by contracts/runtime/embedder.</p></li>
+            <li><span class="move-num">2</span><p>Ship a first connector plugin and SQLite data adapter against the approved connector architecture (spec 039) — the spec is approved but nothing consumes it yet.</p></li>
           </ol>
         </div>
 
