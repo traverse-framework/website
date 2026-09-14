@@ -39,5 +39,5 @@ const relatedLinks = [
   <p>What native support does <em>not</em> mean is a native GUI toolkit. Traverse governs the logic layer; it doesn't paint windows. If you're pairing it with a UI, you'll bring your own — the <a href="/compare/vs-cross-platform-frameworks.html">Traverse vs. cross-platform app frameworks</a> comparison walks through what that pairing looks like with Tauri specifically.</p>
 
   <h2>Where the story is different</h2>
-  <p>Mobile is not the same shipped status as desktop. Android and .NET/WinUI have real, working runtime bridges in progress with no public release yet, and iOS is currently blocked on the WASM engine ecosystem lacking a certifiable resource-control API for App Store distribution. See the <a href="/platforms.html">Platforms</a> page for the full breakdown with links to the actual blocking issues.</p>
+  <p>Mobile is not the same shipped status as desktop. iOS now has a production, certified runtime bridge (a wasmi-based Swift host under ADR-0014/ADR-0015), while Android and .NET/WinUI still have real, working runtime bridges in progress with no public release yet. See the <a href="/platforms.html">Platforms</a> page for the full breakdown with links to the actual tracking issues.</p>
 </QuestionLayout>

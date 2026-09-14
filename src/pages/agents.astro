@@ -62,7 +62,7 @@ const _body = `<section class="page-hero">
   <div class="container">
     <div class="section-header">
       <div class="section-label">The real tool list</div>
-      <h2>Nine commands, one JSON envelope.</h2>
+      <h2>Ten commands, one JSON envelope.</h2>
       <p>This is the actual command set exposed by <code>traverse-mcp</code> today — not an illustrative subset.</p>
     </div>
     <div class="mcp-table-wrap">
@@ -72,6 +72,7 @@ const _body = `<section class="page-hero">
           <tr><td><code>list_content_groups</code></td><td>List the available content groups (the first one shipped is <code>core-runtime-example</code>).</td></tr>
           <tr><td><code>describe_content_group</code></td><td>Detail on one content group — what capabilities, events, and workflows it holds.</td></tr>
           <tr><td><code>list_entrypoints</code></td><td>List the capabilities and workflows an agent can actually call.</td></tr>
+          <tr><td><code>search_capabilities</code></td><td>Search the verified public registry metadata by query.</td></tr>
           <tr><td><code>describe_entrypoint</code></td><td>The full contract for one entrypoint — schema, preconditions, postconditions.</td></tr>
           <tr><td><code>validate_entrypoint</code></td><td>Dry-run a proposed input against the contract without executing anything.</td></tr>
           <tr><td><code>execute_entrypoint</code></td><td>Run it. Returns a public trace summary in the response.</td></tr>
@@ -123,7 +124,7 @@ const _body = `<section class="page-hero">
           <div class="checklist">
             <div class="checklist-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <span><strong style="color:var(--fg)">Stdio only.</strong> <code>traverse-mcp</code> runs as a subprocess an agent host launches — it isn't a library an agent process can link and call in-process yet. A library API is planned but not built.</span>
+              <span><strong style="color:var(--fg)">Stdio is the packaged bootstrap mode.</strong> <code>traverse-mcp</code> also ships as a Rust library — <code>discover_capabilities</code> and <code>execute_capability</code> are public, in-process functions (spec 042) — but the only packaged, ready-to-run entrypoint today is the stdio subprocess.</span>
             </div>
             <div class="checklist-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>

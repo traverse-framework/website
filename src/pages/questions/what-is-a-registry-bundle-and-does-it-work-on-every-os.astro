@@ -34,5 +34,5 @@ const relatedLinks = [
   <p>None of that content is OS-specific. A manifest is JSON. A contract is JSON. A capability module is a portable WASM binary. There's nothing in a bundle's structure that would need to differ if it were being loaded on Windows versus loaded in a browser tab — which is exactly why it doesn't.</p>
 
   <h2>So yes — one bundle, every shipped target</h2>
-  <p>The same bundle a native executor loads through <code>traverse-cli-rs -- bundle inspect</code> is the same file the Web embedder SDK loads and digest-verifies before executing a capability in a browser. There's no "browser bundle" and "native bundle" as separate build artifacts — see the <a href="/docs/guides/cross-os-capability.html">cross-OS capability guide</a> for a step-by-step walkthrough that inspects one bundle and then runs it through both.</p>
+  <p>The same bundle a native executor loads through <code>traverse-cli bundle inspect</code> is the same file the Web embedder SDK loads and digest-verifies before executing a capability in a browser. There's no "browser bundle" and "native bundle" as separate build artifacts — see the <a href="/docs/guides/cross-os-capability.html">cross-OS capability guide</a> for a step-by-step walkthrough that inspects one bundle and then runs it through both.</p>
 </QuestionLayout>

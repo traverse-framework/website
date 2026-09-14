@@ -35,7 +35,7 @@ const relatedLinks = [
   <ul>
     <li><strong>Validate the bundle.</strong> The CLI's bundle inspection checks that contracts are well-formed and referenced modules exist — run this before anything else.</li>
     <li><strong>Exercise the contract's edge cases.</strong> Valid inputs at the boundary of your preconditions, invalid inputs that should be rejected, and the postconditions you expect on success. This is testing the capability's logic, and it's identical regardless of which executor eventually runs it.</li>
-    <li><strong>Read the trace, don't just check the output.</strong> A trace artifact confirms <code>contract_validated</code>, <code>preconditions_met</code>, and <code>postconditions_met</code> explicitly — catching a case where the output happened to look right but a precondition was silently skipped.</li>
+    <li><strong>Read the trace, don't just check the output.</strong> A trace artifact records the terminal outcome, the full execution and result record, and any events emitted — useful for catching a case where the output happened to look right but the run didn't complete the way you expected. Note that preconditions and postconditions in a contract are documentation for reviewers today, not conditions the runtime evaluates and gates on automatically, so a passing trace doesn't by itself mean every declared precondition was checked.</li>
   </ul>
 
   <h2>What's left to test per platform</h2>

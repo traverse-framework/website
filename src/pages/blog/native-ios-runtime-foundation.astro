@@ -229,6 +229,10 @@ const _body = `<section class="post-hero">
         <li>Validate declared capability profiles and cross-host conformance against the other placement targets.</li>
       </ul>
 
+      <div class="callout">
+        <strong>Update:</strong> the first two items above landed the next day. ADR-0014 selected <code>wasmi</code> as the Apple runtime profile and ADR-0015 governed a production Swift <code>wasmi</code> C ABI, resolving #771. <code>packages/swift/TraverseEmbedder</code> now ships a production <code>WasmiHostBridgeClient</code> backed by the released <code>TraverseSwiftHost</code> XCFramework — see <a href="/platforms.html">Platforms</a> for the current status of the remaining items.
+      </div>
+
       <p>None of that changes what this proof establishes: native iOS execution is now an implementable Traverse and UMA delivery path, not a speculative engine choice. If you're building a portable WASM capability system and iOS was the platform you weren't sure how to reach, this is the branch to go read.</p>
 
     </article>

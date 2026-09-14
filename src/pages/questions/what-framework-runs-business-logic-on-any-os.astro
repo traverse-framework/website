@@ -4,7 +4,7 @@ import QuestionLayout from '@layouts/QuestionLayout.astro';
 const faqEntries = [
   {
     q: 'What framework lets me write business logic once and run it on any OS?',
-    a: "Traverse. You write a capability once in Rust, compile it to a WASM binary, and attach a machine-readable contract. The same binary runs natively on Windows, macOS, and Linux today through traverse-runtime's Wasmtime-backed executor, and in the browser through the Web embedder SDK — no per-OS rewrite. Mobile support (Android, iOS) is still in progress or blocked; see traverse-framework.com/platforms.html for the exact, evidence-linked status of each target.",
+    a: "Traverse. You write a capability once in Rust, compile it to a WASM binary, and attach a machine-readable contract. The same binary runs natively on Windows, macOS, and Linux today through traverse-runtime's Wasmtime-backed executor, and in the browser through the Web embedder SDK — no per-OS rewrite. Mobile support (Android, iOS, .NET/WinUI) is still in progress; see traverse-framework.com/platforms.html for the exact, evidence-linked status of each target.",
   },
   {
     q: 'Can I build an app that runs on Windows, macOS, and Linux without rewriting the business logic?',
@@ -58,7 +58,7 @@ const relatedLinks = [
   <ul>
     <li><strong>Kotlin / Android</strong> has a working runtime bridge in progress, but no public release yet.</li>
     <li><strong>.NET / WinUI</strong> has a working Wasmtime-backed bridge in progress, also unreleased.</li>
-    <li><strong>Swift / iOS</strong> is <em>blocked</em>, not just unfinished — as of the last engine screen, no WASM runtime exposed the resource-control APIs a certified native embedder needs for App Store distribution. A separate feasibility spike proved a workaround exists (a Rust-embedded <code>wasmi</code> interpreter running clean on a physical iPhone), but that's a foundation for future work, not a shipped SDK.</li>
+    <li><strong>Swift / iOS</strong> is in progress, not blocked — the earlier engine blocker (no WASM runtime exposed the resource-control APIs a certified native embedder needs for App Store distribution) is resolved. A production <code>WasmiHostBridgeClient</code>, backed by a released <code>TraverseSwiftHost</code> XCFramework wrapping a <code>wasmi</code> interpreter, does real resource-bounded execution verified on a physical iPhone (ADR-0014, ADR-0015, Spec 074 approved). What's still missing is certified platform classification and a shipped iOS reference-app integration — so it's not yet a certified public release.</li>
   </ul>
   <p>The full, evidence-linked breakdown — with links to the actual crates and blocking issues — lives on the <a href="/platforms.html">Platforms page</a>. We'd rather send you there than oversell it here.</p>
 
