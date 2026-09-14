@@ -1,0 +1,162 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 14, 2026</span>
+      <span class="badge">Product</span>
+      <span class="badge">Browser</span>
+      <span class="badge">Governance</span>
+    </div>
+    <h1 class="t-h1">What /discover proves — and what it doesn't</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>We shipped a page on the site called <a href="/discover.html">/discover</a>. It looks like a product demo. It is one — but a narrow one on purpose. This post is the label on the jar: what that flow actually does in your browser, what it refuses to pretend, and why that refusal matters more than a prettier animation.</p>
+
+      <div class="callout">
+        Short version: pick a structured goal → your browser pulls the live public registry, digests it, and a deterministic structural planner proposes a workflow → you review the field mappings → the local governed runtime executes the reviewed plan in your tab and returns a redacted per-node trace. No backend. No model. No fabricated success.
+      </div>
+
+      <h2 id="the-flow">The one real flow</h2>
+
+      <p>Everything on /discover sits on one path. There is not a "demo mode" that paints green checkmarks while a separate code path does the real work. The page either runs the governed path or it fails closed with an explicit reason.</p>
+
+      <p>Concretely:</p>
+
+      <ol>
+        <li><strong>Goal.</strong> You pick a structured target — not a free-text prompt. The goals on the page are authored examples of what the planner is allowed to aim at.</li>
+        <li><strong>Discover.</strong> The browser fetches the public <code>catalog.json</code> from the live registry and builds a digest-verified snapshot of the capabilities in play.</li>
+        <li><strong>Plan.</strong> A browser-local structural planner (Spec 1277) derives a candidate workflow from schema shape and declared relationships. It does not match on capability names, parse natural language, or call a model.</li>
+        <li><strong>Review.</strong> The proposal arrives with every field mapping marked <code>unconfirmed</code>. That is not UI decoration — the execute path is the only place that clears it.</li>
+        <li><strong>Execute.</strong> After you confirm, the local governed runtime validates the proposal against contracts and the snapshot binding, authorizes each node, runs the WASM offline through a minimal WASI shim, and returns a redacted trace (status and failure class per node — never raw payloads).</li>
+      </ol>
+
+      <p>If the catalog cannot be retrieved, the snapshot cannot be verified, the planner rejects the inputs, a node is not authorized, or a node errors — you get that failure. The page does not catch-all and paint success.</p>
+
+      <h2 id="what-it-proves">What it proves</h2>
+
+      <p>Three things, none of them marketing abstractions:</p>
+
+      <p><strong>1. Planning can be structural and deterministic.</strong> Given a registry snapshot and a structured target, the planner proposes a workflow from shape compatibility and declared event relationships, bounded to a small search. Same inputs, same plan. That is a weaker claim than "the system understands your intent," and a stronger claim than a hardcoded demo graph.</p>
+
+      <p><strong>2. A proposal is not authority.</strong> The browser proposes. The runtime decides. Until you confirm mappings and the local runtime authorizes each node, nothing has been endorsed. That split is the whole point of governed composition — including in a tab with no server behind it.</p>
+
+      <p><strong>3. Browser-local execution can still be fail-closed.</strong> Digests, contracts, risk class, and redaction are enforced in-process. The public /discover surface only runs capabilities the host will authorize for this path (pure-read / deterministic). Drift or denial does not get rewritten into a happy path.</p>
+
+      <h2 id="what-it-doesnt">What it does not prove</h2>
+
+      <p>I want this list as loud as the first one, because demos get misquoted faster than they get used.</p>
+
+      <ul>
+        <li><strong>It is not an AI agent.</strong> No prompt, no LLM, no "the model chose these capabilities." If you need agent-driven composition, that is a different surface (MCP, skills, human review). /discover deliberately keeps the planner mechanical so you can see the governance boundary without a model in the loop.</li>
+        <li><strong>It is not the browser becoming the runtime authority.</strong> The tab hosts the embedder and shows the proposal. Authorization and execution still go through the governed path. Copy that says otherwise would be false, and we have a truthfulness test that rejects that drift.</li>
+        <li><strong>It is not a simulation with a real-looking UI.</strong> When execution runs, it runs real published WASM against real contracts from the registry snapshot. When it cannot, it says so.</li>
+        <li><strong>It is not "any goal, any capability."</strong> Goals are structured. Only a small risk class executes here. Schema-shape compatibility is not semantic correctness — that is why mappings stay unconfirmed until a human says go, and why a runtime-generated plan is a proposal until governance promotes it elsewhere.</li>
+        <li><strong>It is not a productized multi-tenant backend.</strong> There is no Traverse server behind /discover. Your browser talks to the public catalog (and artifact mirrors) to prepare, then works offline for plan and execute. That is a feature for the demo's honesty, not a claim about how every production deploy will look.</li>
+      </ul>
+
+      <div class="callout">
+        If a screenshot of /discover ever gets captioned as "AI plans and runs your business logic in the browser," that caption is wrong. The page exists partly so we have a public counterexample to that sentence.
+      </div>
+
+      <h2 id="why-bother">Why bother with a page this careful</h2>
+
+      <p>Because the interesting claim in Traverse is not "we have a demo." It is that composition can be proposed without becoming ambient authority, and that execution can stay auditable when the host is just a browser tab.</p>
+
+      <p>v0.10 put governed composition into the runtime and MCP surfaces. /discover is the public, clickable sibling of that work for the browser embedder: live registry, structural plan, human review gate, local execute, redacted trace. Spec 1277 is the contract for the planning half; the page's own truthfulness tests are there so the copy cannot quietly inflate past the code.</p>
+
+      <p>If you only have five minutes: open <a href="/discover.html">/discover</a>, pick a goal, read the proposed mappings before you confirm, and watch what happens when something is not allowed. The failure cases are part of the product, not a bug in the pitch.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#the-flow">The one real flow</a></li>
+          <li><a href="#what-it-proves">What it proves</a></li>
+          <li><a href="#what-it-doesnt">What it does not prove</a></li>
+          <li><a href="#why-bother">Why bother with a page this careful</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/discover.html">Try /discover →</a></li>
+          <li><a href="/blog/traverse-0-10-governed-composition.html">Traverse v0.10: governed composition →</a></li>
+          <li><a href="/blog/what-a-governed-capability-buys-you.html">What a governed capability buys you →</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/main/specs/1277-browser-local-workflow-composition/spec.md" target="_blank" rel="noopener">Spec 1277 →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">See it run</div>
+        <p>Live registry, structural plan, review gate, governed execute — in your tab.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Open /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Proposal first. Authority second.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">That is the whole demo. Everything else is the machinery that keeps the sentence true.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/discover.html" class="btn btn-primary">Try /discover →</a>
+      <a href="https://github.com/traverse-framework/traverse" class="btn btn-ghost" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"What /discover proves — and what it doesn't — Traverse Blog"}
+  description={"Pick a goal, get a structural plan from the live registry, review the mappings, then run governed WASM in your tab. What that browser flow actually proves — and the claims it refuses."}
+  canonical={"https://traverse-framework.com/blog/what-discover-proves.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
