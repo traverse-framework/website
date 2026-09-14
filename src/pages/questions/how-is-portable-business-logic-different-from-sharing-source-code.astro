@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How is portable business logic different from sharing source code?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Sharing source code (a monorepo package, a shared library, generated clients) still leaves each host to build, link, and run that code in its own toolchain. Portable business logic in Traverse ships as a versioned WASM artifact plus a contract: the same binary runs under different embedders without recompiling the rule per app, and the runtime enforces the contract at call time.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-difference-between-portable-and-cross-platform.html', label: 'What is the difference between "portable" and "cross-platform"?' },
+  { href: '/questions/how-is-traverse-different-from-a-shared-rust-library.html', label: 'Why not just use a shared Rust library?' },
+  { href: '/questions/can-i-use-traverse-in-a-monorepo-with-multiple-apps.html', label: 'Can I use Traverse in a monorepo with multiple apps?' },
+  { href: '/questions/how-do-i-avoid-rewriting-business-logic-for-every-platform.html', label: 'How do I avoid rewriting business logic for every platform?' },
+];
+---
+<QuestionLayout
+  title="How is portable business logic different from sharing source code?"
+  description="A shared package still rebuilds and relinks per host. Portable Traverse capabilities ship as one versioned WASM artifact plus a contract — the rule moves without becoming a different build in every app."
+  canonical="https://traverse-framework.com/questions/how-is-portable-business-logic-different-from-sharing-source-code.html"
+  category="Platforms and portability"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Sharing source is the default answer to "don't rewrite the rule." Put the pricing function in a monorepo package, publish an internal npm/crate, generate clients from an OpenAPI spec. That helps. It is not the same thing as portability.</p>
+
+  <p>Shared source still assumes each consumer can build and run that source in <em>its</em> world. The TypeScript app imports the package; the Rust service links the crate; the mobile team waits for a binding; the agent stack gets a hand-rolled wrapper. Version skew shows up as "we bumped the package in web but not in the worker." Language boundaries force translation layers that slowly become a second implementation. You shared the idea of the rule more than you shared a single running artifact.</p>
+
+  <h2>Portable means the artifact moves</h2>
+  <p>Portable business logic, in the Traverse sense, means the shipped unit is a WASM binary with a contract — not a git path that every team recompiles. The browser embedder, the native CLI, and (when wired) an agent-facing server load the same bytes. They do not each maintain a language-native copy of the discount math. Updates publish as new capability versions in the registry; callers pin or range against that identity instead of hoping every repo caught the same commit.</p>
+
+  <h2>When sharing source is still the right move</h2>
+  <p>If the rule only ever lives in one language and one deployable, a shared module inside that codebase is simpler than a capability. If the "logic" is mostly I/O orchestration, keep it in ordinary application code. Portability earns its keep when the <em>same decision</em> must be reachable from multiple hosts — including hosts that cannot or should not compile your original language — and when you care that "version 1.4.2" means one binary everywhere, not "approximately the same function we copied last sprint."</p>
+
+  <p>For the adjacent word-sense trap ("portable" vs "cross-platform" UI frameworks), see <a href="/questions/what-is-the-difference-between-portable-and-cross-platform.html">What is the difference between "portable" and "cross-platform"?</a>. For why a shared Rust library alone usually stops at the language border, see <a href="/questions/how-is-traverse-different-from-a-shared-rust-library.html">Why not just use a shared Rust library?</a></p>
+</QuestionLayout>

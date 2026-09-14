@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the difference between an AI agent and the Traverse runtime?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'An AI agent proposes work — it plans, picks tools, and generates arguments. The Traverse runtime governs execution — it validates inputs against a contract, loads a signed WASM capability, runs it in a sandbox, and emits a trace. The agent is not the source of truth for business rules; the runtime enforces the rules the agent is allowed to call.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-does-traverse-prevent-ai-agent-errors.html', label: 'How does Traverse prevent AI agent errors?' },
+  { href: '/questions/how-do-ai-agents-discover-capabilities.html', label: 'How do AI agents discover capabilities?' },
+  { href: '/questions/what-is-the-difference-between-a-contract-and-a-tool.html', label: 'What is the difference between a contract and a tool?' },
+  { href: '/blog/ai-agents-need-contracts.html', label: 'AI agents need contracts, not just function definitions' },
+];
+---
+<QuestionLayout
+  title="What is the difference between an AI agent and the Traverse runtime?"
+  description="Agents propose plans and arguments. The Traverse runtime validates contracts, executes sandboxed WASM capabilities, and records traces. One suggests; the other decides what actually runs."
+  canonical="https://traverse-framework.com/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html"
+  category="AI agents and MCP"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Short version: the agent proposes; the runtime decides. Collapsing those two roles is how you end up with an LLM quietly becoming the source of truth for your pricing or eligibility rules.</p>
+
+  <p>An AI agent is a planner and a talker. It reads a goal, chooses among available call surfaces, invents arguments, retries when something looks wrong, and explains itself in natural language. That is valuable. It is also non-deterministic by design. Ask the same agent the same question twice and you may get a different plan, a different tool choice, or a slightly different argument shape. That flexibility is why agents feel powerful — and why they are a terrible place to store the business rule itself.</p>
+
+  <h2>What the runtime owns</h2>
+  <p>The Traverse runtime is the governed execution path. Given a capability identity and an input payload, it checks the input against the contract's schemas, loads the matching WASM artifact, runs it in a sandbox, checks the output shape the contract requires, and writes a trace of what happened. Same capability version, same inputs → same decision path. The runtime does not "understand" your product narrative. It does not invent a discount. It runs the capability you published.</p>
+
+  <h2>Where people mix them up</h2>
+  <p>Mixing them up usually looks like this: the agent has a tool named <code>apply_discount</code>, the tool body is a prompt-shaped helper or a one-off script, and the team treats the agent's successful demo as proof the rule is correct. There is no versioned artifact, no shared binary for the web app and the backend, and no trace that survives the chat session. When compliance asks what the system did last Tuesday, you have a transcript — not an execution record.</p>
+
+  <p>Traverse's intended split is blunt on purpose. Agents discover and compose capabilities (including over MCP when that surface fits). The runtime is what makes a composed call real. If you want the agent to be creative about <em>which</em> governed capabilities to call, good. If you want it to be creative about <em>what the discount rule is</em>, that creativity belongs in a reviewed capability change — not in the next token.</p>
+</QuestionLayout>

@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the difference between a contract and a tool?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A tool is a callable surface an AI agent can invoke — usually a name, a JSON schema, and some host code. A Traverse contract is the enforceable boundary around a capability: input and output schemas the runtime validates, placement and sandbox constraints, and a versioned artifact identity. Tools describe what an agent may try; contracts decide what is allowed to run.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-is-traverse-different-from-function-calling.html', label: 'How is Traverse different from function calling?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+  { href: '/questions/how-do-ai-agents-benefit-from-contracts.html', label: 'How do AI agents benefit from contracts?' },
+  { href: '/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html', label: 'What is the difference between an AI agent and the Traverse runtime?' },
+];
+---
+<QuestionLayout
+  title="What is the difference between a contract and a tool?"
+  description="Tools are callable surfaces agents invent or wire up. Contracts are enforceable, versioned boundaries the runtime checks before and after a capability runs. One describes intent; the other governs execution."
+  canonical="https://traverse-framework.com/questions/what-is-the-difference-between-a-contract-and-a-tool.html"
+  category="Comparisons"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>People building agent stacks often use "tool" and "contract" as if they were synonyms. They are not. A tool is how an agent reaches code. A contract is how a runtime decides whether that reach is allowed to succeed.</p>
+
+  <p>In the usual LLM-tool pattern, you hand the model a name, a short description, and a JSON schema. The model emits a structured call. Your host process runs whatever function you mapped to that name. The schema is guidance for the model; enforcement, if any, is whatever you bolted on afterward. Swap the host, change the wiring, or let the model invent a slightly different shape, and the "tool" is a different thing — even if you kept the same English description.</p>
+
+  <h2>What a Traverse contract actually is</h2>
+  <p>A Traverse contract travels with a capability artifact. It names the inputs and outputs in schemas the <em>runtime</em> validates, not just a prompt the model reads. It carries version identity so "pricing@1.2.0" is not casually interchangeable with "pricing@1.3.0." It declares placement and sandbox expectations so the same binary is not silently given network access it never asked for. The agent can still discover and propose a call — but the runtime is the authority that accepts or rejects the call against that contract.</p>
+
+  <h2>Why the distinction matters in practice</h2>
+  <p>Tools optimize for agent convenience: more tools, faster demos, looser schemas. Contracts optimize for business truth: the same rule, the same version, the same failure modes, whether a human UI, a CLI, or an agent is the caller. If your discount logic lives only as a tool definition in one orchestration layer, every other surface will re-implement or re-prompt it. If it lives as a contracted capability, those surfaces share one artifact — and the agent's job shrinks to finding and composing that artifact, not inventing the rule.</p>
+
+  <p>You can still expose a Traverse capability <em>through</em> a tool-shaped façade (MCP, function calling, a custom host). That façade is transport. The contract is the thing that keeps the business rule from becoming whatever the last prompt said it was. For the adjacent comparison to raw function calling, see <a href="/questions/how-is-traverse-different-from-function-calling.html">How is Traverse different from function calling?</a></p>
+</QuestionLayout>

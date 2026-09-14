@@ -1,0 +1,45 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Why put business logic in WebAssembly?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'WebAssembly gives business rules a portable binary format, a default sandbox (no filesystem or network unless the host grants it), and deterministic execution across hosts. For rules that must behave the same in a browser, a native app, a server, and an agent pipeline, WASM is a better artifact than copying source into each stack or exposing the rule only as an HTTP API.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-a-wasm-capability.html', label: 'What is a WASM capability in Traverse?' },
+  { href: '/questions/can-traverse-run-without-wasm.html', label: 'Can Traverse run without WASM?' },
+  { href: '/questions/how-is-traverse-different-from-a-shared-rust-library.html', label: 'Why not just use a shared Rust library?' },
+  { href: '/blog/wasm-business-logic.html', label: 'What WASM actually gives you for business logic' },
+];
+---
+<QuestionLayout
+  title="Why put business logic in WebAssembly?"
+  description="WASM is not only for games and codecs. For pricing, eligibility, and similar rules, it gives you one sandboxed binary that runs the same way across hosts — instead of four copies or an API round-trip for every decision."
+  canonical="https://traverse-framework.com/questions/why-put-business-logic-in-webassembly.html"
+  category="Platforms and portability"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Most teams first meet WebAssembly as a performance trick: run C++ or Rust in the browser without rewriting it in JavaScript. That use case is real. It is also not the most interesting one for product and platform teams.</p>
+
+  <p>Business logic — pricing tables, eligibility gates, authorization helpers, escalation thresholds — has a different problem. The rule has to be correct in more than one place, and "correct" usually means <em>the same</em> across a web client, a native app, a backend job, and increasingly an AI agent. Shipping the rule as ordinary app code forces a rewrite or a fragile shared library story per stack. Shipping it only as a remote API makes every offline, low-latency, or agent-local path a special case.</p>
+
+  <h2>What WASM changes about the artifact</h2>
+  <p>A WASM module is a binary with a formal execution model. A conformant runtime runs that binary without recompiling it for each OS or UI toolkit. By default the module cannot touch the filesystem or the network; the host has to grant those abilities on purpose. For business rules that should be pure functions of their inputs, that default is a feature: the sandbox pushes side effects out to the edges where you can see them.</p>
+
+  <p>Determinism matters here more than raw speed. A discount capability that returns one number in the browser and another on the server is not a performance bug — it is a trust bug. WASM does not magically make your source correct, but it does remove an entire class of "we reimplemented it slightly differently over here" drift once the rule lives in one compiled artifact.</p>
+
+  <h2>What Traverse adds on top of "just WASM"</h2>
+  <p>Raw WASM is an execution format. Traverse wraps it in a contract: schemas, version identity, placement expectations, and a runtime that validates calls and records traces. That is why "put the rule in WASM" and "publish a Traverse capability" are related but not identical steps. You can compile business logic to WASM without Traverse; you use Traverse when you want that binary governed the same way for humans and agents. The longer essay on this trade is <a href="/blog/wasm-business-logic.html">What WASM actually gives you for business logic</a>.</p>
+
+  <p>It is also fine to leave simple, single-host glue out of WASM. Not every <code>if</code> statement earns a capability. The bar is: shared rule, multiple callers, need for identical behavior and an audit trail. When that bar is met, putting the logic in WebAssembly stops being an exotic choice and starts being the least bad way to keep one truth.</p>
+</QuestionLayout>
