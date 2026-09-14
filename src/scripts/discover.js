@@ -63,6 +63,23 @@ const GOALS = [
     ],
     starting_facts: { number: '4242424242424242' },
   },
+  {
+    id: 'translate-denied',
+    label: 'Watch the runtime refuse a model-derived step',
+    blurb: 'Facts: an English summary and its facts, target report.translate-fr-semantic. This capability is declared model_derived, not deterministic — the local runtime authorizes plan structure but declines to run it automatically. A real refusal, not a scripted one.',
+    kind: 'single',
+    target: { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.0' },
+    candidate_refs: [
+      { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.0' },
+    ],
+    starting_facts: {
+      summary: 'The project combines distributed browser, edge, and cloud evidence into a deterministic operational summary with 2 validated insights.',
+      structured_facts: [
+        'Fact: browser — Browser adoption rose 18% week over week',
+        'Fact: edge — Edge cache hit rate held steady at 94%',
+      ],
+    },
+  },
 ];
 
 /* Fail-closed copy. Asserted by tests/discover-truthfulness.test.mjs. */
@@ -88,12 +105,13 @@ function el(id) { return document.getElementById(id); }
 function setBadge(text, s) { const b = el('discover-badge'); if (b) { b.textContent = text; b.dataset.state = s; } }
 function logLine(text, cls) {
   const log = el('discover-log');
-  if (!log) return;
+  if (!log) return null;
   const d = document.createElement('div');
   d.className = 'discover-log-line' + (cls ? ' ' + cls : '');
   d.textContent = text;
   log.appendChild(d);
   log.scrollTop = log.scrollHeight;
+  return d;
 }
 function failLine(kind, detail) {
   const t = detail ? FAIL[kind].replace('%s', detail) : FAIL[kind].replace(' (%s)', '');
@@ -145,6 +163,11 @@ export async function snapshotIdentity(snapshot) {
   };
 }
 
+/* Below this many bytes we skip the progress line entirely — not worth the
+   noise for the ~50-200 KB artifacts most goals fetch. */
+const PROGRESS_THRESHOLD_BYTES = 2 * 1024 * 1024;
+function mb(n) { return (n / (1024 * 1024)).toFixed(1); }
+
 const artifactFetcher = {
   async fetch(url) {
     let u = url;
@@ -152,7 +175,32 @@ const artifactFetcher = {
     if (m && url.startsWith('https://github.com/')) u = REGISTRY_BASE + '/artifacts/' + m[1] + '/' + m[2];
     const r = await fetch(u);
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    return new Uint8Array(await r.arrayBuffer());
+
+    const total = Number(r.headers.get('content-length')) || 0;
+    if (!r.body || total < PROGRESS_THRESHOLD_BYTES) return new Uint8Array(await r.arrayBuffer());
+
+    const label = (m ? m[2] : u.split('/').pop());
+    const line = logLine('  ↓ ' + label + ' — 0.0 / ' + mb(total) + ' MB', 'cmd');
+    const reader = r.body.getReader();
+    const chunks = [];
+    let received = 0;
+    let lastPaint = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.byteLength;
+      const now = performance.now();
+      if (line && now - lastPaint > 120) {
+        line.textContent = '  ↓ ' + label + ' — ' + mb(received) + ' / ' + mb(total) + ' MB';
+        lastPaint = now;
+      }
+    }
+    if (line) { line.textContent = '  ✓ ' + label + ' — ' + mb(total) + ' MB fetched'; line.className = 'discover-log-line ok'; }
+    const out = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) { out.set(chunk, offset); offset += chunk.byteLength; }
+    return out;
   },
 };
 
