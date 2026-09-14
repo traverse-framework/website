@@ -1,0 +1,53 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [
+  { href: '/docs/guides/mcp-setup.html', label: 'MCP Server Setup guide' },
+  { href: '/questions/how-do-i-connect-claude-to-traverse.html', label: 'How do I connect Claude to Traverse?' },
+  { href: '/questions/how-does-the-mcp-server-work.html', label: 'How does the Traverse MCP server work?' },
+  { href: '/questions/how-do-ai-agents-discover-capabilities.html', label: 'How do AI agents discover capabilities?' },
+];
+
+const _jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I connect Cursor to Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Build or install traverse-mcp, then add a Cursor MCP server entry that launches the binary with the stdio argument. Cursor talks JSON-RPC over stdio; Traverse enforces contracts on tool calls. Use an absolute path to the binary and treat the connection as local trust unless you add your own auth layer.',
+    },
+  }],
+});
+
+const _body = `<p>Cursor can call Traverse the same way Claude Desktop does: as an MCP client over stdio. You run <code>traverse-mcp</code> locally; Cursor launches it and exchanges JSON-RPC messages. Contract enforcement stays inside Traverse — Cursor is the IDE façade, not the authority for business rules.</p>
+
+  <h2>Minimal Cursor config</h2>
+  <p>After <code>cargo build -p traverse-mcp</code> (or an installed binary), add something like this under <code>.cursor/mcp.json</code>:</p>
+  <pre><code>{
+  "mcpServers": {
+    "traverse": {
+      "command": "/absolute/path/to/target/debug/traverse-mcp",
+      "args": ["stdio"]
+    }
+  }
+}</code></pre>
+  <p>The <code>stdio</code> argument is required. Relative paths break when Cursor's working directory is not the repo root — use an absolute path to the binary you just built.</p>
+
+  <h2>What to expect</h2>
+  <p>Once connected, Cursor can list and call tools the MCP server exposes. Treat shapes you see in docs as illustrative unless you have verified them against the running binary and <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-stdio-server.md" target="_blank" rel="noopener">docs/mcp-stdio-server.md</a>. Local MCP is a trust-the-host setup; optional bearer-token guidance lives in the core docs if you need a tighter boundary.</p>
+
+  <h2>Related setup</h2>
+  <p>Step-by-step copy for both Cursor and Claude Desktop is on the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>. If you are choosing between "agent proposes" and "runtime decides," see <a href="/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html">agent vs runtime</a>.</p>`;
+---
+<QuestionLayout
+  title="How do I connect Cursor to Traverse?"
+  description="Point Cursor's MCP config at a local traverse-mcp binary with args including stdio. Same governed tool surface Claude Desktop uses — contracts stay on the Traverse side."
+  canonical="https://traverse-framework.com/questions/how-do-i-connect-cursor-to-traverse.html"
+  category="AI Agents and MCP"
+  relatedLinks={relatedLinks}
+  jsonLd={_jsonLd}
+>
+  <Fragment set:html={_body} />
+</QuestionLayout>

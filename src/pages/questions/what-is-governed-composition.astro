@@ -1,0 +1,42 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is governed composition in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Governed composition is how Traverse turns a proposed multi-capability workflow into an authorized, contract-checked execution with a durable trace. An agent or planner may propose the graph; the runtime decides what is allowed to run, validates each node, and records what happened. A proposal is not ambient authority.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/traverse-0-10-governed-composition.html', label: 'Traverse v0.10: governed composition' },
+  { href: '/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html', label: 'Agent vs Traverse runtime' },
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact?' },
+  { href: '/blog/what-discover-proves.html', label: "What /discover proves" },
+];
+---
+<QuestionLayout
+  title="What is governed composition in Traverse?"
+  description="Governed composition means a proposed workflow is not yet authority: the runtime plans or accepts a graph, checks contracts, authorizes nodes, executes, and leaves a trace. Agents propose; the runtime decides."
+  canonical="https://traverse-framework.com/questions/what-is-governed-composition.html"
+  category="Runtime and Architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Most agent demos treat a multi-step tool plan as done the moment the model emits it. Governed composition is the opposite habit: the plan is a proposal until a runtime accepts it against contracts, policy, and (when required) a human review gate.</p>
+
+  <h2>Proposal first, authority second</h2>
+  <p>In Traverse, composition can come from MCP, from a structural planner, or from a human-authored workflow. Regardless of source, execution goes through the runtime: validate inputs, authorize each capability version, run the WASM under sandbox constraints, and emit a trace of what actually ran. If a node is not allowed, the path fails closed instead of painting success.</p>
+
+  <h2>What shipped in v0.10</h2>
+  <p>The v0.10 line added plan / schedule / run / promote surfaces for multi-capability workflows over MCP, with a durable, tamper-evident trace. That is governed composition on the native/MCP path. The public <a href="/discover.html">/discover</a> page is a narrower browser sibling: live registry snapshot, structural plan, unconfirmed mappings until you confirm, local execute, redacted per-node trace — still proposal-first.</p>
+
+  <h2>What it is not</h2>
+  <p>Governed composition is not "the model is in charge." It is not a guarantee that a structural plan is semantically correct — schema shape compatibility is weaker than business intent, which is why review gates and promotion exist. And it is not a claim that every host (browser, mobile, edge) exposes the full MCP composition surface yet; check the platforms page for what is actually shipping where.</p>
+</QuestionLayout>
