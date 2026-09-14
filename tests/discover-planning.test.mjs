@@ -127,3 +127,38 @@ test('end to end against the LIVE registry: plan a goal, review, composed-execut
   assert.equal(trace.terminal_state, 'succeeded', JSON.stringify(trace));
   assert.ok(trace.node_outcomes.every((o) => o.status === 'succeeded'));
 });
+
+async function liveSnapshotAndFetcher() {
+  const raw = await (await fetch('https://registry.traverse-framework.com/catalog.json', { cache: 'no-store' })).json();
+  const snapshot = await buildSnapshot(raw);
+  const identity = await snapshotIdentity(snapshot);
+  const MIRROR = 'https://registry.traverse-framework.com';
+  const fetcher = { async fetch(url) {
+    let u = url; const m = url.match(/\/artifacts\/([^/]+)\/([^/]+)$/);
+    if (m && url.startsWith('https://github.com/')) u = `${MIRROR}/artifacts/${m[1]}/${m[2]}`;
+    const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); return new Uint8Array(await r.arrayBuffer());
+  } };
+  return { snapshot, identity, fetcher };
+}
+
+test('LIVE: the translate-fr-semantic goal plans but the runtime declines to authorize it (model_derived, not is_automatic_eligible)',
+  { skip: !process.env.CHECK_REGISTRY && 'set CHECK_REGISTRY=1 for the networked check' },
+  async () => {
+    const { snapshot, identity, fetcher } = await liveSnapshotAndFetcher();
+    const store = new MemoryRegistryCacheStore();
+    const ref = { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.0' };
+    await prepareRegistryDependency(store, snapshot, ref, fetcher);
+    const deps = [await resolveRegistryDependencyOffline(store, ref)];
+    const res = await browserLocalPlan(
+      identity, snapshot, deps,
+      { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.0' },
+      { summary: 'Two validated insights.', structured_facts: ['Fact: browser — adoption rose'] },
+      'local-default', MANIFEST,
+    );
+    assert.ok(res.proposals.length >= 1);
+    const reviewed = { ...res.proposals[0], mapping_unconfirmed: false };
+    await assert.rejects(
+      () => executeBrowserComposedWorkflow(reviewed, store, snapshot),
+      (err) => err.code === 'composed_workflow_approval_required',
+    );
+  });

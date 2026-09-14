@@ -50,3 +50,18 @@ test('a single-capability goal (card checksum) plans and executes for real', asy
   await expect(page.locator('#discover-trace')).toContainText('terminal: succeeded');
   await expect(page.locator('#discover-trace')).toContainText('validation.validate-luhn@1.2.0');
 });
+
+test('the translate-fr-semantic goal plans, then the local runtime genuinely refuses to authorize a model_derived node', async ({ page }) => {
+  test.slow(); // fetches a live ~17 MB WASM artifact
+  await page.goto('/discover.html');
+  await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
+
+  await page.locator('.discover-goal[data-goal="translate-denied"]').click();
+  await expect(page.locator('#discover-plan-target')).toHaveText('report.translate-fr-semantic@1.0.0', { timeout: 60_000 });
+  await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
+
+  await page.locator('#discover-exec').click();
+  await expect(page.locator('#discover-badge')).toHaveText('Halted — fail closed', { timeout: 45_000 });
+  await expect(page.locator('#discover-log')).toContainText('the local runtime declined to authorize a node');
+  await expect(page.locator('#discover-log')).toContainText('real governance decision, not an error');
+});
