@@ -19,6 +19,7 @@ const _body = `<section class="page-hero">
 
 <section class="section-sm" id="discover-root">
   <div class="container">
+    <p class="t-body-sm t-muted discover-goals-intro">Each card below is a different real goal against the live registry — from a multi-capability chain to a single target the runtime refuses to run automatically. Pick one; the terminal and graph track it end to end.</p>
     <div class="discover-goals" id="discover-goals" aria-label="Goals"></div>
 
     <div class="discover-graph-panel card">
@@ -70,6 +71,7 @@ const _body = `<section class="page-hero">
   crumbs={[{ label: "Home", href: "/" }]}
 >
   <style is:global slot="head">
+    .discover-goals-intro { margin: 0 0 0.75rem; }
     .discover-goals { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem; }
     .discover-goal { text-align: left; display: flex; flex-direction: column; gap: 0.4rem; padding: 1rem 1.1rem; cursor: pointer; border: 1px solid var(--border); background: var(--bg-card); border-radius: var(--radius); }
     .discover-goal[data-active="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
@@ -104,7 +106,7 @@ const _body = `<section class="page-hero">
     .discover-sub-h { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-subtle); margin-bottom: 0.4rem; }
     .discover-mappings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.75rem; }
     .discover-mappings code { font-size: 0.72rem; }
-    .discover-unconfirmed { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+    .discover-unconfirmed-note { color: var(--accent); font-size: 0.72rem; line-height: 1.5; margin-bottom: 0.2rem; }
     .discover-noplan { color: var(--fg-muted); line-height: 1.55; }
     #discover-exec { align-self: flex-start; }
     #discover-exec[hidden] { display: none !important; }
@@ -112,6 +114,7 @@ const _body = `<section class="page-hero">
     .discover-cap-card { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }
     .discover-cap-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg); word-break: break-all; }
     .discover-note { font-size: 0.72rem; color: var(--fg-subtle); margin: 0; line-height: 1.5; }
+    .discover-halted-note { color: #e8907d; font-size: 0.78rem; }
   </style>
   <Fragment set:html={_body} />
   <script src="https://unpkg.com/@antv/g6@5.1.1/dist/g6.min.js"></script>

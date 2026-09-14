@@ -119,6 +119,17 @@ function failLine(kind, detail) {
   setBadge('Halted — fail closed', 'failed');
   const p = el('discover-result');
   if (p) p.dataset.outcome = 'failed';
+  return t;
+}
+
+/* Surfaces a halt reason in the result panel itself, not only the terminal
+   log — the terminal can be easy to miss, and "why did this stop?" belongs
+   next to the mappings the visitor was just looking at. */
+function renderHalted(text) {
+  const trace = el('discover-trace');
+  if (!trace) return;
+  trace.innerHTML = '<div class="discover-sub-h">Halted — fail closed</div>'
+    + '<p class="discover-note discover-halted-note">' + text + '</p>';
 }
 
 function stable(v) {
@@ -248,11 +259,13 @@ async function renderProposal(goal, proposal) {
   el('discover-plan-target').textContent = goal.target.capability_id + '@' + goal.target.capability_version;
 
   const mapEl = el('discover-plan-mappings');
-  mapEl.innerHTML = proposal.proposal.mappings.map((m) =>
-    '<li><code>' + (m.from_node_id || 'facts') + '.' + m.from_field + '</code> → <code>'
-    + m.to_node_id + '.' + m.to_field + '</code> <span class="badge">'
-    + (m.source === 'starting_facts' ? 'from facts' : 'from output')
-    + '</span> <span class="badge discover-unconfirmed">unconfirmed</span></li>').join('');
+  mapEl.innerHTML =
+    '<li class="discover-unconfirmed-note">These mappings are unconfirmed: an untrusted proposal from the browser planner, nothing has run yet. Each row wires one field from a fact or a prior node\'s output into a capability\'s input.</li>'
+    + proposal.proposal.mappings.map((m) =>
+      '<li><code>' + (m.from_node_id || 'facts') + '.' + m.from_field + '</code> → <code>'
+      + m.to_node_id + '.' + m.to_field + '</code> <span class="badge">'
+      + (m.source === 'starting_facts' ? 'from facts' : 'from output')
+      + '</span></li>').join('');
 
   await renderPlanGraph(el('discover-graph'), proposal);
   setGraphPhase('planned');
@@ -374,7 +387,8 @@ async function doExecute() {
   } catch (e) {
     const code = e && e.code ? e.code : String(e && e.name || 'error');
     setGraphPhase('failed');
-    failLine(classifyExecError(code), (code + (e && e.node_id ? ' @ ' + e.node_id : '')).slice(0, 80));
+    const msg = failLine(classifyExecError(code), (code + (e && e.node_id ? ' @ ' + e.node_id : '')).slice(0, 80));
+    renderHalted(msg);
     console.error('[discover] execution refused', e);
     return;
   }
