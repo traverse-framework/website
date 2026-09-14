@@ -1,0 +1,42 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const relatedLinks = [
+  { href: '/blog/what-discover-proves.html', label: "What /discover proves — and what it doesn't" },
+  { href: '/questions/what-is-governed-composition.html', label: 'What is governed composition?' },
+  { href: '/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html', label: 'Agent vs Traverse runtime' },
+  { href: '/questions/how-do-ai-agents-discover-capabilities.html', label: 'How do AI agents discover capabilities?' },
+];
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does the Traverse /discover page do?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The public /discover page is a browser-local demo of governed composition: you pick a structured goal, the page pulls a live registry snapshot, a deterministic structural planner proposes a workflow from schema shape (no model), you confirm unconfirmed mappings, and the local embedder executes with a redacted per-node trace. It is not an AI agent and not a claim that free-text goals work.',
+    },
+  }],
+});
+---
+<QuestionLayout
+  title="What does the Traverse /discover page do?"
+  description="/discover is a clickable, browser-local demo of governed composition: live registry snapshot, structural plan, review gate, local execute, redacted trace. No backend. No model. Honest bounds."
+  canonical="https://traverse-framework.com/questions/what-does-the-discover-page-do.html"
+  category="Runtime and Architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The public <a href="/discover.html">/discover</a> page is the clickable sibling of governed composition for the browser embedder. You pick a structured goal; the page builds a digest-verified registry snapshot; a deterministic structural planner proposes a workflow from schema shape; you review unconfirmed field mappings; then the local governed runtime executes in your tab and returns a redacted per-node trace.</p>
+
+  <h2>What runs where</h2>
+  <p>There is no Traverse backend behind the demo. Planning and execution happen in the browser via <code>traverse-embedder-web</code>. The registry HTTP endpoints supply catalog and artifacts; after the snapshot is verified, offline resolution is the point. Failures stay failures — the page does not paint success when a node is rejected.</p>
+
+  <h2>Not the same as MCP discovery</h2>
+  <p><a href="/questions/how-do-ai-agents-discover-capabilities.html">How AI agents discover capabilities</a> is about <code>tools/list</code> over MCP. <code>/discover</code> is a different surface: structural composition of a small authorized goal class in the browser. Same product family, different door.</p>
+
+  <h2>Honest bounds</h2>
+  <p><code>/discover</code> is not an AI agent, not “the browser is the authority,” and not a promise that any free-text goal works. Schema-shape compatibility is weaker than business intent — that is why the review gate exists. For the longer writeup, see <a href="/blog/what-discover-proves.html">What /discover proves — and what it doesn't</a>.</p>
+</QuestionLayout>
