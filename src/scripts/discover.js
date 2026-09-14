@@ -176,11 +176,15 @@ const artifactFetcher = {
     const r = await fetch(u);
     if (!r.ok) throw new Error('HTTP ' + r.status);
 
-    const total = Number(r.headers.get('content-length')) || 0;
-    if (!r.body || total < PROGRESS_THRESHOLD_BYTES) return new Uint8Array(await r.arrayBuffer());
+    // content-length reflects the wire (possibly compressed) size, not the
+    // decoded byte count fetch() ultimately hands us — the two can legitimately
+    // differ, so it's only a heuristic for "is this worth a progress line",
+    // never a number we assert as the real total.
+    const contentLength = Number(r.headers.get('content-length')) || 0;
+    if (!r.body || contentLength < PROGRESS_THRESHOLD_BYTES) return new Uint8Array(await r.arrayBuffer());
 
     const label = (m ? m[2] : u.split('/').pop());
-    const line = logLine('  ↓ ' + label + ' — 0.0 / ' + mb(total) + ' MB', 'cmd');
+    const line = logLine('  ↓ ' + label + ' — 0.0 MB downloaded…', 'cmd');
     const reader = r.body.getReader();
     const chunks = [];
     let received = 0;
@@ -192,11 +196,11 @@ const artifactFetcher = {
       received += value.byteLength;
       const now = performance.now();
       if (line && now - lastPaint > 120) {
-        line.textContent = '  ↓ ' + label + ' — ' + mb(received) + ' / ' + mb(total) + ' MB';
+        line.textContent = '  ↓ ' + label + ' — ' + mb(received) + ' MB downloaded…';
         lastPaint = now;
       }
     }
-    if (line) { line.textContent = '  ✓ ' + label + ' — ' + mb(total) + ' MB fetched'; line.className = 'discover-log-line ok'; }
+    if (line) { line.textContent = '  ✓ ' + label + ' — ' + mb(received) + ' MB fetched'; line.className = 'discover-log-line ok'; }
     const out = new Uint8Array(received);
     let offset = 0;
     for (const chunk of chunks) { out.set(chunk, offset); offset += chunk.byteLength; }
