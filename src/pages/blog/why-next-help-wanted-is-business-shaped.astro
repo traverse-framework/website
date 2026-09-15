@@ -1,0 +1,183 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 15, 2026</span>
+      <span class="badge">Community</span>
+      <span class="badge">Registry</span>
+      <span class="badge">Governance</span>
+    </div>
+    <h1 class="t-h1">The next help-wanted batch is business-shaped — not more string utils</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Yesterday I wrote about the first external contributor door: tiny consume examples, a slugify publish, a skill-template fix. That door is still open. It is also not the whole ask.</p>
+
+      <p>If you only ship string and JSON helpers, agents will still invent the rules that actually matter. Pricing caps. Eligibility. Authz. Consent and purpose. Risk bands. Content policy. Those are the decisions a model should <em>propose</em> and a governed capability should <em>make</em>.</p>
+
+      <div class="callout">
+        Short version: the next labeled batch is registry issues <a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493</a>–<a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507</a> — business-shaped capabilities, one PR each. Examples remain the on-ramp. Apps are not the ask. Agents propose; governed capabilities decide.
+      </div>
+
+      <h2 id="why-not-utils">Why not another slugify</h2>
+
+      <p>Utility capabilities are useful. They are also the easy part. A slugify, a JSON reshape, a redaction helper that just runs NER — those are the kinds of tickets you can finish without arguing with a policy document. They teach the publish path. They do not teach the runtime what the business is allowed to do.</p>
+
+      <p>The failure mode I actually care about is an agent that sounds confident while it re-derives a discount, an eligibility gate, or a “this output is fine to send” decision from scratch. No version. No signature. No contract. Authoritative only because it ran last. That is the opposite of what the registry is for.</p>
+
+      <p>So the next batch is not “more things an agent can call.” It is “more things an agent is not allowed to free-hand.”</p>
+
+      <h2 id="what-business-shaped-means">What business-shaped means here</h2>
+
+      <p>I mean a capability whose job is a decision with a fail-closed contract: structured input in, structured decision out, no network, no host state, no “ask a model.” If the policy is invalid, you do not partially succeed. If a cap is hit, the quote does not quietly overflow. If consent does not cover the purpose, the answer is no — not a best-effort maybe.</p>
+
+      <p>The open tickets. Most are unclaimed as I write this; <a href="https://github.com/traverse-framework/registry/issues/500" target="_blank" rel="noopener">#500</a> already has a taker, so skip that one unless you are the person who claimed it:</p>
+
+      <ul>
+        <li><a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493 <code>core.redact-for-export</code></a> — policy-shaped PII/secret redact before export, not NER.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/494" target="_blank" rel="noopener">#494 <code>core.eligibility-check</code></a> — deterministic rule-table eligibility.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/495" target="_blank" rel="noopener">#495 <code>core.quote-with-caps</code></a> — formula pricing with hard caps.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/496" target="_blank" rel="noopener">#496 <code>core.check-declared-permission</code></a> — authz from declared roles/permissions.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/497" target="_blank" rel="noopener">#497 <code>core.risk-band</code></a> — risk score band from structured signals.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/498" target="_blank" rel="noopener">#498 <code>core.extract-to-schema</code></a> — structured extract into a fixed schema, fail closed.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/499" target="_blank" rel="noopener">#499 <code>core.content-policy-gate</code></a> — allow / deny / revise for agent output.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/500" target="_blank" rel="noopener">#500 <code>core.consent-purpose-check</code></a> — consent bound to a purpose.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/501" target="_blank" rel="noopener">#501 <code>core.ttl-expiry-decide</code></a> — retention TTL / expiry.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/502" target="_blank" rel="noopener">#502 <code>core.idempotency-guard</code></a> — duplicate-submit / idempotency.</li>
+      </ul>
+
+      <p>Five more are marked creative — still one capability, still one PR, slightly more judgment in the contract:</p>
+
+      <ul>
+        <li><a href="https://github.com/traverse-framework/registry/issues/503" target="_blank" rel="noopener">#503 <code>core.dispute-triage-classify</code></a></li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/504" target="_blank" rel="noopener">#504 <code>core.refund-eligibility-decide</code></a></li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/505" target="_blank" rel="noopener">#505 <code>core.vendor-risk-questionnaire-score</code></a></li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/506" target="_blank" rel="noopener">#506 <code>core.sla-outcome-classify</code></a></li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507 <code>core.invoice-line-normalize</code></a></li>
+      </ul>
+
+      <p>Each ticket names the contract, the fail-closed cases, and the done-when. Read the issue before you start. If a field in the ask is wrong, say so in the PR. Inventing a parallel API is not the contribution.</p>
+
+      <h2 id="what-this-is-not">What this is not</h2>
+
+      <ul>
+        <li><strong>Not an apps sprint.</strong> The tickets say it in so many words: publish the capability only. No demo product surface, no app wiring. Reference apps consume capabilities after they exist in the catalog. They are not how you land the first version of the rule.</li>
+        <li><strong>Not a replacement for the first door.</strong> If you have not published anything yet, start with an example, a consume script, or a small utility. <a href="/blog/first-external-contributor-door.html">That post</a> is still the on-ramp. This batch is the next shelf up.</li>
+        <li><strong>Not a metrics launch.</strong> I am not going to invent a “business-logic coverage” percentage or a contributor funnel. Fifteen open issues, one already claimed, is the true state. Pick an unclaimed one. Ship it. That is the story.</li>
+      </ul>
+
+      <h2 id="how-to-pick">How to pick one</h2>
+
+      <ol>
+        <li>Open the issue. If the done-when is a capability you can finish in one PR, comment that you are taking it.</li>
+        <li>Follow <a href="https://github.com/traverse-framework/registry/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">registry CONTRIBUTING.md</a> and the capabilities README publish checklist. Coverage gates are real. <code>no-spec-needed</code> is on these tickets on purpose.</li>
+        <li>Keep it pure WASM: <code>network_access: forbidden</code>, no host connector, no model call pretending to be a policy.</li>
+        <li>Run the pre-PR check the ticket names. Open the PR against <code>origin/main</code>. Wait for CI.</li>
+      </ol>
+
+      <p>If you would rather learn the CLI first, do that. Python can consume today by shelling out to <code>traverse-cli capability-package execute</code> — that is a real verb, not a fake <code>capability run</code> — and <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> is the example ticket. JavaScript already has the published web embedder. Neither of those is this batch. This batch is the rules those callers should be hitting instead of re-deriving.</p>
+
+      <div class="callout">
+        I would rather merge one boring, fail-closed eligibility check than ten utilities an agent can ignore when it feels like inventing a discount. The tickets are sized for the boring ones.
+      </div>
+
+      <h2 id="why-now">Why write this on a Tuesday</h2>
+
+      <p>Because the first door taught people how to publish. The catalog already has 83 capabilities across 31 domains. What it is short on is the kind of capability a reviewer would actually trust with money, access, or someone’s data leaving the building.</p>
+
+      <p>If you only have ten minutes: pick one issue in the #493–#507 range, read it end to end, and decide whether the contract is something you can implement without a new product. If yes, claim it. If the ask is too sharp, leave it — someone else will want that exact sharpness.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why-not-utils">Why not another slugify</a></li>
+          <li><a href="#what-business-shaped-means">What business-shaped means</a></li>
+          <li><a href="#what-this-is-not">What this is not</a></li>
+          <li><a href="#how-to-pick">How to pick one</a></li>
+          <li><a href="#why-now">Why write this on a Tuesday</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/first-external-contributor-door.html">The first external contributor door →</a></li>
+          <li><a href="/questions/how-do-i-contribute-to-traverse.html">How do I contribute to Traverse? →</a></li>
+          <li><a href="/registry.html">Public registry →</a></li>
+          <li><a href="/compare/vs-agent-runtimes.html">Traverse vs AI agent runtimes →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Pick a ticket</div>
+        <p>One capability. One PR. Fail closed. No app wiring.</p>
+        <a href="https://github.com/traverse-framework/registry/issues/493" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block" target="_blank" rel="noopener">Start at registry#493 →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Agents propose. Capabilities decide.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">The next batch is eligibility, caps, authz, consent, risk, and content policy. Claim one issue. Leave the product shell for later.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/registry/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22" class="btn btn-primary" target="_blank" rel="noopener">Browse registry help wanted →</a>
+      <a href="/questions/how-do-i-contribute-to-traverse.html" class="btn btn-ghost">Contribute FAQ</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"The next help-wanted batch is business-shaped — not more string utils — Traverse Blog"}
+  description={"Why the next labeled registry tickets are eligibility, pricing caps, authz, consent, risk, and content policy — not more string/JSON utils. Agents propose; governed capabilities decide."}
+  canonical={"https://traverse-framework.com/blog/why-next-help-wanted-is-business-shaped.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

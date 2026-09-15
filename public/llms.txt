@@ -1,27 +1,30 @@
 # Traverse
 
-> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract, compile it to WASM, and run it natively, in the browser, or expose it to an AI agent over MCP. Apache 2.0, pre-1.0 (v0.9.1) — check /platforms.html before assuming any target or feature is shipped.
+> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract, compile it to WASM, and run it natively, in the browser, or expose it to an AI agent over MCP. Apache 2.0, pre-1.0 (v0.10.2) — check /platforms.html before assuming any target or feature is shipped.
 
-Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment.
+Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment. The agent proposes; governed capabilities decide.
+
+Current packages: crates.io at 0.10.2 (pin `traverse-registry` at `=0.20.0` if you consume it directly); npm `traverse-embedder-web@0.10.2`. The public registry holds 83 capabilities across 31 domains (186 signed versions; 148 non-deprecated). The core repo has 148 approved governing specs.
 
 ## Start here
 
 - [Quickstart](https://traverse-framework.com/docs/quickstart.html): install the CLI, write a contract, run it, read the trace — the fastest working path.
 - [Core Concepts](https://traverse-framework.com/docs/concepts.html): the actual vocabulary — Capability, Contract, Registry, Runtime, Placement, Trace, and the spec-governance model.
-- [The System](https://traverse-framework.com/system.html): what the codebase is made of — 9 workspace crates by role, plus how the 73-spec governance layer works.
+- [The System](https://traverse-framework.com/system.html): what the codebase is made of — 8 workspace crates by role, plus how the 148-spec governance layer works.
 - [Examples](https://traverse-framework.com/examples.html): six real, runnable example domains, not illustrative snippets — start with hello-world.
+- [Registry](https://traverse-framework.com/registry.html): the public catalog, counted from live catalog.json at build time.
 
 ## Building with an agent
 
-- [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (describe_server, list_entrypoints, execute_entrypoint, and 6 more), the discover-inspect-execute-trace flow, and the honest limits (stdio only today, no library API yet).
+- [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (ten commands: describe_server, list_content_groups, describe_content_group, list_entrypoints, search_capabilities, describe_entrypoint, validate_entrypoint, execute_entrypoint, render_execution_report, shutdown), the discover-inspect-execute-trace flow, and the honest limits (stdio is the packaged bootstrap today; in-process library functions exist on traverse-mcp, but there is no separate HTTP MCP listener as a packaged product).
 - [traverse-framework/claude-skills](https://github.com/traverse-framework/claude-skills): Claude Skills for building apps with Traverse — starting with `traverse-app-builder`, which checks the registry before authoring anything new, composes capabilities into workflows, and validates against the real traverse-cli, including this platform's current execution limitations.
 - [MCP setup guide](https://traverse-framework.com/docs/guides/mcp-setup.html): connect Claude or any MCP client to a local traverse-mcp server.
-- [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output.
+- [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output. Python consume today is `capability-package execute`, not a fake `capability run`, and not a shipped Python SDK.
 
 ## Where it runs
 
-- [Platforms](https://traverse-framework.com/platforms.html): honest, evidence-linked status per target — native and browser are shipped; Swift/iOS is blocked; Kotlin and .NET embedders are in progress; edge is planned; cloud placement is an explicit non-goal for v0.1. Do not assume a target works without checking this page first.
-- [React integration guide](https://traverse-framework.com/docs/guides/react-integration.html): using the Web embedder SDK from a React app.
+- [Platforms](https://traverse-framework.com/platforms.html): honest, evidence-linked status per target — native and browser are shipped; Swift/iOS, Kotlin, and .NET embedders are in progress (usable in-tree, not certified public package releases); edge is planned; cloud placement is an explicit non-goal for v0.1. Do not assume a target works without checking this page first.
+- [React integration guide](https://traverse-framework.com/docs/guides/react-integration.html): using the published Web embedder SDK (`traverse-embedder-web`) from a React app.
 - [Architecture](https://traverse-framework.com/docs/architecture.html): how the runtime, registry, and WASM sandbox fit together.
 
 ## Project status
@@ -34,6 +37,7 @@ Traverse is not a web framework, an agent-orchestration framework, or a general 
 ## Optional
 
 - [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims.
-- [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html), [vs agent runtimes](https://traverse-framework.com/compare/vs-agent-runtimes.html), [vs WASM runtimes](https://traverse-framework.com/compare/vs-wasm-runtimes.html)
+- [Discover](https://traverse-framework.com/discover.html): a live browser demo that pulls the public registry and executes a reviewed plan locally. Read [what it proves](https://traverse-framework.com/blog/what-discover-proves.html) before quoting it.
+- [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html), [vs agent runtimes](https://traverse-framework.com/compare/vs-agent-runtimes.html), [vs WASM runtimes](https://traverse-framework.com/compare/vs-wasm-runtimes.html), [vs cross-platform frameworks](https://traverse-framework.com/compare/vs-cross-platform-frameworks.html)
 - [About](https://traverse-framework.com/about.html): project history and motivation.
-- [GitHub](https://github.com/traverse-framework/traverse): source, issues, and the 73 approved governing specs.
+- [GitHub](https://github.com/traverse-framework/traverse): source, issues, and the 148 approved governing specs.
