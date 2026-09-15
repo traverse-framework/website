@@ -58,6 +58,16 @@ function styleFor(id) {
   return aiBase; // planned
 }
 
+let edgesMeta = []; // [{ id, source, target, mapCount }]
+function edgeStyleFor(e) {
+  const p = palette();
+  return {
+    stroke: p.border, lineWidth: 1.5, endArrow: true, endArrowSize: 7,
+    labelText: e.mapCount ? e.mapCount + ' field' + (e.mapCount > 1 ? 's' : '') : '',
+    labelFontSize: 8, labelFill: p.muted, labelBackground: false,
+  };
+}
+
 let positions = new Map();
 function pos(id) { return positions.get(id) || { x: 0, y: 0 }; }
 function layout(ids, w, h) {
@@ -72,8 +82,24 @@ function layout(ids, w, h) {
 export function resetGraph(container) {
   phase = new Map();
   aiNodeIds = new Set();
+  edgesMeta = [];
   if (graph) { try { graph.clear(); } catch (e) { void e; } }
   if (container) container.dataset.empty = 'true';
+}
+
+/* Re-applies current styles to the already-built graph without touching
+   `phase` (so an in-progress or completed run keeps its succeeded/failed
+   colouring). Needed because styleFor()/edgeStyleFor() read CSS vars at
+   call time — a theme toggle or viewport resize after the graph was first
+   drawn otherwise leaves stale, theme-mismatched colors baked into the
+   canvas (e.g. dark-mode label text stranded on a light background). */
+function redraw() {
+  if (!graph) return;
+  try {
+    graph.updateNodeData(ordered.map((id) => ({ id, style: styleFor(id) })));
+    graph.updateEdgeData(edgesMeta.map((e) => ({ id: e.id, style: edgeStyleFor(e) })));
+    graph.draw();
+  } catch (e) { console.error('[discover-graph]', e); }
 }
 
 export async function renderPlanGraph(container, proposal, aiCapabilityIds = []) {
@@ -90,24 +116,16 @@ export async function renderPlanGraph(container, proposal, aiCapabilityIds = [])
   for (const m of proposal.proposal.mappings) mapCount.set(m.to_node_id, (mapCount.get(m.to_node_id) || 0) + 1);
   nodes.forEach((n) => labels.set(n.node_id, shortName(n.capability_id)));
 
-  const edges = [];
-  edges.push({ id: 'e-goal', source: '__goal', target: nodes[0].node_id });
+  edgesMeta = [{ id: 'e-goal', source: '__goal', target: nodes[0].node_id, mapCount: mapCount.get(nodes[0].node_id) || 0 }];
   for (let i = 1; i < nodes.length; i++) {
-    edges.push({ id: 'e-' + i, source: nodes[i - 1].node_id, target: nodes[i].node_id });
+    edgesMeta.push({ id: 'e-' + i, source: nodes[i - 1].node_id, target: nodes[i].node_id, mapCount: mapCount.get(nodes[i].node_id) || 0 });
   }
 
   layout(ordered, container.clientWidth || 640, container.clientHeight || 220);
 
   const data = {
     nodes: ordered.map((id) => ({ id, type: aiNodeIds.has(id) ? 'diamond' : 'circle', style: styleFor(id) })),
-    edges: edges.map((e) => ({
-      ...e,
-      style: {
-        stroke: palette().border, lineWidth: 1.5, endArrow: true, endArrowSize: 7,
-        labelText: mapCount.get(e.target) ? mapCount.get(e.target) + ' field' + (mapCount.get(e.target) > 1 ? 's' : '') : '',
-        labelFontSize: 8, labelFill: palette().muted, labelBackground: false,
-      },
-    })),
+    edges: edgesMeta.map((e) => ({ id: e.id, source: e.source, target: e.target, style: edgeStyleFor(e) })),
   };
 
   try {
@@ -135,12 +153,20 @@ export function setGraphPhase(state, nodeId) {
   if (!graph) return;
   const ids = nodeId ? [nodeId] : ordered.filter((id) => id !== '__goal');
   for (const id of ids) phase.set(id, state);
-  try {
-    graph.updateNodeData(ids.map((id) => ({ id, style: styleFor(id) })));
-    graph.draw();
-  } catch (e) { console.error('[discover-graph]', e); }
+  redraw();
 }
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('resize', () => { if (graph) { const c = graph.getCanvas && graph.getCanvas().getContainer && graph.getCanvas().getContainer().parentElement; if (c) { layout(ordered, c.clientWidth, c.clientHeight); graph.setSize(c.clientWidth, c.clientHeight); graph.updateNodeData(ordered.map((id) => ({ id, style: styleFor(id) }))); graph.draw(); } } });
+  window.addEventListener('resize', () => {
+    if (!graph) return;
+    const c = graph.getCanvas && graph.getCanvas().getContainer && graph.getCanvas().getContainer().parentElement;
+    if (!c) return;
+    layout(ordered, c.clientWidth, c.clientHeight);
+    graph.setSize(c.clientWidth, c.clientHeight);
+    redraw();
+  });
+  // The theme toggle (Nav.astro) only sets documentElement[data-theme] — it
+  // dispatches no event. Watch the attribute directly so an already-drawn
+  // graph repaints instead of keeping colors baked in for the prior theme.
+  new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 }
