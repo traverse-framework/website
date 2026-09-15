@@ -69,6 +69,7 @@ const GOALS = [
     blurb: 'Facts: an English summary and its facts, target report.translate-fr-semantic. This capability is declared model_derived, not deterministic — the local runtime authorizes plan structure but declines to run it automatically. A real refusal, not a scripted one.',
     kind: 'single',
     target: { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.0' },
+    ai_capability_ids: ['report.translate-fr-semantic'],
     candidate_refs: [
       { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.0' },
     ],
@@ -86,6 +87,7 @@ const GOALS = [
     blurb: 'From four raw status notes the planner chains report.collect-fragments (dedupe) into report.enrich-insights (derive facts) into report.summarize-semantic — a ~31 MB bundled sentence-embedding model that ranks sentences by real fixed-point cosine similarity, fetched live and digest-verified, entirely offline.',
     kind: 'chain',
     target: { capability_id: 'report.summarize-semantic', capability_version: '1.0.0' },
+    ai_capability_ids: ['report.summarize-semantic'],
     candidate_refs: [
       { namespace: 'report', id: 'report.collect-fragments', versionRange: '1.0.0' },
       { namespace: 'report', id: 'report.enrich-insights', versionRange: '1.1.0' },
@@ -122,7 +124,15 @@ function classifyExecError(code) {
 }
 
 function el(id) { return document.getElementById(id); }
-function setBadge(text, s) { const b = el('discover-badge'); if (b) { b.textContent = text; b.dataset.state = s; } }
+/* Mirrors state on both the floating graph badge and the inline result-panel
+   status chip — the badge is easy to miss, the panel is where attention
+   actually lands after clicking execute. */
+function setBadge(text, s) {
+  const b = el('discover-badge');
+  if (b) { b.textContent = text; b.dataset.state = s; }
+  const r = el('discover-result-status');
+  if (r) { r.textContent = text; r.dataset.state = s; }
+}
 function logLine(text, cls) {
   const log = el('discover-log');
   if (!log) return null;
@@ -139,6 +149,17 @@ function failLine(kind, detail) {
   setBadge('Halted — fail closed', 'failed');
   const p = el('discover-result');
   if (p) p.dataset.outcome = 'failed';
+  return t;
+}
+
+/* Surfaces a halt reason in the result panel itself, not only the terminal
+   log — the terminal can be easy to miss, and "why did this stop?" belongs
+   next to the mappings the visitor was just looking at. */
+function renderHalted(text) {
+  const trace = el('discover-trace');
+  if (!trace) return;
+  trace.innerHTML = '<div class="discover-sub-h">Halted — fail closed</div>'
+    + '<p class="discover-note discover-halted-note">' + text + '</p>';
 }
 
 function stable(v) {
@@ -196,11 +217,15 @@ const artifactFetcher = {
     const r = await fetch(u);
     if (!r.ok) throw new Error('HTTP ' + r.status);
 
-    const total = Number(r.headers.get('content-length')) || 0;
-    if (!r.body || total < PROGRESS_THRESHOLD_BYTES) return new Uint8Array(await r.arrayBuffer());
+    // content-length reflects the wire (possibly compressed) size, not the
+    // decoded byte count fetch() ultimately hands us — the two can legitimately
+    // differ, so it's only a heuristic for "is this worth a progress line",
+    // never a number we assert as the real total.
+    const contentLength = Number(r.headers.get('content-length')) || 0;
+    if (!r.body || contentLength < PROGRESS_THRESHOLD_BYTES) return new Uint8Array(await r.arrayBuffer());
 
     const label = (m ? m[2] : u.split('/').pop());
-    const line = logLine('  ↓ ' + label + ' — 0.0 / ' + mb(total) + ' MB', 'cmd');
+    const line = logLine('  ↓ ' + label + ' — 0.0 MB downloaded…', 'cmd');
     const reader = r.body.getReader();
     const chunks = [];
     let received = 0;
@@ -212,11 +237,11 @@ const artifactFetcher = {
       received += value.byteLength;
       const now = performance.now();
       if (line && now - lastPaint > 120) {
-        line.textContent = '  ↓ ' + label + ' — ' + mb(received) + ' / ' + mb(total) + ' MB';
+        line.textContent = '  ↓ ' + label + ' — ' + mb(received) + ' MB downloaded…';
         lastPaint = now;
       }
     }
-    if (line) { line.textContent = '  ✓ ' + label + ' — ' + mb(total) + ' MB fetched'; line.className = 'discover-log-line ok'; }
+    if (line) { line.textContent = '  ✓ ' + label + ' — ' + mb(received) + ' MB fetched'; line.className = 'discover-log-line ok'; }
     const out = new Uint8Array(received);
     let offset = 0;
     for (const chunk of chunks) { out.set(chunk, offset); offset += chunk.byteLength; }
@@ -252,10 +277,12 @@ async function ensureSnapshot() {
   return snap;
 }
 
-function markActiveCard(goalId) {
-  document.querySelectorAll('.discover-goal').forEach((c) => {
-    c.dataset.active = String(c.dataset.goal === goalId);
-  });
+function syncGoalPicker(goalId) {
+  const sel = el('discover-goal-select');
+  if (sel && sel.value !== goalId) sel.value = goalId;
+  const blurb = el('discover-goal-blurb');
+  const g = GOALS.find((x) => x.id === goalId);
+  if (blurb && g) blurb.textContent = g.blurb;
 }
 
 async function renderProposal(goal, proposal) {
@@ -264,13 +291,15 @@ async function renderProposal(goal, proposal) {
   el('discover-plan-target').textContent = goal.target.capability_id + '@' + goal.target.capability_version;
 
   const mapEl = el('discover-plan-mappings');
-  mapEl.innerHTML = proposal.proposal.mappings.map((m) =>
-    '<li><code>' + (m.from_node_id || 'facts') + '.' + m.from_field + '</code> → <code>'
-    + m.to_node_id + '.' + m.to_field + '</code> <span class="badge">'
-    + (m.source === 'starting_facts' ? 'from facts' : 'from output')
-    + '</span> <span class="badge discover-unconfirmed">unconfirmed</span></li>').join('');
+  mapEl.innerHTML =
+    '<li class="discover-unconfirmed-note">These mappings are unconfirmed: an untrusted proposal from the browser planner, nothing has run yet. Each row wires one field from a fact or a prior node\'s output into a capability\'s input.</li>'
+    + proposal.proposal.mappings.map((m) =>
+      '<li><code>' + (m.from_node_id || 'facts') + '.' + m.from_field + '</code> → <code>'
+      + m.to_node_id + '.' + m.to_field + '</code> <span class="badge">'
+      + (m.source === 'starting_facts' ? 'from facts' : 'from output')
+      + '</span></li>').join('');
 
-  await renderPlanGraph(el('discover-graph'), proposal);
+  await renderPlanGraph(el('discover-graph'), proposal, goal.ai_capability_ids || []);
   setGraphPhase('planned');
 
   el('discover-exec').hidden = false;
@@ -324,7 +353,7 @@ function renderTrace(trace, proposal) {
 }
 
 async function doGoal(goal) {
-  markActiveCard(goal.id);
+  syncGoalPicker(goal.id);
   run = null;
   el('discover-log').innerHTML = '';
   el('discover-exec').hidden = true;
@@ -390,7 +419,8 @@ async function doExecute() {
   } catch (e) {
     const code = e && e.code ? e.code : String(e && e.name || 'error');
     setGraphPhase('failed');
-    failLine(classifyExecError(code), (code + (e && e.node_id ? ' @ ' + e.node_id : '')).slice(0, 80));
+    const msg = failLine(classifyExecError(code), (code + (e && e.node_id ? ' @ ' + e.node_id : '')).slice(0, 80));
+    renderHalted(msg);
     console.error('[discover] execution refused', e);
     return;
   }
@@ -404,24 +434,19 @@ async function doExecute() {
   renderTrace(trace, run.proposal);
 }
 
-function buildGallery() {
-  const wrap = el('discover-goals');
-  if (!wrap) return;
-  wrap.innerHTML = GOALS.map((g) =>
-    '<button class="discover-goal card card-accent-hover" type="button" data-goal="' + g.id + '">'
-    + '<span class="discover-goal-label">' + g.label + '</span>'
-    + '<span class="discover-goal-blurb t-body-sm t-muted">' + g.blurb + '</span></button>').join('');
-  wrap.querySelectorAll('.discover-goal').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const g = GOALS.find((x) => x.id === btn.dataset.goal);
-      doGoal(g).catch((e) => { console.error('[discover]', e); failLine('transport'); });
-    });
+function buildGoalPicker() {
+  const sel = el('discover-goal-select');
+  if (!sel) return;
+  sel.innerHTML = GOALS.map((g) => '<option value="' + g.id + '">' + g.label + '</option>').join('');
+  sel.addEventListener('change', () => {
+    const g = GOALS.find((x) => x.id === sel.value);
+    doGoal(g).catch((e) => { console.error('[discover]', e); failLine('transport'); });
   });
 }
 
 export function initDiscover() {
-  if (!el('discover-goals')) return;
-  buildGallery();
+  if (!el('discover-goal-select')) return;
+  buildGoalPicker();
   const exec = el('discover-exec');
   if (exec) exec.addEventListener('click', () => { doExecute().catch((e) => { console.error('[discover]', e); failLine('exec_failed', 'unexpected'); }); });
   // Auto-run the first goal to the review gate so the page is alive on arrival.

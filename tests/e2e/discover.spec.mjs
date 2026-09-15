@@ -26,7 +26,7 @@ test('a single-capability goal (price a quote) plans and executes for real', asy
   await page.goto('/discover.html');
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
 
-  await page.locator('.discover-goal[data-goal="price"]').click();
+  await page.locator('#discover-goal-select').selectOption('price');
   await expect(page.locator('#discover-plan-target')).toHaveText('core.calculate-price@1.2.0', { timeout: 45_000 });
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
 
@@ -41,7 +41,7 @@ test('a single-capability goal (card checksum) plans and executes for real', asy
   await page.goto('/discover.html');
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
 
-  await page.locator('.discover-goal[data-goal="luhn"]').click();
+  await page.locator('#discover-goal-select').selectOption('luhn');
   await expect(page.locator('#discover-plan-target')).toHaveText('validation.validate-luhn@1.2.0', { timeout: 45_000 });
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
 
@@ -56,7 +56,7 @@ test('the translate-fr-semantic goal plans, then the local runtime genuinely ref
   await page.goto('/discover.html');
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
 
-  await page.locator('.discover-goal[data-goal="translate-denied"]').click();
+  await page.locator('#discover-goal-select').selectOption('translate-denied');
   await expect(page.locator('#discover-plan-target')).toHaveText('report.translate-fr-semantic@1.0.0', { timeout: 60_000 });
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
 
@@ -71,7 +71,7 @@ test('the embedding-model goal chains three real report.* capabilities and execu
   await page.goto('/discover.html');
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
 
-  await page.locator('.discover-goal[data-goal="summarize-embedding"]').click();
+  await page.locator('#discover-goal-select').selectOption('summarize-embedding');
   await expect(page.locator('#discover-plan-target')).toHaveText('report.summarize-semantic@1.0.0', { timeout: 60_000 });
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
 

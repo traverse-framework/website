@@ -26,11 +26,22 @@ function palette() {
 }
 function isDark() { return document.documentElement.getAttribute('data-theme') !== 'light'; }
 
+/* The last dotted segment only — "report.summarize-semantic" -> "summarize-semantic".
+   Namespace and version stay visible elsewhere (mapping list, trace cards, the
+   goal target); the graph is for shape at a glance, not the full identity. */
+function shortName(capabilityId) {
+  const i = capabilityId.lastIndexOf('.');
+  return i === -1 ? capabilityId : capabilityId.slice(i + 1);
+}
+
+let aiNodeIds = new Set();
+
 function styleFor(id) {
   const p = palette();
   const st = phase.get(id) || 'planned';
+  const isAI = aiNodeIds.has(id);
   const base = {
-    x: pos(id).x, y: pos(id).y, size: id === '__goal' ? 26 : 34,
+    x: pos(id).x, y: pos(id).y, size: id === '__goal' ? 26 : (isAI ? 38 : 34),
     labelText: labels.get(id) || '',
     labelPlacement: 'bottom', labelOffsetY: 8, labelFill: p.muted,
     labelFontSize: 9, labelFontFamily: "'JetBrains Mono', monospace",
@@ -38,10 +49,23 @@ function styleFor(id) {
     lineWidth: 1.5, fill: p.card, stroke: p.border,
   };
   if (id === '__goal') return { ...base, fill: 'color-mix(in srgb, ' + p.accent + ' 14%, transparent)', stroke: p.accent, labelFill: p.fg };
-  if (st === 'reviewed') return { ...base, stroke: p.accent, lineWidth: 2, labelFill: p.fg };
-  if (st === 'succeeded') return { ...base, stroke: p.success, fill: 'color-mix(in srgb, ' + p.success + ' 16%, transparent)', lineWidth: 2, labelFill: p.fg, shadowBlur: 12, shadowColor: p.success };
-  if (st === 'failed') return { ...base, stroke: p.err, fill: 'color-mix(in srgb, ' + p.err + ' 16%, transparent)', lineWidth: 2, labelFill: p.fg };
-  return base; // planned
+  // AI-backed (model_derived / bundled-model) capabilities keep a light accent
+  // tint even before execution, so the different shape reads as intentional.
+  const aiBase = isAI ? { ...base, fill: 'color-mix(in srgb, ' + p.accent + ' 10%, transparent)' } : base;
+  if (st === 'reviewed') return { ...aiBase, stroke: p.accent, lineWidth: 2, labelFill: p.fg };
+  if (st === 'succeeded') return { ...aiBase, stroke: p.success, fill: 'color-mix(in srgb, ' + p.success + ' 16%, transparent)', lineWidth: 2, labelFill: p.fg, shadowBlur: 12, shadowColor: p.success };
+  if (st === 'failed') return { ...aiBase, stroke: p.err, fill: 'color-mix(in srgb, ' + p.err + ' 16%, transparent)', lineWidth: 2, labelFill: p.fg };
+  return aiBase; // planned
+}
+
+let edgesMeta = []; // [{ id, source, target, mapCount }]
+function edgeStyleFor(e) {
+  const p = palette();
+  return {
+    stroke: p.border, lineWidth: 1.5, endArrow: true, endArrowSize: 7,
+    labelText: e.mapCount ? e.mapCount + ' field' + (e.mapCount > 1 ? 's' : '') : '',
+    labelFontSize: 8, labelFill: p.muted, labelBackground: false,
+  };
 }
 
 let positions = new Map();
@@ -57,11 +81,28 @@ function layout(ids, w, h) {
 
 export function resetGraph(container) {
   phase = new Map();
+  aiNodeIds = new Set();
+  edgesMeta = [];
   if (graph) { try { graph.clear(); } catch (e) { void e; } }
   if (container) container.dataset.empty = 'true';
 }
 
-export async function renderPlanGraph(container, proposal) {
+/* Re-applies current styles to the already-built graph without touching
+   `phase` (so an in-progress or completed run keeps its succeeded/failed
+   colouring). Needed because styleFor()/edgeStyleFor() read CSS vars at
+   call time — a theme toggle or viewport resize after the graph was first
+   drawn otherwise leaves stale, theme-mismatched colors baked into the
+   canvas (e.g. dark-mode label text stranded on a light background). */
+function redraw() {
+  if (!graph) return;
+  try {
+    graph.updateNodeData(ordered.map((id) => ({ id, style: styleFor(id) })));
+    graph.updateEdgeData(edgesMeta.map((e) => ({ id: e.id, style: edgeStyleFor(e) })));
+    graph.draw();
+  } catch (e) { console.error('[discover-graph]', e); }
+}
+
+export async function renderPlanGraph(container, proposal, aiCapabilityIds = []) {
   if (!container || !window.G6) return;
   container.dataset.empty = 'false';
 
@@ -69,28 +110,22 @@ export async function renderPlanGraph(container, proposal) {
   ordered = ['__goal', ...nodes.map((n) => n.node_id)];
   labels = new Map([['__goal', 'Goal']]);
   phase = new Map(ordered.map((id) => [id, 'planned']));
+  const aiSet = new Set(aiCapabilityIds);
+  aiNodeIds = new Set(nodes.filter((n) => aiSet.has(n.capability_id)).map((n) => n.node_id));
   const mapCount = new Map();
   for (const m of proposal.proposal.mappings) mapCount.set(m.to_node_id, (mapCount.get(m.to_node_id) || 0) + 1);
-  nodes.forEach((n) => labels.set(n.node_id, n.capability_id + '\n@' + n.capability_version));
+  nodes.forEach((n) => labels.set(n.node_id, shortName(n.capability_id)));
 
-  const edges = [];
-  edges.push({ id: 'e-goal', source: '__goal', target: nodes[0].node_id });
+  edgesMeta = [{ id: 'e-goal', source: '__goal', target: nodes[0].node_id, mapCount: mapCount.get(nodes[0].node_id) || 0 }];
   for (let i = 1; i < nodes.length; i++) {
-    edges.push({ id: 'e-' + i, source: nodes[i - 1].node_id, target: nodes[i].node_id });
+    edgesMeta.push({ id: 'e-' + i, source: nodes[i - 1].node_id, target: nodes[i].node_id, mapCount: mapCount.get(nodes[i].node_id) || 0 });
   }
 
   layout(ordered, container.clientWidth || 640, container.clientHeight || 220);
 
   const data = {
-    nodes: ordered.map((id) => ({ id, type: 'circle', style: styleFor(id) })),
-    edges: edges.map((e) => ({
-      ...e,
-      style: {
-        stroke: palette().border, lineWidth: 1.5, endArrow: true, endArrowSize: 7,
-        labelText: mapCount.get(e.target) ? mapCount.get(e.target) + ' field' + (mapCount.get(e.target) > 1 ? 's' : '') : '',
-        labelFontSize: 8, labelFill: palette().muted, labelBackground: false,
-      },
-    })),
+    nodes: ordered.map((id) => ({ id, type: aiNodeIds.has(id) ? 'diamond' : 'circle', style: styleFor(id) })),
+    edges: edgesMeta.map((e) => ({ id: e.id, source: e.source, target: e.target, style: edgeStyleFor(e) })),
   };
 
   try {
@@ -118,12 +153,20 @@ export function setGraphPhase(state, nodeId) {
   if (!graph) return;
   const ids = nodeId ? [nodeId] : ordered.filter((id) => id !== '__goal');
   for (const id of ids) phase.set(id, state);
-  try {
-    graph.updateNodeData(ids.map((id) => ({ id, style: styleFor(id) })));
-    graph.draw();
-  } catch (e) { console.error('[discover-graph]', e); }
+  redraw();
 }
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('resize', () => { if (graph) { const c = graph.getCanvas && graph.getCanvas().getContainer && graph.getCanvas().getContainer().parentElement; if (c) { layout(ordered, c.clientWidth, c.clientHeight); graph.setSize(c.clientWidth, c.clientHeight); graph.updateNodeData(ordered.map((id) => ({ id, style: styleFor(id) }))); graph.draw(); } } });
+  window.addEventListener('resize', () => {
+    if (!graph) return;
+    const c = graph.getCanvas && graph.getCanvas().getContainer && graph.getCanvas().getContainer().parentElement;
+    if (!c) return;
+    layout(ordered, c.clientWidth, c.clientHeight);
+    graph.setSize(c.clientWidth, c.clientHeight);
+    redraw();
+  });
+  // The theme toggle (Nav.astro) only sets documentElement[data-theme] — it
+  // dispatches no event. Watch the attribute directly so an already-drawn
+  // graph repaints instead of keeping colors baked in for the prior theme.
+  new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 }
