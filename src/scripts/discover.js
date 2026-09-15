@@ -80,6 +80,26 @@ const GOALS = [
       ],
     },
   },
+  {
+    id: 'summarize-embedding',
+    label: 'Summarize notes with a bundled embedding model',
+    blurb: 'From four raw status notes the planner chains report.collect-fragments (dedupe) into report.enrich-insights (derive facts) into report.summarize-semantic — a ~31 MB bundled sentence-embedding model that ranks sentences by real fixed-point cosine similarity, fetched live and digest-verified, entirely offline.',
+    kind: 'chain',
+    target: { capability_id: 'report.summarize-semantic', capability_version: '1.0.0' },
+    candidate_refs: [
+      { namespace: 'report', id: 'report.collect-fragments', versionRange: '1.0.0' },
+      { namespace: 'report', id: 'report.enrich-insights', versionRange: '1.1.0' },
+      { namespace: 'report', id: 'report.summarize-semantic', versionRange: '1.0.0' },
+    ],
+    starting_facts: {
+      fragments: [
+        'Browser adoption rose 18% week over week after the Safari fix shipped.',
+        'Edge cache hit rate held steady at 94%, no incidents in the last 30 days.',
+        'Cloud spend is trending 6% over budget for the quarter.',
+        'Two customers escalated onboarding delays through support this week.',
+      ],
+    },
+  },
 ];
 
 /* Fail-closed copy. Asserted by tests/discover-truthfulness.test.mjs. */

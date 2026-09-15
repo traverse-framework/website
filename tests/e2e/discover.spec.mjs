@@ -65,3 +65,20 @@ test('the translate-fr-semantic goal plans, then the local runtime genuinely ref
   await expect(page.locator('#discover-log')).toContainText('the local runtime declined to authorize a node');
   await expect(page.locator('#discover-log')).toContainText('real governance decision, not an error');
 });
+
+test('the embedding-model goal chains three real report.* capabilities and executes a bundled ML model in-browser', async ({ page }) => {
+  test.slow(); // fetches a live ~21 MB (compressed) WASM artifact and instantiates it
+  await page.goto('/discover.html');
+  await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
+
+  await page.locator('.discover-goal[data-goal="summarize-embedding"]').click();
+  await expect(page.locator('#discover-plan-target')).toHaveText('report.summarize-semantic@1.0.0', { timeout: 60_000 });
+  await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
+
+  await page.locator('#discover-exec').click();
+  await expect(page.locator('#discover-badge')).toHaveText('Executed — real, offline, governed', { timeout: 60_000 });
+  await expect(page.locator('#discover-trace')).toContainText('terminal: succeeded');
+  await expect(page.locator('#discover-trace')).toContainText('report.collect-fragments@1.0.0');
+  await expect(page.locator('#discover-trace')).toContainText('report.enrich-insights@1.1.0');
+  await expect(page.locator('#discover-trace')).toContainText('report.summarize-semantic@1.0.0');
+});

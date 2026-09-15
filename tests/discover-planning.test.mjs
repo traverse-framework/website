@@ -59,9 +59,11 @@ async function planningFixture() {
   return { snapshot, identity, deps };
 }
 
-const TARGET = { capability_id: 'uncertainty.score', capability_version: '1.0.0' };
-const FACTS = { coverage_state: 'partial', period_key: '2026-08-17', scope_id: 'golden-bc', policy: { version: 'p1' },
-  included_reference_ids: ['a', 'b'], pending_reference_ids: ['c'] };
+const TARGET = { capability_id: 'period.finalize', capability_version: '1.0.0' };
+// Matches the bundle's own input.fixture.json (period.finalize's published
+// use_cases[0].input_example + a shared policy — see PROVENANCE.md).
+const FACTS = { scope_id: 'golden-bc', period_key: '2026-08-17', coverage_state: 'partial',
+  watermark: 'capture-watermark-001', policy: { version: 'policy-1' } };
 const MANIFEST = { app_id: 'discover', version: '1.0.0', schema_version: '1.0.0' };
 
 test('browserLocalPlan derives a real structural proposal from a goal', async () => {
@@ -69,11 +71,21 @@ test('browserLocalPlan derives a real structural proposal from a goal', async ()
   const res = await browserLocalPlan(identity, snapshot, deps, TARGET, FACTS, 'local-default', MANIFEST);
   assert.ok(res.proposals.length >= 1);
   const p = res.proposals[0];
-  assert.deepEqual(p.proposal.nodes.map((n) => n.capability_id), ['summary.aggregate', 'uncertainty.score']);
+  // period.finalize's own required inputs are fully covered by starting
+  // facts, so this is a valid single-node proposal. summary.aggregate and
+  // uncertainty.score are NOT valid predecessors for anything here: neither
+  // echoes `policy` in its outputs (only `policy_version`), so under the
+  // corrected planner (traverse-embedder-web >=0.10.2, issue #1338 — a
+  // predecessor's outputs alone, never mixed with facts, must cover 100% of
+  // a downstream node's required inputs) no multi-hop chain exists within
+  // this fixture's capability set. A genuine multi-hop chain is covered by
+  // the live-registry test below, against report.* capabilities that were
+  // deliberately designed to echo fields for chain composition.
+  assert.deepEqual(p.proposal.nodes.map((n) => n.capability_id), ['period.finalize']);
   assert.equal(p.mapping_unconfirmed, true);
-  const m = p.proposal.mappings.filter((x) => x.to_node_id === 'node-2');
-  assert.ok(m.some((x) => x.from_field === 'included_count' && x.source === 'capability_output'));
-  assert.ok(m.some((x) => x.from_field === 'policy' && x.source === 'starting_facts'));
+  const m = p.proposal.mappings.filter((x) => x.to_node_id === 'node-1');
+  assert.equal(m.length, 5);
+  assert.ok(m.every((x) => x.source === 'starting_facts'));
 });
 
 test('browserLocalPlan fails closed on a tampered snapshot', async () => {
@@ -98,7 +110,7 @@ test('buildSnapshot skips deprecated and pins a self-consistent releaseTag', asy
   assert.match(snap.releaseTag, /^catalog-[0-9a-f]{16}$/);
 });
 
-test('end to end against the LIVE registry: plan a goal, review, composed-execute', { skip: !process.env.CHECK_REGISTRY && 'set CHECK_REGISTRY=1 for the networked check' }, async () => {
+test('end to end against the LIVE registry: plan a real 3-node goal, review, composed-execute (fetches the ~21MB compressed embedding-model WASM)', { skip: !process.env.CHECK_REGISTRY && 'set CHECK_REGISTRY=1 for the networked check' }, async () => {
   const raw = await (await fetch('https://registry.traverse-framework.com/catalog.json', { cache: 'no-store' })).json();
   const snapshot = await buildSnapshot(raw);
   const identity = await snapshotIdentity(snapshot);
@@ -110,19 +122,26 @@ test('end to end against the LIVE registry: plan a goal, review, composed-execut
   } };
   const store = new MemoryRegistryCacheStore();
   const deps = [];
-  for (const r of [['summary', 'summary.aggregate'], ['uncertainty', 'uncertainty.score']]) {
-    const ref = { namespace: r[0], id: r[1], versionRange: '1.1.0' };
+  for (const r of [
+    ['report', 'report.collect-fragments', '1.0.0'],
+    ['report', 'report.enrich-insights', '1.1.0'],
+    ['report', 'report.summarize-semantic', '1.0.0'],
+  ]) {
+    const ref = { namespace: r[0], id: r[1], versionRange: r[2] };
     await prepareRegistryDependency(store, snapshot, ref, fetcher);
     deps.push(await resolveRegistryDependencyOffline(store, ref));
   }
   const res = await browserLocalPlan(
     identity, snapshot, deps,
-    { capability_id: 'uncertainty.score', capability_version: '1.1.0' },
-    { coverage_state: 'partial', period_key: '2026-08-17', scope_id: 'golden-bc', policy: { version: 'p1' } },
+    { capability_id: 'report.summarize-semantic', capability_version: '1.0.0' },
+    { fragments: ['Browser adoption rose.', 'Edge cache is warm.'] },
     'local-default', MANIFEST,
   );
   assert.ok(res.proposals.length >= 1);
-  const reviewed = { ...res.proposals[0], mapping_unconfirmed: false };
+  const p = res.proposals.find((x) => x.proposal.nodes.length === 3) ?? res.proposals[0];
+  assert.deepEqual(p.proposal.nodes.map((n) => n.capability_id),
+    ['report.collect-fragments', 'report.enrich-insights', 'report.summarize-semantic']);
+  const reviewed = { ...p, mapping_unconfirmed: false };
   const trace = await executeBrowserComposedWorkflow(reviewed, store, snapshot);
   assert.equal(trace.terminal_state, 'succeeded', JSON.stringify(trace));
   assert.ok(trace.node_outcomes.every((o) => o.status === 'succeeded'));
