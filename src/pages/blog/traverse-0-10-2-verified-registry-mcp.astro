@@ -1,0 +1,142 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 14, 2026</span>
+      <span class="badge">Release</span>
+      <span class="badge">MCP</span>
+      <span class="badge">Registry</span>
+    </div>
+    <h1 class="t-h1">Traverse v0.10.2: prepare once, then run offline</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.10.2">Traverse v0.10.2</a> is a compatibility-preserving cut on the v0.10 line. Existing local callers keep the same Rust crate APIs and the same <code>traverse-cli</code> binary name. What changed is how hosts touch the public Registry and how MCP hosts serve from that evidence.</p>
+
+      <div class="callout">
+        Short version: prepare a signed Registry release into a host-owned cache under digest keys, then validate / register / activate — and Mode B MCP — from that cache alone. No fetch-at-activate. No ambient credentials in the Callweave fixture path.
+      </div>
+
+      <h2 id="why">Why this cut exists</h2>
+
+      <p>v0.10.0 and v0.10.1 did not give hosts a complete preparation-to-offline-activation path. Operators who wanted Registry-backed apps still had to resolve <code>registry_ref</code> at command time, or keep expedition checkout material nearby. That is fine for a laptop demo. It is the wrong shape for an MCP host or an app runtime that should fail closed when the network is gone or a digest drifts.</p>
+
+      <p>v0.10.2 closes that gap with work that landed on <code>main</code> after the v0.10.1 compatibility fixes. It is labeled a patch because public caller APIs stayed stable. The behavior for Registry-backed flows is stricter on purpose.</p>
+
+      <h2 id="prep">Prepare once</h2>
+
+      <p>A host prepares an active, signed Registry release and commits verified contract and WASM bytes under immutable digest keys. After that:</p>
+
+      <ul>
+        <li><code>app validate</code>, <code>app register</code>, and <code>app activate</code> consume prepared evidence only.</li>
+        <li>They do not fetch from the Registry, replace an exact version, or substitute a local component path.</li>
+        <li>Cache integrity failures stay redacted. Operators get stable lifecycle outcomes — not endpoints, credentials, headers, cache paths, or raw artifact bytes.</li>
+      </ul>
+
+      <p>The checked-in Callweave <code>inference.evidence-normalize@1.0.1</code> signed-release fixture proves exact-version validation, registration, and local activation from prepared cache bytes with no credential or private endpoint requirement.</p>
+
+      <h2 id="mcp">Mode A and Mode B MCP</h2>
+
+      <p>Two MCP host shapes ship on the same <code>traverse-mcp</code> binary:</p>
+
+      <ul>
+        <li><strong>Mode A</strong> (spec 119): a verified-registry MCP host over host-owned, verified public metadata.</li>
+        <li><strong>Mode B</strong>: <code>traverse-mcp prepare-cache</code> builds a host-owned verified registry cache from public <code>registry_ref</code> values. <code>traverse-mcp stdio --cache &lt;dir&gt;</code> then serves discover / validate / execute / report from that cache only — no expedition checkout, no App-References materialize rewrite.</li>
+      </ul>
+
+      <p>Pin and verify the same versioned <code>traverse-mcp</code> binary for both modes. crates.io packages for this cut are at <code>0.10.2</code>.</p>
+
+      <h2 id="also">Also in the cut (not the whole story)</h2>
+
+      <p>Worth naming so the changelog is not a surprise, without pretending each is a launch:</p>
+
+      <ul>
+        <li>Host connector command dispatch for a manifest-selected, explicitly activated connector (<code>audio.capture</code> first; <code>model.execute</code> on the same envelopes).</li>
+        <li><code>component-wit-v1</code> host-capability activation through application-activated target-local bindings.</li>
+        <li>Persisted capability hydration for <code>serve</code>, plus app availability status.</li>
+        <li>Browser-local deterministic planning and offline composed-workflow execution. Plan-then-seal is the default; adaptive composition is opt-in.</li>
+      </ul>
+
+      <h2 id="upgrade">What breaks if you skip the prep step</h2>
+
+      <p>Registry-backed <code>app validate</code> / <code>register</code> / <code>activate</code> now require the prepared host-owned cache. Legacy <code>serve</code> registrations without a persisted <code>state_machine</code> need an explicit <code>app register</code> refresh — you get <code>503 app_unavailable</code> / <code>app_registration_requires_refresh</code>, not a silent 404. If you consume <code>traverse-registry</code> directly, pin <code>=0.20.0</code>.</p>
+
+      <p>Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.10.2">GitHub Release</a> · <a href="/changelog.html">site changelog</a> · Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1391">#1391</a>.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why">Why this cut exists</a></li>
+          <li><a href="#prep">Prepare once</a></li>
+          <li><a href="#mcp">Mode A and Mode B MCP</a></li>
+          <li><a href="#also">Also in the cut</a></li>
+          <li><a href="#upgrade">What breaks if you skip prep</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.10.2">v0.10.2 release →</a></li>
+          <li><a href="/blog/traverse-0-10-governed-composition.html">Traverse v0.10: governed composition →</a></li>
+          <li><a href="/blog/what-discover-proves.html">What /discover proves →</a></li>
+          <li><a href="/discover.html">Try /discover →</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</div>
+`;
+---
+<SubpageLayout
+  title={"Traverse v0.10.2: prepare once, then run offline — Traverse Blog"}
+  description={"v0.10.2 lands verified Registry preparation and Mode A/B MCP hosts so validate/register/activate and MCP can run from a host-owned cache without fetch-at-activate."}
+  canonical={"https://traverse-framework.com/blog/traverse-0-10-2-verified-registry-mcp.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
