@@ -19,11 +19,19 @@ const _body = `<section class="page-hero">
 
 <section class="section-sm" id="discover-root">
   <div class="container">
-    <div class="discover-goals" id="discover-goals" aria-label="Goals"></div>
+    <p class="t-body-sm t-muted discover-goals-intro">Each goal below is a different real goal against the live registry — from a multi-capability chain to a single target the runtime refuses to run automatically. Pick one; the terminal and graph track it end to end.</p>
+    <div class="discover-goal-picker">
+      <label for="discover-goal-select" class="discover-sub-h">Choose a goal</label>
+      <select id="discover-goal-select" class="discover-select" aria-label="Goal"></select>
+      <p id="discover-goal-blurb" class="t-body-sm t-muted discover-goal-blurb"></p>
+    </div>
 
     <div class="discover-graph-panel card">
       <div id="discover-graph" class="discover-graph-el" data-empty="true"></div>
       <span id="discover-badge" class="discover-badge" data-state="idle">Loading…</span>
+      <button id="discover-exec" class="discover-play-btn" type="button" hidden aria-label="Confirm mappings and execute for real" title="Confirm mappings and execute for real">
+        <span class="discover-play-icon" aria-hidden="true">&#9654;</span><span class="discover-play-label">Execute</span>
+      </button>
     </div>
 
     <div class="discover-layout">
@@ -36,14 +44,17 @@ const _body = `<section class="page-hero">
       </div>
 
       <div class="discover-result" id="discover-result" data-outcome="idle" hidden>
-        <dl class="discover-receipt">
-          <div><dt>Goal (structured target)</dt><dd class="discover-mono" id="discover-plan-target">&mdash;</dd></div>
-        </dl>
+        <div class="discover-result-header">
+          <div>
+            <div class="discover-sub-h">Goal</div>
+            <div class="discover-goal-name" id="discover-plan-target">&mdash;</div>
+          </div>
+          <div class="discover-result-status" id="discover-result-status" data-state="idle">Idle</div>
+        </div>
         <div>
           <div class="discover-sub-h">Proposed field mappings — unconfirmed until you execute</div>
           <ul class="discover-mappings" id="discover-plan-mappings"></ul>
         </div>
-        <button id="discover-exec" class="btn btn-primary" type="button" hidden>Confirm mappings &amp; execute for real &rarr;</button>
         <div id="discover-trace"></div>
       </div>
     </div>
@@ -70,13 +81,20 @@ const _body = `<section class="page-hero">
   crumbs={[{ label: "Home", href: "/" }]}
 >
   <style is:global slot="head">
-    .discover-goals { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem; }
-    .discover-goal { text-align: left; display: flex; flex-direction: column; gap: 0.4rem; padding: 1rem 1.1rem; cursor: pointer; border: 1px solid var(--border); background: var(--bg-card); border-radius: var(--radius); }
-    .discover-goal[data-active="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-    .discover-goal-label { font-weight: 600; color: var(--fg); font-size: 0.95rem; }
-    .discover-goal-blurb { line-height: 1.5; }
+    .discover-goals-intro { margin: 0 0 0.75rem; }
+    .discover-goal-picker { margin-bottom: 1.25rem; }
+    .discover-select {
+      display: block; width: 100%; font-family: inherit; font-size: 0.95rem; font-weight: 600;
+      color: var(--fg); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 0.75rem 1rem; margin-top: 0.35rem; cursor: pointer;
+      appearance: none; -webkit-appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--fg-muted) 50%), linear-gradient(135deg, var(--fg-muted) 50%, transparent 50%);
+      background-position: calc(100% - 22px) center, calc(100% - 16px) center; background-size: 6px 6px; background-repeat: no-repeat;
+    }
+    .discover-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .discover-goal-blurb { line-height: 1.55; margin: 0.55rem 0 0; }
 
-    .discover-graph-panel { position: relative; padding: 0.75rem; margin-bottom: 1.25rem; }
+    .discover-graph-panel { position: relative; padding: 0.75rem 0.75rem 3.25rem; margin-bottom: 1.25rem; }
     .discover-graph-el { width: 100%; height: 240px; }
     .discover-graph-el[data-empty="true"]::after { content: "Planning…"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--fg-subtle); font-family: var(--font-mono); font-size: 0.8rem; }
     .discover-badge { position: absolute; right: 1.1rem; top: 1.1rem; z-index: 5; font-family: var(--font-mono); font-size: 0.7rem; padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-elevated); color: var(--fg-muted); }
@@ -85,6 +103,17 @@ const _body = `<section class="page-hero">
     .discover-badge[data-state="executed"] { border-color: var(--success); color: var(--success); }
     .discover-badge[data-state="failed"] { border-color: #e8907d; color: #e8907d; }
     .discover-badge[data-state="noplan"] { border-color: var(--fg-subtle); color: var(--fg-subtle); }
+
+    .discover-play-btn {
+      position: absolute; left: 50%; bottom: 0.85rem; transform: translateX(-50%); z-index: 5;
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border-radius: 999px;
+      border: 1px solid var(--accent); background: var(--accent); color: var(--bg-elevated);
+      font-weight: 700; font-size: 0.85rem; cursor: pointer;
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+    .discover-play-btn[hidden] { display: none !important; }
+    .discover-play-btn:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
+    .discover-play-icon { font-size: 0.7rem; }
 
     .discover-layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.25rem; align-items: start; }
     @media (max-width: 860px) { .discover-layout { grid-template-columns: 1fr; } }
@@ -96,18 +125,24 @@ const _body = `<section class="page-hero">
     .discover-log-line.ok { color: #9ccdb2; }
     .discover-log-line.err { color: #e8907d; }
 
-    .discover-result { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
-    .discover-receipt { margin: 0; }
-    .discover-receipt dt { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-subtle); margin-bottom: 0.2rem; }
-    .discover-receipt dd { margin: 0; }
+    .discover-result { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1.15rem; }
+    .discover-result-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .discover-goal-name { font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--fg); word-break: break-all; line-height: 1.3; }
+    .discover-result-status {
+      font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+      padding: 0.35rem 0.7rem; border-radius: var(--radius-sm); border: 1px solid var(--border); color: var(--fg-muted);
+    }
+    .discover-result-status[data-state="running"], .discover-result-status[data-state="planned"] { border-color: var(--accent); color: var(--accent); }
+    .discover-result-status[data-state="executed"] { border-color: var(--success); color: var(--success); }
+    .discover-result-status[data-state="failed"] { border-color: #e8907d; color: #e8907d; }
+    .discover-result-status[data-state="noplan"] { border-color: var(--fg-subtle); color: var(--fg-subtle); }
     .discover-mono { font-family: var(--font-mono); font-size: 0.75rem; word-break: break-all; }
     .discover-sub-h { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-subtle); margin-bottom: 0.4rem; }
     .discover-mappings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.75rem; }
     .discover-mappings code { font-size: 0.72rem; }
-    .discover-unconfirmed { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+    .discover-unconfirmed-note { color: var(--accent); font-size: 0.72rem; line-height: 1.5; margin-bottom: 0.2rem; }
+    .discover-halted-note { color: #e8907d; font-size: 0.78rem; }
     .discover-noplan { color: var(--fg-muted); line-height: 1.55; }
-    #discover-exec { align-self: flex-start; }
-    #discover-exec[hidden] { display: none !important; }
     .discover-cap-cards { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.6rem; }
     .discover-cap-card { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }
     .discover-cap-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg); word-break: break-all; }
