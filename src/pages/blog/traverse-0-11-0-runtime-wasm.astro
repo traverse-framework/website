@@ -47,9 +47,9 @@ const _body = `
       <p>Existing local Wasmtime callers keep their Rust APIs. Web / bundle consumers must ship <code>runtime/runtime.wasm</code> with the app. Copy from this repo’s <code>runtime/runtime.wasm</code> (or the published native-runtime artifact) and include the matching <code>.sha256</code>.</p>
 
 
-      <h2 id="coming-next">Coming next (work in flight — not in v0.11.0)</h2>
+      <h2 id="coming-next">Coming next (not in v0.11.0)</h2>
 
-      <p>Separately from this release, work is in flight toward <strong>exact-ref governed model execution</strong> for WASM model packages — Spec <code>138-governed-exact-model-execution</code> and ADR-0074 (owner-approved; implementation tickets open). This is platform work on the existing Spec 137 <code>model.execute</code> host-connector port, not a new public guest import.</p>
+      <p>Separately from this release, <strong>exact-ref governed model execution</strong> for WASM model packages — Spec <code>138-governed-exact-model-execution</code> and ADR-0074 — landed on <code>main</code> via <a href="https://github.com/traverse-framework/traverse/pull/1438">traverse#1438</a> (16 September 2026), closing #1435–#1437. The crate/npm line that carries it is the v0.12.0 cut still in flight (<a href="https://github.com/traverse-framework/traverse/issues/1445">#1445</a>, bump <a href="https://github.com/traverse-framework/traverse/pull/1446">#1446</a>). This is platform work on the existing Spec 137 <code>model.execute</code> host-connector port, not a new public guest import. Longer explainer: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>.</p>
 
       <ul>
         <li><strong>Exact signed model references</strong> — app manifests pin <code>exact_model_dependencies</code>; packages carry a sidecar manifest with digest, license, ABI, schemas, and resource limits. A naked URL is never identity.</li>
@@ -89,7 +89,7 @@ const _body = `
 ---
 <SubpageLayout
   title="Traverse v0.11.0: one runtime.wasm, every host"
-  description="Nested-wasmi runtime.wasm convergence across native hosts and the browser embedder. Coming next: exact-ref governed model execution (Spec 138) — work in flight."
+  description="Nested-wasmi runtime.wasm convergence across native hosts and the browser embedder. Coming next: exact-ref governed model execution (Spec 138) — on main, awaiting the v0.12.0 publish; not in this v0.11.0 cut."
   canonical="https://traverse-framework.com/blog/traverse-0-11-0-runtime-wasm.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
 >
