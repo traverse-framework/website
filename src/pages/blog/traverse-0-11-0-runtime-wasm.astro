@@ -49,7 +49,7 @@ const _body = `
 
       <h2 id="coming-next">Coming next (not in v0.11.0)</h2>
 
-      <p>Separately from this release, <strong>exact-ref governed model execution</strong> for WASM model packages — Spec <code>138-governed-exact-model-execution</code> and ADR-0074 — landed on <code>main</code> via <a href="https://github.com/traverse-framework/traverse/pull/1438">traverse#1438</a> (16 September 2026), closing #1435–#1437. The crate/npm line that carries it is the v0.12.0 cut still in flight (<a href="https://github.com/traverse-framework/traverse/issues/1445">#1445</a>, bump <a href="https://github.com/traverse-framework/traverse/pull/1446">#1446</a>). This is platform work on the existing Spec 137 <code>model.execute</code> host-connector port, not a new public guest import. Longer explainer: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>.</p>
+      <p>Separately from this release, <strong>exact-ref governed model execution</strong> for WASM model packages — Spec <code>138-governed-exact-model-execution</code> and ADR-0074 — shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">Traverse v0.12.0</a> (via <a href="https://github.com/traverse-framework/traverse/pull/1438">traverse#1438</a>). See the <a href="/blog/traverse-0-12-0-exact-ref-model-execute.html">v0.12.0 release post</a> and <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>.</p>
 
       <ul>
         <li><strong>Exact signed model references</strong> — app manifests pin <code>exact_model_dependencies</code>; packages carry a sidecar manifest with digest, license, ABI, schemas, and resource limits. A naked URL is never identity.</li>
@@ -60,7 +60,7 @@ const _body = `
         <li><strong>Fail-closed</strong> — verified digest/signature, unknown fields rejected, redacted traces (no tensors/secrets/credentials).</li>
       </ul>
 
-      <p>That arc is <em>not</em> in v0.11.0. Spec 045 (candidate / LLM resolution) stays a separate track. Guest <code>model_invoke</code> remains out of scope for v1 of Spec 138.</p>
+      <p>That arc is <em>not</em> in v0.11.0 — it shipped in v0.12.0. Spec 045 (candidate / LLM resolution) stays a separate track. Guest <code>model_invoke</code> remains out of scope for v1 of Spec 138.</p>
 
       <p>Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.11.0">GitHub Release</a> · <a href="/changelog.html">site changelog</a> · Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1439">#1439</a>.</p>
 
@@ -89,7 +89,7 @@ const _body = `
 ---
 <SubpageLayout
   title="Traverse v0.11.0: one runtime.wasm, every host"
-  description="Nested-wasmi runtime.wasm convergence across native hosts and the browser embedder. Coming next: exact-ref governed model execution (Spec 138) — on main, awaiting the v0.12.0 publish; not in this v0.11.0 cut."
+  description="Nested-wasmi runtime.wasm convergence across native hosts and the browser embedder. Exact-ref governed model execution (Spec 138) shipped later in v0.12.0; not in this v0.11.0 cut."
   canonical="https://traverse-framework.com/blog/traverse-0-11-0-runtime-wasm.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
 >
