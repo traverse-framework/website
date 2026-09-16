@@ -46,7 +46,23 @@ const _body = `
 
       <p>Existing local Wasmtime callers keep their Rust APIs. Web / bundle consumers must ship <code>runtime/runtime.wasm</code> with the app. Copy from this repo’s <code>runtime/runtime.wasm</code> (or the published native-runtime artifact) and include the matching <code>.sha256</code>.</p>
 
-      <p>Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.11.0">GitHub Release</a> · <a href="/changelog.html">site changelog</a>.</p>
+
+      <h2 id="coming-next">Coming next (work in flight — not in v0.11.0)</h2>
+
+      <p>Separately from this release, work is in flight toward <strong>exact-ref governed model execution</strong> for WASM model packages — Spec <code>138-governed-exact-model-execution</code> and ADR-0074 (owner-approved; implementation tickets open). This is platform work on the existing Spec 137 <code>model.execute</code> host-connector port, not a new public guest import.</p>
+
+      <ul>
+        <li><strong>Exact signed model references</strong> — app manifests pin <code>exact_model_dependencies</code>; packages carry a sidecar manifest with digest, license, ABI, schemas, and resource limits. A naked URL is never identity.</li>
+        <li><strong>Provider-neutral command envelopes</strong> — versioned Spec 137 <code>model.execute</code> request/response fields with opaque <code>input_ref</code> / <code>output_ref</code> handles; host <code>stage_model_input</code> / <code>read_model_output</code> for binary tensors.</li>
+        <li><strong>Registry resolve + content-addressed cache</strong> — verified cache for model packages; offline execute when the package is provisioned and the manifest allows it; miss → stable <code>model_unavailable</code>.</li>
+        <li><strong>First conformance: <code>wasm-cpu</code></strong> — deny-by-default FS/network for the model guest; later acceleration adapters must preserve the public envelopes.</li>
+        <li><strong>Same envelopes for browser and native</strong> — placement is metadata; browser cross-target conformance follows the native path.</li>
+        <li><strong>Fail-closed</strong> — verified digest/signature, unknown fields rejected, redacted traces (no tensors/secrets/credentials).</li>
+      </ul>
+
+      <p>That arc is <em>not</em> in v0.11.0. Spec 045 (candidate / LLM resolution) stays a separate track. Guest <code>model_invoke</code> remains out of scope for v1 of Spec 138.</p>
+
+      <p>Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.11.0">GitHub Release</a> · <a href="/changelog.html">site changelog</a> · Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1440">#1440</a>.</p>
 
     </article>
 
@@ -57,6 +73,7 @@ const _body = `
           <li><a href="#why">Why a minor</a></li>
           <li><a href="#what">What shipped</a></li>
           <li><a href="#upgrade">Upgrade note</a></li>
+          <li><a href="#coming-next">Coming next</a></li>
         </ul>
       </div>
       <div class="sidebar-card sidebar-cta">
@@ -72,7 +89,7 @@ const _body = `
 ---
 <SubpageLayout
   title="Traverse v0.11.0: one runtime.wasm, every host"
-  description="Nested-wasmi runtime.wasm convergence across native hosts and the browser embedder."
+  description="Nested-wasmi runtime.wasm convergence across native hosts and the browser embedder. Coming next: exact-ref governed model execution (Spec 138) — work in flight."
   canonical="https://traverse-framework.com/blog/traverse-0-11-0-runtime-wasm.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
 >
