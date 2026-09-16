@@ -92,20 +92,21 @@
       </ul>
 
       <h2>Basic usage</h2>
-      <pre><code># Register a capability
-traverse capability register \
-  --contract pricing.toml \
-  --wasm target/wasm32-wasi/release/pricing.wasm
+      <pre><code># Scaffold a capability package
+traverse-cli capability new pricing.calculate-total
 
-# Run it
-traverse capability run pricing --input '{"quantity":10,"unit_price":5.00}'
+# Validate the package
+traverse-cli capability-package inspect capabilities/pricing.calculate-total/manifest.json
+
+# Execute it against a request
+traverse-cli capability-package execute capabilities/pricing.calculate-total/manifest.json request.json
 
 # List registered capabilities
-traverse registry list</code></pre>
+traverse-cli registry list</code></pre>
 
       <h2>Starting the MCP server</h2>
       <p>The CLI also starts the MCP stdio server that AI agents use to discover and call capabilities:</p>
-      <pre><code>traverse mcp serve</code></pre>
+      <pre><code>traverse-mcp stdio</code></pre>
       <p>This makes your local registry available to any MCP-compatible client, including Claude Desktop. See <a href="/questions/how-does-the-mcp-server-work.html">how the MCP server works</a> for details.</p>
 
       <h2>Installation</h2>

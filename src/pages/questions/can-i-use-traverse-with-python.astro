@@ -1,17 +1,58 @@
 ---
 import QuestionLayout from '@layouts/QuestionLayout.astro';
 
-const relatedLinks = [];
-const _body = "<p>Yes. You can call Traverse capabilities from Python even though Traverse is written in Rust. The two practical approaches are calling the CLI as a subprocess or connecting to the MCP server from a Python MCP client. The capability contract is enforced on every call regardless of how you invoke it.</p>\n\n      <h2>Option 1: CLI subprocess</h2>\n      <p>The simplest approach is to call <code>traverse capability run</code> from Python using <code>subprocess</code>:</p>\n      <pre><code>import subprocess, json\n\nresult = subprocess.run(\n    [\"traverse\", \"capability\", \"run\", \"calculate_price\",\n     \"--input\", json.dumps({\"quantity\": 10, \"unit_price\": 5.0})],\n    capture_output=True, text=True\n)\noutput = json.loads(result.stdout)</code></pre>\n      <p>This works but adds subprocess overhead per call. It is fine for batch processing or occasional calls. For high-frequency use, the MCP server approach is better.</p>\n\n      <h2>Option 2: MCP client</h2>\n      <p>Start the Traverse MCP server once and connect from your Python code using any MCP client library. The MCP protocol communicates over stdio using JSON-RPC. Your Python process sends <code>tools/call</code> messages and reads responses. The server handles contract enforcement.</p>\n\n      <h2>Option 3: Embed via Wasmtime</h2>\n      <p>Python has Wasmtime bindings. If you want to embed WASM execution directly in Python without the Traverse runtime's full contract enforcement, you can load the capability binary yourself. You lose the contract validation layer, but it is an option for lightweight use cases.</p>\n\n      <h2>What Python provides vs. what Traverse provides</h2>\n      <ul>\n        <li>Python handles your application logic, data pipelines, and ML workflows</li>\n        <li>Traverse handles business capability execution with contract enforcement</li>\n        <li>A common pattern: Python orchestrates, Traverse executes critical business rules</li>\n      </ul>\n\n      <p>A native Python SDK is on the roadmap. See <a href=\"/questions/what-is-traverse-roadmap.html\">the roadmap</a> for timing.</p>";
-const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I use Traverse with Python?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Yes. You can call Traverse capabilities from Python by invoking the traverse CLI as a subprocess, or by using the MCP protocol if your Python code acts as an MCP client. The capability contract is enforced on every call regardless of the calling language.\"}}]}";
+const relatedLinks = [
+  { href: '/faq.html', label: 'FAQ' },
+  { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust to use Traverse?' },
+  { href: 'https://github.com/traverse-framework/traverse/tree/main/examples/consume-python', label: 'Python consume example' },
+];
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I use Traverse with Python?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes. Python can consume Traverse today by using the standard-library subprocess module to call traverse-cli capability-package execute against a checked-in capability package. There is no native Python SDK yet.',
+    },
+  }],
+});
 ---
 <QuestionLayout
-  title={"Can I use Traverse with Python?"}
-  description={"You can call Traverse capabilities from Python via the CLI or subprocess. Learn how Python services can consume contract-governed WASM capabilities."}
-  canonical={"https://traverse-framework.com/questions/can-i-use-traverse-with-python.html"}
-  category={"Use Cases"}
+  title="Can I use Traverse with Python?"
+  description="Yes. Python can consume Traverse today through a standard-library subprocess call to the real traverse-cli capability-package execute command. There is no native Python SDK yet."
+  canonical="https://traverse-framework.com/questions/can-i-use-traverse-with-python.html"
+  category="Use Cases"
   relatedLinks={relatedLinks}
-  jsonLd={_jsonLd}
+  jsonLd={jsonLd}
 >
-  <Fragment set:html={_body} />
+  <p>Yes. Python can consume Traverse today. The honest path is small: use Python's standard-library <code>subprocess</code> module to call the <code>traverse-cli</code> binary. There is no native Python SDK yet.</p>
+
+  <h2>Call the real CLI command</h2>
+  <p>The command for executing a checked-in capability package is <code>capability-package execute</code>. A minimal call looks like this:</p>
+
+  <pre><code>import subprocess
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[2]
+manifest = root / "examples/capabilities/expedition-intent-agent/manifest.json"
+request = root / "examples/capabilities/runtime-requests/interpret-expedition-intent.json"
+
+subprocess.run(
+    ["traverse-cli", "capability-package", "execute", str(manifest), str(request)],
+    cwd=root,
+    check=True,
+)</code></pre>
+
+  <p>That is a subprocess integration, not an embedded Python runtime. The CLI validates the package and executes the capability, while Python remains responsible for your application flow and data handling.</p>
+
+  <h2>Use the checked-in example</h2>
+  <p>The <a href="https://github.com/traverse-framework/traverse/tree/main/examples/consume-python" target="_blank" rel="noopener">consume-python example</a> is the reference path. It uses only the Python standard library, resolves an installed <code>traverse-cli</code> (or falls back to Cargo), and invokes the same <code>capability-package execute</code> command against the expedition fixtures. It landed in <a href="https://github.com/traverse-framework/traverse/pull/1416" target="_blank" rel="noopener">traverse#1416</a>, following <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a>.</p>
+
+  <h2>What is not available yet</h2>
+  <p>There is no Python package that embeds the Traverse runtime, so this page does not pretend there is one. If you need a tighter integration, the current options are to keep the CLI process boundary or use the runtime's supported host integrations from another language.</p>
+
+  <p>For the JavaScript and TypeScript path, see the <a href="/docs/guides/react-integration.html">React integration guide</a>. For the broader Rust question, see <a href="/questions/do-i-need-rust.html">Do I need to know Rust?</a>.</p>
 </QuestionLayout>

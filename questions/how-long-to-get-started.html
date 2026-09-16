@@ -80,11 +80,11 @@
 
       <h2>The five-minute path</h2>
       <ul>
-        <li>Install the CLI: <code>cargo install traverse-cli</code></li>
-        <li>Write a contract TOML with input and output schemas</li>
-        <li>Write the Rust implementation and compile to <code>wasm32-wasi</code></li>
-        <li>Register with <code>traverse capability register</code></li>
-        <li>Run with <code>traverse capability run</code></li>
+        <li>Install the CLI: <code>cargo install traverse-cli-rs</code> (installs <code>traverse-cli</code>)</li>
+        <li>Scaffold a package with <code>traverse-cli capability new your.namespace.your-cap</code></li>
+        <li>Fill in the contract and guest logic, then compile to <code>wasm32-wasip1</code></li>
+        <li>Validate with <code>traverse-cli capability-package inspect</code></li>
+        <li>Execute with <code>traverse-cli capability-package execute</code></li>
       </ul>
       <p>That loop is deliberately short. You do not need to understand everything to get output from your first run.</p>
 
