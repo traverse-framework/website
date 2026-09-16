@@ -79,34 +79,29 @@
     <div class="q-label">Use Cases</div>
     <h1 class="q-title">Can I use Traverse with Python?</h1>
     <div class="q-body">
-      <p>Yes. You can call Traverse capabilities from Python even though Traverse is written in Rust. The two practical approaches are calling the CLI as a subprocess or connecting to the MCP server from a Python MCP client. The capability contract is enforced on every call regardless of how you invoke it.</p>
+      <p>Yes. Python can consume Traverse today. The honest path is small: use Python's standard-library <code>subprocess</code> module to call the <code>traverse-cli</code> binary. There is no native Python SDK yet.</p>
 
-      <h2>Option 1: CLI subprocess</h2>
-      <p>The simplest approach is to call <code>traverse capability run</code> from Python using <code>subprocess</code>:</p>
-      <pre><code>import subprocess, json
+      <h2>Call the real CLI command</h2>
+      <p>The command for executing a checked-in capability package is <code>capability-package execute</code>:</p>
+      <pre><code>import subprocess
+from pathlib import Path
 
-result = subprocess.run(
-    ["traverse", "capability", "run", "calculate_price",
-     "--input", json.dumps({"quantity": 10, "unit_price": 5.0})],
-    capture_output=True, text=True
-)
-output = json.loads(result.stdout)</code></pre>
-      <p>This works but adds subprocess overhead per call. It is fine for batch processing or occasional calls. For high-frequency use, the MCP server approach is better.</p>
+root = Path(__file__).resolve().parents[2]
+manifest = root / "examples/capabilities/expedition-intent-agent/manifest.json"
+request = root / "examples/capabilities/runtime-requests/interpret-expedition-intent.json"
 
-      <h2>Option 2: MCP client</h2>
-      <p>Start the Traverse MCP server once and connect from your Python code using any MCP client library. The MCP protocol communicates over stdio using JSON-RPC. Your Python process sends <code>tools/call</code> messages and reads responses. The server handles contract enforcement.</p>
+subprocess.run(
+    ["traverse-cli", "capability-package", "execute", str(manifest), str(request)],
+    cwd=root,
+    check=True,
+)</code></pre>
+      <p>That is a subprocess integration, not an embedded Python runtime. The CLI validates the package and executes the capability, while Python remains responsible for your application flow and data handling.</p>
 
-      <h2>Option 3: Embed via Wasmtime</h2>
-      <p>Python has Wasmtime bindings. If you want to embed WASM execution directly in Python without the Traverse runtime's full contract enforcement, you can load the capability binary yourself. You lose the contract validation layer, but it is an option for lightweight use cases.</p>
+      <h2>Use the checked-in example</h2>
+      <p>The <a href="https://github.com/traverse-framework/traverse/tree/main/examples/consume-python" target="_blank" rel="noopener">consume-python example</a> uses only the Python standard library and invokes the same command against the expedition fixtures. It landed in <a href="https://github.com/traverse-framework/traverse/pull/1416" target="_blank" rel="noopener">traverse#1416</a>, following <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a>.</p>
 
-      <h2>What Python provides vs. what Traverse provides</h2>
-      <ul>
-        <li>Python handles your application logic, data pipelines, and ML workflows</li>
-        <li>Traverse handles business capability execution with contract enforcement</li>
-        <li>A common pattern: Python orchestrates, Traverse executes critical business rules</li>
-      </ul>
-
-      <p>A native Python SDK is on the roadmap. See <a href="/questions/what-is-traverse-roadmap.html">the roadmap</a> for timing.</p>
+      <h2>What is not available yet</h2>
+      <p>There is no Python package that embeds the Traverse runtime, so this page does not pretend there is one. Keep the CLI process boundary for Python today, or use the runtime's supported host integrations from another language.</p>
     </div>
   </main>
   <aside class="q-sidebar">
