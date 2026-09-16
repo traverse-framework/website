@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can a team that does not write Rust still use Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: "Yes, as a consumer of capabilities — calling a capability over HTTP through the browser adapter, or via an embedder, requires no Rust at all, just JSON in and out. Authoring a new capability currently does require Rust, since that's the language capabilities compile from. A Python SDK is on the roadmap as planned, not yet shipped.",
+      text: "Yes. Consume capabilities with no Rust (npm embedder or CLI). Author new ones in plain English via the official Claude skill traverse-capability-author — under the hood that still emits Rust→WASM. Manual authoring in the repo still expects Rust. There is no shipped Python SDK; Python consumes via traverse-cli subprocess today.",
     },
   }],
 });
@@ -23,7 +23,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can a team that doesn't write Rust still use Traverse?"
-  description="Yes, as a consumer — calling a capability needs no Rust, just JSON over HTTP or an embedder call. Authoring a new capability does require Rust today; a Python SDK is planned, not shipped yet."
+  description="Yes: consume with no Rust, or author in plain English via traverse-capability-author. Manual authoring still expects Rust. No Python SDK — CLI subprocess today."
   canonical="https://traverse-framework.com/questions/can-non-rust-teams-use-traverse.html"
   category="Question"
   relatedLinks={relatedLinks}
@@ -33,8 +33,10 @@ const relatedLinks = [
 
   <p><strong>Consuming a capability</strong> requires no Rust whatsoever. If you're calling into a capability from a React app, you're sending a plain JSON request to the local browser adapter and reading a JSON response back — the <a href="/docs/guides/react-integration.html">React integration guide</a> covers this in full and never touches Rust or WASM directly. The same is true from any language that can make an HTTP request or bind against an embedder's API.</p>
 
-  <p><strong>Authoring a new capability</strong> is a different story today: capabilities compile from Rust to WebAssembly, so writing a new one currently means writing Rust. There isn't yet a path to author a capability directly in Python, JavaScript, or another language and have Traverse compile it — a Python SDK is explicitly on the roadmap as a planned, not-yet-shipped item, aimed specifically at teams that don't write Rust and want to call existing capabilities more idiomatically, or eventually contribute to them.</p>
+  <p><strong>Authoring a new capability</strong> does not require your team to write Rust either, if you use the official Claude skill <code>traverse-capability-author</code> in <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">traverse-framework/claude-skills</a>. You describe the rule in plain English; the skill checks the registry, writes the contract, produces executable WASM, and opens a human-reviewed PR. Under the hood that implementation is still Rust→WASM (determinism, sandbox, portability). The manual path — writing the capability yourself in the repo — still expects Rust.</p>
+
+  <p>There is no shipped Python SDK. Python consumes today by shelling out to <code>traverse-cli capability-package execute</code> (stdlib <code>subprocess</code>). See <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a>.</p>
 
   <h2>A practical split for a mixed team</h2>
-  <p>A common shape: one or two people comfortable with Rust write and maintain the capabilities and their contracts, while the rest of the team — frontend, data, ML — consumes them as a plain API. That's not a workaround; it matches how the contract boundary is meant to work. The contract is the interface a non-Rust consumer needs to understand; the Rust implementation behind it is an internal detail they don't have to touch.</p>
+  <p>A common shape: product or domain people describe capabilities through the skill (or a small Rust-comfortable group maintains the manual path), while the rest of the team — frontend, data, ML — consumes them as a plain API. That matches how the contract boundary is meant to work. The contract is the interface a non-Rust consumer needs to understand; the Rust→WASM implementation behind it is an internal detail they don't have to touch.</p>
 </QuestionLayout>

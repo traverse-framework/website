@@ -1,0 +1,50 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+---
+
+<SubpageLayout
+  title="Contribute to Traverse"
+  description="How to contribute: help-wanted tickets, the Claude skill authoring path, and CONTRIBUTING.md. No Rust required to author a capability in plain English."
+  canonical="https://traverse-framework.com/contribute.html"
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <div class="container" style="padding: 3rem 0 5rem; max-width: 720px">
+    <span class="section-label">Contribute</span>
+    <h1 class="t-h1" style="margin: 0.75rem 0 1rem">Help build Traverse.</h1>
+    <p class="t-body t-muted" style="margin-bottom: 2rem; line-height: 1.7">
+      Traverse is open source (Apache-2.0). The useful first step is a small, reviewable change —
+      not inventing a new placement target from a blank page.
+    </p>
+
+    <h2 class="t-h2" style="margin-bottom: 0.75rem">Start from labeled issues</h2>
+    <p class="t-body t-muted" style="margin-bottom: 1rem; line-height: 1.7">
+      Browse open <code>help wanted</code> and <code>good first issue</code> tickets across the org:
+    </p>
+    <ul style="margin: 0 0 2rem; padding-left: 1.25rem; color: var(--fg-muted); line-height: 1.8">
+      <li><a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22help+wanted%22&amp;type=issues" target="_blank" rel="noopener">org search: help wanted</a></li>
+      <li><a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22&amp;type=issues" target="_blank" rel="noopener">org search: good first issue</a></li>
+      <li><a href="/questions/how-do-i-contribute-to-traverse.html">Longer FAQ: How do I contribute?</a></li>
+    </ul>
+
+    <h2 class="t-h2" style="margin-bottom: 0.75rem">Author a capability in plain English</h2>
+    <p class="t-body t-muted" style="margin-bottom: 1rem; line-height: 1.7">
+      Use the official Claude skill <code>traverse-capability-author</code> in
+      <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">traverse-framework/claude-skills</a>.
+      It interviews you, checks the registry, writes the contract, produces executable WASM, and opens a
+      human-reviewed PR. Under the hood that is still Rust→WASM — you do not have to write the Rust yourself.
+      Manual authoring in the repo still expects Rust.
+    </p>
+
+    <h2 class="t-h2" style="margin-bottom: 0.75rem">Read the first-PR path</h2>
+    <p class="t-body t-muted" style="margin-bottom: 2rem; line-height: 1.7">
+      Core expectations — CLA, branch hygiene, how to open a PR — are in
+      <a href="https://github.com/traverse-framework/traverse/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">traverse/CONTRIBUTING.md</a>.
+      Docs and examples marked <code>no-spec-needed</code> do not need a new specs slice; runtime changes still do.
+    </p>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener" class="btn btn-primary">Claude skills →</a>
+      <a href="/faq.html" class="btn btn-ghost">FAQ</a>
+    </div>
+  </div>
+</SubpageLayout>
