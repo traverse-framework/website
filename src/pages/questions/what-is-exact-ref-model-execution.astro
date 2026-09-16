@@ -1,0 +1,49 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is exact-ref model execution in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Hosts call the existing Spec 137 model.execute surface with opaque input_ref / output_ref handles; the runtime resolves the pin through the registry into a content-addressed cache, or returns a stable model_unavailable. Spec 138 landed on main in September 2026; published crates and npm are still v0.11.0, with the v0.12.0 cut still in flight.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-governed-composition.html', label: 'What is governed composition?' },
+  { href: '/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html', label: 'Agent vs Traverse runtime' },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/blog/traverse-0-11-0-runtime-wasm.html', label: 'Traverse v0.11.0: one runtime.wasm' },
+];
+---
+<QuestionLayout
+  title="What is exact-ref model execution in Traverse?"
+  description="App manifests pin digest-signed model packages, never a naked URL. Hosts call Spec 137 model.execute with opaque tensor refs; miss is model_unavailable. Spec 138 is on main; published packages are still v0.11.0."
+  canonical="https://traverse-framework.com/questions/what-is-exact-ref-model-execution.html"
+  category="Runtime and Architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Most model stacks treat a URL or a vendor SDK as identity: fetch whatever is at that path and hope the bytes match what you tested. Exact-ref model execution is the opposite habit. The app names a specific model package — digest, signature, sidecar metadata — and the runtime either runs <em>that</em> package or it fails closed. A naked URL is never the name of the thing that ran.</p>
+
+  <h2>Pin the package, not a path</h2>
+  <p>Traverse app manifests declare exact model references. The package carries a sidecar: digest, license, ABI, schemas, resource limits. If the bytes do not match the pin, they do not run. You cannot “upgrade” a model by swapping the file behind a URL.</p>
+
+  <h2>One envelope, any host</h2>
+  <p>The call surface is the existing Spec 137 <code>model.execute</code> host-connector command — not a new public guest import, and not Spec 045’s candidate/LLM resolution track. Request and response are versioned. Inputs and outputs travel as opaque <code>input_ref</code> / <code>output_ref</code> handles; the host stages binary tensors in and reads them back out. Browser and native use the same envelopes. Placement is metadata, not a second API.</p>
+
+  <h2>Resolve, cache, or say no</h2>
+  <p>The runtime resolves the pin through the registry into a content-addressed cache. If the package is already provisioned and the manifest allows it, execute can stay offline. A cache miss is a stable <code>model_unavailable</code>, not a silent download of something adjacent. Unknown fields, bad digests, and bad signatures fail closed. Traces stay redacted: no tensors, no secrets, no credentials.</p>
+
+  <h2>What landed, and what has not</h2>
+  <p>Spec 138 (<code>138-governed-exact-model-execution</code>) and ADR-0074 landed on <code>main</code> on 16 September 2026 via <a href="https://github.com/traverse-framework/traverse/pull/1438">traverse#1438</a>, closing the governance/native/browser tickets <a href="https://github.com/traverse-framework/traverse/issues/1435">#1435</a>–<a href="https://github.com/traverse-framework/traverse/issues/1437">#1437</a>. First conformance is <code>wasm-cpu</code>, with deny-by-default filesystem and network for the model guest. Later acceleration adapters have to keep the public envelopes.</p>
+  <p>Published crates.io packages and npm <code>traverse-embedder-web</code> are still v0.11.0. The crate/npm line that carries Spec 138 is the v0.12.0 cut, still in flight (<a href="https://github.com/traverse-framework/traverse/issues/1445">#1445</a>, bump <a href="https://github.com/traverse-framework/traverse/pull/1446">#1446</a>). This page is not a claim that every host already ships a certified public model-runtime package.</p>
+
+  <h2>What it is not</h2>
+  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity.</p>
+</QuestionLayout>

@@ -4,7 +4,7 @@
 
 Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment. The agent proposes; governed capabilities decide.
 
-Current packages: crates.io at 0.11.0 (pin `traverse-registry` at `=0.21.0` if you consume it directly); npm `traverse-embedder-web@0.11.0`. The public registry holds 92 capabilities across 33 domains (213 signed versions; 175 non-deprecated). The core repo has 149 approved governing specs.
+Current packages: crates.io at 0.11.0 (pin `traverse-registry` at `=0.21.0` if you consume it directly); npm `traverse-embedder-web@0.11.0`. Spec 138 (exact-ref governed `model.execute`) landed on `main` in September 2026; the published crate/npm line that carries it is the v0.12.0 cut still in flight — do not treat 0.11.0 packages as that surface. The public registry holds 92 capabilities across 33 domains (213 signed versions; 175 non-deprecated). The core repo has 149 approved governing specs.
 
 ## Start here
 
@@ -33,6 +33,7 @@ Current packages: crates.io at 0.11.0 (pin `traverse-registry` at `=0.21.0` if y
 - [Changelog](https://traverse-framework.com/changelog.html): release-by-release history.
 - [Security & Permanence Audit](https://traverse-framework.com/security-audit.html): every known finding, its GitHub ticket, and its real status — not a marketing page.
 - [FAQ](https://traverse-framework.com/faq.html) and [Questions](https://traverse-framework.com/questions.html): 70+ specific Q&A pages, mostly long-tail but accurate.
+- [What is exact-ref model execution?](https://traverse-framework.com/questions/what-is-exact-ref-model-execution.html): app manifests pin digest/signature, never a naked URL; Spec 137 `model.execute` envelopes; on `main`, not in published v0.11.0.
 
 ## Optional
 
