@@ -18,6 +18,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 
 - [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (ten commands: describe_server, list_content_groups, describe_content_group, list_entrypoints, search_capabilities, describe_entrypoint, validate_entrypoint, execute_entrypoint, render_execution_report, shutdown), the discover-inspect-execute-trace flow, and the honest limits (stdio is the packaged bootstrap today; in-process library functions exist on traverse-mcp, but there is no separate HTTP MCP listener as a packaged product).
 - [traverse-framework/claude-skills](https://github.com/traverse-framework/claude-skills): Claude Skills for building apps with Traverse — starting with `traverse-capability-author` (plus extractor and workflow-planner), which checks the registry before authoring, produces contract + WASM, and validates against the real traverse-cli — including this platform's current execution limitations.
+- [How do I author a capability in plain English?](https://traverse-framework.com/questions/how-do-i-author-a-capability-in-plain-english.html): Claude skill `traverse-capability-author` — interview → registry check → contract → WASM → human-reviewed PR; under the hood still Rust→WASM; manual Rust is secondary.
 - [MCP setup guide](https://traverse-framework.com/docs/guides/mcp-setup.html): connect Claude or any MCP client to a local traverse-mcp server.
 - [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output. Python consume today is `capability-package execute`, not a fake `capability run`, and not a shipped Python SDK.
 
@@ -37,7 +38,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 
 ## Optional
 
-- [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims.
+- [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims. Latest on authoring: [You don't need Rust to publish a capability](https://traverse-framework.com/blog/you-dont-need-rust-to-publish-a-capability.html).
 - [Discover](https://traverse-framework.com/discover.html): a live browser demo that pulls the public registry and executes a reviewed plan locally. Read [what it proves](https://traverse-framework.com/blog/what-discover-proves.html) before quoting it.
 - [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html), [vs agent runtimes](https://traverse-framework.com/compare/vs-agent-runtimes.html), [vs WASM runtimes](https://traverse-framework.com/compare/vs-wasm-runtimes.html), [vs cross-platform frameworks](https://traverse-framework.com/compare/vs-cross-platform-frameworks.html)
 - [About](https://traverse-framework.com/about.html): project history and motivation.
