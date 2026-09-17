@@ -1,0 +1,51 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I go from a skill draft to a published Traverse capability?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'After traverse-capability-author drafts the contract and WASM and opens a registry PR, you review the PR, wait for CI, address feedback, and merge only when a human approves. After merge the capability appears in the next public catalog release at registry.traverse-framework.com. There is no upload that skips the PR. Manual Rust remains a secondary path if you skip the skill.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author in plain English?' },
+  { href: '/questions/what-does-human-review-mean-for-a-capability-pr.html', label: 'What does human review mean?' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: '/questions/how-do-i-write-a-capability-contract.html', label: 'How do I write a capability contract?' },
+  { href: '/blog/you-dont-need-rust-to-publish-a-capability.html', label: "You don't need Rust to publish a capability" },
+];
+---
+<QuestionLayout
+  title="How do I go from a skill draft to a published Traverse capability?"
+  description="Skill opens the registry PR → you review → CI green → human merge → next catalog release. No side-door upload. Manual Rust is the secondary path if you skip the skill."
+  canonical="https://traverse-framework.com/questions/how-do-i-go-from-skill-draft-to-published-capability.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The plain-English skill gets you a draft. Publishing is what happens after that draft is a real pull request someone can merge. This page is the handoff — not a second copy of the interview steps.</p>
+
+  <h2>Where you should already be</h2>
+  <p>You loaded <code>traverse-capability-author</code> from <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">claude-skills</a>, answered the interview, let it check the registry, and accepted a PR into <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a> that carries a contract plus executable WASM. If you have not done that yet, start with <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a></p>
+
+  <h2>After the PR exists</h2>
+  <ol>
+    <li><strong>Read the PR yourself.</strong> Confirm the capability id/name, input and output schemas, and fail-closed behavior match the rule you described. The skill drafted it; you still own the intent.</li>
+    <li><strong>Wait for CI.</strong> Registry checks cover structure, digests, and coverage. Red CI is not “close enough.” Fix or ask the skill to regenerate rather than hand-editing digests.</li>
+    <li><strong>Answer review comments.</strong> Maintainers may ask for clearer contract text, a tighter domain fit, or a business-shaped rule instead of a generic utility. That is normal.</li>
+    <li><strong>Merge only with a human decision.</strong> See <a href="/questions/what-does-human-review-mean-for-a-capability-pr.html">What does human review mean for a capability PR?</a> — there is no auto-publish from the skill.</li>
+  </ol>
+
+  <h2>When it counts as published</h2>
+  <p>After merge, the capability is in the git catalog. Callers see it in the next index release on <a href="https://registry.traverse-framework.com" target="_blank" rel="noopener">registry.traverse-framework.com</a>, addressed by name@version with a verifiable artifact digest. Until merge, it is a draft PR — useful, not public.</p>
+
+  <h2>If you skipped the skill</h2>
+  <p>The secondary path is still manual Rust in the registry repo: implement, attach contract metadata, compile to <code>wasm32-wasip1</code>, keep digests stable, meet coverage gates, open the PR yourself. Full checklist: <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability to the Traverse registry?</a> Documentation order stays skill first, manual second. Under the hood both paths still produce Rust→WASM.</p>
+</QuestionLayout>
