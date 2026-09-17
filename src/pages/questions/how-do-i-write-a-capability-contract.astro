@@ -1,17 +1,109 @@
 ---
 import QuestionLayout from '@layouts/QuestionLayout.astro';
 
-const relatedLinks = [];
-const _body = "<p>A contract is a JSON file, <code>contract.json</code>. It sits next to your Rust implementation and describes what the capability accepts, what it produces, and what conditions are expected to hold on both sides. You register the contract and the compiled WASM binary together, as part of a registry bundle.</p>\n\n      <h2>Minimal contract structure</h2>\n      <pre><code>{\n  \"kind\": \"capability_contract\",\n  \"schema_version\": \"1.0.0\",\n  \"id\": \"examples.pricing.calculate-price\",\n  \"namespace\": \"examples.pricing\",\n  \"name\": \"calculate-price\",\n  \"version\": \"1.0.0\",\n  \"lifecycle\": \"draft\",\n  \"service_type\": \"stateless\",\n  \"artifact_type\": \"native\",\n  \"description\": \"Calculates the total price for a line item\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"required\": [\"quantity\", \"unit_price\"],\n    \"properties\": {\n      \"quantity\": { \"type\": \"integer\", \"minimum\": 1 },\n      \"unit_price\": { \"type\": \"number\", \"minimum\": 0.0 }\n    }\n  },\n  \"output_schema\": {\n    \"type\": \"object\",\n    \"required\": [\"total\"],\n    \"properties\": {\n      \"total\": { \"type\": \"number\" }\n    }\n  },\n  \"preconditions\": [\n    { \"id\": \"quantity-positive\", \"description\": \"quantity must be greater than 0\" }\n  ],\n  \"postconditions\": [\n    { \"id\": \"total-non-negative\", \"description\": \"total must be greater than or equal to 0\" }\n  ],\n  \"execution\": {\n    \"binary_format\": \"wasm\",\n    \"entrypoint\": { \"kind\": \"wasi-command\", \"command\": \"run\" },\n    \"preferred_targets\": [\"local\"],\n    \"constraints\": {\n      \"host_api_access\": \"none\",\n      \"network_access\": \"forbidden\",\n      \"filesystem_access\": \"none\"\n    }\n  },\n  \"provenance\": {\n    \"spec_refs\": [\"002-capability-contracts\"],\n    \"exception_refs\": []\n  }\n}</code></pre>\n\n      <h2>What each field does</h2>\n      <ul>\n        <li><code>id</code>, <code>namespace</code>, <code>name</code> — the identity triple used by the registry and MCP server; <code>id</code> must equal <code>namespace</code> + \".\" + <code>name</code></li>\n        <li><code>input_schema</code> — JSON Schema for the input object the caller must provide</li>\n        <li><code>output_schema</code> — JSON Schema for the output the WASM binary must return</li>\n        <li><code>preconditions</code> — assertions expected to hold before execution; each is an id and a description. These are documentation for now, not something the runtime evaluates before invocation</li>\n        <li><code>postconditions</code> — same structure, for the state after execution; also documentation-only rather than runtime-enforced today</li>\n      </ul>\n\n      <h2>Registering the contract</h2>\n      <p>Add the contract and its compiled WASM module to a registry bundle manifest, then inspect and register the bundle:</p>\n      <pre><code>cargo run -p traverse-cli-rs -- bundle inspect path/to/manifest.json\ncargo run -p traverse-cli-rs -- bundle register path/to/manifest.json</code></pre>\n\n      <p><code>bundle inspect</code> validates the contract's JSON structure before anything is registered — a missing required field, or an <code>id</code> that doesn't match <code>namespace.name</code>, is rejected there rather than at registration time.</p>\n\n      <p>See <a href=\"/questions/what-are-preconditions.html\">what are preconditions</a> and <a href=\"/questions/what-are-postconditions.html\">what are postconditions</a> for more detail on writing conditions.</p>";
-const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I write a capability contract?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"A capability contract is a contract.json file that defines the capability's identity, input schema, output schema, preconditions, postconditions, and execution constraints. You write it alongside your Rust implementation and register both together, as part of a registry bundle, with the Traverse CLI.\"}}]}";
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I write a capability contract?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A Traverse capability contract is a contract.json that defines identity, input/output JSON Schema, preconditions, postconditions, and execution constraints. Primary path: let traverse-capability-author draft it from a plain-English interview, then review. Secondary path: write contract.json by hand next to a Rust→WASM implementation and register both in a registry bundle. Preconditions and postconditions are documentation today, not runtime-enforced.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author in plain English?' },
+  { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: '/questions/how-do-i-go-from-skill-draft-to-published-capability.html', label: 'Skill draft → published capability' },
+  { href: '/questions/what-are-preconditions.html', label: 'What are preconditions?' },
+];
+
+const sampleContract = `{
+  "kind": "capability_contract",
+  "schema_version": "1.0.0",
+  "id": "examples.pricing.calculate-price",
+  "namespace": "examples.pricing",
+  "name": "calculate-price",
+  "version": "1.0.0",
+  "lifecycle": "draft",
+  "service_type": "stateless",
+  "artifact_type": "native",
+  "description": "Calculates the total price for a line item",
+  "input_schema": {
+    "type": "object",
+    "required": ["quantity", "unit_price"],
+    "properties": {
+      "quantity": { "type": "integer", "minimum": 1 },
+      "unit_price": { "type": "number", "minimum": 0.0 }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["total"],
+    "properties": {
+      "total": { "type": "number" }
+    }
+  },
+  "preconditions": [
+    { "id": "quantity-positive", "description": "quantity must be greater than 0" }
+  ],
+  "postconditions": [
+    { "id": "total-non-negative", "description": "total must be greater than or equal to 0" }
+  ],
+  "execution": {
+    "binary_format": "wasm",
+    "entrypoint": { "kind": "wasi-command", "command": "run" },
+    "preferred_targets": ["local"],
+    "constraints": {
+      "host_api_access": "none",
+      "network_access": "forbidden",
+      "filesystem_access": "none"
+    }
+  },
+  "provenance": {
+    "spec_refs": ["002-capability-contracts"],
+    "exception_refs": []
+  }
+}`;
 ---
 <QuestionLayout
-  title={"How do I write a capability contract?"}
-  description={"A Traverse capability contract is a contract.json file with input schema, output schema, preconditions, and postconditions. Learn how to write one step by step."}
-  canonical={"https://traverse-framework.com/questions/how-do-i-write-a-capability-contract.html"}
-  category={"Contracts"}
+  title="How do I write a capability contract?"
+  description="Primary: let traverse-capability-author draft contract.json from plain English. Secondary: write it by hand next to a Rust→WASM implementation. Schema, pre/postconditions, execution constraints."
+  canonical="https://traverse-framework.com/questions/how-do-i-write-a-capability-contract.html"
+  category="Contracts"
   relatedLinks={relatedLinks}
-  jsonLd={_jsonLd}
+  jsonLd={jsonLd}
 >
-  <Fragment set:html={_body} />
+  <p>A contract is a JSON file, <code>contract.json</code>. It describes what the capability accepts, what it produces, and what conditions are expected to hold on both sides. You ship the contract together with a digest-addressed WASM artifact as part of a registry publish — never the contract alone as a side-door upload.</p>
+
+  <h2>Primary path — let the skill draft it</h2>
+  <p>For most authors, do not start by hand-writing JSON. Load <code>traverse-capability-author</code> from <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener">traverse-framework/claude-skills</a>, answer the interview about inputs, outputs, fail-closed cases, and placement, and review the contract the skill produces alongside the executable WASM. You still own the merge. Details: <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a> and <a href="/questions/how-do-i-go-from-skill-draft-to-published-capability.html">skill draft → published</a>.</p>
+
+  <h2>Secondary path — write contract.json by hand</h2>
+  <p>If you are on the manual Rust path, the contract sits next to your implementation and both land in the registry bundle together. Under the hood that implementation is still Rust compiled to WASM. Use the structure below as a starting point, then follow the publish checklist in <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability to the Traverse registry?</a></p>
+
+  <h2>Minimal contract structure</h2>
+  <pre><code>{sampleContract}</code></pre>
+
+  <h2>What each field does</h2>
+  <ul>
+    <li><code>id</code>, <code>namespace</code>, <code>name</code> — the identity triple used by the registry and MCP server; <code>id</code> must equal <code>namespace</code> + "." + <code>name</code></li>
+    <li><code>input_schema</code> — JSON Schema for the input object the caller must provide</li>
+    <li><code>output_schema</code> — JSON Schema for the output the WASM binary must return</li>
+    <li><code>preconditions</code> — assertions expected to hold before execution; each is an id and a description. These are documentation for now, not something the runtime evaluates before invocation</li>
+    <li><code>postconditions</code> — same structure, for the state after execution; also documentation-only rather than runtime-enforced today</li>
+  </ul>
+
+  <h2>Registering a hand-written contract</h2>
+  <p>Add the contract and its compiled WASM module to a registry bundle manifest, then inspect and register the bundle:</p>
+  <pre><code>cargo run -p traverse-cli-rs -- bundle inspect path/to/manifest.json
+cargo run -p traverse-cli-rs -- bundle register path/to/manifest.json</code></pre>
+
+  <p><code>bundle inspect</code> validates the contract's JSON structure before anything is registered — a missing required field, or an <code>id</code> that doesn't match <code>namespace.name</code>, is rejected there rather than at registration time.</p>
+
+  <p>See <a href="/questions/what-are-preconditions.html">what are preconditions</a> and <a href="/questions/what-are-postconditions.html">what are postconditions</a> for more detail on writing conditions.</p>
 </QuestionLayout>

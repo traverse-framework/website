@@ -1,0 +1,51 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does human review mean for a Traverse capability PR?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Human review means a person still has to read and merge the pull request before a capability becomes public. The Claude skill traverse-capability-author can draft the contract, produce executable WASM, and open the PR — it does not get a side-door upload. Reviewers check that the rule matches the contract, CI and coverage gates pass, artifact digests stay stable, and the capability is worth publishing (prefer business-shaped rules over generic utilities).',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author in plain English?' },
+  { href: '/questions/how-do-i-go-from-skill-draft-to-published-capability.html', label: 'Skill draft → published capability' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: '/questions/how-do-i-contribute-to-traverse.html', label: 'How do I contribute to Traverse?' },
+  { href: '/blog/you-dont-need-rust-to-publish-a-capability.html', label: "You don't need Rust to publish a capability" },
+];
+---
+<QuestionLayout
+  title="What does human review mean for a Traverse capability PR?"
+  description="A person still merges the PR. The skill can draft contract + WASM and open the PR — no side-door upload. Reviewers check rule fit, CI, digests, and whether it belongs in the catalog."
+  canonical="https://traverse-framework.com/questions/what-does-human-review-mean-for-a-capability-pr.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>When we say the authoring path ends in a <strong>human-reviewed PR</strong>, we mean exactly that: a person still has to read the change and merge it. The skill is allowed to draft. It is not allowed to publish.</p>
+
+  <h2>What the skill is allowed to do</h2>
+  <p><code>traverse-capability-author</code> in <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener">traverse-framework/claude-skills</a> can interview you, check the registry, write the contract, produce executable ABI-compliant WASM, and open a pull request into <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a>. Under the hood that artifact is still Rust compiled to WASM. None of that bypasses review.</p>
+
+  <h2>What a reviewer is actually checking</h2>
+  <ul>
+    <li><strong>Does the contract match the rule?</strong> Inputs, outputs, fail-closed cases, and placement should describe the business behavior you meant — not a vague stub.</li>
+    <li><strong>Does CI pass?</strong> Registry PRs still hit coverage gates, digest checks, and the repo's pre-merge pipeline. Green checks are required; the skill does not waive them.</li>
+    <li><strong>Are digests stable?</strong> <code>artifact.digest</code> / URL metadata has to survive review. Hand-edited digests usually fail for a reason.</li>
+    <li><strong>Is this worth publishing?</strong> Prefer business-shaped rules agents should not free-hand (eligibility, pricing caps, authz, consent, risk, policy). Tiny utilities can teach the pipeline; they are not the ceiling. See the <a href="/blog/why-next-help-wanted-is-business-shaped.html">business-shaped help-wanted</a> write-up.</li>
+  </ul>
+
+  <h2>What human review is not</h2>
+  <p>It is not a rubber stamp on whatever an LLM pasted. It is not a maintainer-only upload that skips the PR. It is not “CI green means automatically merged.” Fork-and-PR is the path; collaborator seats are not the first-publish door.</p>
+
+  <h2>If you authored via the skill</h2>
+  <p>Your job after the skill opens the PR is to read it like a reviewer would: confirm the contract text, skim the generated sources if you care, wait for CI, and answer review comments. Details of that handoff: <a href="/questions/how-do-i-go-from-skill-draft-to-published-capability.html">How do I go from a skill draft to a published capability?</a></p>
+</QuestionLayout>
