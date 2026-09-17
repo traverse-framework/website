@@ -1,0 +1,52 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I author a Traverse capability in plain English?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Use the official Claude skill traverse-capability-author in traverse-framework/claude-skills. It interviews you, checks the registry, writes a JSON-Schema contract, produces executable WASM, and opens a human-reviewed PR. Under the hood the implementation is still Rust compiled to WASM. Manual Rust authoring remains available as a secondary path.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust to use Traverse?' },
+  { href: '/questions/can-non-rust-teams-use-traverse.html', label: "Can a non-Rust team use Traverse?" },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: '/blog/you-dont-need-rust-to-publish-a-capability.html', label: "You don't need Rust to publish a capability" },
+  { href: '/contribute.html', label: 'Contribute' },
+];
+---
+<QuestionLayout
+  title="How do I author a Traverse capability in plain English?"
+  description="Load traverse-capability-author: interview → registry check → contract → WASM → human-reviewed PR. Under the hood still Rust→WASM. Manual Rust is secondary."
+  canonical="https://traverse-framework.com/questions/how-do-i-author-a-capability-in-plain-english.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Describe the business rule in plain English. The official Claude skill <code>traverse-capability-author</code> in <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener">traverse-framework/claude-skills</a> turns that description into a contract, executable WASM, and a pull request a human still has to merge.</p>
+
+  <h2>The skill path</h2>
+  <ol>
+    <li>Install or open the skill from <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">claude-skills</a> in a client that can run Claude Skills (Claude is the documented path today).</li>
+    <li>Answer the interview questions about inputs, outputs, fail-closed cases, and placement.</li>
+    <li>Let the skill check the public registry (and any private registry you configured) before it authors something that already exists.</li>
+    <li>Review the contract and the generated artifact. The skill should produce genuinely executable ABI-compliant WASM, not a placeholder.</li>
+    <li>Open or accept the human-reviewed PR into <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a>. There is no upload that skips review.</li>
+  </ol>
+
+  <h2>What you are not skipping</h2>
+  <p>Under the hood the implementation is still Rust compiled to WASM. That is where determinism, sandboxing, and cross-host portability come from. The skill owns that step so you do not have to write the Rust yourself. Merge still requires a person. CI and coverage gates still apply to the PR.</p>
+
+  <h2>When to use the manual Rust path instead</h2>
+  <p>If you want to implement the capability by hand in the registry repo, that secondary path expects Rust, the <code>wasm32-wasip1</code> target, and the publish checklist in <code>CONTRIBUTING.md</code>. See <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability to the Traverse registry?</a> for both orders: skill first, manual second.</p>
+
+  <h2>Related honest answers</h2>
+  <p><a href="/questions/do-i-need-rust.html">Do I need Rust?</a> and <a href="/questions/can-non-rust-teams-use-traverse.html">Can a non-Rust team use Traverse?</a> cover consume paths (npm embedder; Python via <code>traverse-cli capability-package execute</code> — no Python SDK). For what kinds of capabilities to publish next, see the <a href="/blog/why-next-help-wanted-is-business-shaped.html">business-shaped help-wanted</a> post.</p>
+</QuestionLayout>

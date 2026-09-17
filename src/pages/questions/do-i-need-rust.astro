@@ -4,6 +4,8 @@ import QuestionLayout from '@layouts/QuestionLayout.astro';
 const relatedLinks = [
   { href: '/faq.html', label: 'FAQ' },
   { href: '/contribute.html', label: 'Contribute' },
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author in plain English?' },
+  { href: '/blog/you-dont-need-rust-to-publish-a-capability.html', label: "Thursday blog: you don't need Rust" },
   { href: '/questions/can-non-rust-teams-use-traverse.html', label: 'Can a non-Rust team use Traverse?' },
   { href: '/questions/can-i-use-traverse-with-python.html', label: 'Can I use Traverse with Python?' },
 ];
@@ -49,5 +51,5 @@ const jsonLd = JSON.stringify({
     <li><strong>Manual capability author:</strong> Rust toolchain (rustup), the <code>wasm32-wasip1</code> target, and familiarity with writing Rust functions.</li>
   </ul>
 
-  <p>See the <a href="/faq.html">FAQ</a>, the <a href="/questions/how-do-i-install-traverse.html">installation guide</a>, or the <a href="/contribute.html">contribute</a> page for where to start.</p>
+  <p>See the <a href="/faq.html">FAQ</a>, the <a href="/questions/how-do-i-install-traverse.html">installation guide</a>, the <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">plain-English authoring</a> page, or the <a href="/contribute.html">contribute</a> page for where to start.</p>
 </QuestionLayout>

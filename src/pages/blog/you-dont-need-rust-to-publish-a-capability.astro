@@ -1,0 +1,161 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 17, 2026</span>
+      <span class="badge">Authoring</span>
+      <span class="badge">Skills</span>
+      <span class="badge">Registry</span>
+    </div>
+    <h1 class="t-h1">You don't need Rust to publish a Traverse capability</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Someone reads the Announcement, opens the repo, sees Rust crates and <code>wasm32-wasip1</code>, and concludes the only way in is to become a Rust engineer first. That reading is understandable. It is also wrong for the path we actually want people on.</p>
+
+      <p>The runtime is Rust. Published capabilities are Rust compiled to WASM. Those facts stay true. What does not follow is “you must write the Rust yourself before you can put a business rule in the catalog.”</p>
+
+      <div class="callout">
+        Short version: the primary authoring path is plain English through the official Claude skill <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener"><code>traverse-capability-author</code></a>. Interview → registry check → contract → executable WASM → human-reviewed PR. Under the hood is still Rust→WASM. Manual Rust remains a valid secondary path, not the front door.
+      </div>
+
+      <h2 id="why-the-assumption">Why the Rust-first assumption sticks</h2>
+
+      <p>Traverse looks like a systems project because it is one. Specs, ADRs, crates.io packages, coverage gates, digest-pinned artifacts. If you land on a CONTRIBUTING note that says “implement the capability in Rust,” you will assume that is the only story.</p>
+
+      <p>I keep rewriting the on-ramp because that assumption quietly kills the people we need most: product and domain folks who know the eligibility rule, the pricing cap, or the consent binding, and who should not have to learn a WASM toolchain to get that rule into a governed catalog.</p>
+
+      <h2 id="what-the-skill-does">What the skill actually does</h2>
+
+      <p><code>traverse-capability-author</code> lives in <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">traverse-framework/claude-skills</a>. Load it in Claude (or another client that can run the skill). Then:</p>
+
+      <ol>
+        <li>It interviews you one question at a time about the business rule — inputs, outputs, fail-closed cases, placement expectations.</li>
+        <li>It checks the public registry (and any private registry you pointed it at) so you do not republish something that already exists.</li>
+        <li>It writes a JSON-Schema-backed contract.</li>
+        <li>It produces genuinely executable, ABI-compliant WASM — not a stub that “looks like” a capability.</li>
+        <li>It opens a human-reviewed pull request into the registry. Merge still requires a person. The skill does not get a side door.</li>
+      </ol>
+
+      <p>You describe the rule. You review the PR. You do not have to author the Rust source yourself for that path to count.</p>
+
+      <h2 id="under-the-hood">Under the hood is still Rust→WASM</h2>
+
+      <p>I am not pretending the skill deletes the implementation language. Determinism, sandboxing, and the same artifact on native hosts and in the browser come from compiling Rust to WASM. The skill owns that step so the author does not have to. If someone later opens the generated sources, they will see Rust. That is fine. It is not a bait-and-switch; it is where the guarantees live.</p>
+
+      <h2 id="manual-path">The manual path stays — second</h2>
+
+      <p>If you prefer to write the capability yourself in the registry repo, that path still expects Rust: implement the logic, attach contract metadata, compile to <code>wasm32-wasip1</code>, meet coverage gates, keep digests stable through review. The expedition example and the registry CONTRIBUTING notes are for that track.</p>
+
+      <p>Documentation order matters. Skill first. Manual Rust second. We already fixed the FAQ answers for <a href="/questions/do-i-need-rust.html">“Do I need Rust?”</a> and <a href="/questions/can-non-rust-teams-use-traverse.html">non-Rust teams</a>. Today’s publish Q&amp;A gets the same treatment so “how do I publish?” does not quietly shove people back into rustup before they have described the rule.</p>
+
+      <h2 id="consume-still-no-rust">Consume still needs no Rust</h2>
+
+      <p>Separate from authoring: calling a published capability never required Rust. JavaScript and TypeScript use npm <code>traverse-embedder-web</code>. Python today shells out to <code>traverse-cli capability-package execute</code> — that is the real verb; there is no shipped Python SDK. Neither path asks you to touch WASM tooling in app code.</p>
+
+      <h2 id="what-to-publish">What to publish once you can author</h2>
+
+      <p>If the skill (or the manual path) gets you to a PR, aim at rules agents should not free-hand: eligibility, quote caps, declared-permission authz, consent/purpose, risk bands, content policy. That is the <a href="/blog/why-next-help-wanted-is-business-shaped.html">business-shaped help-wanted batch</a> on registry issues <a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493</a>–<a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507</a>. Tiny utilities still teach the pipeline; they are not the ceiling.</p>
+
+      <p>Examples and consume scripts remain the on-ramp if you have never landed a PR here. Apps are still not the ask. Fork and open a PR; we are not handing out collaborator seats for a first publish.</p>
+
+      <div class="callout">
+        Plain English in. Governed WASM out. Human review in the middle. That is the authoring story. Rust is how the artifact is built — not a cover charge for describing the business rule.
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why-the-assumption">Why the assumption sticks</a></li>
+          <li><a href="#what-the-skill-does">What the skill does</a></li>
+          <li><a href="#under-the-hood">Under the hood</a></li>
+          <li><a href="#manual-path">Manual path second</a></li>
+          <li><a href="#consume-still-no-rust">Consume needs no Rust</a></li>
+          <li><a href="#what-to-publish">What to publish</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author in plain English? →</a></li>
+          <li><a href="/questions/do-i-need-rust.html">Do I need Rust? →</a></li>
+          <li><a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability? →</a></li>
+          <li><a href="/blog/why-next-help-wanted-is-business-shaped.html">Business-shaped help-wanted →</a></li>
+          <li><a href="/contribute.html">Contribute →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Start here</div>
+        <p>Load the skill. Describe one rule. Review the PR.</p>
+        <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block" target="_blank" rel="noopener">Open traverse-capability-author →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Describe the rule. Review the PR.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">The skill writes the contract and the WASM. A human still merges. That is enough ceremony for a business decision.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" class="btn btn-primary" target="_blank" rel="noopener">Claude skill →</a>
+      <a href="/questions/how-do-i-author-a-capability-in-plain-english.html" class="btn btn-ghost">Plain-English FAQ</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"You don't need Rust to publish a Traverse capability — Traverse Blog"}
+  description={"Primary authoring is plain English via traverse-capability-author: interview, registry check, contract, WASM, human-reviewed PR. Under the hood still Rust→WASM. Manual Rust is secondary."}
+  canonical={"https://traverse-framework.com/blog/you-dont-need-rust-to-publish-a-capability.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
