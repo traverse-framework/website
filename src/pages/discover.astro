@@ -61,6 +61,36 @@ const _body = `<section class="page-hero">
   </div>
 </section>
 
+<section class="section-sm" id="discover-generate-section" style="border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">New this release &mdash; Decision 95</div>
+      <h2>Real, governed text generation. No daemon, no server, no network call.</h2>
+      <p class="t-body-sm t-muted">Every goal above plans against the live registry. This panel is different: it runs the exact, checked-in conformance fixture (<code>fixture.responder@1.0.0</code>) that proves the Spec 045/138 bridge described in <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 95</a> &mdash; the same governed, offline, digest-verified <code>model.execute</code> pipeline a full generative model would run through, satisfying <code>traverse.inference.generate</code> without an Ollama daemon or any network call. The fixture is small and deterministic on purpose: it scans your prompt for the letters &ldquo;hi&rdquo; and returns one of two fixed responses, so you can read the entire guest module yourself &mdash; <strong>it is not a trained language model</strong>.</p>
+    </div>
+    <div class="discover-gen-panel card">
+      <label for="discover-gen-prompt" class="discover-sub-h">Prompt</label>
+      <div class="discover-gen-row">
+        <input id="discover-gen-prompt" class="discover-gen-input" type="text" value="hi there, how are you?" spellcheck="false" autocomplete="off" />
+        <button id="discover-gen-run" class="btn btn-primary btn-sm" type="button">Run &mdash; offline, in this tab</button>
+      </div>
+      <div class="terminal discover-terminal discover-gen-terminal">
+        <div class="terminal-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="terminal-title">prompt &rarr; digest-verify &rarr; stage &rarr; execute (wasm-cpu)</span>
+        </div>
+        <div class="terminal-body discover-log" id="discover-gen-log"></div>
+      </div>
+      <div id="discover-gen-output" class="discover-gen-output" hidden>
+        <div class="discover-sub-h">Response &mdash; genuinely computed from your prompt bytes</div>
+        <p class="discover-gen-response" id="discover-gen-response"></p>
+        <div class="discover-sub-h">Spec 138 <code>model.execute</code> evidence</div>
+        <pre class="discover-gen-evidence" id="discover-gen-evidence"></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section-sm" id="discover-how-its-built" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-header">
@@ -147,11 +177,35 @@ const _body = `<section class="page-hero">
     .discover-cap-card { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }
     .discover-cap-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg); word-break: break-all; }
     .discover-note { font-size: 0.72rem; color: var(--fg-subtle); margin: 0; line-height: 1.5; }
+
+    .discover-gen-panel { padding: 1.25rem; }
+    .discover-gen-row { display: flex; gap: 0.6rem; margin-top: 0.35rem; }
+    .discover-gen-input {
+      flex: 1; font-family: var(--font-mono); font-size: 0.85rem; color: var(--fg);
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 0.65rem 0.9rem;
+    }
+    .discover-gen-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .discover-gen-terminal { margin-top: 1rem; }
+    .discover-gen-output { margin-top: 1.15rem; padding-top: 1.15rem; border-top: 1px solid var(--border); }
+    .discover-gen-response {
+      font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--fg);
+      background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 0.65rem 0.9rem; margin: 0 0 1rem;
+    }
+    .discover-gen-evidence {
+      font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-muted); white-space: pre-wrap;
+      word-break: break-word; margin: 0; background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.65rem 0.9rem;
+    }
+    @media (max-width: 560px) { .discover-gen-row { flex-direction: column; } }
   </style>
   <Fragment set:html={_body} />
   <script src="https://unpkg.com/@antv/g6@5.1.1/dist/g6.min.js"></script>
   <script>
     import { initDiscover } from '../scripts/discover.js';
+    import { initGenerateDemo } from '../scripts/discover-generate.js';
     initDiscover();
+    initGenerateDemo();
   </script>
 </SubpageLayout>
