@@ -21,6 +21,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 - [How do I author a capability in plain English?](https://traverse-framework.com/questions/how-do-i-author-a-capability-in-plain-english.html): Claude skill `traverse-capability-author` — interview → registry check → contract → WASM → human-reviewed PR; under the hood still Rust→WASM; manual Rust is secondary.
 - [How do I go from a skill draft to a published capability?](https://traverse-framework.com/questions/how-do-i-go-from-skill-draft-to-published-capability.html): after the skill opens the registry PR — review, CI, human merge, next catalog release; no side-door upload.
 - [What does human review mean for a capability PR?](https://traverse-framework.com/questions/what-does-human-review-mean-for-a-capability-pr.html): a person still merges; skill drafts only; check rule fit, CI, digests, catalog fit.
+- [How do I verify a signed capability artifact?](https://traverse-framework.com/questions/how-do-i-verify-a-signed-capability-artifact.html): SHA-256 digest = integrity; Ed25519 signature.json = registry attestation; pin by digest, never a naked URL.
 - [MCP setup guide](https://traverse-framework.com/docs/guides/mcp-setup.html): connect Claude or any MCP client to a local traverse-mcp server.
 - [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output. Python consume today is `capability-package execute`, not a fake `capability run`, and not a shipped Python SDK.
 
