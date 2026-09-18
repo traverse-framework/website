@@ -17,23 +17,23 @@ const CATALOG_URL = 'https://registry.traverse-framework.com/catalog.json';
 const REGISTRY_BASE = 'https://registry.traverse-framework.com';
 const CONTRACT_SCHEMA_VERSION = '1.0.0';
 
+/* The real, certified traverse-runtime-wasm binary (Spec 1402) — the same
+   nested-wasmi orchestrator every native host embeds. executeBrowserComposedWorkflow
+   never fetches this itself (it's host-owned); this site ships its own copy
+   under public/runtime/ and digest-verifies it before every execute, the
+   same way every other artifact on this page is verified. Pin source:
+   traverse-framework/traverse runtime/runtime.wasm.sha256 (certified digest
+   unchanged since v0.11.0, per the v0.12.0 release notes). */
+const RUNTIME_WASM_URL = '/runtime/runtime.wasm';
+const RUNTIME_WASM_DIGEST = 'e8d8c04b8927becb5deab9f33da81dd1c121954993ba8b83ea71a2c37cd45e70';
+
 /* Three committed goals — a structured Spec-113 target + starting facts each.
-   No natural language: the target is an exact capability identity. */
+   No natural language: the target is an exact capability identity.
+   `price` is listed (and loaded) first on purpose: it's the goal most
+   reliably reaching a real success end to end, so a first-time visitor's
+   first execute isn't the one most likely to hit an unrelated, real
+   capability-execution failure elsewhere in the registry. */
 const GOALS = [
-  {
-    id: 'docapproval',
-    label: 'Review a document for approval',
-    blurb: 'From the document text alone the planner chains doc-approval.analyze (extract type, parties, amounts, a confidence) into doc-approval.recommend (approve or route, with a rationale).',
-    kind: 'chain',
-    target: { capability_id: 'doc-approval.recommend', capability_version: '1.4.0' },
-    candidate_refs: [
-      { namespace: 'doc-approval', id: 'doc-approval.analyze', versionRange: '1.4.0' },
-      { namespace: 'doc-approval', id: 'doc-approval.recommend', versionRange: '1.4.0' },
-    ],
-    starting_facts: {
-      document: 'INVOICE\nVendor: Acme Corp\nBill to: Globex Industries\nInvoice #: AC-20481\nTotal due: $4,200.00\nDue date: 2026-10-01\nTerms: Net 30',
-    },
-  },
   {
     id: 'price',
     label: 'Price a quote',
@@ -50,6 +50,20 @@ const GOALS = [
         version: '1.0', currency: 'USD', rounding: 'half_up', decimal_places: 2,
         discount_rules: [], tax_rules: [],
       },
+    },
+  },
+  {
+    id: 'docapproval',
+    label: 'Review a document for approval',
+    blurb: 'From the document text alone the planner chains doc-approval.analyze (extract type, parties, amounts, a confidence) into doc-approval.recommend (approve or route, with a rationale).',
+    kind: 'chain',
+    target: { capability_id: 'doc-approval.recommend', capability_version: '1.4.0' },
+    candidate_refs: [
+      { namespace: 'doc-approval', id: 'doc-approval.analyze', versionRange: '1.4.0' },
+      { namespace: 'doc-approval', id: 'doc-approval.recommend', versionRange: '1.4.0' },
+    ],
+    starting_facts: {
+      document: 'INVOICE\nVendor: Acme Corp\nBill to: Globex Industries\nInvoice #: AC-20481\nTotal due: $4,200.00\nDue date: 2026-10-01\nTerms: Net 30',
     },
   },
   {
@@ -173,6 +187,10 @@ async function sha256Hex(text) {
   const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
+export async function sha256HexBytes(bytes) {
+  const h = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 /* Build a SyncedPublicRegistryState from the live catalog. releaseTag is a
    self-consistent label; the real verification is the per-artifact digest
@@ -252,10 +270,25 @@ const artifactFetcher = {
 let mod = null;
 let snap = null; // { snapshot, identity, catalog }
 let run = null;  // { goal, store, proposal }
+let runtimeWasmBytes = null;
 
 async function ensureModule() {
   if (!mod) mod = await import('traverse-embedder-web');
   return mod;
+}
+async function ensureRuntimeWasm() {
+  if (runtimeWasmBytes) return runtimeWasmBytes;
+  logLine('$ fetch ' + RUNTIME_WASM_URL + ' — the real governed runtime binary (Spec 1402)', 'cmd');
+  const r = await fetch(RUNTIME_WASM_URL, { cache: 'force-cache' });
+  if (!r.ok) throw Object.assign(new Error('runtime.wasm unavailable: HTTP ' + r.status), { code: 'digest_drift' });
+  const bytes = new Uint8Array(await r.arrayBuffer());
+  const digest = await sha256HexBytes(bytes);
+  if (digest !== RUNTIME_WASM_DIGEST) {
+    throw Object.assign(new Error('runtime.wasm digest mismatch'), { code: 'digest_drift' });
+  }
+  runtimeWasmBytes = bytes;
+  logLine('✓ runtime.wasm verified: sha256:' + digest.slice(0, 23) + '…', 'ok');
+  return runtimeWasmBytes;
 }
 async function ensureSnapshot() {
   if (snap) return snap;
@@ -408,14 +441,15 @@ async function doExecute() {
   const btn = el('discover-exec');
   btn.disabled = true;
   setBadge('Confirming & executing…', 'running');
-  logLine('$ confirm mappings → hand the reviewed proposal to executeBrowserComposedWorkflow (offline, governed)', 'cmd');
   setGraphPhase('reviewed');
 
   const { executeBrowserComposedWorkflow } = mod;
   const reviewed = { ...run.proposal, mapping_unconfirmed: false };
   let trace;
   try {
-    trace = await executeBrowserComposedWorkflow(reviewed, run.store, snap.snapshot);
+    const wasmBytes = await ensureRuntimeWasm();
+    logLine('$ confirm mappings → hand the reviewed proposal to executeBrowserComposedWorkflow (offline, governed)', 'cmd');
+    trace = await executeBrowserComposedWorkflow(reviewed, run.store, snap.snapshot, { runtimeWasmBytes: wasmBytes });
   } catch (e) {
     const code = e && e.code ? e.code : String(e && e.name || 'error');
     setGraphPhase('failed');
