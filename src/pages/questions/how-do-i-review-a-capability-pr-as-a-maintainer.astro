@@ -1,0 +1,66 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I review a Traverse capability PR as a maintainer?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Treat the registry PR as the only publish door: confirm the contract matches the rule, CI is green (including digest fetch, coverage, authoring.method, and licensing on new versions), mirror fork artifacts into a registry Release before merge when needed, prefer business-shaped capabilities over generic utilities, and merge only after a person reads the change. Signing is automatic after merge — reviewers do not hand-edit signature.json.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-does-human-review-mean-for-a-capability-pr.html', label: 'What does human review mean?' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed artifact?' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: '/questions/how-do-i-go-from-skill-draft-to-published-capability.html', label: 'Skill draft → published capability' },
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'Author in plain English' },
+  { href: '/blog/why-next-help-wanted-is-business-shaped.html', label: 'Why next help-wanted is business-shaped' },
+];
+---
+<QuestionLayout
+  title="How do I review a Traverse capability PR as a maintainer?"
+  description="Checklist for merging a registry capability PR: contract fit, green CI (digest, coverage, authoring, licensing), fork artifact mirror, catalog fit. Signing is automatic after merge — no side door."
+  canonical="https://traverse-framework.com/questions/how-do-i-review-a-capability-pr-as-a-maintainer.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Human review is not a vibe check. On <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a>, the pull request <em>is</em> the publish door. Your job is to confirm the rule belongs in the catalog, that CI’s hard gates actually passed, and that digests will still mean something after merge. Authors — including the <code>traverse-capability-author</code> skill — draft. They do not merge.</p>
+
+  <h2>What to read before you click Merge</h2>
+  <ul>
+    <li><strong>Contract vs rule.</strong> Inputs, outputs, fail-closed cases, and placement should describe the business behavior the PR claims — not a vague stub that “might be useful later.”</li>
+    <li><strong>Catalog fit.</strong> Prefer business-shaped rules agents should not free-hand (eligibility, pricing caps, authz, consent, risk, policy). Tiny utilities can teach the pipeline; they are not the ceiling. See <a href="/blog/why-next-help-wanted-is-business-shaped.html">why the next help-wanted batch is business-shaped</a>.</li>
+    <li><strong>Governing Spec section.</strong> Registry PRs need the org body sections (<code>## Summary</code>, <code>## Governing Spec</code>, and friends). Spec ids must match what the changed files actually touch, or <code>spec-alignment</code> stays red.</li>
+  </ul>
+
+  <h2>CI gates that are not optional</h2>
+  <p>Reproduce the required checks locally when something looks flaky — the registry <a href="https://github.com/traverse-framework/registry/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">CONTRIBUTING</a> path is <code>bash scripts/ci/pre_pr_check.sh &lt;draft-pr-body.md&gt;</code>. In review, at least confirm:</p>
+  <ul>
+    <li><strong>Artifact digest + URL.</strong> New WASM-backed contracts must declare <code>artifact.digest</code> (<code>sha256:…</code>) and an <code>artifact.url</code> under this repo’s Releases. CI fetches the URL and fails on unreachable or hash mismatch. Hand-edited digests that “look fine” usually are not.</li>
+    <li><strong>Mirror-before-green for forks.</strong> First-time / fork publishers often cannot create Releases here. Their PR cannot go green until a maintainer mirrors the built WASM into a registry Release so <code>artifact.url</code> resolves <em>before</em> merge. Rewriting the URL after merge would break contract immutability — so the mirror is a review step, not a follow-up chore.</li>
+    <li><strong>Real source + coverage.</strong> A contract plus a prebuilt <code>.wasm</code> is not enough. Implementation lives under <code>capability-src/…</code> with measured Rust tests; CI expects full function coverage and high line/region coverage per the publisher checklist in <code>capabilities/README.md</code>.</li>
+    <li><strong><code>authoring.method</code>.</strong> New/changed contracts must declare <code>human</code> or <code>llm-assisted</code>. LLM-assisted PRs need the extra authoring evidence fields; method is not a substitute for a CLA-covered human (or sanctioned bot) commit author.</li>
+    <li><strong><code>licensing</code> on newly added versions.</strong> Publisher-declared SPDX / reuse metadata is required on new versions; it is metadata, not a legal certification, and it does not inherit to models or datasets.</li>
+  </ul>
+
+  <h2>What you do <em>not</em> do in the publish PR</h2>
+  <ul>
+    <li>Do not add or hand-edit <code>signature.json</code>. Ed25519 signing runs in CI after merge; publishers never hold the key. See <a href="/questions/how-do-i-verify-a-signed-capability-artifact.html">how to verify a signed artifact</a>.</li>
+    <li>Do not merge on “CI mostly green” or waive digest checks because a CDN is convenient.</li>
+    <li>Do not treat skill-authored PRs as auto-approved. Plain-English authoring still ends in the same human-reviewed PR — details in <a href="/questions/what-does-human-review-mean-for-a-capability-pr.html">what human review means</a>.</li>
+    <li>Do not invite every first publisher as a collaborator so they can upload Releases themselves. Fork-and-PR plus maintainer mirror is the deliberate door.</li>
+  </ul>
+
+  <h2>After merge</h2>
+  <p>Signing CI attaches <code>signature.json</code> for non-deprecated, artifact-bearing versions. The capability shows up in the next public catalog release — there is still no side-door upload. If you mirrored an artifact for a fork PR, keep the Release tag/asset stable; the contract already pins that URL and digest.</p>
+
+  <h2>Related surfaces</h2>
+  <p>Authors: <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">publish a capability</a> and <a href="/questions/how-do-i-go-from-skill-draft-to-published-capability.html">skill draft → published</a>. Callers verifying downloads: digest vs signature. This page is the maintainer checklist in the middle.</p>
+</QuestionLayout>
