@@ -6,7 +6,7 @@ const _body = `<section class="page-hero">
     <div class="page-hero-inner">
       <span class="section-label">Real · live · in your browser</span>
       <h1 class="t-h1">Watch a goal get planned and executed — for real.</h1>
-      <p class="page-hero-sub">Pick a goal. Your browser fetches the live Traverse capability registry, builds a digest-verified snapshot, and a <strong>deterministic structural planner</strong> derives a workflow from it — matching each capability&rsquo;s declared input and output shapes, with <strong>no capability-name matching, no natural language, and no model</strong>. You review the proposed field mappings, then the <strong>local governed runtime</strong> executes the reviewed workflow in your tab and returns a redacted per-node trace. No backend, no simulation. <a href="#discover-how-its-built">How it works &darr;</a></p>
+      <p class="page-hero-sub">Pick a goal below. Your browser plans it against Traverse&rsquo;s live capability registry, you review exactly what it&rsquo;s about to do, then a <strong>governed runtime</strong> executes it for real &mdash; right in your tab. No backend, no simulation. <a href="#discover-how-its-built">How it works &darr;</a></p>
       <div class="page-hero-badges">
         <span class="badge badge-accent badge-dot">Live registry</span>
         <span class="badge">Deterministic structural planning</span>
@@ -19,7 +19,7 @@ const _body = `<section class="page-hero">
 
 <section class="section-sm" id="discover-root">
   <div class="container">
-    <p class="t-body-sm t-muted discover-goals-intro">Each goal below is a different real goal against the live registry — from a multi-capability chain to a single target the runtime refuses to run automatically. Pick one; the terminal and graph track it end to end.</p>
+    <p class="t-body-sm t-muted discover-goals-intro">Five real goals against the live registry &mdash; including one the runtime refuses to run automatically. Pick one to watch it plan and execute end to end.</p>
     <div class="discover-goal-picker">
       <label for="discover-goal-select" class="discover-sub-h">Choose a goal</label>
       <select id="discover-goal-select" class="discover-select" aria-label="Goal"></select>
@@ -64,9 +64,9 @@ const _body = `<section class="page-hero">
 <section class="section-sm" id="discover-generate-section" style="border-top:1px solid var(--border)">
   <div class="container">
     <div class="section-header">
-      <div class="section-label">New this release &mdash; Decision 95</div>
+      <div class="section-label">New this release</div>
       <h2>Real, governed text generation. No daemon, no server, no network call.</h2>
-      <p class="t-body-sm t-muted">Every goal above plans against the live registry. This panel is different: it runs the exact, checked-in conformance fixture (<code>fixture.responder@1.0.0</code>) that proves the Spec 045/138 bridge described in <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 95</a> &mdash; the same governed, offline, digest-verified <code>model.execute</code> pipeline a full generative model would run through, satisfying <code>traverse.inference.generate</code> without an Ollama daemon or any network call. The fixture is small and deterministic on purpose: it scans your prompt for the letters &ldquo;hi&rdquo; and returns one of two fixed responses, so you can read the entire guest module yourself &mdash; <strong>it is not a trained language model</strong>.</p>
+      <p class="t-body-sm t-muted">Type a prompt and press run: a governed WebAssembly runtime executes it for real, completely offline &mdash; no API key, no daemon, no network request. <strong>It is not a trained language model</strong> &mdash; it&rsquo;s a small, hand-written fixture simple enough to read end to end, proving the exact mechanism (<a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 95</a>) a full generative model would run through.</p>
     </div>
     <div class="discover-gen-panel card">
       <label for="discover-gen-prompt" class="discover-sub-h">Prompt</label>
@@ -84,8 +84,10 @@ const _body = `<section class="page-hero">
       <div id="discover-gen-output" class="discover-gen-output" hidden>
         <div class="discover-sub-h">Response &mdash; genuinely computed from your prompt bytes</div>
         <p class="discover-gen-response" id="discover-gen-response"></p>
-        <div class="discover-sub-h">Spec 138 <code>model.execute</code> evidence</div>
-        <pre class="discover-gen-evidence" id="discover-gen-evidence"></pre>
+        <details class="discover-gen-details">
+          <summary>Show the governance evidence (Spec 138 <code>model.execute</code>)</summary>
+          <pre class="discover-gen-evidence" id="discover-gen-evidence"></pre>
+        </details>
       </div>
     </div>
   </div>
@@ -96,9 +98,9 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">How it works</div>
       <h2>The browser proposes. The runtime decides.</h2>
-      <p><strong>Your browser</strong> fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a>, builds a canonical <strong>digest-verified snapshot</strong>, prepares the exact WASM + contracts for the capabilities in play, and runs <code>traverse-embedder-web</code>&rsquo;s browser-local planner (<a href="https://github.com/traverse-framework/traverse/blob/main/specs/1277-browser-local-workflow-composition/spec.md">Spec 1277</a>). Planning is <strong>deterministic and structural</strong>: candidates come only from Spec-113 schema-shape and declared-event relationships, bounded to a small search. It <strong>does not</strong> infer from capability names or namespaces, from natural language, from a prompt or model, or from recency — and it makes no network request after preparation.</p>
-      <p><strong>Your browser does not</strong> execute anything on its own, hold runtime authority, run a language model, or talk to a Traverse backend — there is none. A proposal is an <strong>untrusted</strong> artifact with every mapping <code>unconfirmed</code>.</p>
-      <p><strong>The local governed runtime</strong> takes the reviewed proposal and validates it against the immutable contracts, snapshot binding, and per-node risk class, authorizes each node (only <code>pure_read</code> / <code>deterministic</code> capabilities run here), executes them offline through a minimal WASI shim, and returns a <strong>redacted</strong> trace — per-node status and failure class only, never raw payloads. It fails closed on any drift or denial; it never fabricates a success.</p>
+      <p><strong>Your browser</strong> fetches the public <a href="https://registry.traverse-framework.com/catalog.json">catalog.json</a>, builds a <strong>digest-verified snapshot</strong>, and runs <code>traverse-embedder-web</code>&rsquo;s <strong>deterministic structural planner</strong> (<a href="https://github.com/traverse-framework/traverse/blob/main/specs/1277-browser-local-workflow-composition/spec.md">Spec 1277</a>) &mdash; using <strong>no capability-name matching, no natural language, and no model</strong>, only Spec-113 schema shapes and declared event relationships, within a bounded search. It makes no further network request after preparation.</p>
+      <p><strong>Your browser never executes anything itself</strong>, holds no runtime authority, and runs no language model — there is no Traverse backend to talk to, because none exists. Its output is only an <strong>untrusted</strong> proposal, every mapping <code>unconfirmed</code>.</p>
+      <p><strong>The local governed runtime</strong> validates your reviewed proposal against the immutable contracts and snapshot, authorizes only <code>pure_read</code> / <code>deterministic</code> nodes to run, and executes them offline through the same digest-verified <code>runtime.wasm</code> binary every native host embeds (Spec 1402) — not a browser-only reimplementation. It returns a <strong>redacted</strong> trace — status and failure class only, never raw payloads — fails closed on any drift or denial, and <strong>it never fabricates a success</strong>.</p>
       <a href="/registry.html" class="btn btn-ghost btn-sm" style="margin-top:1rem">Browse the full registry &rarr;</a>
     </div>
   </div>
@@ -189,10 +191,18 @@ const _body = `<section class="page-hero">
     .discover-gen-terminal { margin-top: 1rem; }
     .discover-gen-output { margin-top: 1.15rem; padding-top: 1.15rem; border-top: 1px solid var(--border); }
     .discover-gen-response {
-      font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--fg);
-      background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm);
-      padding: 0.65rem 0.9rem; margin: 0 0 1rem;
+      font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: var(--fg);
+      background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+      border-radius: var(--radius-sm); padding: 0.7rem 0.9rem; margin: 0 0 0.85rem;
     }
+    .discover-gen-details summary {
+      cursor: pointer; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--fg-subtle); list-style: none;
+    }
+    .discover-gen-details summary::-webkit-details-marker { display: none; }
+    .discover-gen-details summary::before { content: "▸ "; }
+    .discover-gen-details[open] summary::before { content: "▾ "; }
+    .discover-gen-details[open] summary { margin-bottom: 0.5rem; }
     .discover-gen-evidence {
       font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-muted); white-space: pre-wrap;
       word-break: break-word; margin: 0; background: var(--bg-elevated); border: 1px solid var(--border);
