@@ -1,0 +1,61 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I verify a signed Traverse capability artifact?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A published capability carries two checks: a SHA-256 digest in contract.json (integrity — the bytes match what CI reviewed) and an Ed25519 signature.json sibling (authenticity — the registry signing key attested those bytes). CI rejects digest mismatches before merge; after merge, signing CI attaches signature.json for non-deprecated WASM-backed versions. Callers should pin by digest and verify the signature against the published public key — not trust a naked URL.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/what-is-traverse-security-model.html', label: "What is Traverse's security model?" },
+  { href: '/security-audit.html', label: 'Security & permanence audit' },
+];
+---
+<QuestionLayout
+  title="How do I verify a signed Traverse capability artifact?"
+  description="Digest proves the bytes match; Ed25519 signature.json proves the registry attested them. Pin by digest — never trust a naked URL. Publishers do not hold the signing key."
+  canonical="https://traverse-framework.com/questions/how-do-i-verify-a-signed-capability-artifact.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>When the public registry says a capability is published, it is not asking you to trust a download link. Two different checks sit on the record: a <strong>digest</strong> (integrity) and an Ed25519 <strong>signature</strong> (authenticity). Confusing them is how people end up shipping “whatever is at that URL today.”</p>
+
+  <h2>Digest — the bytes match what CI reviewed</h2>
+  <p>Every new WASM-backed <code>contract.json</code> must declare <code>artifact.digest</code> (<code>sha256:…</code>) and <code>artifact.url</code> pointing at a GitHub Release asset under <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a>. Before merge, CI fetches that URL and fails the PR on <code>contract.artifact_digest_mismatch</code> or an unreachable URL. That is integrity: the file at the URL hashes to the digest written on the contract.</p>
+  <p>Integrity alone does not prove who produced the artifact. Anyone who can host bytes at a URL could match a digest they chose. That is why the registry also signs.</p>
+
+  <h2>Signature — the registry attested those bytes</h2>
+  <p>After a capability PR merges, registry CI Ed25519-signs the exact artifact bytes and lands a <code>signature.json</code> sibling next to the contract (scheme, public key hex, signature hex, timestamp). Publishers do not hold or handle the signing key — see the registry <a href="https://github.com/traverse-framework/registry/blob/main/docs/artifact-signing.md" target="_blank" rel="noopener">artifact-signing runbook</a>. Completeness is CI-enforced for non-deprecated, artifact-bearing versions (<code>capabilities/.signatures-enforced</code>). Workflow-only records without an <code>artifact</code> field are not signed.</p>
+  <p>Digest answers “same bytes?” Signature answers “did the registry’s published key attest those bytes?” The runtime’s <code>PublishedGoverned</code> trust tier is meant to require that attestation — digest verification alone is not authenticity.</p>
+
+  <h2>What you should do as a caller</h2>
+  <ol>
+    <li>Resolve the capability by name@version from the catalog — not by pasting a Release URL into an app.</li>
+    <li>Pin the digest from the contract (and, for model packages, the same habit as <a href="/questions/what-is-exact-ref-model-execution.html">exact-ref model execution</a>: never a naked URL as identity).</li>
+    <li>Verify the Ed25519 signature over the downloaded bytes against the published public key (the registry documents a short Python check in the signing runbook; <code>traverse-runtime</code>’s full <code>verify_artifact</code> path is the product surface for hosts).</li>
+    <li>Fail closed on digest or signature mismatch. Do not “fall back” to unsigned bytes because a CDN is convenient.</li>
+  </ol>
+
+  <h2>What verification is not</h2>
+  <ul>
+    <li>It is not a rubber stamp that the business rule is wise — that is still human review on the publish PR.</li>
+    <li>It is not Sigstore/Rekor by default on every capability (<code>sigstore_bundle_ref</code> may be null; Ed25519 is the enforced path today).</li>
+    <li>It is not permission to skip CI digest checks on a fork PR because “we’ll sign later.”</li>
+    <li>It is not a claim that every historical audit finding is gone — read the <a href="/security-audit.html">security audit</a> for current status, including supply-chain notes.</li>
+  </ul>
+
+  <h2>If you are publishing, not verifying</h2>
+  <p>Authors (skills path or manual Rust) still go through a human-reviewed registry PR with digest-stable metadata. Signing is automatic after merge; you do not add <code>signature.json</code> by hand in the publish PR. Details: <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability to the Traverse registry?</a></p>
+</QuestionLayout>
