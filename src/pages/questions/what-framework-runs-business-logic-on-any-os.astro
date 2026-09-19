@@ -4,7 +4,7 @@ import QuestionLayout from '@layouts/QuestionLayout.astro';
 const faqEntries = [
   {
     q: 'What framework lets me write business logic once and run it on any OS?',
-    a: "Traverse. You write a capability once in Rust, compile it to a WASM binary, and attach a machine-readable contract. The same binary runs natively on Windows, macOS, and Linux today through traverse-runtime's Wasmtime-backed executor, and in the browser through the Web embedder SDK — no per-OS rewrite. Mobile support (Android, iOS, .NET/WinUI) is still in progress; see traverse-framework.com/platforms.html for the exact, evidence-linked status of each target.",
+    a: "Traverse. You author a capability once (usual path: plain English via traverse-capability-author; manual path still Rust→WASM) and attach a machine-readable contract. The same WASM binary runs natively on Windows, macOS, and Linux today through traverse-runtime's Wasmtime-backed executor, and in the browser through the Web embedder SDK — no per-OS rewrite. Mobile support (Android, iOS, .NET/WinUI) is still in progress; see traverse-framework.com/platforms.html for the exact, evidence-linked status of each target.",
   },
   {
     q: 'Can I build an app that runs on Windows, macOS, and Linux without rewriting the business logic?',
@@ -42,7 +42,7 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>Traverse. You write a capability once in Rust, compile it to a WebAssembly binary, and attach a machine-readable contract that says what it does, what it needs, and what must be true before and after it runs. The runtime — not your app code — decides where that binary executes. Today, that means the same unmodified binary runs natively on Windows, macOS, and Linux through <code>traverse-runtime</code>'s Wasmtime-backed executor, and in the browser through the Web embedder SDK. No recompiling for the target OS. No forked codepath for "the Windows version."</p>
+  <p>Traverse. You author a capability once — usual path plain English via <code>traverse-capability-author</code>, or manual Rust→WASM — and attach a machine-readable contract that says what it does, what it needs, and what must be true before and after it runs. The runtime — not your app code — decides where that binary executes. Today, that means the same unmodified binary runs natively on Windows, macOS, and Linux through <code>traverse-runtime</code>'s Wasmtime-backed executor, and in the browser through the Web embedder SDK. No recompiling for the target OS. No forked codepath for "the Windows version."</p>
 
   <p>That's the real, shipped answer. It's narrower than the breathless "write once, run anywhere on every device" pitch you'll see from most cross-platform tools, and it's narrower on purpose — because the honest version is the only one that survives contact with production.</p>
 

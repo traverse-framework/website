@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can I migrate existing business logic into Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: "Yes, in the sense that you re-express the logic as a Rust capability compiled to WASM with a contract — Traverse doesn't ingest existing code from another language automatically. The practical path is picking one duplicated, drifting, or hard-to-audit rule, rewriting just that rule as a governed capability, and pointing your existing callers at it, rather than migrating an entire codebase at once.",
+      text: "Yes, in the sense that you re-express the logic as a Traverse capability (WASM + contract) — Traverse doesn't ingest existing code from another language automatically. Usual authoring path: plain English via traverse-capability-author (under the hood still Rust→WASM). Manual authoring still uses Rust→WASM. Pick one duplicated or hard-to-audit rule, publish that capability, and point callers at it — not a whole-codebase migration.",
     },
   }],
 });
@@ -23,18 +23,18 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can I migrate existing business logic into Traverse?"
-  description="Yes — by re-expressing the rule as a Rust capability with a contract, one rule at a time, rather than an automated code-ingestion process or a whole-codebase migration."
+  description="Yes — re-express one rule as a Traverse capability (skill-first plain English, or manual Rust→WASM), one rule at a time. No automatic language converter; no whole-codebase migration."
   canonical="https://traverse-framework.com/questions/can-i-migrate-existing-business-logic-to-traverse.html"
   category="Question"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>There's no automatic converter that takes your existing JavaScript, Python, or C# business rule and produces a Traverse capability — you re-implement the rule in Rust, compile it to WASM, and write the contract that describes it. That's real, deliberate work, not a checkbox migration, and it's worth being upfront about that instead of implying otherwise.</p>
+  <p>There's no automatic converter that takes your existing JavaScript, Python, or C# business rule and produces a Traverse capability. You re-express the rule as a governed capability: usual path is the Claude skill <code>traverse-capability-author</code> in <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">claude-skills</a> (plain English interview → registry check → contract → WASM → human-reviewed PR). Manual authoring still uses Rust→WASM. Either way, under the hood stays Rust→WASM for determinism, sandboxing, and portability. That's deliberate work, not a checkbox migration.</p>
 
   <p>Where it pays off is when you're not migrating "the codebase" but one specific rule that's currently duplicated, drifting, or hard to audit — a pricing calculation reimplemented in three services, an eligibility check nobody's fully sure is consistent across the app and the backend. You rewrite that one rule as a governed capability, define its contract precisely (including the edge cases the old scattered copies probably handled inconsistently), and update your existing callers to invoke the capability instead of their own local implementation.</p>
 
   <h2>A reasonable order of operations</h2>
-  <p>Start with the rule that's causing the most actual pain from drift, not the most complex one. Write its contract first — inputs, outputs, preconditions, postconditions — since that step alone often surfaces inconsistencies between the existing copies that nobody had written down before. Then implement it once in Rust, compile it, and swap one caller over at a time, verifying the trace output matches what you expect before removing the old implementation it replaced.</p>
+  <p>Start with the rule that's causing the most actual pain from drift, not the most complex one. Get the contract clear first — inputs, outputs, preconditions, postconditions — since that step alone often surfaces inconsistencies between the existing copies. Then publish once (skill or manual Rust→WASM) and swap one caller over at a time, verifying the trace before removing the old local copy.</p>
 
-  <p>You don't need to know Rust deeply to consume a capability once it exists — see <a href="/questions/do-i-need-rust.html">do I need to know Rust to use Traverse</a> — but writing the capability itself does require it, since that's the language capabilities compile from today.</p>
+  <p>You do not need to write Rust for the usual authoring or consume paths — see <a href="/questions/do-i-need-rust.html">do I need to know Rust to use Traverse</a> and <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">author in plain English</a>. Manual authoring in the repo still expects Rust.</p>
 </QuestionLayout>

@@ -1,8 +1,8 @@
 # Traverse
 
-> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract, compile it to WASM, and run it natively, in the browser, or expose it to an AI agent over MCP. Apache 2.0, pre-1.0 (v0.12.0) — check /platforms.html before assuming any target or feature is shipped.
+> Traverse is a contract-driven WASM runtime for portable business capabilities. Usual authoring is skill-first plain English via `traverse-capability-author` (contract → WASM → human-reviewed PR); manual authoring still uses Rust→WASM. One shared `runtime.wasm` orchestrator everywhere — browser, native, CLI, and MCP are embedders/entry points, not different Traverse runtimes. Consumers today: published JS/TS (`traverse-embedder-web`), Rust (`traverse-embedder`), AI agents via `traverse-mcp`; Python shells out to `traverse-cli capability-package execute` (no Python SDK). Apache 2.0, pre-1.0 (v0.12.0) — check /platforms.html before assuming any target or feature is shipped.
 
-Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment. The agent proposes; governed capabilities decide.
+Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across hosts. The agent proposes; governed capabilities decide.
 
 Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if you consume it directly); npm `traverse-embedder-web@0.12.0`. Spec 138 (exact-ref governed `model.execute`) ships in this cut. The public registry holds 92 capabilities across 33 domains (213 signed versions; 175 non-deprecated). The core repo has 150 approved governing specs.
 
