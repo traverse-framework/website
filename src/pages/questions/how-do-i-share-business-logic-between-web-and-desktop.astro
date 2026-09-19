@@ -29,7 +29,7 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>This is the exact shape of problem Traverse was built around, so the answer is fairly direct: write the rule once as a Rust capability, compile it to a WASM binary, attach a contract, and register it into a bundle. From there, your web app and your desktop app each load that one bundle through whichever executor matches their host — they're not two implementations that happen to agree, they're one implementation two hosts both call.</p>
+  <p>This is the exact shape of problem Traverse was built around, so the answer is fairly direct: author the rule once as a Traverse capability (skill-first plain English, or manual Rust→WASM), attach a contract, and register it into a bundle. Browser, native, CLI, and MCP are embedders — not different Traverse runtimes. Your web app and your desktop app each load that one bundle through whichever embedder matches their host; same <code>runtime.wasm</code> orchestrator either way.</p>
 
   <h2>The web side</h2>
   <p>Your web frontend talks to the capability either through the local browser adapter over a simple HTTP request (the pattern the <a href="/docs/guides/react-integration.html">React integration guide</a> covers step by step) or, for a single pre-published capability, directly through the Web embedder SDK's verified execution path in the browser's native WASM host.</p>

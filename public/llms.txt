@@ -1,16 +1,16 @@
 # Traverse
 
-> Traverse is a contract-driven WASM runtime for portable business capabilities: write a capability once with a machine-readable contract, compile it to WASM, and run it natively, in the browser, or expose it to an AI agent over MCP. Apache 2.0, pre-1.0 (v0.12.0) — check /platforms.html before assuming any target or feature is shipped.
+> Traverse is a contract-driven WASM runtime for portable business capabilities. Usual authoring is skill-first plain English via `traverse-capability-author` (contract → WASM → human-reviewed PR); manual authoring still uses Rust→WASM. One shared `runtime.wasm` orchestrator everywhere — browser, native, CLI, and MCP are embedders/entry points, not different Traverse runtimes. Consumers today: published JS/TS (`traverse-embedder-web`), Rust (`traverse-embedder`), AI agents via `traverse-mcp`; Python shells out to `traverse-cli capability-package execute` (no Python SDK). Apache 2.0, pre-1.0 (v0.12.0) — check /platforms.html before assuming any target or feature is shipped.
 
-Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across more than one runtime environment. The agent proposes; governed capabilities decide.
+Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across hosts. The agent proposes; governed capabilities decide.
 
-Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if you consume it directly); npm `traverse-embedder-web@0.12.0`. Spec 138 (exact-ref governed `model.execute`) ships in this cut. The public registry holds 92 capabilities across 33 domains (213 signed versions; 175 non-deprecated). The core repo has 150 approved governing specs.
+Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if you consume it directly); npm `traverse-embedder-web@0.12.0`. Value loop: discover a governed capability → execute known behavior → produce a trace. Specs and registry catalog size are governance hygiene, not the pitch — see /about.html and the registry site for live counts when you need them.
 
 ## Start here
 
 - [Quickstart](https://traverse-framework.com/docs/quickstart.html): install the CLI, write a contract, run it, read the trace — the fastest working path.
 - [Core Concepts](https://traverse-framework.com/docs/concepts.html): the actual vocabulary — Capability, Contract, Registry, Runtime, Placement, Trace, and the spec-governance model.
-- [The System](https://traverse-framework.com/system.html): what the codebase is made of — 10 workspace crates by role, plus how the 150-spec governance layer works.
+- [The System](https://traverse-framework.com/system.html): what the codebase is made of — 10 workspace crates by role, plus how the governance layer works (specs keep us honest; they are not the product).
 - [Examples](https://traverse-framework.com/examples.html): six real, runnable example domains, not illustrative snippets — start with hello-world.
 - [Registry](https://traverse-framework.com/registry.html): the public catalog, counted from live catalog.json at build time.
 
@@ -46,4 +46,4 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 - [Discover](https://traverse-framework.com/discover.html): a live browser demo that pulls the public registry and executes a reviewed plan locally. Read [what it proves](https://traverse-framework.com/blog/what-discover-proves.html) before quoting it.
 - [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html), [vs agent runtimes](https://traverse-framework.com/compare/vs-agent-runtimes.html), [vs WASM runtimes](https://traverse-framework.com/compare/vs-wasm-runtimes.html), [vs cross-platform frameworks](https://traverse-framework.com/compare/vs-cross-platform-frameworks.html)
 - [About](https://traverse-framework.com/about.html): project history and motivation.
-- [GitHub](https://github.com/traverse-framework/traverse): source, issues, and the 150 approved governing specs.
+- [GitHub](https://github.com/traverse-framework/traverse): source, issues, and governing specs (honesty layer, not the pitch).
