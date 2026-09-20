@@ -27,7 +27,7 @@ const _body = `
       <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.10.2">Traverse v0.10.2</a> is a compatibility-preserving cut on the v0.10 line. Existing local callers keep the same Rust crate APIs and the same <code>traverse-cli</code> binary name. What changed is how hosts touch the public Registry and how MCP hosts serve from that evidence.</p>
 
       <div class="callout">
-        Short version: prepare a signed Registry release into a host-owned cache under digest keys, then validate / register / activate — and Mode B MCP — from that cache alone. No fetch-at-activate. No ambient credentials in the Callweave fixture path.
+        Short version: prepare a signed Registry release into a host-owned cache under digest keys, then validate / register / activate — and Mode B MCP — from that cache alone. No fetch-at-activate. No ambient credentials in the checked-in fixture path.
       </div>
 
       <h2 id="why">Why this cut exists</h2>
@@ -46,7 +46,7 @@ const _body = `
         <li>Cache integrity failures stay redacted. Operators get stable lifecycle outcomes — not endpoints, credentials, headers, cache paths, or raw artifact bytes.</li>
       </ul>
 
-      <p>The checked-in Callweave <code>inference.evidence-normalize@1.0.1</code> signed-release fixture proves exact-version validation, registration, and local activation from prepared cache bytes with no credential or private endpoint requirement.</p>
+      <p>The checked-in <code>inference.evidence-normalize@1.0.1</code> signed-release fixture proves exact-version validation, registration, and local activation from prepared cache bytes with no credential or private endpoint requirement.</p>
 
       <h2 id="mcp">Mode A and Mode B MCP</h2>
 

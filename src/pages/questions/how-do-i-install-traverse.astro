@@ -1,17 +1,72 @@
 ---
 import QuestionLayout from '@layouts/QuestionLayout.astro';
 
-const relatedLinks = [];
-const _body = "<p>Traverse is built from source. There are no binary releases yet. The process takes about 10 minutes if you already have Rust installed.</p>\n\n      <h2>Prerequisites</h2>\n      <ul>\n        <li><strong>Rust toolchain</strong> — install via <a href=\"https://rustup.rs\" target=\"_blank\" rel=\"noopener\">rustup.rs</a> if you do not have it</li>\n        <li><strong>wasm32-wasip1 target</strong> — needed to compile capabilities to WASM</li>\n        <li><strong>Node.js</strong> — only needed if you want to run the React demo</li>\n      </ul>\n\n      <h2><span class=\"step-num\">1</span> Add the WASM target</h2>\n      <p>After installing Rust, add the WASM target:</p>\n      <pre><code>rustup target add wasm32-wasip1</code></pre>\n\n      <h2><span class=\"step-num\">2</span> Clone the repository</h2>\n      <pre><code>git clone https://github.com/traverse-framework/traverse\ncd traverse</code></pre>\n\n      <h2><span class=\"step-num\">3</span> Build the workspace</h2>\n      <p>This builds all crates including the runtime, registry, CLI, and the expedition WASM capabilities:</p>\n      <pre><code>cargo build</code></pre>\n      <p>The first build will take a few minutes while Cargo downloads and compiles dependencies. Subsequent builds are much faster.</p>\n\n      <h2><span class=\"step-num\">4</span> Verify with bundle inspect</h2>\n      <p>Run the bundle inspect command to confirm everything built correctly. It prints the registry contents, showing all capabilities indexed from the bundle:</p>\n      <pre><code>cargo run -p traverse-cli-rs -- bundle inspect examples/expedition/registry-bundle/manifest.json</code></pre>\n      <p>You should see a list of capabilities from the expedition planning example, each with their contract metadata. If this runs without error, your installation is working.</p>\n\n      <h2>What is installed where</h2>\n      <p>Nothing is installed globally. All binaries live in <code>target/debug/</code>. The WASM capability modules are compiled to <code>target/wasm32-wasip1/debug/</code>. The CLI reads from those paths at runtime.</p>\n\n      <h2>Next step</h2>\n      <p>Once the build passes, follow the <a href=\"/questions/how-do-i-run-the-first-example.html\">expedition example walkthrough</a> to see the full runtime in action, including the browser adapter and React demo.</p>\n\n      <p>For more detail, see the <a href=\"/docs/quickstart.html\">quickstart documentation</a>.</p>";
-const _jsonLd = "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I install Traverse?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Traverse is built from source. Prerequisites are the Rust toolchain (rustup), the wasm32-wasip1 target, and Node.js for the React demo. Clone the repo at github.com/traverse-framework/traverse, run cargo build, then run cargo run -p traverse-cli-rs -- bundle inspect <manifest-path> to verify the installation. There are no binary releases yet.\"}}]}";
+const relatedLinks = [
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'Author in plain English' },
+  { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust?' },
+  { href: '/questions/can-i-use-traverse-with-python.html', label: 'Python (CLI, no SDK)' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/docs/quickstart.html', label: 'Quickstart' },
+];
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I install Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Usual paths need no full from-source install: author in plain English with the Claude skill traverse-capability-author, or consume via npm traverse-embedder-web, the Rust embedder, traverse-mcp, or Python via traverse-cli capability-package execute (no Python SDK). Contributors and manual authors build from source with Rust and the wasm32-wasip1 target; there are no binary releases yet.',
+    },
+  }],
+});
 ---
 <QuestionLayout
-  title={"How do I install Traverse?"}
-  description={"Step-by-step installation guide for Traverse Framework. Prerequisites, clone, build from source, and run your first command."}
-  canonical={"https://traverse-framework.com/questions/how-do-i-install-traverse.html"}
-  category={"Question"}
+  title="How do I install Traverse?"
+  description="Usual paths: plain-English authoring skill or consume via npm / CLI / MCP. From-source build is for contributors and manual Rust→WASM authors."
+  canonical="https://traverse-framework.com/questions/how-do-i-install-traverse.html"
+  category="Question"
   relatedLinks={relatedLinks}
-  jsonLd={_jsonLd}
+  jsonLd={jsonLd}
 >
-  <Fragment set:html={_body} />
+  <p>Most people do not need a full from-source build to try Traverse. Pick the path that matches what you are doing.</p>
+
+  <h2>Path A — Author in plain English (usual)</h2>
+  <p>Load the official Claude skill <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener"><code>traverse-capability-author</code></a>. It interviews you, checks the registry, writes the contract, produces executable WASM, and opens a human-reviewed PR. You describe the business rule; you do not install a Rust toolchain for that path. Under the hood the artifact is still Rust→WASM.</p>
+  <p>Details: <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a> and <a href="/blog/you-dont-need-rust-to-publish-a-capability.html">You don't need Rust to publish a capability</a>.</p>
+
+  <h2>Path B — Consume a published capability (no Rust)</h2>
+  <ul>
+    <li><strong>JavaScript / TypeScript:</strong> npm package <code>traverse-embedder-web</code> (published). See the <a href="/docs/guides/react-integration.html">React integration guide</a>.</li>
+    <li><strong>Rust host:</strong> crates.io package <code>traverse-embedder</code>.</li>
+    <li><strong>AI agents:</strong> <code>traverse-mcp</code> over stdio — see <a href="/agents.html">Agents</a> and the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>.</li>
+    <li><strong>Python:</strong> no SDK. Shell out to <code>traverse-cli capability-package execute</code> (stdlib <code>subprocess</code>). See <a href="/questions/can-i-use-traverse-with-python.html">Can I use Traverse with Python?</a>.</li>
+  </ul>
+
+  <h2>Path C — Build from source (contributors / manual authors)</h2>
+  <p>If you are contributing to the runtime or writing capabilities by hand (the secondary path), you build the workspace from source. There are no binary releases yet. Plan on about 10 minutes if you already have Rust.</p>
+
+  <h3>Prerequisites (Path C only)</h3>
+  <ul>
+    <li><strong>Rust toolchain</strong> — install via <a href="https://rustup.rs" target="_blank" rel="noopener">rustup.rs</a></li>
+    <li><strong>wasm32-wasip1 target</strong> — needed to compile capabilities to WASM on the manual path</li>
+    <li><strong>Node.js</strong> — only if you want to run the React demo</li>
+  </ul>
+
+  <h3>1. Add the WASM target</h3>
+  <pre><code>rustup target add wasm32-wasip1</code></pre>
+
+  <h3>2. Clone and build</h3>
+  <pre><code>git clone https://github.com/traverse-framework/traverse
+cd traverse
+cargo build</code></pre>
+  <p>First build downloads and compiles dependencies; later builds are much faster.</p>
+
+  <h3>3. Verify with the CLI</h3>
+  <pre><code>cargo run -p traverse-cli -- --help</code></pre>
+  <p>Then follow the <a href="/docs/quickstart.html">quickstart</a> for a first contract + execute + trace loop. For the manual author path, see <a href="/questions/do-i-need-rust.html">Do I need to know Rust?</a>.</p>
+
+  <h2>What is real today</h2>
+  <p>Honest consumer and platform status lives on <a href="/what-is-real-today.html">What is real today</a> and <a href="/platforms.html">Platforms</a>. Traverse is pre-1.0.</p>
 </QuestionLayout>
