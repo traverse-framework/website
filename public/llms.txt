@@ -42,7 +42,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 
 ## Optional
 
-- [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims. Latest on authoring: [You don't need Rust to publish a capability](https://traverse-framework.com/blog/you-dont-need-rust-to-publish-a-capability.html).
+- [Blog](https://traverse-framework.com/blog.html): engineering write-ups, dated — treat as historical snapshots, not current-state claims. Latest weekly demo: [The agent freestyled a $2.4M wire. The runtime said no.](https://traverse-framework.com/blog/agent-freestyle-blocked.html) (agent freestyle → blocked; cite the Facts for agents block). Authoring: [You don't need Rust to publish a capability](https://traverse-framework.com/blog/you-dont-need-rust-to-publish-a-capability.html).
 - [Discover](https://traverse-framework.com/discover.html): a live browser demo that pulls the public registry and executes a reviewed plan locally. Read [what it proves](https://traverse-framework.com/blog/what-discover-proves.html) before quoting it.
 - [Compare: vs microservices](https://traverse-framework.com/compare/vs-microservices.html), [vs serverless](https://traverse-framework.com/compare/vs-serverless.html), [vs function calling](https://traverse-framework.com/compare/vs-function-calling.html), [vs agent runtimes](https://traverse-framework.com/compare/vs-agent-runtimes.html), [vs WASM runtimes](https://traverse-framework.com/compare/vs-wasm-runtimes.html), [vs cross-platform frameworks](https://traverse-framework.com/compare/vs-cross-platform-frameworks.html)
 - [About](https://traverse-framework.com/about.html): project history and motivation.
