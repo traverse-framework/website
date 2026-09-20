@@ -34,6 +34,8 @@ const _body = `
         Short version: the agent proposes; the pinned capability decides. The same nested-wasmi <code>runtime.wasm</code> enforces that decision in the browser, CLI, and agent host.
       </div>
 
+      <p>Runnable demo source: <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" target="_blank" rel="noopener"><code>traverse-framework/weekly-demos/…/2026-09-18-agent-blocked</code></a> — <code>npm install && node server.mjs</code>, then open <code>http://127.0.0.1:8767</code>.</p>
+
       <figure class="post-figure">
         <img src="/assets/img/blog/agent-freestyle-blocked-2026-09-18/cheat-deny.webp" alt="Demo UI showing junior_analyst payments.transfer on a $2.4M wire denied with no_matching_rule" width="960" height="540" loading="lazy" />
         <figcaption>Cheat path: <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire → <code>deny</code> / <code>no_matching_rule</code>.</figcaption>
@@ -76,6 +78,7 @@ const _body = `
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Agent freestyle → blocked (week of 2026-09-18)</li>
+          <li><strong>Runnable demo:</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" target="_blank" rel="noopener">github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked</a></li>
           <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code></li>
           <li><strong>Runtime line:</strong> Traverse <strong>v0.12.0</strong> / <code>traverse-embedder-web@0.12.0</code> via nested-wasmi <code>runtime.wasm</code></li>
           <li><strong>runtime.wasm digest:</strong> <code>sha256:e8d8c04b8927becb5deab9f33da81dd1c121954993ba8b83ea71a2c37cd45e70</code> (certified 0.11.0, unchanged in 0.12.0)</li>
@@ -128,6 +131,7 @@ const _body = `
     <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">A deny that sticks is enforced by the same <code>runtime.wasm</code> and capability across clients.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" class="btn btn-ghost" target="_blank" rel="noopener">Runnable demo →</a>
       <a href="/blog/ai-agents-need-contracts.html" class="btn btn-ghost">Why contracts →</a>
     </div>
   </div>
