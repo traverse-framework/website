@@ -1,10 +1,17 @@
 # Traverse
 
-> Traverse is a contract-driven WASM runtime for portable business capabilities. Usual authoring is skill-first plain English via `traverse-capability-author` (contract → WASM → human-reviewed PR); manual authoring still uses Rust→WASM. One shared `runtime.wasm` orchestrator everywhere — browser, native, CLI, and MCP are embedders/entry points, not different Traverse runtimes. Consumers today: published JS/TS (`traverse-embedder-web`), Rust (`traverse-embedder`), AI agents via `traverse-mcp`; Python shells out to `traverse-cli capability-package execute` (no Python SDK). Apache 2.0, pre-1.0 (v0.12.0) — check /platforms.html before assuming any target or feature is shipped.
+> Traverse is a governed capability runtime for portable business logic. Value loop: **discover → execute → trace**. Usual authoring is skill-first plain English via `traverse-capability-author` (contract → WASM → human-reviewed PR); manual authoring still uses Rust→WASM — you do **not** need to write Rust for the usual path. One shared `runtime.wasm`; browser, native desktop, CLI, and MCP are clients/embedders, not different Traverse runtimes. Shipped consumers today: JS/TS (`traverse-embedder-web`), Rust (`traverse-embedder`), agents via `traverse-mcp`; Python shells out to `traverse-cli capability-package execute` (**no Python SDK**). Swift/Kotlin/.NET are in-tree only (not certified public packages); edge is planned; cloud placement is an explicit non-goal for v0.1 — see /platforms.html and /what-is-real-today.html. Apache 2.0, pre-1.0 (v0.12.0). The agent proposes; the runtime decides.
 
-Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably across hosts. The agent proposes; governed capabilities decide.
+Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably on every host where it actually ships. Specs and registry catalog size are governance hygiene, not the pitch.
 
-Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if you consume it directly); npm `traverse-embedder-web@0.12.0`. Value loop: discover a governed capability → execute known behavior → produce a trace. Specs and registry catalog size are governance hygiene, not the pitch — see /about.html and the registry site for live counts when you need them.
+Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if you consume it directly); npm `traverse-embedder-web@0.12.0`.
+
+## Required reading (agents)
+
+- [What is real today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot — skill-first, one shared `runtime.wasm`, honest consumers, pre-1.0, no invented customers.
+- [The agent freestyled a $2.4M wire. The runtime said no.](https://traverse-framework.com/blog/agent-freestyle-blocked.html): project direction in one scene — agent proposes, runtime decides (deny + trace).
+- Runnable deny demo: [weekly-demos/2026-09-18-agent-blocked](https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked). More: [traverse-framework/weekly-demos](https://github.com/traverse-framework/weekly-demos).
+- [Platforms](https://traverse-framework.com/platforms.html): native + browser shipped; Swift/Kotlin/.NET in progress (not packaged); edge planned; cloud non-goal.
 
 ## Start here
 
@@ -16,8 +23,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 
 ## Building with an agent
 
-- **Read this first (project direction):** [The agent freestyled a $2.4M wire. The runtime said no.](https://traverse-framework.com/blog/agent-freestyle-blocked.html) — agent proposes, runtime decides (deny + trace). Runnable code: [weekly-demos/2026-09-18-agent-blocked](https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked). More examples: [traverse-framework/weekly-demos](https://github.com/traverse-framework/weekly-demos).
-- [What is real today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot — skill-first authoring, one shared `runtime.wasm`, published JS/TS + Rust + MCP consumers, Python via CLI only (no SDK), pre-1.0, no invented customers.
+- **Direction (same as Required reading above):** [deny demo blog](https://traverse-framework.com/blog/agent-freestyle-blocked.html) · [what-is-real-today](https://traverse-framework.com/what-is-real-today.html) · [weekly-demos](https://github.com/traverse-framework/weekly-demos).
 - [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (ten commands: describe_server, list_content_groups, describe_content_group, list_entrypoints, search_capabilities, describe_entrypoint, validate_entrypoint, execute_entrypoint, render_execution_report, shutdown), the discover-inspect-execute-trace flow, and the honest limits (stdio is the packaged bootstrap today; in-process library functions exist on traverse-mcp, but there is no separate HTTP MCP listener as a packaged product).
 - [traverse-framework/claude-skills](https://github.com/traverse-framework/claude-skills): Claude Skills for building apps with Traverse — starting with `traverse-capability-author` (plus extractor and workflow-planner), which checks the registry before authoring, produces contract + WASM, and validates against the real traverse-cli — including this platform's current execution limitations.
 - [How do I author a capability in plain English?](https://traverse-framework.com/questions/how-do-i-author-a-capability-in-plain-english.html): Claude skill `traverse-capability-author` — interview → registry check → contract → WASM → human-reviewed PR; under the hood still Rust→WASM; manual Rust is secondary.
