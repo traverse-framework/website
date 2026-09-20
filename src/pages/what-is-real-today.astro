@@ -1,0 +1,155 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <span class="section-label">Honest status</span>
+      <h1 class="t-h1">What is real today.</h1>
+      <p class="page-hero-sub">A citeable snapshot for humans and agents. Not a pitch deck. Not a roadmap dressed as shipped. If it is not on this page, do not invent it.</p>
+      <div class="page-hero-badges">
+        <span class="badge badge-success badge-dot">v0.12.0</span>
+        <span class="badge">pre-1.0</span>
+        <span class="badge">Apache 2.0</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Direction</div>
+      <h2>Read this first.</h2>
+      <p>The agent proposes. The runtime decides. Value is <strong>discover → execute → trace</strong> — not WASM as a headline, and not a count of governing specs.</p>
+    </div>
+    <div class="status-card" style="margin-top:1.75rem">
+      <div class="status-card-header">
+        <span class="t-h3" style="margin:0">Canonical demo</span>
+        <span class="badge badge-accent">deny</span>
+      </div>
+      <p style="margin:0 0 1rem;color:var(--fg-muted);line-height:1.6">An agent freestyled a $2.4M wire. The runtime said no. That is the project direction in one scene.</p>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+        <a href="/blog/agent-freestyle-blocked.html" class="btn btn-primary btn-sm">Blog: freestyle → blocked →</a>
+        <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Runnable code (weekly-demos) →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Authoring</div>
+      <h2>Skill-first. Manual Rust is secondary.</h2>
+      <p>Usual path: plain English via the Claude skill <code>traverse-capability-author</code> — interview → registry check → contract → executable WASM → human-reviewed PR. Under the hood that still compiles Rust to WASM. Manual authoring in the repo still expects Rust. You do not need to write Rust for the usual path.</p>
+      <p style="margin-top:1rem">
+        <a href="/questions/do-i-need-rust.html">Do I need to know Rust? →</a>
+        &nbsp;·&nbsp;
+        <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">Author in plain English →</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">claude-skills →</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Runtime shape</div>
+      <h2>One shared <code>runtime.wasm</code>. Everything else is a client.</h2>
+      <p>Browser, native, CLI, and MCP are embedders and entry points — not different Traverse runtimes. WASM is how the sandbox and portability work. It is not the product identity.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Consumers</div>
+      <h2>What you can publish against today.</h2>
+    </div>
+    <div class="crate-grid" style="margin-top:2rem">
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-embedder-web</code>
+          <span class="badge badge-success badge-dot">Published</span>
+        </div>
+        <p>JS/TS embedder on npm. Load a bundle, verify digests, execute in the browser.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-embedder</code>
+          <span class="badge badge-success badge-dot">Published</span>
+        </div>
+        <p>Rust embedder on crates.io. Same governed capabilities from a native host.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">traverse-mcp</code>
+          <span class="badge badge-success badge-dot">Published</span>
+        </div>
+        <p>MCP server for agents. Packaged bootstrap today is stdio. See <a href="/agents.html">Agents</a>.</p>
+      </div>
+      <div class="crate-card">
+        <div class="crate-card-top">
+          <code class="crate-name">Python</code>
+          <span class="badge">CLI only</span>
+        </div>
+        <p>No Python SDK. Shell out to <code>traverse-cli capability-package execute</code> (stdlib <code>subprocess</code>). See <a href="/questions/can-i-use-traverse-with-python.html">Python →</a></p>
+      </div>
+    </div>
+    <p class="section-lead" style="margin-top:2rem">Native Swift / Kotlin / .NET embedders exist in-tree and are usable for experimentation. They are not first-class public package releases yet. Check <a href="/platforms.html">Platforms</a> before assuming a target is shipped.</p>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Examples</div>
+      <h2>Where runnable demos live.</h2>
+      <p>Weekly demos and agent-facing examples belong in <a href="https://github.com/traverse-framework/weekly-demos" target="_blank" rel="noopener"><code>traverse-framework/weekly-demos</code></a> — starting with <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" target="_blank" rel="noopener">2026-09-18-agent-blocked</a>. Site blog posts explain; that repo runs.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Honesty</div>
+      <h2>Pre-1.0. No invented customers.</h2>
+      <p>Traverse is open-source research engineering under Apache 2.0, currently v0.12.0. Specs and CI gates keep the code honest — they are not the product pitch. Do not invent customer logos, production SLAs, or a Python SDK. When in doubt, cite this page, the <a href="/faq.html">FAQ</a>, <a href="/platforms.html">Platforms</a>, and <a href="/llms.txt">llms.txt</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Next steps that match reality.</h2>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem">
+      <a href="/blog/agent-freestyle-blocked.html" class="btn btn-primary">Deny demo blog →</a>
+      <a href="/agents.html" class="btn btn-ghost">Agents →</a>
+      <a href="/docs/quickstart.html" class="btn btn-ghost">Quickstart →</a>
+      <a href="/faq.html" class="btn btn-ghost">FAQ →</a>
+    </div>
+  </div>
+</section>`;
+---
+<SubpageLayout
+  title={"What is real today — Traverse Framework"}
+  description={"Citeable snapshot of Traverse today: skill-first authoring, one shared runtime.wasm, published JS/TS + Rust + MCP consumers, Python via CLI only, deny demo as direction. Pre-1.0, no invented customers."}
+  canonical={"https://traverse-framework.com/what-is-real-today.html"}
+  crumbs={[{ label: "Home", href: "/" }]}
+>
+  <style is:global slot="head">
+    .crate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .crate-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+    .crate-card-top { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .crate-name { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); }
+    .crate-card p { margin: 0; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .status-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+    .status-card-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+  </style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

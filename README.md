@@ -15,3 +15,5 @@ Contribute: see [How do I contribute to Traverse?](https://traverse-framework.co
 and open `help wanted` issues across the org. Site-specific starter: [#83](https://github.com/traverse-framework/website/issues/83).
 
 Governance pin: `.governance-version`.
+
+Citeable shipped snapshot: [What is real today](https://traverse-framework.com/what-is-real-today.html).
