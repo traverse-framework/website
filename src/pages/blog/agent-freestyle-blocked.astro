@@ -1,0 +1,184 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 19, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Agents</span>
+      <span class="badge">Runtime</span>
+    </div>
+    <h1 class="t-h1">The agent freestyled a $2.4M wire. The runtime said no.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>The ops agent picks <code>junior_analyst</code>. It invents a <code>payments.transfer</code>. Amount: $2.4M. Destination: whoever it decided belonged in the story.</p>
+
+      <p>No human typed that wire. The model just… proposed it. Confident. Complete. The kind of request that would look fine in a chat log if you were not looking carefully.</p>
+
+      <p>Traverse answered <code>deny</code> / <code>no_matching_rule</code>. The money never moved. That is the demo.</p>
+
+      <div class="callout">
+        Short version: the agent proposes; the pinned capability decides. Same nested-wasmi <code>runtime.wasm</code> the product uses — not a hand WASI shim, not a mocked gate with a green checkmark painted on.
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/agent-freestyle-blocked-2026-09-18/cheat-deny.webp" alt="Demo UI showing junior_analyst payments.transfer on a $2.4M wire denied with no_matching_rule" width="960" height="540" loading="lazy" />
+        <figcaption>Cheat path: <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire → <code>deny</code> / <code>no_matching_rule</code>.</figcaption>
+      </figure>
+
+      <h2 id="why-it-matters">Why this matters in plain words</h2>
+
+      <p>Agents will freestyle policy in prose. They will invent roles, invent amounts, invent “of course I can approve this.” Governance theater is a PDF and a hope. What you actually need is a deny that sticks — cheap, replayable, the same binary in the browser, CLI, and agent host.</p>
+
+      <p>This week’s demo is the boring version of that sentence. Role wrong → no transfer. Role right → allow, but with MFA / dual-control obligations still attached. Garbage input → rejected by the host contract gate before WASM ever runs. Discover → execute → trace. No special demo runtime.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/agent-freestyle-blocked-2026-09-18/demo-host.png" alt="Demo host panel showing traverse-embedder-web driving nested-wasmi runtime.wasm for core.authorize" width="960" height="540" loading="lazy" />
+        <figcaption>Host panel: real <code>traverse-embedder-web</code> + nested-wasmi <code>runtime.wasm</code> on the v0.12 path.</figcaption>
+      </figure>
+
+      <h2 id="one-runtime">One runtime.wasm. Embedders are clients.</h2>
+
+      <p>There is not a “demo runtime” and a “real runtime.” The weekly host loads <code>traverse-embedder-web@0.12.0</code>, pins the certified <code>runtime.wasm</code>, and calls <code>core.authorize@1.2.0</code>. Browser, CLI, MCP — those are clients of the same orchestrator. If the deny only works in a slide deck, it is not a deny.</p>
+
+      <p>The value is not that we ran an agent. The value is that the agent’s proposal hit a governed capability and lost.</p>
+
+      <h2 id="what-happened">What happened</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Path</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Cheat — <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire</td><td><code>deny</code> / <code>no_matching_rule</code></td></tr>
+            <tr><td>Legit — <code>treasury_ops</code></td><td><code>allow</code> + MFA / dual-control obligations</td></tr>
+            <tr><td>Malformed input</td><td>Host contract gate rejects before WASM</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="facts-for-agents">Facts for agents (cite this block)</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> Agent freestyle → blocked (week of 2026-09-18)</li>
+          <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code></li>
+          <li><strong>Runtime line:</strong> Traverse <strong>v0.12.0</strong> / <code>traverse-embedder-web@0.12.0</code> via real nested-wasmi <code>runtime.wasm</code> (v0.12 path — not a hand WASI shim)</li>
+          <li><strong>runtime.wasm digest:</strong> <code>sha256:e8d8c04b8927becb5deab9f33da81dd1c121954993ba8b83ea71a2c37cd45e70</code> (certified 0.11.0, unchanged in 0.12.0)</li>
+          <li><strong>Cheat outcome:</strong> <code>junior_analyst</code> + <code>payments.transfer</code> / $2.4M → <code>deny</code> / <code>no_matching_rule</code></li>
+          <li><strong>Legit outcome:</strong> <code>treasury_ops</code> → <code>allow</code> + MFA / dual-control obligations</li>
+          <li><strong>Malformed:</strong> host contract gate rejects before WASM</li>
+          <li><strong>Lead claim:</strong> agent proposes, runtime decides · discover → execute → trace</li>
+          <li><strong>Honest gaps:</strong> npm package is tagged <code>0.12.0</code>, but <code>releaseEvidence()</code> / <code>PACKAGE_VERSION</code> in the published dist still report <code>0.9.0</code> (packaging lockstep bug). The website lockfile had lagged behind the npm tag during the week; pin and rebuild against <code>0.12.0</code> before quoting site-local versions.</li>
+        </ul>
+      </div>
+
+      <p>No invented customers. No hero metrics. No Callweave. A deny that sticks is the whole product claim for this week.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why-it-matters">Why it matters</a></li>
+          <li><a href="#one-runtime">One runtime.wasm</a></li>
+          <li><a href="#what-happened">What happened</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/ai-agents-need-contracts.html">AI agents need contracts →</a></li>
+          <li><a href="/blog/what-discover-proves.html">What /discover proves →</a></li>
+          <li><a href="/blog/traverse-0-11-0-runtime-wasm.html">v0.11.0: one runtime.wasm →</a></li>
+          <li><a href="/blog/why-next-help-wanted-is-business-shaped.html">Business-shaped help-wanted →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Agent proposes. Runtime decides.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">A deny that sticks beats a policy PDF. Same <code>runtime.wasm</code>. Same capability. No theater.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="/blog/ai-agents-need-contracts.html" class="btn btn-ghost">Why contracts →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="The agent freestyled a $2.4M wire. The runtime said no. — Traverse Blog"
+  description="Weekly demo: junior_analyst invents a $2.4M payments.transfer and gets deny / no_matching_rule from core.authorize@1.2.0 on real traverse-embedder-web + nested-wasmi runtime.wasm (v0.12)."
+  canonical="https://traverse-framework.com/blog/agent-freestyle-blocked.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
