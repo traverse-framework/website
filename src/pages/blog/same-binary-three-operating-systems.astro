@@ -23,13 +23,15 @@ const _body = `
 
     <article class="post-prose">
 
+      <div class="callout"><strong>Dated note (Sep 2026):</strong> Parts of this post still read as if authors must write Rust themselves. That is no longer the usual path. Prefer the Claude skill <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener"><code>traverse-capability-author</code></a> (plain English to contract to WASM to human-reviewed PR). Manual Rust to WASM remains valid under the hood / as a secondary path. See <a href="/blog/you-dont-need-rust-to-publish-a-capability.html">You do not need Rust to publish a capability</a> and <a href="/what-is-real-today.html">What is real today</a>.</div>
+
       <p>A teammate asked me last week whether Traverse "runs on any OS." I gave the honest answer, which took about four sentences and included the word "blocked" once. They looked a little disappointed. I get it — "yes, any OS" is a much better sentence than what I actually said. It's also not true for most tools that say it, and I'd rather be the tool that says the true thing.</p>
 
       <p>So here's the actual mechanics of what happens when the same capability runs on Windows, macOS, and Linux, and why that part of the claim is one I'll make without hedging.</p>
 
       <h2 id="what-actually-runs">What actually runs</h2>
 
-      <p>You write a capability once, in Rust. You compile it to WebAssembly. That produces a single <code>.wasm</code> file — a binary instruction format, not machine code for any particular CPU or OS. <code>traverse-runtime</code> loads that file into a Wasmtime-backed <code>WasmExecutor</code>, validates the request against the capability's contract, runs it in a sandbox, checks the output against the contract's postconditions, and writes a trace.</p>
+      <p>You author a capability once (usual path: plain English via traverse-capability-author; manual path still Rust to WASM). You compile it to WebAssembly. That produces a single <code>.wasm</code> file — a binary instruction format, not machine code for any particular CPU or OS. <code>traverse-runtime</code> loads that file into a Wasmtime-backed <code>WasmExecutor</code>, validates the request against the capability's contract, runs it in a sandbox, checks the output against the contract's postconditions, and writes a trace.</p>
 
       <p>Every step of that is identical on Windows, macOS, and Linux, because none of it touches the host OS directly. The WASM sandbox doesn't see a filesystem, a network socket, or a thread unless the contract explicitly grants it and the host wires up the import. There's no "Windows build" of your capability and no <code>#[cfg(target_os = "linux")]</code> branch hiding somewhere. It's the same file, byte for byte, on all three.</p>
 

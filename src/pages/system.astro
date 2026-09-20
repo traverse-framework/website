@@ -5,12 +5,12 @@ const _body = `<section class="page-hero">
   <div class="container">
     <div class="page-hero-inner">
       <span class="section-label">The System</span>
-      <h1 class="t-h1">One workspace, ten crates, one governance layer.</h1>
+      <h1 class="t-h1">One shared runtime. Clients around it. Specs keep us honest.</h1>
       <p class="page-hero-sub">Traverse isn't a single binary. It's a Rust workspace of purpose-built crates, each governed by an immutable, versioned spec, that together define, validate, place, and execute business capabilities. This is the map.</p>
       <div class="page-hero-badges">
         <span class="badge badge-success badge-dot">v0.12.0</span>
-        <span class="badge">10 workspace crates</span>
-        <span class="badge">150 approved specs</span>
+        <span class="badge">pre-1.0</span>
+        <span class="badge">Apache 2.0</span>
       </div>
     </div>
   </div>
@@ -152,9 +152,9 @@ const _body = `<section class="page-hero">
     <div class="two-col">
       <div>
         <span class="section-label">Governance</span>
-        <h2 class="section-title-sm">150 approved specs, and code loses to them.</h2>
+        <h2 class="section-title-sm">Specs keep the code honest — they are not the product.</h2>
         <p class="section-lead">Every one of the crates above is governed by at least one immutable, versioned spec. The project's own rule, stated plainly in its constitution: when code and contract disagree, the contract wins until it's formally amended. No change merges without passing <code>spec_alignment_check.sh</code> against its governing spec.</p>
-        <p class="section-lead">Roughly how the 145 break down by area — this is our own bucketing for orientation, not an authoritative taxonomy:</p>
+        <p class="section-lead">Approved governing specs live in the repo as an honesty layer. Roughly how they break down by area — our own bucketing for orientation, not an authoritative taxonomy or a marketing number:</p>
         <ul class="spec-breakdown">
           <li><span>Runtime core / execution</span><strong>~14</strong></li>
           <li><span>Contracts &amp; registries</span><strong>~11</strong></li>
@@ -210,7 +210,7 @@ const _body = `<section class="page-hero">
 ---
 <SubpageLayout
   title={"The System — Traverse Framework"}
-  description={"How Traverse is actually built: ten workspace crates grouped by role, plus the 150-spec governance layer that keeps them honest."}
+  description={"How Traverse is actually built: a shared runtime.wasm, the workspace crates around it, and a governance layer that keeps the code honest — specs are hygiene, not the pitch."}
   canonical={"https://traverse-framework.com/system.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
