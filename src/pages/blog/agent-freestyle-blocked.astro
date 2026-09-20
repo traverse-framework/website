@@ -31,7 +31,7 @@ const _body = `
       <p>Traverse answered <code>deny</code> / <code>no_matching_rule</code>. The money never moved. That is the demo.</p>
 
       <div class="callout">
-        Short version: the agent proposes; the pinned capability decides. Same nested-wasmi <code>runtime.wasm</code> the product uses — not a hand WASI shim, not a mocked gate with a green checkmark painted on.
+        Short version: the agent proposes; the pinned capability decides. The same nested-wasmi <code>runtime.wasm</code> enforces that decision in the browser, CLI, and agent host.
       </div>
 
       <figure class="post-figure">
@@ -41,9 +41,9 @@ const _body = `
 
       <h2 id="why-it-matters">Why this matters in plain words</h2>
 
-      <p>Agents will freestyle policy in prose. They will invent roles, invent amounts, invent “of course I can approve this.” Governance theater is a PDF and a hope. What you actually need is a deny that sticks — cheap, replayable, the same binary in the browser, CLI, and agent host.</p>
+      <p>An agent can produce a plausible role, amount, and approval story. Prose is not authorization. The policy has to be executable: a denied role stays denied, and a permitted role still carries its MFA / dual-control obligations.</p>
 
-      <p>This week’s demo is the boring version of that sentence. Role wrong → no transfer. Role right → allow, but with MFA / dual-control obligations still attached. Garbage input → rejected by the host contract gate before WASM ever runs. Discover → execute → trace. No special demo runtime.</p>
+      <p>In this flow, the wrong role gets no transfer, the authorized role gets <code>allow</code> with its obligations attached, and malformed input is rejected by the host contract gate before WASM runs. The path is discover → execute → trace.</p>
 
       <figure class="post-figure">
         <img src="/assets/img/blog/agent-freestyle-blocked-2026-09-18/demo-host.png" alt="Demo host panel showing traverse-embedder-web driving nested-wasmi runtime.wasm for core.authorize" width="960" height="540" loading="lazy" />
@@ -52,9 +52,9 @@ const _body = `
 
       <h2 id="one-runtime">One runtime.wasm. Embedders are clients.</h2>
 
-      <p>There is not a “demo runtime” and a “real runtime.” The weekly host loads <code>traverse-embedder-web@0.12.0</code>, pins the certified <code>runtime.wasm</code>, and calls <code>core.authorize@1.2.0</code>. Browser, CLI, MCP — those are clients of the same orchestrator. If the deny only works in a slide deck, it is not a deny.</p>
+      <p>The weekly host loads <code>traverse-embedder-web@0.12.0</code>, pins the certified <code>runtime.wasm</code>, and calls <code>core.authorize@1.2.0</code>. The browser, CLI, and MCP are clients of the same orchestrator. The deny belongs to the pinned capability and runtime, not to a demo screen.</p>
 
-      <p>The value is not that we ran an agent. The value is that the agent’s proposal hit a governed capability and lost.</p>
+      <p>A governed capability evaluates the proposal and denies it.</p>
 
       <h2 id="what-happened">What happened</h2>
 
@@ -71,23 +71,23 @@ const _body = `
         </table>
       </div>
 
-      <h2 id="facts-for-agents">Facts for agents (cite this block)</h2>
+      <h2 id="facts-for-agents">Facts for agents</h2>
 
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Agent freestyle → blocked (week of 2026-09-18)</li>
           <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code></li>
-          <li><strong>Runtime line:</strong> Traverse <strong>v0.12.0</strong> / <code>traverse-embedder-web@0.12.0</code> via real nested-wasmi <code>runtime.wasm</code> (v0.12 path — not a hand WASI shim)</li>
+          <li><strong>Runtime line:</strong> Traverse <strong>v0.12.0</strong> / <code>traverse-embedder-web@0.12.0</code> via nested-wasmi <code>runtime.wasm</code></li>
           <li><strong>runtime.wasm digest:</strong> <code>sha256:e8d8c04b8927becb5deab9f33da81dd1c121954993ba8b83ea71a2c37cd45e70</code> (certified 0.11.0, unchanged in 0.12.0)</li>
           <li><strong>Cheat outcome:</strong> <code>junior_analyst</code> + <code>payments.transfer</code> / $2.4M → <code>deny</code> / <code>no_matching_rule</code></li>
           <li><strong>Legit outcome:</strong> <code>treasury_ops</code> → <code>allow</code> + MFA / dual-control obligations</li>
           <li><strong>Malformed:</strong> host contract gate rejects before WASM</li>
           <li><strong>Lead claim:</strong> agent proposes, runtime decides · discover → execute → trace</li>
-          <li><strong>Honest gaps:</strong> npm package is tagged <code>0.12.0</code>, but <code>releaseEvidence()</code> / <code>PACKAGE_VERSION</code> in the published dist still report <code>0.9.0</code> (packaging lockstep bug). The website lockfile had lagged behind the npm tag during the week; pin and rebuild against <code>0.12.0</code> before quoting site-local versions.</li>
+          <li><strong>Packaging caveat:</strong> npm is tagged <code>0.12.0</code>, but <code>releaseEvidence()</code> / <code>PACKAGE_VERSION</code> in the published dist still report <code>0.9.0</code>. The website lockfile also lagged the npm tag; these version surfaces are not yet in lockstep.</li>
         </ul>
       </div>
 
-      <p>No invented customers. No hero metrics. No Callweave. A deny that sticks is the whole product claim for this week.</p>
+      <p>A deny that sticks: the agent proposes; the runtime decides.</p>
 
     </article>
 
@@ -125,7 +125,7 @@ const _body = `
 <section class="cta-band">
   <div class="container" style="text-align:center">
     <h2 class="t-h2" style="margin-bottom:0.75rem">Agent proposes. Runtime decides.</h2>
-    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">A deny that sticks beats a policy PDF. Same <code>runtime.wasm</code>. Same capability. No theater.</p>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">A deny that sticks is enforced by the same <code>runtime.wasm</code> and capability across clients.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
       <a href="/blog/ai-agents-need-contracts.html" class="btn btn-ghost">Why contracts →</a>
