@@ -1,0 +1,51 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does discover → execute → trace mean in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Discover finds a versioned, contract-governed capability. Execute runs that known artifact in a sandbox after validation. Trace records what ran — inputs, outputs, contract version, and outcome — so the decision is auditable. The agent proposes; the runtime decides. Specs and catalog size are honesty hygiene, not the product pitch.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
+  { href: '/questions/how-do-i-run-the-agent-blocked-weekly-demo.html', label: 'How do I run the agent-blocked weekly demo?' },
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact?' },
+  { href: '/questions/how-do-ai-agents-discover-capabilities.html', label: 'How do AI agents discover capabilities?' },
+  { href: '/blog/agent-freestyle-blocked.html', label: 'Agent freestyle → blocked' },
+  { href: '/agents.html', label: 'For AI agents' },
+];
+---
+<QuestionLayout
+  title="What does discover → execute → trace mean in Traverse?"
+  description="Discover a governed capability, execute the known artifact, get a trace. The agent proposes; the runtime decides. Specs are honesty hygiene, not the pitch."
+  canonical="https://traverse-framework.com/questions/what-does-discover-execute-trace-mean.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Discover → execute → trace</strong> is the value loop. Not “WASM as a headline,” and not a count of governing specs. Find a reviewed capability, run the known artifact, keep evidence of what happened.</p>
+
+  <h2>Discover</h2>
+  <p>Look up a versioned capability by contract metadata — name, schema, risk, placement — not by regenerating business logic from a prompt. Public surfaces include the registry catalog, MCP search tools, and the skill path that checks the registry before authoring anything new. If the rule already exists, reuse it.</p>
+
+  <h2>Execute</h2>
+  <p>Run that exact artifact under the shared <code>runtime.wasm</code>. Preconditions and postconditions validate inputs and outputs. The sandbox isolates the call. Language SDKs, the CLI, and MCP are clients that ask the runtime to execute — they are not separate Traverses. See <a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm?</a>.</p>
+
+  <h2>Trace</h2>
+  <p>Every run leaves a trace artifact: what was called, which contract version, the inputs and outputs that passed validation, and the outcome (including deny). Auditors and operators can replay the decision without re-deriving the rule. See <a href="/questions/what-is-a-trace-artifact.html">What is a trace artifact?</a>.</p>
+
+  <h2>The agent proposes; the runtime decides</h2>
+  <p>An agent can search, plan, and suggest a call. It does not get to invent the authoritative business answer. The runtime validates and either executes or denies. The public scene for that boundary: <a href="/blog/agent-freestyle-blocked.html">The agent freestyled a $2.4M wire. The runtime said no.</a> Runnable copy: <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">how to run the weekly demo</a>.</p>
+
+  <h2>What this is not</h2>
+  <p>It is not a pitch about how many specs are approved. Specs and CI gates keep the codebase honest — cite them in footnotes or About, not as the product. For a citeable snapshot of what ships today, start at <a href="/what-is-real-today.html">what is real today</a>.</p>
+</QuestionLayout>

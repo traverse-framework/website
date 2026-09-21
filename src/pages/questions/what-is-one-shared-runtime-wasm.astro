@@ -1,0 +1,52 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is one shared runtime.wasm in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Traverse uses one shared runtime.wasm orchestrator. Browser, native desktop, CLI, and MCP are embedders and clients — not different Traverse runtimes per language. Published consumers today include JS/TS (traverse-embedder-web), Rust (traverse-embedder), and agents via traverse-mcp. Python shells out to traverse-cli; Swift, Kotlin, and .NET exist in-tree but are not first-class public packages yet.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/platforms.html', label: 'Platforms' },
+  { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'discover → execute → trace' },
+  { href: '/questions/can-i-use-traverse-with-python.html', label: 'Can I use Traverse with Python?' },
+  { href: '/questions/how-do-i-embed-traverse-in-a-web-app.html', label: 'How do I embed Traverse in a web app?' },
+  { href: '/questions/what-is-a-wasm-capability.html', label: 'What is a WASM capability?' },
+  { href: '/docs/architecture.html', label: 'Architecture' },
+];
+---
+<QuestionLayout
+  title="What is one shared runtime.wasm in Traverse?"
+  description="One shared runtime.wasm; browser, native, CLI, and MCP are clients. Honest consumers: JS/TS, Rust, MCP published; Python via CLI; Swift/Kotlin/.NET in-tree only."
+  canonical="https://traverse-framework.com/questions/what-is-one-shared-runtime-wasm.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Traverse is one orchestrator binary — <code>runtime.wasm</code> — shared across hosts that have actually shipped. WASM is how the sandbox and portable artifacts work. It is not the product identity, and it is not a license to claim every OS and cloud placement.</p>
+
+  <h2>Embedders are clients</h2>
+  <p>The browser package, native Rust embedder, CLI, and MCP server load and talk to the same runtime model. They do not each reinvent a separate “Traverse runtime” in their language. When you call a capability from npm, crates.io, or an MCP client, you are asking that shared runtime to discover → execute → trace against a known contract.</p>
+
+  <h2>Honest consumers today</h2>
+  <ul>
+    <li><strong>JS/TS</strong> — published npm <code>traverse-embedder-web@0.12.0</code></li>
+    <li><strong>Rust</strong> — published crates.io <code>traverse-embedder@0.12.0</code></li>
+    <li><strong>AI agents</strong> — published <code>traverse-mcp</code> (stdio bootstrap)</li>
+    <li><strong>Python</strong> — works by shelling out to <code>traverse-cli capability-package execute</code>. There is <strong>no Python SDK</strong>.</li>
+    <li><strong>Swift / Kotlin / .NET</strong> — exist in-tree and are usable for experimentation; they are not first-class public package releases yet.</li>
+  </ul>
+  <p>Edge is planned. Cloud placement is an explicit non-goal for v0.1. Before assuming a host works, read <a href="/platforms.html">Platforms</a> and <a href="/what-is-real-today.html">what is real today</a>.</p>
+
+  <h2>What this is not</h2>
+  <p>It is not “write once, run on any OS forever.” It is one governed capability on the hosts Traverse has actually shipped. Capability WASM and the shared runtime are different layers: your business rule is a capability artifact; the orchestrator that validates and runs it is <code>runtime.wasm</code>.</p>
+</QuestionLayout>
