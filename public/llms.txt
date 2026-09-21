@@ -10,6 +10,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 
 - [What is real today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot — skill-first, one shared `runtime.wasm`, honest consumers, pre-1.0, no invented customers.
 - [What does discover → execute → trace mean?](https://traverse-framework.com/questions/what-does-discover-execute-trace-mean.html): the value loop in plain language — agent proposes, runtime decides.
+- [What does “the agent proposes; the runtime decides” mean?](https://traverse-framework.com/questions/what-does-agent-proposes-runtime-decides-mean.html): boundary in one page — agents search/plan/suggest; runtime validates, executes or denies, leaves a trace.
 - [What is one shared runtime.wasm?](https://traverse-framework.com/questions/what-is-one-shared-runtime-wasm.html): embedders are clients; honest consumer list.
 - [The agent freestyled a $2.4M wire. The runtime said no.](https://traverse-framework.com/blog/agent-freestyle-blocked.html): project direction in one scene — agent proposes, runtime decides (deny + trace).
 - Runnable deny demo: [weekly-demos/2026-09-18-agent-blocked](https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked) · [How do I run it?](https://traverse-framework.com/questions/how-do-i-run-the-agent-blocked-weekly-demo.html). More: [traverse-framework/weekly-demos](https://github.com/traverse-framework/weekly-demos).
@@ -35,6 +36,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 - [How do I review a capability PR as a maintainer?](https://traverse-framework.com/questions/how-do-i-review-a-capability-pr-as-a-maintainer.html): contract fit, green CI (digest/coverage/authoring/licensing), fork artifact mirror before merge; signing automatic after merge; no side door.
 - [MCP setup guide](https://traverse-framework.com/docs/guides/mcp-setup.html): connect Claude or any MCP client to a local traverse-mcp server.
 - [CLI Reference](https://traverse-framework.com/docs/cli-reference.html): every traverse command, flag, and expected output. Python consume today is `capability-package execute`, not a fake `capability run`, and not a shipped Python SDK.
+- [Does Traverse have a Python SDK?](https://traverse-framework.com/questions/does-traverse-have-a-python-sdk.html): **No** — no pip embedder; Python shells out to `traverse-cli capability-package execute`; do not invent an SDK or fake `capability run`.
 
 ## Where it runs
 
