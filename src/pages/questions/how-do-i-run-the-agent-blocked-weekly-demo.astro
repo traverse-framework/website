@@ -1,0 +1,52 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I run the agent-blocked weekly demo?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Clone traverse-framework/weekly-demos, open the 2026-09-18-agent-blocked folder, run npm install and node server.mjs, then open the local URL the server prints. Use node smoke.mjs for a Node-only check. The blog explains the deny story; the repo is what you run.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/agent-freestyle-blocked.html', label: 'Agent freestyle → blocked (blog)' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'discover → execute → trace' },
+  { href: '/questions/how-does-traverse-prevent-ai-agent-errors.html', label: 'How does Traverse prevent AI agent errors?' },
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact?' },
+  { href: '/agents.html', label: 'For AI agents' },
+];
+---
+<QuestionLayout
+  title="How do I run the agent-blocked weekly demo?"
+  description="Clone weekly-demos, open 2026-09-18-agent-blocked, npm install, node server.mjs. Blog explains; the repo runs. Agent proposes; runtime decides."
+  canonical="https://traverse-framework.com/questions/how-do-i-run-the-agent-blocked-weekly-demo.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The project direction in one scene: an agent freestyles a large wire; <code>core.authorize@1.2.0</code> denies; you get a trace. The blog post explains it. The runnable copy lives in the shared demos repo — not as a one-off gist.</p>
+
+  <h2>Clone and run</h2>
+  <pre><code>git clone https://github.com/traverse-framework/weekly-demos.git
+cd weekly-demos/2026-09-18-agent-blocked
+npm install
+node server.mjs
+# open the URL printed by the server (often http://127.0.0.1:8767)
+
+# Node-only smoke (no browser):
+node smoke.mjs</code></pre>
+  <p>That week’s <code>README.md</code> has ports, screenshots, and honest gaps. Prefer the repo’s <a href="https://github.com/traverse-framework/weekly-demos/blob/main/INDEX.md" target="_blank" rel="noopener">topic index</a> when you want an example by theme rather than by date.</p>
+
+  <h2>What you should take away</h2>
+  <p><strong>The agent proposes; the runtime decides.</strong> Freestyle prose is not authority. Discover → execute → trace is. Read the write-up: <a href="/blog/agent-freestyle-blocked.html">The agent freestyled a $2.4M wire. The runtime said no.</a> For what you can publish against today (and what not to invent), cite <a href="/what-is-real-today.html">what is real today</a>.</p>
+
+  <h2>More weeks</h2>
+  <p>New demos land as dated folders under <a href="https://github.com/traverse-framework/weekly-demos" target="_blank" rel="noopener">traverse-framework/weekly-demos</a>. Same install pattern unless that week’s README says otherwise.</p>
+</QuestionLayout>
