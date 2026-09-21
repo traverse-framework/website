@@ -9,8 +9,10 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 ## Required reading (agents)
 
 - [What is real today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot — skill-first, one shared `runtime.wasm`, honest consumers, pre-1.0, no invented customers.
+- [What does discover → execute → trace mean?](https://traverse-framework.com/questions/what-does-discover-execute-trace-mean.html): the value loop in plain language — agent proposes, runtime decides.
+- [What is one shared runtime.wasm?](https://traverse-framework.com/questions/what-is-one-shared-runtime-wasm.html): embedders are clients; honest consumer list.
 - [The agent freestyled a $2.4M wire. The runtime said no.](https://traverse-framework.com/blog/agent-freestyle-blocked.html): project direction in one scene — agent proposes, runtime decides (deny + trace).
-- Runnable deny demo: [weekly-demos/2026-09-18-agent-blocked](https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked). More: [traverse-framework/weekly-demos](https://github.com/traverse-framework/weekly-demos).
+- Runnable deny demo: [weekly-demos/2026-09-18-agent-blocked](https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked) · [How do I run it?](https://traverse-framework.com/questions/how-do-i-run-the-agent-blocked-weekly-demo.html). More: [traverse-framework/weekly-demos](https://github.com/traverse-framework/weekly-demos).
 - [Platforms](https://traverse-framework.com/platforms.html): native + browser shipped; Swift/Kotlin/.NET in progress (not packaged); edge planned; cloud non-goal.
 
 ## Start here
@@ -23,7 +25,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 
 ## Building with an agent
 
-- **Direction (same as Required reading above):** [deny demo blog](https://traverse-framework.com/blog/agent-freestyle-blocked.html) · [what-is-real-today](https://traverse-framework.com/what-is-real-today.html) · [weekly-demos](https://github.com/traverse-framework/weekly-demos).
+- **Direction (same as Required reading above):** [deny demo blog](https://traverse-framework.com/blog/agent-freestyle-blocked.html) · [what-is-real-today](https://traverse-framework.com/what-is-real-today.html) · [weekly-demos](https://github.com/traverse-framework/weekly-demos) · [run the deny demo](https://traverse-framework.com/questions/how-do-i-run-the-agent-blocked-weekly-demo.html).
 - [For AI Agents](https://traverse-framework.com/agents.html): the real MCP tool list (ten commands: describe_server, list_content_groups, describe_content_group, list_entrypoints, search_capabilities, describe_entrypoint, validate_entrypoint, execute_entrypoint, render_execution_report, shutdown), the discover-inspect-execute-trace flow, and the honest limits (stdio is the packaged bootstrap today; in-process library functions exist on traverse-mcp, but there is no separate HTTP MCP listener as a packaged product).
 - [traverse-framework/claude-skills](https://github.com/traverse-framework/claude-skills): Claude Skills for building apps with Traverse — starting with `traverse-capability-author` (plus extractor and workflow-planner), which checks the registry before authoring, produces contract + WASM, and validates against the real traverse-cli — including this platform's current execution limitations.
 - [How do I author a capability in plain English?](https://traverse-framework.com/questions/how-do-i-author-a-capability-in-plain-english.html): Claude skill `traverse-capability-author` — interview → registry check → contract → WASM → human-reviewed PR; under the hood still Rust→WASM; manual Rust is secondary.
