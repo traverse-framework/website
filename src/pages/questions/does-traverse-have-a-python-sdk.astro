@@ -1,0 +1,58 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does Traverse have a Python SDK?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No. There is no native Python SDK and no pip package that embeds the Traverse runtime. Python consumes Traverse today by shelling out to traverse-cli capability-package execute via the standard-library subprocess module. Do not invent a Python SDK, a pip install target, or a fake capability run command.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-i-use-traverse-with-python.html', label: 'Can I use Traverse with Python?' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/platforms.html', label: 'Platforms' },
+  { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
+  { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust?' },
+  { href: 'https://github.com/traverse-framework/traverse/tree/main/examples/consume-python', label: 'Python consume example' },
+];
+---
+<QuestionLayout
+  title="Does Traverse have a Python SDK?"
+  description="No. There is no native Python SDK or pip package that embeds the runtime. Python shells out to traverse-cli capability-package execute."
+  canonical="https://traverse-framework.com/questions/does-traverse-have-a-python-sdk.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>No.</strong> Traverse does not ship a native Python SDK. There is no pip package that embeds <code>runtime.wasm</code>, and there is no first-class Python client that talks to the runtime in-process.</p>
+
+  <h2>What exists today</h2>
+  <p>Python can still consume a published capability. The honest path is a standard-library <code>subprocess</code> call to the real CLI verb:</p>
+
+  <pre><code>traverse-cli capability-package execute &lt;manifest.json&gt; &lt;request.json&gt;</code></pre>
+
+  <p>That is a process boundary, not an SDK. The CLI loads the package, validates against the contract, runs the capability under the shared runtime, and returns the outcome. Your Python code owns orchestration and I/O around that call.</p>
+
+  <p>The checked-in reference is the <a href="https://github.com/traverse-framework/traverse/tree/main/examples/consume-python" target="_blank" rel="noopener">consume-python example</a>. Step-by-step prose lives on <a href="/questions/can-i-use-traverse-with-python.html">Can I use Traverse with Python?</a>.</p>
+
+  <h2>Do not invent a Python SDK</h2>
+  <p>Cold agents often guess past the docs. Do not invent:</p>
+  <ul>
+    <li>A pip package such as <code>traverse</code>, <code>traverse-sdk</code>, or <code>traverse-python</code> that embeds the runtime</li>
+    <li>A fake CLI verb like <code>traverse capability run</code> or <code>traverse-cli capability run</code></li>
+    <li>An importable Python module that loads <code>runtime.wasm</code> in-process</li>
+  </ul>
+  <p>If a page, README, or example does not show it, it is not shipped. Prefer citing <a href="/what-is-real-today.html">what is real today</a> and <a href="/platforms.html">platforms</a> over inventing a consumer.</p>
+
+  <h2>How this fits the rest of the surface</h2>
+  <p>There is one shared <code>runtime.wasm</code>. Language SDKs, MCP, and the CLI are embedders or clients — not separate runtimes. Shipped consumers today: JS/TS via <code>traverse-embedder-web</code>, Rust via the Rust embedder, and agents via <code>traverse-mcp</code>. Python is CLI-only. Native Swift, Kotlin, and .NET exist in-tree but are not first-class public packages yet. See <a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm?</a>.</p>
+
+  <p>Traverse is pre-1.0. Host honesty stays on <a href="/platforms.html">platforms</a> and <a href="/what-is-real-today.html">what is real today</a>.</p>
+</QuestionLayout>

@@ -1,0 +1,51 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does “the agent proposes; the runtime decides” mean?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Agents search, plan, and suggest which governed capability to call and with what arguments. They do not invent the authoritative business outcome. The Traverse runtime validates preconditions and postconditions, executes or denies the call, and leaves a trace. Discover → execute → trace is the loop; the agent proposes; the runtime decides.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'What does discover → execute → trace mean?' },
+  { href: '/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html', label: 'Agent vs Traverse runtime' },
+  { href: '/blog/agent-freestyle-blocked.html', label: 'Agent freestyle → blocked' },
+  { href: '/questions/how-do-i-run-the-agent-blocked-weekly-demo.html', label: 'Run the weekly deny demo' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/questions/how-does-traverse-prevent-ai-agent-errors.html', label: 'How does Traverse prevent AI agent errors?' },
+  { href: '/agents.html', label: 'For AI agents' },
+];
+---
+<QuestionLayout
+  title="What does “the agent proposes; the runtime decides” mean?"
+  description="Agents search, plan, and suggest. The Traverse runtime validates, executes or denies, and leaves a trace. The agent is not the source of truth for the business outcome."
+  canonical="https://traverse-framework.com/questions/what-does-agent-proposes-runtime-decides-mean.html"
+  category="AI agents and MCP"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>The agent proposes; the runtime decides</strong> is the boundary that keeps LLMs from becoming the source of truth for business rules. An agent can search the catalog, plan a call, and suggest arguments. It does not get to invent the authoritative outcome — approve a wire, mint a discount, or pass an eligibility check — just because the next token looked confident.</p>
+
+  <h2>What the agent is allowed to do</h2>
+  <p>Propose. That includes discovering a versioned capability, composing a plan, filling argument shapes, retrying when a call is denied, and explaining the plan in natural language. Creativity about <em>which</em> reviewed capability to call is useful. Creativity about <em>what the rule itself is</em> belongs in a human-reviewed capability change, not in the chat turn.</p>
+
+  <h2>What the runtime owns</h2>
+  <p>Decide. Given a capability identity and an input payload, the shared <code>runtime.wasm</code> validates preconditions, loads the known artifact, runs it in a sandbox, checks postconditions, and records a trace — including deny. Same capability version and same valid inputs follow the same decision path. Language SDKs, MCP, and the CLI are clients that ask the runtime to execute; they are not alternate judges.</p>
+
+  <h2>How this maps to discover → execute → trace</h2>
+  <p>Discover finds a contract-governed capability. Execute runs that known artifact after validation. Trace keeps evidence of what ran and whether it was allowed. The slogan is the same loop in one sentence. Full walkthrough: <a href="/questions/what-does-discover-execute-trace-mean.html">What does discover → execute → trace mean?</a>. Role split in more detail: <a href="/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html">agent vs runtime</a>.</p>
+
+  <h2>A public scene, not a customer story</h2>
+  <p>The public demonstration of the boundary is the weekly deny demo write-up: <a href="/blog/agent-freestyle-blocked.html">The agent freestyled a $2.4M wire. The runtime said no.</a> The agent freestyles; the runtime denies and leaves a trace. Runnable copy: <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">how to run the agent-blocked weekly demo</a>. That page is a scene and a runnable fixture — not a claim about production deny rates or named customers.</p>
+
+  <h2>What this is not</h2>
+  <p>It is not a pitch about how many governing specs exist. Specs and CI gates keep the codebase honest; cite them sparingly. For a citeable snapshot of what ships today — skill-first authoring, one shared runtime, honest consumers, pre-1.0 host status — start at <a href="/what-is-real-today.html">what is real today</a> and <a href="/platforms.html">platforms</a>.</p>
+</QuestionLayout>
