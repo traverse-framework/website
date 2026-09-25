@@ -1,0 +1,64 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Where does business logic live in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Non-UI business logic belongs in Traverse capabilities: versioned WASM artifacts with contracts under discover → execute → trace. Hosts and embedders supply UI and I/O only. Utility-tier helpers teach the publish pipeline; they are not a size ceiling. “Apps are not ready” means do not ship a product shell in a capability PR — it does not mean domain rules stay in the host forever.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'What does discover → execute → trace mean?' },
+  { href: '/questions/what-is-a-wasm-capability.html', label: 'What is a WASM capability?' },
+  { href: '/questions/why-put-business-logic-in-webassembly.html', label: 'Why put business logic in WebAssembly?' },
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author in plain English?' },
+  { href: '/compare/vs-cross-platform-frameworks.html', label: 'Compare: vs cross-platform frameworks' },
+  { href: '/blog/you-dont-need-rust-to-publish-a-capability.html', label: 'You don’t need Rust to publish a capability' },
+  { href: '/docs/guides/react-integration.html', label: 'React integration guide' },
+];
+---
+<QuestionLayout
+  title="Where does business logic live in Traverse?"
+  description="Capabilities hold non-UI domain rules (pricing, eligibility, codecs, scorers, gates). Hosts do UI and I/O. Utility helpers teach the pipeline — they are not the ceiling."
+  canonical="https://traverse-framework.com/questions/where-does-business-logic-live-in-traverse.html"
+  category="Contracts and capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> non-UI business logic belongs in <em>capabilities</em>. Hosts and embedders do UI and I/O. The runtime stays one shared <code>runtime.wasm</code>. The agent proposes; the runtime decides.</p>
+
+  <h2>Capability vs host</h2>
+  <p>A capability is a versioned contract plus a sandboxed WASM artifact: pricing, eligibility, consent checks, mesh codecs, overhang analysis, orientation scoring, export gates — anything that must behave the same way for every caller and leave a trace. The host (browser app, native shell, CLI, MCP client) renders UI, holds session state, and supplies the I/O the capability is allowed to use. It is not the forever home of the domain rule.</p>
+
+  <p>If you are choosing where a rule should live, ask: would it be wrong for two hosts to disagree? If yes, put it in a capability.</p>
+
+  <h2>Utilities are not the ceiling</h2>
+  <p>The registry includes small helpers (slugify, truncate, email validate). Those teach the publish pipeline and CI gates. They are legitimate. They are <strong>not</strong> the product identity and not a size limit. Preferred publishes are business-shaped: deterministic decisions, domain transforms, policy gates. “One small capability” means <strong>one concern per package</strong>, not “keep it tiny forever.”</p>
+
+  <h2>“Apps are not ready” is sequencing, not expressiveness</h2>
+  <p>When help-wanted tickets say apps are not ready, they mean: do not open a PR that rewrites a whole product UI or ports an entire application shell into this org’s capability repos. Capability packs are in scope. Domain logic in WASM is the point. See the print-support initiative as a living example of a domain pack (capabilities only) — Announcement on the org Discussions, umbrella <code>registry#596</code>.</p>
+
+  <h2>Deny-by-default I/O is not “leave logic in JS”</h2>
+  <p>Capabilities do not get ambient filesystem or network access. Today’s common execution boundary is stdin/stdout JSON through the embedder. That limits <em>authority</em>, not <em>how rich the rule can be</em>. Putting pricing or eligibility back into React “because WASM cannot touch disk” is the wrong conclusion. Call the capability; keep the host thin.</p>
+
+  <p>The React guide’s “app never touches Rust/WASM directly” means you go through the published embedder client. It does <strong>not</strong> mean reimplement the business rule in React.</p>
+
+  <h2>How to author</h2>
+  <p>Usual path: plain English via the Claude skill <code>traverse-capability-author</code> — interview → registry check → contract → WASM → human-reviewed PR. You do not need to write Rust for that path. Manual authoring in-repo still uses Rust→WASM under the hood. Start at <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a> and the citeable snapshot at <a href="/what-is-real-today.html">what is real today</a>.</p>
+
+  <h2>What this is not</h2>
+  <ul>
+    <li>Not “Traverse is only tiny utils.”</li>
+    <li>Not “leave domain logic in the host forever.”</li>
+    <li>Not a promise that every OS host or every I/O shape is shipped — check <a href="/platforms.html">Platforms</a>.</li>
+    <li>Not an invitation to invent a Python SDK or a second runtime. One shared <code>runtime.wasm</code>; Python shells out to the CLI today.</li>
+  </ul>
+</QuestionLayout>

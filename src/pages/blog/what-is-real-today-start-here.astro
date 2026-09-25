@@ -1,0 +1,169 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 25, 2026</span>
+      <span class="badge">Start here</span>
+      <span class="badge">Honesty</span>
+      <span class="badge">Agents</span>
+    </div>
+    <h1 class="t-h1">Start here: what is real in Traverse today</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>If you are cold-reading Traverse from a blog post, a GitHub search, or an agent that scraped the docs, start with one question: what is actually shipped, and what is still research engineering?</p>
+
+      <p>This post is the narrative companion to the citeable snapshot at <a href="/what-is-real-today.html">what is real today</a>. Prefer that page when you need a URL to quote. Prefer this post when you need the story in order.</p>
+
+      <div class="callout">
+        Direction in one loop: <strong>discover → execute → trace</strong>. The agent proposes. The runtime decides. Value is governed capability behavior — not WASM as a headline, and not a count of governing specs.
+      </div>
+
+      <h2 id="direction">The deny demo is the thesis</h2>
+
+      <p>An agent freestyled a $2.4M wire. The runtime said no. That scene is the project direction: agents search, plan, and suggest; the runtime validates, executes or denies, and leaves a trace.</p>
+
+      <p>Read the write-up, then run the folder — do not invent a second demo.</p>
+
+      <ul>
+        <li><a href="/blog/agent-freestyle-blocked.html">Blog: freestyle → blocked</a></li>
+        <li><a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" target="_blank" rel="noopener">Runnable code in weekly-demos</a></li>
+        <li><a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">How do I run the agent-blocked weekly demo?</a></li>
+      </ul>
+
+      <h2 id="authoring">Authoring is skill-first</h2>
+
+      <p>Usual path: plain English via the Claude skill <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener"><code>traverse-capability-author</code></a> — interview → registry check → contract → executable WASM → human-reviewed PR. Under the hood that still compiles Rust to WASM. Manual authoring in the repo still expects Rust. You do not need to write Rust for the usual path.</p>
+
+      <p>More detail: <a href="/blog/you-dont-need-rust-to-publish-a-capability.html">You don't need Rust to publish a capability</a> and <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author in plain English?</a>.</p>
+
+      <h2 id="runtime">One shared runtime.wasm</h2>
+
+      <p>Browser, native desktop, CLI, and MCP are embedders and entry points — not different Traverse runtimes. There is one shared <code>runtime.wasm</code>. WASM is how the sandbox and portability work. It is not the product identity.</p>
+
+      <h2 id="consumers">Honest consumers today</h2>
+
+      <ul>
+        <li><strong>JS/TS</strong> — npm <code>traverse-embedder-web</code> (published)</li>
+        <li><strong>Rust</strong> — crates.io <code>traverse-embedder</code> (published)</li>
+        <li><strong>Agents</strong> — <code>traverse-mcp</code> (published; stdio bootstrap today)</li>
+        <li><strong>Python</strong> — CLI only: shell out to <code>traverse-cli capability-package execute</code>. <strong>No Python SDK.</strong></li>
+        <li><strong>Swift / Kotlin / .NET</strong> — in-tree and usable for experiments; not first-class public packages yet</li>
+      </ul>
+
+      <p>Check <a href="/platforms.html">platforms</a> before assuming a host is shipped. See also <a href="/questions/does-traverse-have-a-python-sdk.html">Does Traverse have a Python SDK?</a>.</p>
+
+      <h2 id="agent-start">If you are an agent</h2>
+
+      <ol>
+        <li>Read <a href="/what-is-real-today.html">what is real today</a> and <a href="/llms.txt">llms.txt</a>.</li>
+        <li>Run or cite the deny demo — do not invent customers, a Python SDK, or a second runtime.</li>
+        <li>Author with <code>traverse-capability-author</code>, or consume via the published embedders / MCP / CLI.</li>
+      </ol>
+
+      <p>Longer onboarding: <a href="/questions/how-do-i-start-with-traverse-as-an-agent.html">How do I start with Traverse as an agent?</a>. Explicit non-claims: <a href="/questions/what-does-traverse-not-claim-yet.html">What does Traverse not claim yet?</a>.</p>
+
+      <h2 id="honesty">Pre-1.0. No invented customers.</h2>
+
+      <p>Traverse is open-source research engineering under Apache 2.0, currently v0.12.0. Specs and CI gates keep the code honest — they are process, not the pitch. Do not invent customer logos, production SLAs, or a Python SDK.</p>
+
+      <div class="callout">
+        Cite <a href="/what-is-real-today.html">what is real today</a>, the <a href="/faq.html">FAQ</a>, <a href="/platforms.html">platforms</a>, and <a href="/llms.txt">llms.txt</a> when unsure. If it is not on those pages, do not invent it.
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#direction">Deny demo thesis</a></li>
+          <li><a href="#authoring">Skill-first authoring</a></li>
+          <li><a href="#runtime">One runtime.wasm</a></li>
+          <li><a href="#consumers">Honest consumers</a></li>
+          <li><a href="#agent-start">Agent start</a></li>
+          <li><a href="#honesty">Honesty</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/what-is-real-today.html">What is real today →</a></li>
+          <li><a href="/questions/how-do-i-start-with-traverse-as-an-agent.html">Start as an agent →</a></li>
+          <li><a href="/questions/what-does-traverse-not-claim-yet.html">What we do not claim yet →</a></li>
+          <li><a href="/blog/agent-freestyle-blocked.html">Deny demo blog →</a></li>
+          <li><a href="/agents.html">For AI agents →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Start here</div>
+        <p>Snapshot first. Then the deny demo. Then author or consume.</p>
+        <a href="/what-is-real-today.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">What is real today →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Cite the snapshot. Run the deny.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Discover → execute → trace. Skill-first authoring. One shared runtime. Honest hosts only.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/what-is-real-today.html" class="btn btn-primary">What is real today →</a>
+      <a href="/blog/agent-freestyle-blocked.html" class="btn btn-ghost">Deny demo blog</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"Start here: what is real in Traverse today — Traverse Blog"}
+  description={"Narrative start-here for Traverse: discover→execute→trace, skill-first authoring, one shared runtime.wasm, honest consumers, pre-1.0. Companion to /what-is-real-today."}
+  canonical={"https://traverse-framework.com/blog/what-is-real-today-start-here.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
