@@ -12,7 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "astro": "7.3.2",
+    "astro": "7.3.4",
     "traverse-embedder-web": "^0.13.0"
   },
   "devDependencies": {
