@@ -1,0 +1,56 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I start with Traverse as an agent?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Read what is real today and llms.txt first. Internalize discover → execute → trace (agent proposes, runtime decides). Run or cite the agent-blocked weekly deny demo. Then either author via traverse-capability-author (skill-first; under the hood Rust→WASM) or consume via published JS/TS and Rust embedders, traverse-mcp, or Python CLI subprocess — there is no Python SDK. Do not invent customers, hosts, or a second runtime.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/llms.txt', label: 'llms.txt' },
+  { href: '/agents.html', label: 'For AI Agents' },
+  { href: '/questions/how-do-i-run-the-agent-blocked-weekly-demo.html', label: 'How do I run the agent-blocked weekly demo?' },
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author in plain English?' },
+  { href: '/questions/does-traverse-have-a-python-sdk.html', label: 'Does Traverse have a Python SDK?' },
+  { href: '/questions/what-does-traverse-not-claim-yet.html', label: 'What does Traverse not claim yet?' },
+  { href: '/blog/what-is-real-today-start-here.html', label: 'Start here blog' },
+];
+---
+<QuestionLayout
+  title="How do I start with Traverse as an agent?"
+  description="Cold start for agents: what-is-real-today + llms.txt, deny demo, then skill-first authoring or published consumers. No invented SDK, hosts, or customers."
+  canonical="https://traverse-framework.com/questions/how-do-i-start-with-traverse-as-an-agent.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Start with the citeable snapshot, not a guessed SDK. Traverse is a governed capability runtime: <strong>discover → execute → trace</strong>. You propose; the runtime decides.</p>
+
+  <h2>1. Read the honest front door</h2>
+  <ol>
+    <li><a href="/what-is-real-today.html">What is real today</a> — skill-first, one shared <code>runtime.wasm</code>, honest consumers, pre-1.0.</li>
+    <li><a href="/llms.txt">llms.txt</a> — required reading list for agents.</li>
+    <li><a href="/agents.html">For AI Agents</a> — real MCP tool list and limits (stdio packaged bootstrap today).</li>
+  </ol>
+
+  <h2>2. Internalize the direction</h2>
+  <p>The canonical scene is the deny demo: an agent freestyled a $2.4M wire; the runtime said no. Read <a href="/blog/agent-freestyle-blocked.html">the blog</a>, then run <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-18-agent-blocked" target="_blank" rel="noopener">weekly-demos/2026-09-18-agent-blocked</a>. Step-by-step: <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">How do I run the agent-blocked weekly demo?</a>.</p>
+
+  <h2>3. Choose author or consume</h2>
+  <p><strong>Author:</strong> load <code>traverse-capability-author</code> from <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">claude-skills</a>. Interview → registry check → contract → WASM → human-reviewed PR. You do not need to write Rust for that path; under the hood is still Rust→WASM. See <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">plain-English authoring</a>.</p>
+  <p><strong>Consume:</strong> JS/TS via npm <code>traverse-embedder-web</code>; Rust via <code>traverse-embedder</code>; agents via <code>traverse-mcp</code>; Python via <code>subprocess</code> to <code>traverse-cli capability-package execute</code> only — <a href="/questions/does-traverse-have-a-python-sdk.html">no Python SDK</a>.</p>
+
+  <h2>4. Do not invent</h2>
+  <p>Do not invent a Python SDK, a second Traverse runtime per language, certified mobile/.NET packages, customer logos, or production SLAs. When unsure, cite <a href="/what-is-real-today.html">what is real today</a>, <a href="/platforms.html">platforms</a>, and <a href="/questions/what-does-traverse-not-claim-yet.html">what we do not claim yet</a>.</p>
+
+  <p>Narrative companion: <a href="/blog/what-is-real-today-start-here.html">Start here: what is real in Traverse today</a>.</p>
+</QuestionLayout>

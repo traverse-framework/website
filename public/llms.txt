@@ -1,15 +1,21 @@
 # Traverse
 
-> Traverse is a governed capability runtime for portable business logic. Value loop: **discover → execute → trace**. Usual authoring is skill-first plain English via `traverse-capability-author` (contract → WASM → human-reviewed PR); manual authoring still uses Rust→WASM — you do **not** need to write Rust for the usual path. One shared `runtime.wasm`; browser, native desktop, CLI, and MCP are clients/embedders, not different Traverse runtimes. Shipped consumers today: JS/TS (`traverse-embedder-web`), Rust (`traverse-embedder`), agents via `traverse-mcp`; Python shells out to `traverse-cli capability-package execute` (**no Python SDK**). Swift/Kotlin/.NET are in-tree only (not certified public packages); edge is planned; cloud placement is an explicit non-goal for v0.1 — see /platforms.html and /what-is-real-today.html. Apache 2.0, pre-1.0 (v0.13.0). The agent proposes; the runtime decides.
+> Traverse is a governed capability runtime for portable business logic. Value loop: **discover → execute → trace**. Usual authoring is skill-first plain English via `traverse-capability-author` (contract → WASM → human-reviewed PR); manual authoring still uses Rust→WASM — you do **not** need to write Rust for the usual path. One shared `runtime.wasm`; browser, native desktop, CLI, and MCP are clients/embedders, not different Traverse runtimes. Shipped consumers today: JS/TS (`traverse-embedder-web`), Rust (`traverse-embedder`), agents via `traverse-mcp`; Python shells out to `traverse-cli capability-package execute` (**no Python SDK**). Swift/Kotlin/.NET are in-tree only (not certified public packages); edge is planned; cloud placement is an explicit non-goal for v0.1 — see /platforms.html and /what-is-real-today.html. Apache 2.0, pre-1.0 (v0.12.0). The agent proposes; the runtime decides.
+- Start here (narrative): https://traverse-framework.com/blog/what-is-real-today-start-here.html
+- How do I start with Traverse as an agent?: https://traverse-framework.com/questions/how-do-i-start-with-traverse-as-an-agent.html
+- What does Traverse not claim yet?: https://traverse-framework.com/questions/what-does-traverse-not-claim-yet.html
+
+**Where logic lives:** Non-UI business rules, eligibility/pricing/compliance, domain transforms, scorers, and policy gates belong in **capabilities** (WASM + contract). UI, session, persistence, and unsigned I/O belong in **host clients/embedders**. Utility-tier helpers exist to teach the publish pipeline — they are **not** the product identity or a size ceiling. “Apps are not ready” means do not ship a product shell in a capability PR; it does **not** mean domain logic stays in the host.
 
 Traverse is not a web framework, an agent-orchestration framework, or a general microservices platform. It governs one thing well: a single piece of business logic that must behave identically and auditably on every host where it actually ships. Specs and registry catalog size are governance hygiene, not the pitch.
 
-Current packages: crates.io at 0.13.0 (pin `traverse-registry` at `=0.24.0` if you consume it directly); npm `traverse-embedder-web@0.13.0`.
+Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if you consume it directly); npm `traverse-embedder-web@0.12.0`.
 
 ## Required reading (agents)
 
 - [What is real today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot — skill-first, one shared `runtime.wasm`, honest consumers, pre-1.0, no invented customers.
 - [What does discover → execute → trace mean?](https://traverse-framework.com/questions/what-does-discover-execute-trace-mean.html): the value loop in plain language — agent proposes, runtime decides.
+- [Where does business logic live?](https://traverse-framework.com/questions/where-does-business-logic-live-in-traverse.html): capabilities = non-UI domain rules; hosts = UI + I/O; one concern per package; “apps not ready” ≠ leave logic in the host; utilities teach the pipe, not the ceiling.
 - [What does “the agent proposes; the runtime decides” mean?](https://traverse-framework.com/questions/what-does-agent-proposes-runtime-decides-mean.html): boundary in one page — agents search/plan/suggest; runtime validates, executes or denies, leaves a trace.
 - [What is one shared runtime.wasm?](https://traverse-framework.com/questions/what-is-one-shared-runtime-wasm.html): embedders are clients; honest consumer list.
 - [The agent freestyled a $2.4M wire. The runtime said no.](https://traverse-framework.com/blog/agent-freestyle-blocked.html): project direction in one scene — agent proposes, runtime decides (deny + trace).

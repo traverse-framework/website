@@ -40,6 +40,16 @@ const _body = `<section class="page-hero">
 <section class="section-sm" style="background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-header">
+      <div class="section-label">Capabilities</div>
+      <h2>Where logic lives.</h2>
+      <p>Non-UI business rules — pricing, eligibility, codecs, scorers, policy gates — belong in <strong>capabilities</strong> (WASM + contract) under discover → execute → trace. Hosts and embedders do UI and I/O only. Utility-tier helpers teach the publish pipeline; they are not a size ceiling. “Apps are not ready” means do not ship a product shell in a capability PR — it does not mean domain logic stays in the host. Living example of a domain pack (capabilities only): <a href="https://github.com/orgs/traverse-framework/discussions/1540" target="_blank" rel="noopener">print-support Announcement #1540</a>. Full Q&amp;A: <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live in Traverse?</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="section-header">
       <div class="section-label">Authoring</div>
       <h2>Skill-first. Manual Rust is secondary.</h2>
       <p>Usual path: plain English via the Claude skill <code>traverse-capability-author</code> — interview → registry check → contract → executable WASM → human-reviewed PR. Under the hood that still compiles Rust to WASM. Manual authoring in the repo still expects Rust. You do not need to write Rust for the usual path.</p>

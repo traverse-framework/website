@@ -1,0 +1,61 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does Traverse not claim yet?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Traverse does not claim a Python SDK; first-class public Swift/Kotlin/.NET packages; that it is a general agent-orchestration framework or web framework; cloud placement as a v0.1 goal; invented customers or production SLAs; or that approved-spec counts are the product pitch. Shipped consumers today are JS/TS and Rust embedders plus MCP; Python is CLI-only; check platforms.html and what-is-real-today.html before assuming a host.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/platforms.html', label: 'Platforms' },
+  { href: '/questions/does-traverse-have-a-python-sdk.html', label: 'Does Traverse have a Python SDK?' },
+  { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
+  { href: '/questions/how-do-i-start-with-traverse-as-an-agent.html', label: 'How do I start as an agent?' },
+  { href: '/blog/what-is-real-today-start-here.html', label: 'Start here blog' },
+  { href: '/roadmap.html', label: 'Roadmap' },
+];
+---
+<QuestionLayout
+  title="What does Traverse not claim yet?"
+  description="Explicit non-claims: no Python SDK; mobile/.NET not first-class packages; not a general agent framework; cloud non-goal for v0.1; no invented customers; specs are not the pitch."
+  canonical="https://traverse-framework.com/questions/what-does-traverse-not-claim-yet.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Cold readers and agents often over-claim. This page lists what Traverse does <strong>not</strong> claim today. Prefer <a href="/what-is-real-today.html">what is real today</a> and <a href="/platforms.html">platforms</a> over inventing a surface.</p>
+
+  <h2>Consumers and packages</h2>
+  <ul>
+    <li><strong>No Python SDK.</strong> Python shells out to <code>traverse-cli capability-package execute</code>. See <a href="/questions/does-traverse-have-a-python-sdk.html">Does Traverse have a Python SDK?</a>.</li>
+    <li><strong>Swift / Kotlin / .NET</strong> exist in-tree for experimentation. They are not first-class public package releases yet.</li>
+    <li><strong>Edge</strong> is planned; <strong>cloud placement</strong> is an explicit non-goal for v0.1.</li>
+  </ul>
+
+  <h2>What Traverse is not</h2>
+  <ul>
+    <li>Not a web framework</li>
+    <li>Not a general agent-orchestration framework</li>
+    <li>Not a general microservices platform</li>
+  </ul>
+  <p>It governs portable business logic that must behave identically and auditably on every host where it actually ships. One shared <code>runtime.wasm</code>; language SDKs, MCP, and the CLI are clients — see <a href="/questions/what-is-one-shared-runtime-wasm.html">one shared runtime.wasm</a>.</p>
+
+  <h2>Honesty / GTM</h2>
+  <ul>
+    <li>No invented customer logos, production SLAs, or “enterprise ready” claims beyond what the roadmap and security pages say.</li>
+    <li>Approved-spec counts and registry catalog size are governance hygiene — not the product pitch. Lead with discover → execute → trace.</li>
+    <li>Pre-1.0: currently v0.12.0 under Apache 2.0.</li>
+  </ul>
+
+  <h2>What is claimed</h2>
+  <p>Skill-first authoring via <code>traverse-capability-author</code>; published JS/TS + Rust embedders + MCP; Python via CLI; the deny demo as direction; native desktop + browser as shipped hosts per <a href="/platforms.html">platforms</a>. Narrative: <a href="/blog/what-is-real-today-start-here.html">Start here: what is real in Traverse today</a>. Agent onboarding: <a href="/questions/how-do-i-start-with-traverse-as-an-agent.html">How do I start with Traverse as an agent?</a>.</p>
+</QuestionLayout>
