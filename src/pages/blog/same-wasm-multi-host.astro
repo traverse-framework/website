@@ -1,0 +1,210 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 25, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Agents</span>
+      <span class="badge">Runtime</span>
+    </div>
+    <h1 class="t-h1">Same WASM. Browser and Node match. Agent still can’t freestyle.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse <strong>v0.13.0</strong> is the multi-host cut. The Friday demo is not a pricing explainer and not a hand WASI shim. It is the same published <code>core.authorize@1.2.0</code> bytes deciding a treasury wire on more than one host.</p>
+
+      <p>Ops agent Atlas proposes a <strong>$2.4M</strong> wire. Role: <code>junior_analyst</code>. Action: <code>payments.transfer</code>. The pinned capability answers <code>deny</code> / <code>no_matching_rule</code>. Swap the role to <code>treasury_ops</code> with the same amount and action — <code>allow</code>, with MFA and dual-control obligations attached. The money still does not move until those obligations are satisfied. Agent proposes; runtime decides.</p>
+
+      <div class="callout">
+        Short version: identical <code>authorize.wasm</code> and matching deny/allow decisions on Browser and Node. Column three is a digest + decision fingerprint for Swift / .NET / Kotlin hosts that ship in 0.13 but are not run on this Linux demo box. Discover → execute → trace.
+      </div>
+
+      <p>Runnable demo source: <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts" target="_blank" rel="noopener"><code>traverse-framework/weekly-demos/…/2026-09-25-same-wasm-hosts</code></a> — <code>npm install && node server.mjs</code>, then open the printed URL (often <code>http://127.0.0.1:8770</code>). Node-only: <code>npm run smoke</code>.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/same-wasm-multi-host-2026-09-25/01-landing-multi-host.webp" alt="Multi-host demo landing UI with Browser, Node, and digest fingerprint columns for core.authorize" width="1400" height="1100" loading="lazy" />
+        <figcaption>Landing: three columns — Browser, Node, and digest fingerprint — around the same <code>core.authorize@1.2.0</code> wire story.</figcaption>
+      </figure>
+
+      <h2 id="why-it-matters">Why same-bytes matters</h2>
+
+      <p>Last week’s demo proved the deny. This week proves the deny is not a browser-only trick. The product path is <code>traverse-embedder-web@0.13.0</code> driving nested-wasmi <code>runtime.wasm</code> with an app-owned bundle. Browser uses <code>FetchBundleLoader</code>. Node smoke uses the <strong>same</strong> npm <code>BundleEmbedder</code> with <code>NodeFsBundleLoader</code> and the <strong>same</strong> bundle bytes. Matching digests. Matching decisions.</p>
+
+      <p>That is the v0.13.0 multi-host throughline (embedder-api 1.1.0 / Spec 139): hosts are clients of one orchestrator, not forks of the policy.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/same-wasm-multi-host-2026-09-25/02-cheat-deny.webp" alt="Cheat path UI: junior_analyst payments.transfer $2.4M denied with no_matching_rule" width="1400" height="1525" loading="lazy" />
+        <figcaption>Cheat path: <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire → <code>deny</code> / <code>no_matching_rule</code>.</figcaption>
+      </figure>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/same-wasm-multi-host-2026-09-25/03-legit-allow.webp" alt="Legit path UI: treasury_ops allow with MFA and dual_control obligations" width="1400" height="1919" loading="lazy" />
+        <figcaption>Legit path: <code>treasury_ops</code> → <code>allow</code> + required MFA / dual-control obligations.</figcaption>
+      </figure>
+
+      <h2 id="hosts">Hosts in this demo</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Column</th><th>Host</th><th>Path</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Browser</td><td><code>traverse-embedder-web@0.13.0</code> <code>BundleEmbedder</code> + <code>FetchBundleLoader</code> + app-owned <code>runtime/runtime.wasm</code></td></tr>
+            <tr><td>2</td><td>Node / CLI smoke</td><td>Same npm <code>BundleEmbedder</code> + <code>NodeFsBundleLoader</code> + same bundle bytes (published web embedder under Node — not a separate native CLI)</td></tr>
+            <tr><td>3</td><td>Digest + fingerprint</td><td><code>hosts/digest-match.mjs</code> proves identical wasm sha256 + deny/allow JSON; stands in for Swift / .NET / Kotlin (not executed on this Linux box)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="what-happened">What happened</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Path</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Cheat — <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire</td><td><code>deny</code> / <code>no_matching_rule</code></td></tr>
+            <tr><td>Legit — <code>treasury_ops</code></td><td><code>allow</code> + MFA / dual-control obligations</td></tr>
+            <tr><td>Cross-host</td><td>Identical <code>authorize.wasm</code> digest; matching deny/allow decisions on Browser + Node</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/same-wasm-multi-host-2026-09-25/04-node-smoke.webp" alt="Node smoke terminal output showing matching digests and deny/allow decisions" width="1100" height="900" loading="lazy" />
+        <figcaption>Node smoke: same digests and deny/allow JSON as the browser path.</figcaption>
+      </figure>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> Same WASM across hosts; agent freestyle still blocked (week of 2026-09-25)</li>
+          <li><strong>Runnable demo:</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts" target="_blank" rel="noopener">github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts</a></li>
+          <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code> — digest <code>sha256:0c318fff56a74eddfbc1ab850c25c1ba191744309984a07bd503b8cd9cb92e40</code></li>
+          <li><strong>Runtime line:</strong> Traverse <strong>v0.13.0</strong> / <code>traverse-embedder-web@0.13.0</code> via nested-wasmi <code>runtime.wasm</code></li>
+          <li><strong>runtime.wasm digest:</strong> <code>sha256:a254c161d5699b19ffe6eb47d2e11e45a39363ae8b2a9ac435d54a09fb31d782</code></li>
+          <li><strong>Crates:</strong> <code>traverse-runtime</code> / <code>traverse-embedder</code> / <code>traverse-mcp</code> / <code>traverse-cli-rs</code> <strong>0.13.0</strong>; <code>traverse-registry</code> <strong>0.24.0</strong></li>
+          <li><strong>Product tags:</strong> <code>v0.13.0</code> / <code>web-v0.13.0</code> (prefer crates.io + npm + git tags)</li>
+          <li><strong>Cheat outcome:</strong> <code>junior_analyst</code> + <code>payments.transfer</code> / $2.4M → <code>deny</code> / <code>no_matching_rule</code></li>
+          <li><strong>Legit outcome:</strong> <code>treasury_ops</code> → <code>allow</code> + MFA / dual-control obligations</li>
+          <li><strong>Lead claim:</strong> agent proposes, runtime decides · discover → execute → trace</li>
+          <li><strong>Packaging caveat:</strong> npm is <code>0.13.0</code>, but <code>releaseEvidence()</code> / <code>PACKAGE_VERSION</code> in the published dist still report <code>0.9.0</code>. UI/README pin the npm version, not the skew.</li>
+          <li><strong>Node path:</strong> published web embedder under Node — not a separate native <code>traverse-cli</code> invoke for this demo.</li>
+          <li><strong>HF:</strong> not first-class in the catalog — do not claim an HF demo.</li>
+          <li><strong>GitHub Releases “latest”:</strong> resolves to artifact-only <code>swift-host-v0.13.0</code> (xcframework). That is <strong>not</strong> the product changelog.</li>
+          <li><strong>Optional discussion:</strong> <a href="https://github.com/orgs/traverse-framework/discussions/1552" target="_blank" rel="noopener">org discussion #1552</a></li>
+        </ul>
+      </div>
+
+      <p>Same binary. Visible traces. The agent still cannot freestyle past <code>core.authorize</code>.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why-it-matters">Why same-bytes matters</a></li>
+          <li><a href="#hosts">Hosts in this demo</a></li>
+          <li><a href="#what-happened">What happened</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/agent-freestyle-blocked.html">Agent freestyle → blocked →</a></li>
+          <li><a href="/blog/ai-agents-need-contracts.html">AI agents need contracts →</a></li>
+          <li><a href="/blog/traverse-0-11-0-runtime-wasm.html">v0.11.0: one runtime.wasm →</a></li>
+          <li><a href="/blog/what-discover-proves.html">What /discover proves →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Same WASM. Runtime decides.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Browser and Node share the pinned capability bytes. The deny sticks on both.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts" class="btn btn-ghost" target="_blank" rel="noopener">Runnable demo →</a>
+      <a href="/blog/agent-freestyle-blocked.html" class="btn btn-ghost">Last week’s deny →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Same WASM. Browser and Node match. Agent still can’t freestyle. — Traverse Blog"
+  description="Weekly demo: identical core.authorize@1.2.0 bytes on Browser + Node deny junior_analyst $2.4M wire and allow treasury_ops with MFA/dual-control. Traverse v0.13.0 multi-host."
+  canonical="https://traverse-framework.com/blog/same-wasm-multi-host.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
