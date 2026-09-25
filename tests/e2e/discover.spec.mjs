@@ -23,17 +23,11 @@ test('goal 1 (price a quote) auto-plans on load, then review + execute for real 
   await expect(page.locator('#discover-log')).toContainText('executed offline in your browser');
 });
 
-// KNOWN ISSUE (found 2026-09-18, tracked for a follow-up fix — see
-// tests/discover-planning.test.mjs for the same issue reproduced without a
-// browser): doc-approval.analyze currently traps with `execution_failed`
-// ("wasm `unreachable` instruction executed") when run through the real
-// nested runtime.wasm (Spec 1402) rather than the old browser-only WASI
-// shim traverse-embedder-web <=0.10.x used. core.calculate-price succeeds
-// through the same path, so this looks like a per-capability build/ABI
-// compatibility gap, not a planning or execution-wiring bug on this site.
-// Planning genuinely still derives the real two-node chain; only the
-// execution outcome below is the current (failing) reality.
-test('goal (doc-approval chain) plans a real two-node structural chain — execution currently fails at node 1 (known issue, see comment above)', async ({ page }) => {
+// doc-approval.analyze used to trap with `execution_failed` ("wasm
+// `unreachable` instruction executed") under the v0.11/v0.12 nested
+// runtime.wasm. With the v0.13.0 certified runtime.wasm and
+// traverse-embedder-web@0.13.0 the full two-node chain executes for real.
+test('goal (doc-approval chain) plans a real two-node structural chain and executes it for real', async ({ page }) => {
   test.slow();
   await page.goto('/discover.html');
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
@@ -43,9 +37,10 @@ test('goal (doc-approval chain) plans a real two-node structural chain — execu
   await expect(page.locator('#discover-plan-mappings')).toContainText('unconfirmed');
 
   await page.locator('#discover-exec').click();
-  await expect(page.locator('#discover-badge')).toHaveText('Run failed at a node', { timeout: 45_000 });
-  await expect(page.locator('#discover-trace')).toContainText('terminal: failed');
+  await expect(page.locator('#discover-badge')).toHaveText('Executed — real, offline, governed', { timeout: 45_000 });
+  await expect(page.locator('#discover-trace')).toContainText('terminal: succeeded');
   await expect(page.locator('#discover-trace')).toContainText('doc-approval.analyze@1.4.0');
+  await expect(page.locator('#discover-trace')).toContainText('doc-approval.recommend@1.4.0');
 });
 
 test('a single-capability goal (price a quote) plans and executes for real', async ({ page }) => {
@@ -63,9 +58,9 @@ test('a single-capability goal (price a quote) plans and executes for real', asy
   await expect(page.locator('#discover-trace')).toContainText('core.calculate-price@1.2.0');
 });
 
-// KNOWN ISSUE (see the doc-approval test above): validation.validate-luhn
-// hits the same real `unreachable` trap under the nested runtime.wasm.
-test('a single-capability goal (card checksum) plans, then execution currently fails at the node (known issue, see comment above)', async ({ page }) => {
+// validation.validate-luhn hit the same `unreachable` trap as doc-approval
+// before v0.13.0; it now executes for real.
+test('a single-capability goal (card checksum) plans and executes for real', async ({ page }) => {
   test.slow();
   await page.goto('/discover.html');
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings', { timeout: 45_000 });
@@ -75,8 +70,8 @@ test('a single-capability goal (card checksum) plans, then execution currently f
   await expect(page.locator('#discover-badge')).toHaveText('Planned — review the mappings');
 
   await page.locator('#discover-exec').click();
-  await expect(page.locator('#discover-badge')).toHaveText('Run failed at a node', { timeout: 45_000 });
-  await expect(page.locator('#discover-trace')).toContainText('terminal: failed');
+  await expect(page.locator('#discover-badge')).toHaveText('Executed — real, offline, governed', { timeout: 45_000 });
+  await expect(page.locator('#discover-trace')).toContainText('terminal: succeeded');
   await expect(page.locator('#discover-trace')).toContainText('validation.validate-luhn@1.2.0');
 });
 
@@ -95,8 +90,8 @@ test('the translate-fr-semantic goal plans, then the local runtime genuinely ref
   await expect(page.locator('#discover-log')).toContainText('real governance decision, not an error');
 });
 
-// KNOWN ISSUE (see the doc-approval test above): report.collect-fragments
-// fails differently from the unreachable-trap capabilities — it fails to
+// KNOWN ISSUE (still present at v0.13.0): report.collect-fragments
+// fails differently from the (now fixed) unreachable-trap capabilities — it fails to
 // instantiate memory under the nested runtime.wasm's resource limiter
 // ("a resource limiter denied to allocate or grow the linear memory").
 // Planning still genuinely derives the real three-node chain.
