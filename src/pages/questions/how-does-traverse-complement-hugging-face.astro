@@ -1,0 +1,66 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does Traverse complement Hugging Face?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Hugging Face is provenance and discovery for models. Traverse packages a chosen Hub revision as a pinned, signed, client-first capability under discover → execute → trace. It does not replace Transformers.js, Hub search, or training. Cloud or edge defer only when a second executor exists — today the honest demo is on-device.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'What does discover → execute → trace mean?' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/where-does-business-logic-live-in-traverse.html', label: 'Where does business logic live?' },
+  { href: '/compare/vs-agent-runtimes.html', label: 'Compare: vs agent runtimes' },
+  { href: '/platforms.html', label: 'Platforms' },
+];
+---
+<QuestionLayout
+  title="How does Traverse complement Hugging Face?"
+  description="Hub = provenance and discovery. Traverse = pinned, signed, client-first capability unit under discover → execute → trace. Not a Transformers.js or Hub replacement."
+  canonical="https://traverse-framework.com/questions/how-does-traverse-complement-hugging-face.html"
+  category="How Traverse compares"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> Hugging Face is where you find and provenance models. Traverse is how you ship one as a <em>governed product unit</em> — pinned revision, signed bytes, discover → execute → trace — that runs client-first. Complement, don’t compete.</p>
+
+  <h2>Two jobs, one chain</h2>
+  <p>The Hub stays the source of the model: cards, licenses, revisions, community discovery. Traverse records exactly which revision was packaged, embeds (or pins) the weights, publishes an immutable capability version, and signs the artifact. At runtime the host verifies digest + Ed25519 against the registry’s pinned key, then runs on-device. The Hub is not fetched on the critical path after that pin.</p>
+
+  <p>Value loop stays the same as everywhere else in Traverse: <strong>discover → execute → trace</strong>. The agent may propose a call; the runtime decides.</p>
+
+  <h2>What ships today (Track 2 demo)</h2>
+  <p>The registry example <a href="https://github.com/traverse-framework/registry/tree/main/examples/hub-client-first-ner"><code>examples/hub-client-first-ner</code></a> runs <code>text.detect-entities@1.1.1</code> — Hub model <code>dslim/distilbert-NER</code> at a commit pin — in a browser tab and in Node from the <strong>same verified bytes</strong>. Contract digest, pinned-key signature check, then local inference. Text never leaves the device after the one-time artifact download from the registry mirror.</p>
+
+  <pre><code>$ node cli.js "Elon Musk founded SpaceX in California."
+# → PER Elon Musk · ORG SpaceX · LOC California (on-device)</code></pre>
+
+  <h2>Non-goals (say them out loud)</h2>
+  <ul>
+    <li><strong>Not a Transformers.js replacement.</strong> Use Transformers.js (or similar) to try models in the browser. Traverse packages a chosen revision as a versioned, signed capability.</li>
+    <li><strong>Not Hub discovery or training.</strong> Search, fine-tune, and card browsing stay on the Hub.</li>
+    <li><strong>No “HF needs our runtime.”</strong> Cold pitch that way is wrong. The Hub stays open; we package client-first when you want product-unit guarantees.</li>
+    <li><strong>No multi-host defer promise yet.</strong> Edge or cloud placement needs a second executor. Until that exists, demos show client-side execution only — honest, not aspirational.</li>
+  </ul>
+
+  <h2>Trust wedge (why pin + sign)</h2>
+  <p>Regulated and offline consumers care that yesterday’s model is still today’s bytes. Traverse keeps predecessors immutable; fixes ship as new versions. Digests and signatures are the product story for Hub-derived agents — see <a href="/questions/how-do-i-verify-a-signed-capability-artifact.html">verify a signed artifact</a> and <a href="/questions/what-is-exact-ref-model-execution.html">exact-ref model execution</a>.</p>
+
+  <h2>What this is not</h2>
+  <ul>
+    <li>Not “a better Transformers.js.”</li>
+    <li>Not a live Hub fetch inside the capability at run time.</li>
+    <li>Not a claim that every Hub model is already a Traverse capability — only published, reviewed versions in the registry.</li>
+    <li>Not one-click hosting of the demo on catalog Pages or an HF Space yet (owner follow-up; the in-repo example is the citeable artifact).</li>
+  </ul>
+</QuestionLayout>

@@ -58,6 +58,7 @@ Current packages: crates.io at 0.12.0 (pin `traverse-registry` at `=0.22.0` if y
 - [Security & Permanence Audit](https://traverse-framework.com/security-audit.html): every known finding, its GitHub ticket, and its real status — not a marketing page.
 - [FAQ](https://traverse-framework.com/faq.html) and [Questions](https://traverse-framework.com/questions.html): 70+ specific Q&A pages, mostly long-tail but accurate.
 - [What is exact-ref model execution?](https://traverse-framework.com/questions/what-is-exact-ref-model-execution.html): app manifests pin digest/signature, never a naked URL; Spec 137 `model.execute` envelopes; ships in published v0.12.0.
+- [How does Traverse complement Hugging Face?](https://traverse-framework.com/questions/how-does-traverse-complement-hugging-face.html): Hub = provenance; Traverse = pinned signed client-first capability; not Transformers.js/Hub replacement; no defer promise until a second executor exists.
 
 ## Optional
 
