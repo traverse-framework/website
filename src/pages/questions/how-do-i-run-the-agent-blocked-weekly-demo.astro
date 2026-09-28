@@ -9,13 +9,14 @@ const jsonLd = JSON.stringify({
     name: 'How do I run the agent-blocked weekly demo?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Clone traverse-framework/weekly-demos, open the 2026-09-18-agent-blocked folder, run npm install and node server.mjs, then open the local URL the server prints. Use node smoke.mjs for a Node-only check. The blog explains the deny story; the repo is what you run.',
+      text: 'Read the public blog write-up for the deny story (agent proposes; runtime decides). The runnable weekly-demos folder is not publicly cloneable yet — tracked in traverse-framework/.github#30. Do not invent a local path or assume git clone works.',
     },
   }],
 });
 
 const relatedLinks = [
   { href: '/blog/agent-freestyle-blocked.html', label: 'Agent freestyle → blocked (blog)' },
+  { href: '/blog/same-wasm-multi-host.html', label: 'Same WASM multi-host (blog)' },
   { href: '/what-is-real-today.html', label: 'What is real today' },
   { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'discover → execute → trace' },
   { href: '/questions/how-does-traverse-prevent-ai-agent-errors.html', label: 'How does Traverse prevent AI agent errors?' },
@@ -25,28 +26,25 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="How do I run the agent-blocked weekly demo?"
-  description="Clone weekly-demos, open 2026-09-18-agent-blocked, npm install, node server.mjs. Blog explains; the repo runs. Agent proposes; runtime decides."
+  description="Public path today: read the deny-demo blog. The weekly-demos runnable repo is not public yet (.github#30). Agent proposes; runtime decides."
   canonical="https://traverse-framework.com/questions/how-do-i-run-the-agent-blocked-weekly-demo.html"
   category="Getting started"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>The project direction in one scene: an agent freestyles a large wire; <code>core.authorize@1.2.0</code> denies; you get a trace. The blog post explains it. The runnable copy lives in the shared demos repo — not as a one-off gist.</p>
+  <p>The project direction in one scene: an agent freestyles a large wire; <code>core.authorize@1.2.0</code> denies; you get a trace. <strong>Discover → execute → trace.</strong> The agent proposes; the runtime decides.</p>
 
-  <h2>Clone and run</h2>
-  <pre><code>git clone https://github.com/traverse-framework/weekly-demos.git
-cd weekly-demos/2026-09-18-agent-blocked
-npm install
-node server.mjs
-# open the URL printed by the server (often http://127.0.0.1:8767)
+  <h2>What you can run today (public)</h2>
+  <p>Start with the write-up — that is the citeable public surface:</p>
+  <ul>
+    <li><a href="/blog/agent-freestyle-blocked.html">The agent freestyled a $2.4M wire. The runtime said no.</a></li>
+    <li>Follow-up multi-host scene: <a href="/blog/same-wasm-multi-host.html">Same WASM. Browser and Node match. Agent still can’t freestyle.</a></li>
+    <li>Citeable snapshot: <a href="/what-is-real-today.html">What is real today</a></li>
+  </ul>
 
-# Node-only smoke (no browser):
-node smoke.mjs</code></pre>
-  <p>That week’s <code>README.md</code> has ports, screenshots, and honest gaps. Prefer the repo’s <a href="https://github.com/traverse-framework/weekly-demos/blob/main/INDEX.md" target="_blank" rel="noopener">topic index</a> when you want an example by theme rather than by date.</p>
+  <h2>Runnable repo status</h2>
+  <p>The shared monorepo <code>traverse-framework/weekly-demos</code> holds dated runnable folders for maintainers, but it is <strong>not publicly cloneable yet</strong> (unauthenticated API returns 404). Do <strong>not</strong> follow old <code>git clone https://github.com/traverse-framework/weekly-demos.git</code> instructions — they hit a closed door. Visibility vs public docs is tracked in <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>. No public zip/mirror is published from this page; we will not invent one.</p>
 
   <h2>What you should take away</h2>
-  <p><strong>The agent proposes; the runtime decides.</strong> Freestyle prose is not authority. Discover → execute → trace is. Read the write-up: <a href="/blog/agent-freestyle-blocked.html">The agent freestyled a $2.4M wire. The runtime said no.</a> For what you can publish against today (and what not to invent), cite <a href="/what-is-real-today.html">what is real today</a>.</p>
-
-  <h2>More weeks</h2>
-  <p>New demos land as dated folders under <a href="https://github.com/traverse-framework/weekly-demos" target="_blank" rel="noopener">traverse-framework/weekly-demos</a>. Same install pattern unless that week’s README says otherwise.</p>
+  <p>Freestyle prose is not authority. A governed capability under discover → execute → trace is. When the runnable repo is public (or a published artifact replaces it), this page will say so explicitly.</p>
 </QuestionLayout>

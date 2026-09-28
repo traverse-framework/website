@@ -32,7 +32,7 @@ const _body = `
         Short version: identical <code>authorize.wasm</code> and matching deny/allow decisions on Browser and Node. Column three is a digest + decision fingerprint for Swift / .NET / Kotlin hosts that ship in 0.13 but are not run on this Linux demo box. Discover → execute → trace.
       </div>
 
-      <p>Runnable demo source: <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts" target="_blank" rel="noopener"><code>traverse-framework/weekly-demos/…/2026-09-25-same-wasm-hosts</code></a> — <code>npm install && node server.mjs</code>, then open the printed URL (often <code>http://127.0.0.1:8770</code>). Node-only: <code>npm run smoke</code>.</p>
+      <p>Public surface for this scene is this write-up. The runnable <code>weekly-demos</code> folder is <strong>not publicly cloneable yet</strong> (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>). Status: <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">How do I run the agent-blocked weekly demo?</a>.</p>
 
       <figure class="post-figure">
         <img src="/assets/img/blog/same-wasm-multi-host-2026-09-25/01-landing-multi-host.webp" alt="Multi-host demo landing UI with Browser, Node, and digest fingerprint columns for core.authorize" width="1400" height="1100" loading="lazy" />
@@ -95,7 +95,7 @@ const _body = `
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Same WASM across hosts; agent freestyle still blocked (week of 2026-09-25)</li>
-          <li><strong>Runnable demo:</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts" target="_blank" rel="noopener">github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts</a></li>
+          <li><strong>Runnable demo:</strong> not publicly cloneable yet — see <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">deny-demo Q&amp;A</a> and <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a></li>
           <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code> — digest <code>sha256:0c318fff56a74eddfbc1ab850c25c1ba191744309984a07bd503b8cd9cb92e40</code></li>
           <li><strong>Runtime line:</strong> Traverse <strong>v0.13.0</strong> / <code>traverse-embedder-web@0.13.0</code> via nested-wasmi <code>runtime.wasm</code></li>
           <li><strong>runtime.wasm digest:</strong> <code>sha256:a254c161d5699b19ffe6eb47d2e11e45a39363ae8b2a9ac435d54a09fb31d782</code></li>
@@ -153,7 +153,7 @@ const _body = `
     <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Browser and Node share the pinned capability bytes. The deny sticks on both.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
-      <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-09-25-same-wasm-hosts" class="btn btn-ghost" target="_blank" rel="noopener">Runnable demo →</a>
+      <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html" class="btn btn-ghost">Deny demo status →</a>
       <a href="/blog/agent-freestyle-blocked.html" class="btn btn-ghost">Last week’s deny →</a>
     </div>
   </div>
