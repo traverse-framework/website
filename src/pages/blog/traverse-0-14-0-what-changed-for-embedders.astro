@@ -1,0 +1,122 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">September 29, 2026</span>
+      <span class="badge">Release</span>
+      <span class="badge">Embedders</span>
+      <span class="badge">Models</span>
+    </div>
+    <h1 class="t-h1">v0.14.0: what changed for embedders</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> is the signed exact-ref model cut. One shared <code>runtime.wasm</code>. Hosts stay UI + WASI/WIT I/O. Capabilities still <strong>discover → execute → trace</strong>. The agent proposes; the runtime decides.</p>
+
+      <div class="callout">
+        Short version for embedders: model packages are signed, bound to the app that pins them, and checked against host-owned trust roots. Native Rust and the web embedder execute exact-ref models today. Swift / Kotlin / .NET do not — yet.
+      </div>
+
+      <h2 id="breaking">Breaking for Spec 138 consumers</h2>
+
+      <ul>
+        <li>Manifests move to schema <strong>2.0.0</strong>. Every package ships a detached Ed25519 <code>model.sig.json</code> over the exact <code>model.manifest.json</code> bytes.</li>
+        <li>Host-owned trust roots: <code>TrustedModelKeys</code> (Rust) / <code>trustedPublicKeysHex</code> (web). Apps never add trust.</li>
+        <li><code>register_package</code> / <code>registerPackage</code> replaces <code>insertVerified</code> — signature, trusted key, digest, schema, rights, target, and limits are checked before the package enters the cache. Every execute re-hashes cached bytes.</li>
+        <li>Pins bind the SHA-256 of those manifest bytes and declare <code>target</code>, expected <code>rights</code>, and an optional signer <code>key_id</code>.</li>
+      </ul>
+
+      <h2 id="digits">First trained model</h2>
+
+      <p><code>digits-mlp-1.0.0</code> — a 64→32→10 MLP on UCI Optical Recognition of Handwritten Digits (CC BY 4.0). <strong>96.10%</strong> held-out. Bit-identical trainer / native / browser. Signed with the <strong>test-only</strong> key; production model signing is <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">traverse#1567</a>.</p>
+
+      <h2 id="hosts">Honest host matrix</h2>
+
+      <ul>
+        <li><strong>Rust native + web</strong> — exact-ref execute ships in this cut.</li>
+        <li><strong>Swift / Kotlin / .NET</strong> — in-tree embedders continue; they do <strong>not</strong> execute exact-ref models yet.</li>
+      </ul>
+
+      <p>SDKs, MCP, and CLI are embedders and clients of the same orchestrator — not different Traverse runtimes.</p>
+
+      <h2 id="pins">Pins</h2>
+
+      <p>crates.io lockstep at <strong>0.14.0</strong> with <code>traverse-embedder-web@0.14.0</code>. Pin <code>traverse-registry =0.25.0</code> if you consume the registry crate directly.</p>
+
+      <h2 id="upgrade">Upgrade</h2>
+
+      <p>Re-sign and re-pin every Spec 138 model package. Schema <code>1.0.0</code> manifests no longer verify. Constructors now require trust roots. Switch callers from <code>insertVerified</code> to <code>registerPackage</code>.</p>
+
+      <p>Step-by-step: <a href="https://github.com/traverse-framework/traverse/blob/v0.14.0/docs/upgrade-to-v0.14.0.md" target="_blank" rel="noopener">upgrade-to-v0.14.0.md</a>.</p>
+
+      <p>Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">GitHub Release</a> · Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1576" target="_blank" rel="noopener">#1576</a> · Q&amp;A <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#breaking">Breaking</a></li>
+          <li><a href="#digits">First trained model</a></li>
+          <li><a href="#hosts">Honest hosts</a></li>
+          <li><a href="#pins">Pins</a></li>
+          <li><a href="#upgrade">Upgrade</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Get the cut</div>
+        <p><code>cargo add traverse-runtime@0.14.0</code><br/><code>npm i traverse-embedder-web@0.14.0</code></p>
+        <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0" class="btn btn-primary btn-sm" target="_blank" rel="noopener">GitHub Release →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+`;
+---
+<SubpageLayout
+  title="v0.14.0: what changed for embedders — Traverse Blog"
+  description="Traverse v0.14.0 for embedders: signed Spec 138 manifests (schema 2.0.0), host-owned trust, registerPackage, digits-mlp-1.0.0 (test-only key). Native + web execute; Swift/Kotlin/.NET do not yet."
+  canonical="https://traverse-framework.com/blog/traverse-0-14-0-what-changed-for-embedders.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
