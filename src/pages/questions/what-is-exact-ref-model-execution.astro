@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is exact-ref model execution in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Hosts call the existing Spec 137 model.execute surface with opaque input_ref / output_ref handles; the runtime resolves the pin through the registry into a content-addressed cache, or returns a stable model_unavailable. Spec 138 ships in Traverse v0.12.0 (crates.io and npm `traverse-embedder-web@0.12.0`).',
+      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Hosts call the Spec 137 model.execute surface with opaque input_ref / output_ref handles. As of Traverse v0.14.0, packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json; host-owned trust roots gate register_package; the first trained digits-mlp-1.0.0 ships signed with a test-only key (production signing is separate). Exact-ref execute is implemented on native Rust and web only — Swift, Kotlin, and .NET do not execute exact-ref yet. First landed in v0.12.0.',
     },
   }],
 });
@@ -18,13 +18,13 @@ const relatedLinks = [
   { href: '/questions/what-is-governed-composition.html', label: 'What is governed composition?' },
   { href: '/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html', label: 'Agent vs Traverse runtime' },
   { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
-  { href: '/blog/traverse-0-12-0-exact-ref-model-execute.html', label: 'Traverse v0.12.0: exact-ref model.execute' },
+  { href: '/blog/traverse-0-12-0-exact-ref-model-execute.html', label: 'Traverse v0.12.0: exact-ref model.execute (historical)' },
   { href: '/blog/traverse-0-11-0-runtime-wasm.html', label: 'Traverse v0.11.0: one runtime.wasm' },
 ];
 ---
 <QuestionLayout
   title="What is exact-ref model execution in Traverse?"
-  description="App manifests pin digest-signed model packages, never a naked URL. Hosts call Spec 137 model.execute with opaque tensor refs; miss is model_unavailable. Spec 138 ships in Traverse v0.12.0."
+  description="Signed schema 2.0.0 + model.sig.json; host-owned trust; digits-mlp-1.0.0 (test-only key). Spec 137 model.execute; native+web execute in v0.14.0; Swift/Kotlin/.NET not yet."
   canonical="https://traverse-framework.com/questions/what-is-exact-ref-model-execution.html"
   category="Runtime and Architecture"
   relatedLinks={relatedLinks}
@@ -33,18 +33,18 @@ const relatedLinks = [
   <p>Most model stacks treat a URL or a vendor SDK as identity: fetch whatever is at that path and hope the bytes match what you tested. Exact-ref model execution is the opposite habit. The app names a specific model package — digest, signature, sidecar metadata — and the runtime either runs <em>that</em> package or it fails closed. A naked URL is never the name of the thing that ran.</p>
 
   <h2>Pin the package, not a path</h2>
-  <p>Traverse app manifests declare exact model references. The package carries a sidecar: digest, license, ABI, schemas, resource limits. If the bytes do not match the pin, they do not run. You cannot “upgrade” a model by swapping the file behind a URL.</p>
+  <p>Traverse app manifests declare exact model references. As of <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">v0.14.0</a>, manifests use schema <code>2.0.0</code> and every package ships a detached Ed25519 <code>model.sig.json</code> over the exact <code>model.manifest.json</code> bytes. An application's <code>exact_model_dependencies</code> pin binds the SHA-256 of those manifest bytes and declares <code>target</code>, expected <code>rights</code>, and an optional signer <code>key_id</code>. You cannot “upgrade” a model by swapping the file behind a URL.</p>
 
-  <h2>One envelope, any host</h2>
-  <p>The call surface is the existing Spec 137 <code>model.execute</code> host-connector command — not a new public guest import, and not Spec 045’s candidate/LLM resolution track. Request and response are versioned. Inputs and outputs travel as opaque <code>input_ref</code> / <code>output_ref</code> handles; the host stages binary tensors in and reads them back out. Browser and native use the same envelopes. Placement is metadata, not a second API.</p>
+  <h2>Host-owned trust</h2>
+  <p>Trust roots are host-owned (<code>TrustedModelKeys</code> on Rust, <code>trustedPublicKeysHex</code> on web). Apps can never add trust. Packages enter the cache only through <code>register_package</code> / <code>registerPackage</code>, which verifies the signature and trusted key, the digest against exactly one pin, and the manifest schema (unknown fields fail closed), rights, target, and limits. Every execute re-hashes the cached bytes. Failures keep <code>model_unavailable</code> / <code>model_incompatible</code> and add a stable <code>reason</code>.</p>
 
-  <h2>Resolve, cache, or say no</h2>
-  <p>The runtime resolves the pin through the registry into a content-addressed cache. If the package is already provisioned and the manifest allows it, execute can stay offline. A cache miss is a stable <code>model_unavailable</code>, not a silent download of something adjacent. Unknown fields, bad digests, and bad signatures fail closed. Traces stay redacted: no tensors, no secrets, no credentials.</p>
+  <h2>One envelope, any host that implements it</h2>
+  <p>The call surface is the existing Spec 137 <code>model.execute</code> host-connector command — not a new public guest import, and not Spec 045’s candidate/LLM resolution track. Request and response are versioned. Inputs and outputs travel as opaque <code>input_ref</code> / <code>output_ref</code> handles. Browser and native use the same envelopes when both implement execute.</p>
 
-  <h2>What landed, and what has not</h2>
-  <p>Spec 138 (<code>138-governed-exact-model-execution</code>) and ADR-0074 landed on <code>main</code> on 16 September 2026 via <a href="https://github.com/traverse-framework/traverse/pull/1438">traverse#1438</a>, closing the governance/native/browser tickets <a href="https://github.com/traverse-framework/traverse/issues/1435">#1435</a>–<a href="https://github.com/traverse-framework/traverse/issues/1437">#1437</a>. First conformance is <code>wasm-cpu</code>, with deny-by-default filesystem and network for the model guest. Later acceleration adapters have to keep the public envelopes.</p>
-  <p>Spec 138 ships in Traverse <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">v0.12.0</a>: crates.io packages and npm <code>traverse-embedder-web@0.12.0</code> are published and aligned. Longer release write-up: <a href="/blog/traverse-0-12-0-exact-ref-model-execute.html">Traverse v0.12.0: exact-ref model.execute</a>. This page is not a claim that every host already ships a certified public model-runtime package beyond the published Spec 138 <code>wasm-cpu</code> path.</p>
+  <h2>What landed in v0.14.0</h2>
+  <p>Spec 138 first shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">v0.12.0</a> (see the <a href="/blog/traverse-0-12-0-exact-ref-model-execute.html">historical v0.12.0 write-up</a>). <strong>v0.14.0</strong> adds signed packages, host-owned trust, machine-readable rights, and the first trained model <code>digits-mlp-1.0.0</code> (64→32→10 MLP on UCI digits, CC BY 4.0, 96.10% held-out, bit-identical trainer / native / browser). That package is signed with the <strong>test-only</strong> key; production model signing is <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>.</p>
+  <p><strong>Host honesty:</strong> exact-ref execute is implemented in the Rust native runtime and the web embedder today. The Swift, Kotlin, and .NET embedders do <em>not</em> execute exact-ref models yet. Pin crates.io and npm at <code>0.14.0</code> (and <code>traverse-registry</code> at <code>=0.25.0</code> if you consume it directly).</p>
 
   <h2>What it is not</h2>
-  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity.</p>
+  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity, or to assume every native embedder language already executes exact-ref.</p>
 </QuestionLayout>
