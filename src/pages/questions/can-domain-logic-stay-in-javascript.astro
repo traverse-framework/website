@@ -1,0 +1,48 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can domain logic stay in JavaScript forever?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Single-host glue can stay in JavaScript. Shared non-UI rules that must match across hosts belong in Traverse capabilities under discover → execute → trace. Deny-by-default I/O (stdin/stdout JSON today) limits authority, not how rich the rule can be. The React guide’s “never touches Rust/WASM directly” means use the embedder client — not reimplement the business rule in React. One shared runtime.wasm; there is no Python SDK (CLI shell-out only). Check Platforms for honest host status.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/where-does-business-logic-live-in-traverse.html', label: 'Where does business logic live in Traverse?' },
+  { href: '/questions/what-does-apps-not-ready-mean.html', label: 'What does “apps are not ready” mean?' },
+  { href: '/questions/can-i-use-traverse-with-react.html', label: 'Can I use Traverse with React?' },
+  { href: '/docs/guides/react-integration.html', label: 'React integration guide' },
+  { href: '/platforms.html', label: 'Platforms' },
+  { href: '/questions/does-traverse-have-a-python-sdk.html', label: 'Does Traverse have a Python SDK?' },
+  { href: '/blog/where-business-logic-lives.html', label: 'Where business logic lives (hosts stay thin)' },
+];
+---
+<QuestionLayout
+  title="Can domain logic stay in JavaScript forever?"
+  description="Host glue can stay in JS. Shared non-UI rules that must match across hosts belong in capabilities. Deny-by-default I/O limits authority, not richness. Use the embedder — do not reimplement rules in React."
+  canonical="https://traverse-framework.com/questions/can-domain-logic-stay-in-javascript.html"
+  category="Contracts and capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> glue that only one host needs can stay in JavaScript. Shared non-UI rules that must behave the same everywhere belong in capabilities — not forever in the React tree “because WASM cannot touch disk.”</p>
+
+  <h2>When JS is fine</h2>
+  <p>Session wiring, view-model mapping, one-off UI helpers, and host-local adapters that never need to match another OS or client can live in JS/TS. That is normal host work. Traverse does not ask you to WASM every line of a front-end app.</p>
+
+  <h2>When it should leave the host</h2>
+  <p>If two hosts disagreeing would be a bug — pricing, eligibility, consent, codecs, scorers, export gates — put the rule in a capability under discover → execute → trace. The host calls the capability; it does not re-own the rule. See <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live in Traverse?</a></p>
+
+  <h2>Deny-by-default I/O is not “keep it in React”</h2>
+  <p>Capabilities do not get ambient filesystem or network access. Today’s common boundary is stdin/stdout JSON through the embedder. That limits <em>authority</em>, not how rich the domain rule can be. “WASM can’t open a file, so the rule stays in JS” is the wrong conclusion. Call the capability; keep the host thin.</p>
+
+  <h2>What the React guide actually says</h2>
+  <p>The React integration guide’s “app never touches Rust/WASM directly” means you go through the published embedder client (<code>traverse-embedder-web</code>). It does <strong>not</strong> mean reimplement business rules in React components. One shared <code>runtime.wasm</code> everywhere; language SDKs are clients, not second runtimes. There is <strong>no Python SDK</strong> — Python shells out to the CLI today. Check <a href="/platforms.html">Platforms</a> before assuming a host is shipped.</p>
+</QuestionLayout>

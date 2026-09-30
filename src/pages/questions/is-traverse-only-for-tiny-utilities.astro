@@ -1,0 +1,47 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is Traverse only for tiny utilities?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No. Utility helpers in the registry teach the publish pipeline and CI gates. They are legitimate, but they are not the product identity and not a size ceiling. “One small capability” means one concern per package. Preferred publishes are business-shaped: pricing, eligibility, scorers, gates, codecs — non-UI domain rules under discover → execute → trace.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/where-does-business-logic-live-in-traverse.html', label: 'Where does business logic live in Traverse?' },
+  { href: '/questions/what-does-apps-not-ready-mean.html', label: 'What does “apps are not ready” mean?' },
+  { href: '/blog/where-business-logic-lives.html', label: 'Where business logic lives (hosts stay thin)' },
+  { href: '/questions/what-is-a-wasm-capability.html', label: 'What is a WASM capability?' },
+  { href: '/questions/can-i-use-traverse-for-pricing-logic.html', label: 'Can I use Traverse for pricing logic?' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+];
+---
+<QuestionLayout
+  title="Is Traverse only for tiny utilities?"
+  description="No. Slugify-style helpers teach the publish pipe — they are not the ceiling. Preferred capabilities are business-shaped: pricing, eligibility, scorers, gates, codecs."
+  canonical="https://traverse-framework.com/questions/is-traverse-only-for-tiny-utilities.html"
+  category="Contracts and capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> no. Small utility helpers teach the publish pipeline. They are not Traverse’s product identity and not a size limit on what a capability may contain.</p>
+
+  <h2>Why utilities exist</h2>
+  <p>The registry includes helpers such as slugify, truncate, and email validate. Those packages exercise contracts, digests, CI gates, and the human-reviewed PR path with a small surface. That is useful onboarding. It is not a statement that “real” work stays in the host.</p>
+
+  <h2>“One small capability” means one concern</h2>
+  <p>When docs say keep a capability small, they mean <strong>one concern per package</strong> — a clear contract boundary, not “keep the bytes tiny forever.” A pricing rule, an eligibility check, a mesh codec, or an export gate can be substantial and still be one capability. Split by concern when two rules would evolve or authorize differently; do not split because someone equated WASM with toy utils.</p>
+
+  <h2>Preferred publishes are business-shaped</h2>
+  <p>What we want in the catalog: deterministic decisions, domain transforms, policy gates, scorers, codecs — anything that must match across hosts and leave a trace. Put that under discover → execute → trace. Leave UI, session, and ambient I/O in the host. Narrative: <a href="/blog/where-business-logic-lives.html">Where business logic lives (hosts stay thin)</a>.</p>
+
+  <h2>Related misconceptions</h2>
+  <p>“Apps are not ready” blocks product-shell PRs, not domain packs — see <a href="/questions/what-does-apps-not-ready-mean.html">What does “apps are not ready” mean?</a> Placement in one page: <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live in Traverse?</a></p>
+</QuestionLayout>
