@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is exact-ref model execution in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Hosts call the Spec 137 model.execute surface with opaque input_ref / output_ref handles. As of Traverse v0.14.0, packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json; host-owned trust roots gate register_package; the first trained digits-mlp-1.0.0 ships signed with a test-only key (production signing is separate). Exact-ref execute is implemented on native Rust and web only — Swift, Kotlin, and .NET do not execute exact-ref yet. First landed in v0.12.0.',
+      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Hosts call the Spec 137 model.execute surface with opaque input_ref / output_ref handles. As of Traverse v0.14.0, packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json; host-owned trust roots gate register_package; the first trained digits-mlp-1.0.0 ships signed with a test-only key (production signing is separate). Exact-ref execute is implemented on native Rust, web, and Swift ExactModelHost (Package.swift pin to swift-host-v0.14.0-1); Kotlin and .NET do not execute exact-ref yet. First landed in v0.12.0; Swift parity closed #1579 on 2026-09-30.',
     },
   }],
 });
@@ -26,7 +26,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What is exact-ref model execution in Traverse?"
-  description="Signed schema 2.0.0 + model.sig.json; host-owned trust; digits-mlp-1.0.0 (test-only key). Spec 137 model.execute; native+web execute in v0.14.0; Swift/Kotlin/.NET not yet."
+  description="Signed schema 2.0.0 + model.sig.json; host-owned trust; digits-mlp-1.0.0 (test-only key). Spec 137 model.execute; native+web+Swift ExactModelHost; Kotlin/.NET not yet."
   canonical="https://traverse-framework.com/questions/what-is-exact-ref-model-execution.html"
   category="Runtime and Architecture"
   relatedLinks={relatedLinks}
@@ -38,15 +38,15 @@ const relatedLinks = [
   <p>Traverse app manifests declare exact model references. As of <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">v0.14.0</a>, manifests use schema <code>2.0.0</code> and every package ships a detached Ed25519 <code>model.sig.json</code> over the exact <code>model.manifest.json</code> bytes. An application's <code>exact_model_dependencies</code> pin binds the SHA-256 of those manifest bytes and declares <code>target</code>, expected <code>rights</code>, and an optional signer <code>key_id</code>. You cannot “upgrade” a model by swapping the file behind a URL.</p>
 
   <h2>Host-owned trust</h2>
-  <p>Trust roots are host-owned (<code>TrustedModelKeys</code> on Rust, <code>trustedPublicKeysHex</code> on web). Apps can never add trust. Packages enter the cache only through <code>register_package</code> / <code>registerPackage</code>, which verifies the signature and trusted key, the digest against exactly one pin, and the manifest schema (unknown fields fail closed), rights, target, and limits. Every execute re-hashes the cached bytes. Failures keep <code>model_unavailable</code> / <code>model_incompatible</code> and add a stable <code>reason</code>.</p>
+  <p>Trust roots are host-owned (<code>TrustedModelKeys</code> on Rust, <code>trustedPublicKeysHex</code> on web and Swift <code>ExactModelHost</code>). Apps can never add trust. Packages enter the cache only through <code>register_package</code> / <code>registerPackage</code>, which verifies the signature and trusted key, the digest against exactly one pin, and the manifest schema (unknown fields fail closed), rights, target, and limits. Every execute re-hashes the cached bytes. Failures keep <code>model_unavailable</code> / <code>model_incompatible</code> and add a stable <code>reason</code>.</p>
 
   <h2>One envelope, any host that implements it</h2>
   <p>The call surface is the existing Spec 137 <code>model.execute</code> host-connector command — not a new public guest import, and not Spec 045’s candidate/LLM resolution track. Request and response are versioned. Inputs and outputs travel as opaque <code>input_ref</code> / <code>output_ref</code> handles. Browser and native use the same envelopes when both implement execute.</p>
 
   <h2>What landed in v0.14.0</h2>
   <p>Spec 138 first shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">v0.12.0</a> (see the <a href="/blog/traverse-0-12-0-exact-ref-model-execute.html">historical v0.12.0 write-up</a>). <strong>v0.14.0</strong> adds signed packages, host-owned trust, machine-readable rights, and the first trained model <code>digits-mlp-1.0.0</code> (64→32→10 MLP on UCI digits, CC BY 4.0, 96.10% held-out, bit-identical trainer / native / browser). That package is signed with the <strong>test-only</strong> key; production model signing is <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>.</p>
-  <p><strong>Host honesty:</strong> exact-ref execute is implemented in the Rust native runtime and the web embedder today. The Swift, Kotlin, and .NET embedders do <em>not</em> execute exact-ref models yet. Pin crates.io and npm at <code>0.14.0</code> (and <code>traverse-registry</code> at <code>=0.25.0</code> if you consume it directly).</p>
+  <p><strong>Host honesty:</strong> exact-ref execute is implemented in the Rust native runtime, the web embedder, and Swift <code>ExactModelHost</code> (published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-1"><code>swift-host-v0.14.0-1</code></a>; <code>Package.swift</code> binary pin; digits conformance byte-identical). Kotlin and .NET do <em>not</em> execute exact-ref yet. Pin crates.io and npm at <code>0.14.0</code> (and <code>traverse-registry</code> at <code>=0.25.0</code> if you consume it directly).</p>
 
   <h2>What it is not</h2>
-  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity, or to assume every native embedder language already executes exact-ref.</p>
+  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity, or to assume Kotlin/.NET already execute exact-ref.</p>
 </QuestionLayout>
