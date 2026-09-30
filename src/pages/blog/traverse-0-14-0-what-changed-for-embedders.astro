@@ -27,14 +27,18 @@ const _body = `
       <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> is the signed exact-ref model cut. One shared <code>runtime.wasm</code>. Hosts stay UI + WASI/WIT I/O. Capabilities still <strong>discover → execute → trace</strong>. The agent proposes; the runtime decides.</p>
 
       <div class="callout">
-        Short version for embedders: model packages are signed, bound to the app that pins them, and checked against host-owned trust roots. Native Rust and the web embedder execute exact-ref models today. Swift / Kotlin / .NET do not — yet.
+        Short version for embedders: model packages are signed, bound to the app that pins them, and checked against host-owned trust roots. Native Rust, the web embedder, and Swift (<code>ExactModelHost</code>) execute exact-ref models today. Kotlin and .NET do not — yet.
+      </div>
+
+      <div class="callout">
+        <strong>Update (September 30, 2026):</strong> overnight after the v0.14.0 product cut, <a href="https://github.com/traverse-framework/traverse/issues/1579" target="_blank" rel="noopener">#1579</a> closed and the published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-1" target="_blank" rel="noopener"><code>swift-host-v0.14.0-1</code></a> exposes Spec 138 parity. <code>packages/swift/TraverseEmbedder/Package.swift</code> pins that binary target. Digits conformance is byte-identical on Swift (1,727 / 1,797). Kotlin (<a href="https://github.com/traverse-framework/traverse/issues/1580" target="_blank" rel="noopener">#1580</a>) and .NET still do not execute exact-ref.
       </div>
 
       <h2 id="breaking">Breaking for Spec 138 consumers</h2>
 
       <ul>
         <li>Manifests move to schema <strong>2.0.0</strong>. Every package ships a detached Ed25519 <code>model.sig.json</code> over the exact <code>model.manifest.json</code> bytes.</li>
-        <li>Host-owned trust roots: <code>TrustedModelKeys</code> (Rust) / <code>trustedPublicKeysHex</code> (web). Apps never add trust.</li>
+        <li>Host-owned trust roots: <code>TrustedModelKeys</code> (Rust) / <code>trustedPublicKeysHex</code> (web and Swift). Apps never add trust.</li>
         <li><code>register_package</code> / <code>registerPackage</code> replaces <code>insertVerified</code> — signature, trusted key, digest, schema, rights, target, and limits are checked before the package enters the cache. Every execute re-hashes cached bytes.</li>
         <li>Pins bind the SHA-256 of those manifest bytes and declare <code>target</code>, expected <code>rights</code>, and an optional signer <code>key_id</code>.</li>
       </ul>
@@ -46,8 +50,9 @@ const _body = `
       <h2 id="hosts">Honest host matrix</h2>
 
       <ul>
-        <li><strong>Rust native + web</strong> — exact-ref execute ships in this cut.</li>
-        <li><strong>Swift / Kotlin / .NET</strong> — in-tree embedders continue; they do <strong>not</strong> execute exact-ref models yet.</li>
+        <li><strong>Rust native + web</strong> — exact-ref execute shipped in the v0.14.0 product cut.</li>
+        <li><strong>Swift</strong> — <code>ExactModelHost</code> executes signed exact-ref via the published <code>TraverseSwiftHost</code> xcframework (<code>swift-host-v0.14.0-1</code>) and the in-repo <code>Package.swift</code> binary pin. Still not a CocoaPods / Swift Package Index first-class package; distribution is GitHub Release + SPM binary target.</li>
+        <li><strong>Kotlin / .NET</strong> — in-tree embedders continue; they do <strong>not</strong> execute exact-ref models yet.</li>
       </ul>
 
       <p>SDKs, MCP, and CLI are embedders and clients of the same orchestrator — not different Traverse runtimes.</p>
@@ -90,7 +95,7 @@ const _body = `
 ---
 <SubpageLayout
   title="v0.14.0: what changed for embedders — Traverse Blog"
-  description="Traverse v0.14.0 for embedders: signed Spec 138 manifests (schema 2.0.0), host-owned trust, registerPackage, digits-mlp-1.0.0 (test-only key). Native + web execute; Swift/Kotlin/.NET do not yet."
+  description="Traverse v0.14.0 for embedders: signed Spec 138 manifests (schema 2.0.0), host-owned trust, registerPackage, digits-mlp-1.0.0 (test-only key). Native + web + Swift ExactModelHost execute; Kotlin/.NET do not yet."
   canonical="https://traverse-framework.com/blog/traverse-0-14-0-what-changed-for-embedders.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
 >
