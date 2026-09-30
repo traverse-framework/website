@@ -1,0 +1,47 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does “apps are not ready” mean in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: '“Apps are not ready” is a contrib and help-wanted door phrase. It means do not open PRs that port a whole product UI or application shell into Traverse capability repos. It does not mean leave domain logic in the host forever, and it does not mean Traverse is only for tiny utilities. Capability packs — business-shaped WASM capabilities under discover → execute → trace — are in scope. See the print-support pack (registry#596) and Discussion #1374.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/where-does-business-logic-live-in-traverse.html', label: 'Where does business logic live in Traverse?' },
+  { href: '/questions/is-traverse-only-for-tiny-utilities.html', label: 'Is Traverse only for tiny utilities?' },
+  { href: '/questions/can-domain-logic-stay-in-javascript.html', label: 'Can domain logic stay in JavaScript forever?' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/blog/where-business-logic-lives.html', label: 'Where business logic lives (hosts stay thin)' },
+  { href: '/questions/how-do-i-contribute-to-traverse.html', label: 'How do I contribute to Traverse?' },
+];
+---
+<QuestionLayout
+  title="What does “apps are not ready” mean in Traverse?"
+  description="A help-wanted door phrase: do not ship a product UI/shell in a capability PR. Capability packs and domain logic in WASM are in scope — not “leave rules in the host forever.”"
+  canonical="https://traverse-framework.com/questions/what-does-apps-not-ready-mean.html"
+  category="Contracts and capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> “apps are not ready” tells contributors what <em>not</em> to open a PR for — a whole product UI or application shell inside this org’s capability repos. It is sequencing and scope for help-wanted, not a claim that Traverse cannot hold real domain rules.</p>
+
+  <h2>What the phrase blocks</h2>
+  <p>Help-wanted tickets and contrib notes use “apps are not ready” when the ask would pull a full client shell, product chrome, or multi-screen app into a capability repository. That work belongs with host apps and product teams, not in the registry’s capability packages. Opening that kind of PR burns review time and muddies the contract boundary.</p>
+
+  <h2>What it does <em>not</em> mean</h2>
+  <p>It does <strong>not</strong> mean leave non-UI domain logic in JavaScript (or any host) forever. It does <strong>not</strong> mean Traverse is only for tiny string helpers. Preferred publishes are business-shaped: pricing, eligibility, scorers, codecs, export gates — one concern per package, under discover → execute → trace. Hosts stay thin: UI plus the I/O the capability is allowed to use.</p>
+
+  <h2>Capability packs are in scope</h2>
+  <p>A pack of related capabilities is exactly the kind of contrib the door wants. The print-support initiative is a living example: codecs, overhang/score/fin/brace rules, export gates — capabilities only, no product shell. Umbrella <a href="https://github.com/traverse-framework/registry/issues/596">registry#596</a>; Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1540">Discussion #1540</a>.</p>
+
+  <h2>Where to read next</h2>
+  <p>Placement rules in one page: <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live in Traverse?</a> Citeable host honesty: <a href="/what-is-real-today.html">what is real today</a>. Broader contrib framing: <a href="https://github.com/orgs/traverse-framework/discussions/1374">Discussion #1374</a>.</p>
+</QuestionLayout>

@@ -1,0 +1,46 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do hosts trust signed models in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'As of Traverse v0.14.0 (signed Spec 138), model packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json. Host-owned trust roots gate register_package / registerPackage; apps never add trust. Pin by digest and signature, never a naked URL. The first trained package digits-mlp-1.0.0 ships with a test-only key; production signing is #1567. Exact-ref execute is native Rust and web only — Swift, Kotlin, and .NET do not execute exact-ref yet. ONNX as a generic runner is not shipped.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/blog/traverse-0-14-0-what-changed-for-embedders.html', label: 'v0.14.0: what changed for embedders' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/platforms.html', label: 'Platforms' },
+];
+---
+<QuestionLayout
+  title="How do hosts trust signed models in Traverse?"
+  description="v0.14.0 signed Spec 138: schema 2.0.0 + model.sig.json; host-owned trust roots; pin by digest; digits-mlp test-only key; exact-ref execute on native+web only."
+  canonical="https://traverse-framework.com/questions/how-do-hosts-trust-signed-models.html"
+  category="Runtime and Architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> the host owns the trust roots. Packages enter only through <code>register_package</code> / <code>registerPackage</code> after signature and digest checks against pins the app already declared. A naked URL is never identity.</p>
+
+  <h2>Signed packages (v0.14.0)</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> lands signed Spec 138: schema <code>2.0.0</code> manifests and a detached Ed25519 <code>model.sig.json</code> over the exact <code>model.manifest.json</code> bytes. App manifests pin those bytes (SHA-256), plus <code>target</code>, expected <code>rights</code>, and an optional signer <code>key_id</code>. Embedder notes: <a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">what changed for embedders</a>. Announcement: <a href="https://github.com/orgs/traverse-framework/discussions/1576">Discussion #1576</a>.</p>
+
+  <h2>Host-owned trust roots</h2>
+  <p>Trust lists live on the host (<code>TrustedModelKeys</code> on Rust, <code>trustedPublicKeysHex</code> on web). Applications cannot inject keys. Registration verifies the signature against a trusted key, the digest against exactly one pin, and the manifest schema (unknown fields fail closed), rights, target, and limits. Every execute re-hashes cached bytes. Failures stay typed (<code>model_unavailable</code> / <code>model_incompatible</code>) with a stable <code>reason</code>.</p>
+
+  <h2>Test-only key vs production</h2>
+  <p>The first trained package <code>digits-mlp-1.0.0</code> is signed with a <strong>test-only</strong> key so CI and demos can exercise the path. Production model signing is tracked separately as <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>. Do not treat the test key as a production trust root.</p>
+
+  <h2>Host honesty</h2>
+  <p>Exact-ref execute is implemented on native Rust and the web embedder today. Swift, Kotlin, and .NET embedders do <em>not</em> execute exact-ref models yet — check <a href="/platforms.html">Platforms</a>. This page is about signed-model trust for Spec 138 exact-ref; it does <strong>not</strong> claim a generic ONNX runner is shipped. Deeper loop: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a></p>
+</QuestionLayout>
