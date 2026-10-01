@@ -1,0 +1,57 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the print-support capability pack in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The print-support pack is a help-wanted capability initiative (registry#596, Announcement Discussion #1540): eight governed WASM capabilities for manufacturing print-support rules — mesh parse/write, overhang analysis, orientation scoring, fins, sway braces, export gate, bed pad. Apps-not-ready means no product shell PR; capability packs are in scope. None of the print.* capabilities are published yet. One capability per PR; skill-first authoring via traverse-capability-author is welcome. I/O today is stdin/stdout JSON.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/print-support-domain-pack.html', label: 'Domain packs are in scope: print-support' },
+  { href: '/questions/where-does-business-logic-live-in-traverse.html', label: 'Where does business logic live in Traverse?' },
+  { href: '/questions/what-does-apps-not-ready-mean.html', label: 'What does “apps are not ready” mean?' },
+  { href: '/blog/where-business-logic-lives.html', label: 'Where business logic lives (hosts stay thin)' },
+  { href: '/questions/how-do-i-author-a-capability-in-plain-english.html', label: 'How do I author a capability in plain English?' },
+  { href: '/questions/how-do-i-contribute-to-traverse.html', label: 'How do I contribute to Traverse?' },
+];
+---
+<QuestionLayout
+  title="What is the print-support capability pack in Traverse?"
+  description="registry#596: eight manufacturing-shaped print.* capabilities under discover→execute→trace. Apps-not-ready = no product shell. None published yet; help-wanted door open."
+  canonical="https://traverse-framework.com/questions/what-is-the-print-support-capability-pack.html"
+  category="Contracts and capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> print-support is a <em>capability pack</em> initiative — governed WASM for print-oriented domain rules — not an app rewrite. Umbrella <a href="https://github.com/traverse-framework/registry/issues/596">registry#596</a>; Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1540">Discussion #1540</a>. None of the <code>print.*</code> capabilities are published yet.</p>
+
+  <h2>Capabilities in the pack</h2>
+  <p>Publish as separate one-capability PRs (recommended order on the umbrella):</p>
+  <ul>
+    <li><a href="https://github.com/traverse-framework/registry/issues/597">#597</a> <code>print.mesh-parse</code> — STL/3MF → mesh IR</li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/598">#598</a> <code>print.mesh-write</code> — mesh IR → STL/3MF</li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/599">#599</a> <code>print.overhangs-analyze</code></li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/600">#600</a> <code>print.orientation-score</code></li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/602">#602</a> <code>print.fins-generate</code></li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/601">#601</a> <code>print.sway-braces-generate</code></li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/603">#603</a> <code>print.export-gate</code></li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/604">#604</a> <code>print.bed-pad-generate</code></li>
+  </ul>
+
+  <h2>“Apps are not ready” here</h2>
+  <p>The door phrase means do not open a product UI or application-shell PR into capability repos. It does <strong>not</strong> mean domain packs are out of scope. Codecs, scorers, generators, and export gates under discover → execute → trace are the point. See <a href="/questions/what-does-apps-not-ready-mean.html">What does “apps are not ready” mean?</a>.</p>
+
+  <h2>Boundary and authoring</h2>
+  <p>Hosts stay thin (UI + allowed I/O). Today’s common execution boundary is stdin/stdout JSON. Skill-first path welcome: <code>traverse-capability-author</code> → contract → WASM → human-reviewed PR. One capability per PR. Narrative: <a href="/blog/print-support-domain-pack.html">Domain packs are in scope: print-support without an app rewrite</a>.</p>
+
+  <h2>What this page does not claim</h2>
+  <p>No affiliation with third-party print-support apps. Domain inspiration (designed-in support fins as a technique class) is problem framing only. No claim that any <code>print.*</code> capability has shipped.</p>
+</QuestionLayout>

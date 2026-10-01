@@ -1,0 +1,47 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can Kotlin or .NET embedders run exact-ref models in Traverse yet?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No. Kotlin and .NET embedders are in-tree only and do not execute signed exact-ref models yet (tracked as #1580 and #1602). Native Rust, web, and Swift ExactModelHost (swift-host-v0.14.0-1) do execute exact-ref as of v0.14.0 / #1579. Check Platforms and what-is-real-today; do not invent first-class Kotlin/.NET packages.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/blog/traverse-0-14-0-what-changed-for-embedders.html', label: 'v0.14.0: what changed for embedders' },
+  { href: '/platforms.html', label: 'Platforms' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+];
+---
+<QuestionLayout
+  title="Can Kotlin or .NET embedders run exact-ref models in Traverse yet?"
+  description="Honest no for execute: Kotlin/.NET are in-tree only (#1580/#1602). Swift ExactModelHost, native Rust, and web do execute exact-ref as of v0.14.0 / swift-host-v0.14.0-1."
+  canonical="https://traverse-framework.com/questions/can-kotlin-or-dotnet-embedders-run-exact-ref-yet.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <strong>no</strong> for Kotlin and .NET exact-ref execute today. They remain in-tree embedders, not first-class published packages with Spec 138 parity.</p>
+
+  <h2>What works instead</h2>
+  <p>Native Rust and the web embedder execute signed exact-ref in the v0.14.0 cut. Swift <code>ExactModelHost</code> reached parity via <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-1"><code>swift-host-v0.14.0-1</code></a> (#1579) — GitHub Release + SPM binary target, not a CocoaPods claim. Full matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
+
+  <h2>Tracked gaps</h2>
+  <ul>
+    <li>Kotlin: <a href="https://github.com/traverse-framework/traverse/issues/1580">#1580</a></li>
+    <li>.NET: <a href="https://github.com/traverse-framework/traverse/issues/1602">#1602</a></li>
+  </ul>
+
+  <h2>Honest consumers</h2>
+  <p>Shipped consumers for capabilities today: JS/TS + Rust embedders + MCP; Python via CLI only. Mobile/.NET hosts: check <a href="/platforms.html">Platforms</a> and <a href="/what-is-real-today.html">what is real today</a> before quoting. Embedder notes: <a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">v0.14.0: what changed for embedders</a>.</p>
+</QuestionLayout>
