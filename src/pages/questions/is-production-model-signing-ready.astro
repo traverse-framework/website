@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is production model signing ready in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No. digits-mlp-1.0.0 is signed with a test-only key so CI and demos can exercise Spec 138. Production model-signing key custody, distribution, rotation, and revocation are tracked as traverse#1567. Do not treat the test key as a production trust root. Signed package format (schema 2.0.0 + model.sig.json) and host-owned trust roots ship in v0.14.0; production operations are separate work.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: '/blog/traverse-0-14-0-what-changed-for-embedders.html', label: 'v0.14.0: what changed for embedders' },
+];
+---
+<QuestionLayout
+  title="Is production model signing ready in Traverse?"
+  description="No — digits-mlp-1.0.0 uses a test-only key. Production custody, rotation, and revocation tracked as #1567. Do not treat the test key as a prod trust root."
+  canonical="https://traverse-framework.com/questions/is-production-model-signing-ready.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <strong>no</strong> for production trust operations. The signed Spec 138 path exists in v0.14.0; the first trained package uses a test-only key. Production custody is open work.</p>
+
+  <h2>What shipped vs what did not</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> lands schema <code>2.0.0</code> manifests, detached Ed25519 <code>model.sig.json</code>, and host-owned trust roots that gate <code>register_package</code> / <code>registerPackage</code>. That is the format and the host gate — not a finished production key program.</p>
+
+  <h2>Test-only key</h2>
+  <p><code>digits-mlp-1.0.0</code> is signed with a <strong>test-only</strong> key so CI and demos can exercise the path. Do <strong>not</strong> treat that key as a production trust root. Do not ship products that depend on it as the sole signer of record.</p>
+
+  <h2>Tracked work</h2>
+  <p>Production model-signing key custody, distribution, rotation, and revocation: <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>. Trust mechanics for callers: <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a>. Host matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
+</QuestionLayout>

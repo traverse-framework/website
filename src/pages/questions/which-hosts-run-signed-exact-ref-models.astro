@@ -1,0 +1,51 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Which hosts run signed exact-ref models in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'As of Traverse v0.14.0 and swift-host-v0.14.0-1: native Rust, the web embedder, and Swift ExactModelHost execute signed exact-ref models (Spec 138). Kotlin and .NET embedders do not execute exact-ref yet (tracked #1580 and #1602). digits-mlp-1.0.0 uses a test-only signing key; production custody is #1567. No generic ONNX runner is shipped. One shared runtime.wasm; embedders are clients.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+  { href: '/questions/can-kotlin-or-dotnet-embedders-run-exact-ref-yet.html', label: 'Can Kotlin or .NET run exact-ref yet?' },
+  { href: '/blog/traverse-0-14-0-what-changed-for-embedders.html', label: 'v0.14.0: what changed for embedders' },
+  { href: '/platforms.html', label: 'Platforms' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+];
+---
+<QuestionLayout
+  title="Which hosts run signed exact-ref models in Traverse?"
+  description="Honest matrix as of v0.14.0 / swift-host-v0.14.0-1: native Rust + web + Swift ExactModelHost execute; Kotlin/.NET not yet; test-only digits-mlp key; no generic ONNX runner."
+  canonical="https://traverse-framework.com/questions/which-hosts-run-signed-exact-ref-models.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> native Rust, web (<code>traverse-embedder-web</code>), and Swift <code>ExactModelHost</code> execute signed exact-ref models today. Kotlin and .NET do not — yet. Pin by digest and signature; never treat a naked URL as identity.</p>
+
+  <h2>Honest matrix (v0.14.0 / swift-host-v0.14.0-1)</h2>
+  <ul>
+    <li><strong>Native Rust</strong> — exact-ref execute shipped in the v0.14.0 product cut.</li>
+    <li><strong>Web</strong> — <code>traverse-embedder-web@0.14.0</code> executes exact-ref.</li>
+    <li><strong>Swift</strong> — <code>ExactModelHost</code> via published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-1"><code>swift-host-v0.14.0-1</code></a> and in-repo <code>Package.swift</code> binary pin (#1579). Distribution is GitHub Release + SPM binary target — not a CocoaPods / Swift Package Index first-class package claim.</li>
+    <li><strong>Kotlin</strong> — in-tree only; no exact-ref execute yet (<a href="https://github.com/traverse-framework/traverse/issues/1580">#1580</a>).</li>
+    <li><strong>.NET</strong> — in-tree only; no exact-ref execute yet (<a href="https://github.com/traverse-framework/traverse/issues/1602">#1602</a>).</li>
+  </ul>
+
+  <h2>Signing honesty</h2>
+  <p>Packages use schema <code>2.0.0</code> + detached Ed25519 <code>model.sig.json</code>. Host-owned trust roots gate <code>register_package</code> / <code>registerPackage</code>. The first trained package <code>digits-mlp-1.0.0</code> is signed with a <strong>test-only</strong> key. Production custody, rotation, and revocation are tracked as <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a> — see <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a>.</p>
+
+  <h2>What this is not</h2>
+  <p>Not a generic ONNX runner. Not a claim that every language embedder already executes exact-ref. Not Spec 026 / model-rights enforcement as shipped product. Deeper loop: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a> · Embedder notes: <a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">v0.14.0: what changed for embedders</a>.</p>
+</QuestionLayout>

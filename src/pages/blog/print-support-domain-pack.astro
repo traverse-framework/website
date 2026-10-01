@@ -1,0 +1,163 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 1, 2026</span>
+      <span class="badge">Capabilities</span>
+      <span class="badge">Help wanted</span>
+      <span class="badge">Honesty</span>
+    </div>
+    <h1 class="t-h1">Domain packs are in scope: print-support without an app rewrite</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>When help-wanted says “apps are not ready,” cold readers sometimes hear “don’t bring real domain work.” That is the wrong hearing. Domain packs — related capabilities under one umbrella — are exactly in scope. The living example is the print-support pack: manufacturing-shaped rules as governed WASM, not a product shell PR.</p>
+
+      <div class="callout">
+        Direction stays one loop: <strong>discover → execute → trace</strong>. The agent proposes; the runtime decides. Non-UI print rules belong in capabilities. Hosts stay thin — UI plus the I/O the capability is allowed to use.
+      </div>
+
+      <h2 id="what-the-pack-is">What the pack is</h2>
+
+      <p>Umbrella <a href="https://github.com/traverse-framework/registry/issues/596" target="_blank" rel="noopener">registry#596</a> tracks eight one-capability tickets. Announcement: <a href="https://github.com/orgs/traverse-framework/discussions/1540" target="_blank" rel="noopener">Discussion #1540</a>. Citeable Q&amp;A: <a href="/questions/what-is-the-print-support-capability-pack.html">What is the print-support capability pack?</a>.</p>
+
+      <ul>
+        <li><a href="https://github.com/traverse-framework/registry/issues/597" target="_blank" rel="noopener">#597</a> <code>print.mesh-parse</code> — STL/3MF bytes → mesh IR</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/598" target="_blank" rel="noopener">#598</a> <code>print.mesh-write</code> — mesh IR → STL/3MF bytes</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/599" target="_blank" rel="noopener">#599</a> <code>print.overhangs-analyze</code> — overhangs, bed reachability, fin-eligible features</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/600" target="_blank" rel="noopener">#600</a> <code>print.orientation-score</code> — load-aware orientation ranking</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/602" target="_blank" rel="noopener">#602</a> <code>print.fins-generate</code> — breakaway fin walls + tines</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/601" target="_blank" rel="noopener">#601</a> <code>print.sway-braces-generate</code> — tall-part sway braces + collision refuse</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/603" target="_blank" rel="noopener">#603</a> <code>print.export-gate</code> — allow/deny export before write</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/604" target="_blank" rel="noopener">#604</a> <code>print.bed-pad-generate</code> — bed pad under posed mesh</li>
+      </ul>
+
+      <p>None of these <code>print.*</code> capabilities are published yet. The tickets are the door. That is honesty, not a stall story.</p>
+
+      <h2 id="apps-not-ready">“Apps not ready” ≠ no domain packs</h2>
+
+      <p>The phrase blocks product UI and application-shell PRs into capability repos. It does <strong>not</strong> block codecs, scorers, generators, or export gates. Packaging is one concern per PR — not a ceiling on how rich the rule can be.</p>
+
+      <p>Full phrasing: <a href="/questions/what-does-apps-not-ready-mean.html">What does “apps are not ready” mean?</a> Narrative companion: <a href="/blog/where-business-logic-lives.html">Where business logic lives (hosts stay thin)</a>.</p>
+
+      <h2 id="hosts-thin">Hosts stay thin</h2>
+
+      <p>A browser, CLI, MCP client, or native shell can call the same capability once it exists. The host renders UI, holds session state, and supplies allowed I/O. It does not own the overhang score or the export gate forever.</p>
+
+      <p>Today’s common execution boundary is <strong>stdin/stdout JSON</strong> through the embedder. That limits authority (no ambient filesystem). It does not limit whether the rule is manufacturing-shaped.</p>
+
+      <h2 id="how-to-contribute">How to contribute</h2>
+
+      <p>One capability per PR. Skill-first is welcome: plain English via <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener"><code>traverse-capability-author</code></a> → contract → WASM → human-reviewed registry PR. Under the hood that still compiles Rust to WASM; you do not need to write Rust for the usual path.</p>
+
+      <p>Pick a child of #596. Prefer good-first tickets when labeled. Keep mesh IR consistent across parse → analyze → generate → write. Do not open a product-shell PR.</p>
+
+      <h2 id="what-this-is-not">What this is not</h2>
+
+      <ul>
+        <li>Not a claim that any <code>print.*</code> capability is published today.</li>
+        <li>Not an affiliation with, or port of, any third-party print-support app. Domain inspiration (designed-in support fins as a technique class) is problem framing only.</li>
+        <li>Not permission to leave domain rules in the host “until apps are ready.”</li>
+        <li>Not a second runtime or a Python SDK. One shared <code>runtime.wasm</code>; Python shells out to the CLI today.</li>
+      </ul>
+
+      <div class="callout">
+        Prefer the Q&amp;A when you need a URL to quote. Prefer this post when you need the story. Placement rules: <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live?</a>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-the-pack-is">What the pack is</a></li>
+          <li><a href="#apps-not-ready">Apps not ready</a></li>
+          <li><a href="#hosts-thin">Hosts stay thin</a></li>
+          <li><a href="#how-to-contribute">How to contribute</a></li>
+          <li><a href="#what-this-is-not">What this is not</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/what-is-the-print-support-capability-pack.html">Print-support pack Q&amp;A →</a></li>
+          <li><a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live? →</a></li>
+          <li><a href="/blog/where-business-logic-lives.html">Where logic lives (narrative) →</a></li>
+          <li><a href="/questions/what-does-apps-not-ready-mean.html">What “apps not ready” means →</a></li>
+          <li><a href="/blog/you-dont-need-rust-to-publish-a-capability.html">Skill-first authoring →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Cite the Q&amp;A</div>
+        <p>Capability pack only. Apps-not-ready blocks product shells, not domain packs. None of the print.* capabilities are published yet.</p>
+        <a href="/questions/what-is-the-print-support-capability-pack.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Print-support pack →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Domain packs yes. Product shells no.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Discover → execute → trace. One capability per PR. Hosts stay thin.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/questions/what-is-the-print-support-capability-pack.html" class="btn btn-primary">Print-support pack →</a>
+      <a href="https://github.com/traverse-framework/registry/issues/596" class="btn btn-ghost" target="_blank" rel="noopener">registry#596</a>
+      <a href="/blog/where-business-logic-lives.html" class="btn btn-ghost">Where logic lives</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title={"Domain packs are in scope: print-support without an app rewrite — Traverse Blog"}
+  description={"Print-support is a living manufacturing-shaped capability pack: discover→execute→trace, hosts stay thin, apps-not-ready ≠ no domain packs. None of the print.* capabilities are published yet."}
+  canonical={"https://traverse-framework.com/blog/print-support-domain-pack.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
