@@ -1,0 +1,47 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is digits-mlp in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'digits-mlp-1.0.0 is the first trained exact-ref model package shipped with Traverse v0.14.0: a 64→32→10 MLP on the UCI Optical Recognition of Handwritten Digits dataset (CC BY 4.0), scoring 96.10% on the held-out split and bit-identical across trainer, native, and browser hosts. It is signed with a test-only key for CI and demos — not a production trust root, and not a general-purpose LLM.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/blog/traverse-0-14-0-what-changed-for-embedders.html', label: 'v0.14.0: what changed for embedders' },
+];
+---
+<QuestionLayout
+  title="What is digits-mlp in Traverse?"
+  description="digits-mlp-1.0.0 is v0.14.0’s first trained exact-ref model package: a small UCI-digits MLP (96.10% held-out), bit-identical across hosts, signed with a test-only key — not a general LLM."
+  canonical="https://traverse-framework.com/questions/what-is-digits-mlp.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <code>digits-mlp-1.0.0</code> is the first <strong>trained</strong> exact-ref model package in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a>. It proves the signed Spec 138 path with a real small model — not a chat LLM.</p>
+
+  <h2>What it is</h2>
+  <p>A 64→32→10 multilayer perceptron trained on the UCI Optical Recognition of Handwritten Digits dataset (<strong>CC BY 4.0</strong>). Held-out accuracy is <strong>96.10%</strong>. The guest runs bit-identically in the trainer, on the native host, and in the browser embedder — same pinned bytes, same scores.</p>
+
+  <h2>How it fits the product</h2>
+  <p>Exact-ref means the app pins the package by digest and signature and calls governed <code>model.execute</code> — never a naked URL. See <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>. Hosts that execute that path today: native Rust, web, and Swift <code>ExactModelHost</code> (<code>swift-host-v0.14.0-1</code>). Kotlin and .NET do not execute exact-ref yet.</p>
+
+  <h2>Honest limits</h2>
+  <ul>
+    <li><strong>Test-only signing.</strong> The package is signed so CI and demos can exercise the path. It is <strong>not</strong> a production trust root. Production custody, rotation, and revocation: <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a> · <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a>.</li>
+    <li><strong>Not a general LLM.</strong> Fixed digit classification guest. Do not invent tool-use, chat, or Hub-download claims from this package alone.</li>
+    <li><strong>Not “every host.”</strong> Matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</li>
+  </ul>
+</QuestionLayout>

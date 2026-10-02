@@ -1,0 +1,46 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does the Traverse website use the latest traverse-embedder-web?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Not always. The public website currently pins traverse-embedder-web at ^0.13.0 while npm publishes 0.14.0 with Traverse v0.14.0. The /discover generate panel still calls ExactModelBrowserHost.insertVerified (the 0.13 API); 0.14 replaced that with registerPackage(manifestBytes, wasm, signatureBytes) for signed Spec 138 packages. Treat published npm/crates versions and what-is-real-today as the product line — do not assume the website pin equals the latest shipped embedder.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-does-the-discover-page-do.html', label: 'What does the /discover page do?' },
+  { href: '/what-is-real-today.html', label: 'What is real today' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/blog/traverse-0-14-0-what-changed-for-embedders.html', label: 'v0.14.0: what changed for embedders' },
+  { href: '/questions/how-do-i-embed-traverse-in-a-web-app.html', label: 'How do I embed Traverse in a web app?' },
+];
+---
+<QuestionLayout
+  title="Does the Traverse website use the latest traverse-embedder-web?"
+  description="Not always — the site currently pins ^0.13.0 while npm ships 0.14.0. /discover still uses insertVerified; 0.14 uses registerPackage. Pin published packages, not the website demo."
+  canonical="https://traverse-framework.com/questions/does-the-website-use-the-latest-traverse-embedder.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <strong>not always.</strong> The marketing site can lag the published package line. That is honesty, not a secret second runtime.</p>
+
+  <h2>What is pinned today</h2>
+  <p>On <code>traverse-framework/website</code> main, <code>package.json</code> depends on <code>traverse-embedder-web</code> at <code>^0.13.0</code>. npm’s current published line for that package is <strong>0.14.0</strong>, lockstep with <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> crates. Cite <a href="/what-is-real-today.html">what is real today</a> for the consumer list apps should build against.</p>
+
+  <h2>Why /discover can lag</h2>
+  <p>The public <a href="/discover.html">/discover</a> generate panel (<code>discover-generate.js</code>) still constructs an <code>ExactModelBrowserHost</code> and calls <strong><code>insertVerified(...)</code></strong> — the <strong>0.13</strong> admission path. In <strong>0.14</strong>, that host admits packages through <strong><code>registerPackage(manifestBytes, wasm, signatureBytes)</code></strong> so signed Spec 138 manifests and <code>model.sig.json</code> are verified before execute. Migrating the demo is separate eng work; until it lands, the site pin stays on 0.13 so the demo keeps working.</p>
+
+  <h2>What you should pin</h2>
+  <p>If you are building a product host, depend on the <strong>published</strong> npm / crates.io versions (today <code>traverse-embedder-web@0.14.0</code> / <code>traverse-embedder@0.14.0</code>), not on whatever the website happens to ship in its demo bundle. The site is a citeable demo surface; it is not the version authority for your app.</p>
+
+  <h2>Related</h2>
+  <p>What the page is for: <a href="/questions/what-does-the-discover-page-do.html">What does the /discover page do?</a>. Signed exact-ref surface: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>. Embedder delta notes: <a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">v0.14.0: what changed for embedders</a>.</p>
+</QuestionLayout>
