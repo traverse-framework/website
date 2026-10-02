@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Does the Traverse website use the latest traverse-embedder-web?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Not always. The public website currently pins traverse-embedder-web at ^0.13.0 while npm publishes 0.14.0 with Traverse v0.14.0. The /discover generate panel still calls ExactModelBrowserHost.insertVerified (the 0.13 API); 0.14 replaced that with registerPackage(manifestBytes, wasm, signatureBytes) for signed Spec 138 packages. Treat published npm/crates versions and what-is-real-today as the product line — do not assume the website pin equals the latest shipped embedder.',
+      text: 'Today, yes: the website pins traverse-embedder-web at ^0.14.0, the same line npm publishes with Traverse v0.14.0, and the /discover generate panel admits its demo fixture through registerPackage(manifestBytes, wasm, signatureBytes), the 0.14 signed Spec 138 path. The demo fixture is signed with Traverse\'s published test-only key, which it trusts only for that demo. The site can still lag a future release, so treat published npm/crates versions and what-is-real-today as the product line, not the website pin.',
     },
   }],
 });
@@ -24,19 +24,19 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Does the Traverse website use the latest traverse-embedder-web?"
-  description="Not always — the site currently pins ^0.13.0 while npm ships 0.14.0. /discover still uses insertVerified; 0.14 uses registerPackage. Pin published packages, not the website demo."
+  description="Today the site pins ^0.14.0, matching npm, and /discover admits its signed demo fixture through registerPackage. The site can lag future releases: pin published packages, not the website demo."
   canonical="https://traverse-framework.com/questions/does-the-website-use-the-latest-traverse-embedder.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> <strong>not always.</strong> The marketing site can lag the published package line. That is honesty, not a secret second runtime.</p>
+  <p><strong>Short answer:</strong> <strong>today, yes</strong>, but it can lag. The marketing site follows the published package line after each release. That is honesty, not a secret second runtime.</p>
 
   <h2>What is pinned today</h2>
-  <p>On <code>traverse-framework/website</code> main, <code>package.json</code> depends on <code>traverse-embedder-web</code> at <code>^0.13.0</code>. npm’s current published line for that package is <strong>0.14.0</strong>, lockstep with <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> crates. Cite <a href="/what-is-real-today.html">what is real today</a> for the consumer list apps should build against.</p>
+  <p>On <code>traverse-framework/website</code> main, <code>package.json</code> depends on <code>traverse-embedder-web</code> at <code>^0.14.0</code>. npm’s current published line for that package is also <strong>0.14.0</strong>, lockstep with <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> crates. Cite <a href="/what-is-real-today.html">what is real today</a> for the consumer list apps should build against.</p>
 
-  <h2>Why /discover can lag</h2>
-  <p>The public <a href="/discover.html">/discover</a> generate panel (<code>discover-generate.js</code>) still constructs an <code>ExactModelBrowserHost</code> and calls <strong><code>insertVerified(...)</code></strong> — the <strong>0.13</strong> admission path. In <strong>0.14</strong>, that host admits packages through <strong><code>registerPackage(manifestBytes, wasm, signatureBytes)</code></strong> so signed Spec 138 manifests and <code>model.sig.json</code> are verified before execute. Migrating the demo is separate eng work; until it lands, the site pin stays on 0.13 so the demo keeps working.</p>
+  <h2>How /discover admits its demo model</h2>
+  <p>The public <a href="/discover.html">/discover</a> generate panel (<code>discover-generate.js</code>) constructs an <code>ExactModelBrowserHost</code> and admits the <code>fixture.responder@1.0.0</code> conformance fixture through <strong><code>registerPackage(manifestBytes, wasm, signatureBytes)</code></strong>, the 0.14 path. The Ed25519 signature over the exact <code>model.manifest.json</code> bytes, the pin digest, and the WASM digest are all verified before execute. The fixture is signed with Traverse's published <strong>test-only</strong> key, which the demo trusts only for that fixture. Product hosts configure their own trust roots. Earlier, the 0.13 pin used <code>insertVerified</code>, which 0.14 removed.</p>
 
   <h2>What you should pin</h2>
   <p>If you are building a product host, depend on the <strong>published</strong> npm / crates.io versions (today <code>traverse-embedder-web@0.14.0</code> / <code>traverse-embedder@0.14.0</code>), not on whatever the website happens to ship in its demo bundle. The site is a citeable demo surface; it is not the version authority for your app.</p>

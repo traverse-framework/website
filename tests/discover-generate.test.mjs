@@ -21,12 +21,23 @@ test('runResponderDemo genuinely executes the checked-in bridge fixture, not a c
   assert.equal(miss.digest, hit.digest);
 });
 
-test('the fixture digest matches the real checked-in traverse-framework/traverse conformance fixture', async () => {
+test('the fixture digests match the real checked-in traverse-framework/traverse conformance fixture', async () => {
   // fixtures/models/fixture-responder-1.0.0/model.manifest.json in
   // traverse-framework/traverse pins this exact wasm_digest for the same
   // 491-byte file — this embeds the real bytes, not a stripped variant.
-  const { digest } = await runResponderDemo('hi');
-  assert.equal(digest, 'bf04760b1937c2f2b813b6e28f2fdc6e334833c2dfadc1f7c872f3f28c341294');
+  // Since traverse-embedder-web 0.14 the pin digest is the SHA-256 of that
+  // exact signed manifest file.
+  const { digest, wasmDigest } = await runResponderDemo('hi');
+  assert.equal(wasmDigest, 'bf04760b1937c2f2b813b6e28f2fdc6e334833c2dfadc1f7c872f3f28c341294');
+  assert.equal(digest, '50b74bd39bc81da3639d74f2df6e31c243d1a496fde0127486630624b2983763');
+});
+
+test('admission goes through registerPackage with a real signature, not the removed insertVerified', async () => {
+  const gen = await read('src/scripts/discover-generate.js');
+  assert.match(gen, /registerPackage\(/);
+  assert.doesNotMatch(gen, /insertVerified/);
+  // The test-only fixture key is labelled as such, never presented as production trust.
+  assert.match(gen, /TEST-ONLY public key/);
 });
 
 test('/discover states the generation panel honestly and does not overclaim', async () => {
