@@ -1,0 +1,202 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 2, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Models</span>
+      <span class="badge">Runtime</span>
+    </div>
+    <h1 class="t-h1">Signed model. Exact pin. Bit-identical hosts.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>An agent tries to swap a model. Traverse only admits the <strong>exact signed package</strong>. Friday’s demo classifies a handwritten digit with the same <code>digits-mlp-1.0.0</code> bytes on Browser and Node. Change one WASM byte and the host fails closed. This is not a pricing explainer, and it is not Hugging Face.</p>
+
+      <div class="callout">
+        Short version: pin the SHA-256 of the manifest bytes, check an Ed25519 <code>model.sig.json</code> against host-owned trust roots, then <code>registerPackage</code> on <code>ExactModelBrowserHost</code>. Same package. Same npm embedder. Browser and Node. Discover → execute → trace.
+      </div>
+
+      <p>Public proof is this write-up and the screenshots. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-02-signed-exact-ref" target="_blank" rel="noopener"><code>weekly-demos/2026-10-02-signed-exact-ref</code></a> is for people who already have access. <code>weekly-demos</code> is still <strong>not publicly cloneable</strong> (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>). There is no public-clone CTA. Status of the earlier deny demo: <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">How do I run the agent-blocked weekly demo?</a>.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/signed-exact-ref-digits-2026-10-02/01-landing.webp" alt="Signed exact-ref demo landing: pin and trust root, Browser host waiting to register, Node proof JSON" width="1280" height="1800" loading="lazy" />
+        <figcaption>Landing: pin + host-owned trust, Browser host, and the Node proof column. Same <code>traverse-embedder-web@0.14.0</code> package.</figcaption>
+      </figure>
+
+      <h2 id="why-it-matters">Why the pin is the product</h2>
+
+      <p>Traverse <strong>v0.14.0</strong> ships signed exact-ref model packages. Manifest schema <code>2.0.0</code>. A detached Ed25519 <code>model.sig.json</code> covers the manifest bytes. Trust roots live on the host — the app cannot add a key. Pins bind the SHA-256 of those manifest bytes and declare <code>target</code>, expected <code>rights</code>, and an optional <code>key_id</code>.</p>
+
+      <p>The first trained package in this demo is <code>digits-mlp-1.0.0</code> (<code>traverse.digits-mlp@1.0.0</code>): a 64→32→10 MLP on UCI Optical Recognition of Handwritten Digits (CC BY 4.0), 96.10% held-out, as recorded with the package. One shared <code>runtime.wasm</code>. Hosts are UI + I/O, not a second runtime.</p>
+
+      <p>The Node column is that published <strong>web embedder under Node</strong> — <code>ExactModelBrowserHost</code> plus <code>registerPackage</code>. It is not a separate native Rust CLI, and it is not a different runtime.</p>
+
+      <h2 id="what-happened">What happened</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Check</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Node classify</td><td>Digits <strong>0 → 0</strong>, <strong>7 → 7</strong>, <strong>4 → 4</strong>. Output frames match the conformance fixture byte for byte.</td></tr>
+            <tr><td>Browser ↔ Node</td><td>Label 0 on the browser host is <code>bit_identical</code> to the Node case (same package bytes, same <code>outputHex</code>).</td></tr>
+            <tr><td>Tamper</td><td>Swap one WASM byte → fail closed. Code <code>model_incompatible</code>, reason <code>digest_mismatch</code>.</td></tr>
+            <tr><td>Empty trust</td><td>No host trust roots → <code>key_untrusted</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/signed-exact-ref-digits-2026-10-02/02-classify-success.webp" alt="Classify success: digit 0 predicted 0 with matching Browser and Node output hex" width="1280" height="1800" loading="lazy" />
+        <figcaption>Register + classify: predicted 0, and the Browser output hex matches Node.</figcaption>
+      </figure>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/signed-exact-ref-digits-2026-10-02/03-attack-fail-closed.webp" alt="Tamper attack fail-closed: ExactModelError digest_mismatch after one WASM byte swap" width="1280" height="1800" loading="lazy" />
+        <figcaption>Attack: one WASM byte swapped. Signature still covers the manifest; the WASM digest check fails closed.</figcaption>
+      </figure>
+
+      <h2 id="hosts">Hosts in this demo</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Column</th><th>What it is</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Browser</td><td><code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.14.0</code>. <code>registerPackage(manifestBytes, wasm, signatureBytes)</code>.</td></tr>
+            <tr><td>Node</td><td>The same npm host under Node. Not a native Rust CLI invoke.</td></tr>
+            <tr><td>Not in this proof</td><td>Swift, Kotlin, and .NET do <strong>not</strong> execute exact-ref on the published <code>v0.14.0</code> pins used here.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> Signed model. Exact pin. Bit-identical hosts (week of 2026-10-02).</li>
+          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-02-signed-exact-ref" target="_blank" rel="noopener">2026-10-02-signed-exact-ref</a>. Not a public clone — <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
+          <li><strong>Product pins:</strong> tags <code>v0.14.0</code> and <code>web-v0.14.0</code> @ <code>4dac877c2fe0b28491848016747850ae31327ebc</code>. npm <code>traverse-embedder-web@0.14.0</code>.</li>
+          <li><strong>Model:</strong> <code>traverse.digits-mlp@1.0.0</code>. Manifest schema <code>2.0.0</code>. Governing spec <code>138-governed-exact-model-execution</code>.</li>
+          <li><strong>Manifest / pin sha256:</strong> <code>3068f3ae464fbbb43b45b089ab225a1371060a94a214c10629b4d8e402e8eadf</code></li>
+          <li><strong>WASM sha256:</strong> <code>6eeea06029ce4210842edfe70d7e0d8d7e926953ead5f18a0dca3c351ad5dc88</code></li>
+          <li><strong>Path:</strong> <code>ExactModelBrowserHost</code> + <code>registerPackage</code> (not <code>insertVerified</code>). Host-owned trust roots only.</li>
+          <li><strong>Smoke:</strong> 0→0, 7→7, 4→4 on Node; Browser label 0 bit-identical to Node; tamper → <code>digest_mismatch</code>; empty trust → <code>key_untrusted</code>.</li>
+          <li><strong>Signing key:</strong> test-only fixture. Production signing is <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">traverse#1567</a>. Do not trust this key in a real host.</li>
+          <li><strong>Not claimed:</strong> Hugging Face. Catalog <code>model.execute</code> (the catalog still has none). Swift / Kotlin / .NET exact-ref execute on published 0.14.0. A separate native CLI. A second runtime.</li>
+          <li><strong>Lead claim:</strong> one shared <code>runtime.wasm</code>. Hosts = UI + I/O. Discover → execute → trace.</li>
+        </ul>
+      </div>
+
+      <p>Same signed bytes. Visible trace. A swapped byte does not get to run.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#why-it-matters">Why the pin is the product</a></li>
+          <li><a href="#what-happened">What happened</a></li>
+          <li><a href="#hosts">Hosts in this demo</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">v0.14.0 for embedders →</a></li>
+          <li><a href="/blog/same-wasm-multi-host.html">Same WASM, Browser and Node →</a></li>
+          <li><a href="/blog/traverse-0-12-0-exact-ref-model-execute.html">v0.12.0 exact-ref model.execute →</a></li>
+          <li><a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution? →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Signed bytes. Runtime decides.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Browser and Node share the pinned model package. A tampered WASM byte fails closed.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="/blog/traverse-0-14-0-what-changed-for-embedders.html" class="btn btn-ghost">Embedder notes →</a>
+      <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html" class="btn btn-ghost">Weekly demos are blog-first →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Signed model. Exact pin. Bit-identical hosts. — Traverse Blog"
+  description="Weekly demo: signed digits-mlp-1.0.0 exact-ref package classifies a digit with the same bytes on Browser and Node. One WASM byte swapped fails closed. Traverse v0.14.0."
+  canonical="https://traverse-framework.com/blog/signed-exact-ref-digits.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
