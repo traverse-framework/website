@@ -19,6 +19,7 @@ const relatedLinks = [
   { href: '/questions/what-does-human-review-mean-for-a-capability-pr.html', label: 'What does human review mean?' },
   { href: '/questions/how-do-i-review-a-capability-pr-as-a-maintainer.html', label: 'Review a capability PR as a maintainer' },
   { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed artifact?' },
+  { href: '/questions/does-capability-publish-validate-model-attribution.html', label: 'Does publish validate model attribution?' },
   { href: '/questions/how-do-i-go-from-skill-draft-to-published-capability.html', label: 'Skill draft → published capability' },
   { href: '/questions/do-i-need-rust.html', label: 'Do I need to know Rust?' },
   { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
@@ -53,4 +54,7 @@ const relatedLinks = [
 
   <h2>A good first publish</h2>
   <p>If you want a tiny first capability rather than inventing a domain model, see the labeled starter <a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485 (text.slugify)</a>. For business-shaped rules agents should not free-hand, see registry issues <a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493</a>–<a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507</a> and the <a href="/blog/why-next-help-wanted-is-business-shaped.html">help-wanted write-up</a>.</p>
+
+  <h2>Offline AI admission before the Git write</h2>
+  <p>When the contract carries an <code>ai</code> attribution object, <code>traverse-cli capability publish</code> now rejects — offline, before any registry Git write — every rule registry CI would reject from the contract alone (Decision 109 / Spec 056 v1.1.0). It also keeps <code>ai</code> verbatim in the generated registry contract. Details: <a href="/questions/does-capability-publish-validate-model-attribution.html">Does capability publish validate model attribution before the registry write?</a></p>
 </QuestionLayout>
