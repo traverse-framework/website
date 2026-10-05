@@ -36,7 +36,7 @@ const relatedLinks = [
   <p>Registry CI checks every <em>newly added</em> contract with <code>ai.model_backed: true</code>. Each model entry must carry:</p>
   <ul>
     <li><strong><code>commercial_use</code>, <code>redistribution</code>, <code>derivatives</code></strong>, each <code>allowed</code>, <code>forbidden</code> or <code>conditional</code>. <code>unknown</code> fails validation, because the registry won't redistribute weights on unknown rights.</li>
-    <li><strong>LICENSE and NOTICE files</strong> as <code>{url, sha256}</code> on registry Release assets. CI downloads them and checks the digest. NOTICE is required when attribution is required.</li>
+    <li><strong>LICENSE and NOTICE files</strong> as <code>{"{url, sha256}"}</code> on registry Release assets. CI downloads them and checks the digest. NOTICE is required when attribution is required.</li>
     <li><strong>An immutable upstream pin</strong>: a full commit id, not a branch or tag.</li>
     <li><strong>A <code>derivation</code></strong> (or an explicit <code>null</code>) describing how the shipped weights differ from upstream, for example quantization or format conversion, with the converted digest.</li>
     <li>Optional <strong><code>data_obligations</code></strong> for training or label data terms.</li>
