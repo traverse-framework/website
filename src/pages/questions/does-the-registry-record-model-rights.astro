@@ -1,0 +1,59 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does the Traverse registry record model licenses and usage rights?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, on the registry side. Registry spec 026 (model rights compliance) requires every newly added model-backed contract to declare commercial_use, redistribution and derivatives for each ai.models entry, with unknown rejected. It also pins LICENSE and NOTICE files by sha256, requires an immutable upstream commit, records how shipped weights were derived, and signs the contract bytes so the rights record is authenticated. The index projects a usage_class (unrestricted, evaluation-only or conditional). The record is a signed maintainer declaration, not a legal certification. Traverse CLI inspection and runtime enforcement are tracked in traverse#1598 and are not shipped yet.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/does-capability-publish-validate-model-attribution.html', label: 'Does capability publish validate model attribution?' },
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is deprecated or revoked?' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/can-i-use-traverse-commercially.html', label: 'Can I use Traverse commercially?' },
+];
+---
+<QuestionLayout
+  title="Does the Traverse registry record model licenses and usage rights?"
+  description="Yes. Registry spec 026 makes model-backed contracts declare commercial use, redistribution and derivative rights, pins LICENSE/NOTICE by digest, and signs the contract. Traverse-side enforcement is still open (traverse#1598)."
+  canonical="https://traverse-framework.com/questions/does-the-registry-record-model-rights.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> yes, on the registry side. Some capabilities embed third-party model weights in their WASM artifact, and the registry redistributes those artifacts publicly. Registry spec <strong>026-model-rights-compliance</strong> turns each <code>ai.models</code> entry into a machine-readable, signed rights record, so a consumer can tell from the contract whether a model may be used commercially, redistributed, or modified, before anything runs.</p>
+
+  <h2>What a model-backed contract has to declare</h2>
+  <p>Registry CI checks every <em>newly added</em> contract with <code>ai.model_backed: true</code>. Each model entry must carry:</p>
+  <ul>
+    <li><strong><code>commercial_use</code>, <code>redistribution</code>, <code>derivatives</code></strong>, each <code>allowed</code>, <code>forbidden</code> or <code>conditional</code>. <code>unknown</code> fails validation, because the registry won't redistribute weights on unknown rights.</li>
+    <li><strong>LICENSE and NOTICE files</strong> as <code>{"{url, sha256}"}</code> on registry Release assets. CI downloads them and checks the digest. NOTICE is required when attribution is required.</li>
+    <li><strong>An immutable upstream pin</strong>: a full commit id, not a branch or tag.</li>
+    <li><strong>A <code>derivation</code></strong> (or an explicit <code>null</code>) describing how the shipped weights differ from upstream, for example quantization or format conversion, with the converted digest.</li>
+    <li>Optional <strong><code>data_obligations</code></strong> for training or label data terms.</li>
+  </ul>
+  <p>CI also rejects contradictions it can decide without guessing, such as <code>redistribution: forbidden</code> (publishing is redistribution) or a derivation on a model marked <code>derivatives: forbidden</code>. It does not infer rights from an SPDX identifier.</p>
+
+  <h2>How consumers read it</h2>
+  <p>The registry index projects a <code>usage_class</code> for each model reference from those three fields alone: <code>unrestricted</code> when all are allowed, <code>evaluation-only</code> when commercial use is forbidden, and <code>conditional</code> otherwise. The consumer guidance in the spec is deny-by-default on <code>conditional</code>.</p>
+  <p>New <code>signature.json</code> files also sign the contract itself: an Ed25519 signature over the SHA-256 of the exact committed <code>contract.json</code> bytes, with the same registry key that signs artifacts. That is what authenticates the rights fields, not just the WASM bytes.</p>
+
+  <h2>What it is not</h2>
+  <p>The record is a <strong>maintainer-declared</strong>, signed declaration. A registry signature proves the declaration wasn't altered; it doesn't certify that the legal claim is right, and it isn't legal advice.</p>
+
+  <h2>What is still open (as of October 5, 2026)</h2>
+  <ul>
+    <li><strong>Traverse-side enforcement.</strong> Showing the full rights record in <code>traverse-cli</code>, honoring <code>revoked</code> at runtime, and verifying the contract signature are tracked in <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>. They are not in a published Traverse release yet.</li>
+    <li><strong>Existing agents.</strong> Already-published versions are never judged retroactively. The five existing model-backed agents get compliant new MINOR versions under <a href="https://github.com/traverse-framework/registry/issues/623">registry#623</a>.</li>
+  </ul>
+  <p>The publish path already checks the parts of this record that the contract alone can decide, offline: see <a href="/questions/does-capability-publish-validate-model-attribution.html">Does capability publish validate model attribution?</a>.</p>
+</QuestionLayout>
