@@ -1,0 +1,141 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 6, 2026</span>
+      <span class="badge">AI models</span>
+      <span class="badge">Registry</span>
+      <span class="badge">Honesty</span>
+    </div>
+    <h1 class="t-h1">Model rights are data, not a README</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>6 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Some Traverse capabilities carry third-party model weights inside their WASM artifact, and the registry redistributes those artifacts publicly. So a fair question from anyone wiring one into a product is: <em>am I allowed to use this model commercially?</em> The usual answer in open source is “read the README and the upstream license.” That doesn't hold up once an agent is the one picking the capability.</p>
+
+      <p>This post walks the chain Traverse uses instead, from authoring to the host, and is plain about which links are shipped and which are still open.</p>
+
+      <div class="callout">
+        Same loop as everything else: <strong>discover → execute → trace</strong>. Rights travel with the contract, so an agent or app can read them at discover time, before anything runs. The agent proposes; the runtime decides.
+      </div>
+
+      <h2 id="authoring">1. Authoring: the contract carries an ai record</h2>
+
+      <p>You still author capabilities skill-first with <code>traverse-capability-author</code>; you don't need to write Rust. For a model-backed capability, the contract's <code>ai</code> object names each model with an immutable upstream pin (a full commit id, not a branch or tag), an SPDX license expression, and the rights fields the registry requires.</p>
+
+      <h2 id="publish">2. Publish: rejected offline, before any registry write</h2>
+
+      <p>As of <a href="https://github.com/traverse-framework/traverse/pull/1597" target="_blank" rel="noopener">traverse#1597</a>, <code>traverse-cli capability publish</code> rejects an <code>ai</code> object offline when registry CI would reject it on rules the contract alone can decide: object-shaped models when <code>model_backed</code> is true, commit pins, SPDX syntax, and the rights-record shape. Each failure uses the same error code registry CI uses. It also keeps the <code>ai</code> object verbatim in the generated registry contract, where it used to be dropped. Proving evidence bytes and rights drift stays in registry CI, because the CLI doesn't fetch from the network.</p>
+
+      <p>Honest status: this is on Traverse <code>main</code>, merged after v0.14.0, and isn't in a tagged release yet. Details: <a href="/questions/does-capability-publish-validate-model-attribution.html">Does capability publish validate model attribution?</a></p>
+
+      <h2 id="registry">3. Registry: a signed rights record</h2>
+
+      <p>Registry spec 026 makes every newly added model-backed contract declare <code>commercial_use</code>, <code>redistribution</code> and <code>derivatives</code> for each model, as <code>allowed</code>, <code>forbidden</code> or <code>conditional</code>. <code>unknown</code> fails, because the registry won't redistribute weights on unknown rights. LICENSE and NOTICE files are pinned by sha256, any conversion of the weights (like quantization) is recorded with its digest, and the contract bytes themselves are signed with the registry key, so the rights fields are authenticated and not just the WASM.</p>
+
+      <p>The index then projects a <code>usage_class</code> per model: <code>unrestricted</code>, <code>evaluation-only</code> or <code>conditional</code>, and the consumer guidance is deny-by-default on <code>conditional</code>. That's a field an agent can filter on at discover time instead of a paragraph it has to interpret. More: <a href="/questions/does-the-registry-record-model-rights.html">Does the registry record model rights?</a></p>
+
+      <p>What it is not: a legal certification. The signature proves the maintainer's declaration wasn't altered. It doesn't prove the declaration is right, and it isn't legal advice.</p>
+
+      <h2 id="host">4. Host: trust roots belong to the host</h2>
+
+      <p>Traverse v0.14.0 shipped signed model packages (schema 2.0.0 manifests plus a detached Ed25519 <code>model.sig.json</code>). The app pins the manifest digest and the expected rights; the host owns the trusted keys, and apps can't inject their own. A naked URL is never identity. Exact-ref execute runs on native Rust, the web embedder and Swift today; Kotlin and .NET don't execute exact-ref yet. See <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a></p>
+
+      <h2 id="open">What's still open (as of October 6, 2026)</h2>
+
+      <ul>
+        <li><strong>Runtime enforcement.</strong> Showing the full rights record in <code>traverse-cli</code>, honoring <code>revoked</code> at runtime, and verifying the contract signature are tracked in <a href="https://github.com/traverse-framework/traverse/issues/1598" target="_blank" rel="noopener">traverse#1598</a>. Not in a release yet.</li>
+        <li><strong>Existing model-backed agents.</strong> Published versions are never judged retroactively; compliant new MINOR versions are tracked in <a href="https://github.com/traverse-framework/registry/issues/623" target="_blank" rel="noopener">registry#623</a>.</li>
+        <li><strong>Production model signing.</strong> The first trained package, <code>digits-mlp-1.0.0</code>, uses a test-only key. Key custody, rotation and revocation are <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">traverse#1567</a>. See <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a></li>
+      </ul>
+
+      <h2 id="why">Why bother</h2>
+
+      <p>When a person picks a library, a README is fine. When an agent proposes a capability, the rights question has to be answerable from data the runtime can check, at the same moment it checks the contract. That's the whole idea: the rule lives in one governed place, and every host reads the same answer.</p>
+
+      <p>If you're building a model-backed capability and want to help close one of the open items above, the tickets are linked and the door for first-time contributors is open: <a href="/questions/how-do-i-contribute-to-traverse.html">How do I contribute?</a></p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="toc-list">
+          <li><a href="#authoring">Authoring</a></li>
+          <li><a href="#publish">Publish</a></li>
+          <li><a href="#registry">Registry</a></li>
+          <li><a href="#host">Host</a></li>
+          <li><a href="#open">Still open</a></li>
+          <li><a href="#why">Why bother</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/does-the-registry-record-model-rights.html">Registry model rights →</a></li>
+          <li><a href="/questions/does-capability-publish-validate-model-attribution.html">Publish-time attribution checks →</a></li>
+          <li><a href="/questions/what-happens-when-a-capability-version-is-revoked.html">Deprecated and revoked versions →</a></li>
+          <li><a href="/questions/how-do-hosts-trust-signed-models.html">Host trust roots →</a></li>
+          <li><a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">v0.14.0 for embedders →</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Start here</div>
+        <p>New to Traverse? One runtime.wasm, skill-first authoring, discover → execute → trace.</p>
+        <a href="/blog/what-is-real-today-start-here.html" class="btn btn-ghost">What is real today</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+`;
+---
+<SubpageLayout
+  title={"Model rights are data, not a README — Traverse Blog"}
+  description={"How Traverse carries AI model rights from contract to host: offline publish checks (traverse#1597), the signed registry spec 026 rights record, host-owned trust roots in v0.14.0, and what is still open (#1598, #1567, registry#623)."}
+  canonical={"https://traverse-framework.com/blog/model-rights-are-data.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
