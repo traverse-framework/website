@@ -1,0 +1,160 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 8, 2026</span>
+      <span class="badge">Registry</span>
+      <span class="badge">Lifecycle</span>
+      <span class="badge">Honesty</span>
+    </div>
+    <h1 class="t-h1">You don't edit a published capability. You mark it.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>An agent finds a versioned capability, proposes a call, and the runtime either runs that known artifact or refuses. That is the loop: <strong>discover → execute → trace</strong>. The agent proposes; the runtime decides. Deprecation and revocation are how the registry tells that loop a published version should stop being the one new callers land on, without rewriting the bytes that already shipped.</p>
+
+      <div class="callout">
+        Authors still don't write the artifact by hand. The usual path is skill-first, via <code>traverse-capability-author</code>: interview, registry check, contract, WASM, human-reviewed pull request. Under the hood it is still Rust compiled to WASM. Marking a version later is a registry change, not a new language and not a second runtime. Browser, native, CLI, and MCP are clients of one shared <code>runtime.wasm</code>.
+      </div>
+
+      <h2 id="discover">Discover: a range walks past the marker</h2>
+
+      <p>A version range such as <code>^1.2.0</code> means the highest <em>active</em> version that satisfies it. Registry spec 005 (<code>005-yank-deprecation</code>) says range resolution skips a deprecated version. Decision-log entry 127, question 11, says the same for revocation: range resolution skips a revoked version. If nothing active matches, resolution fails instead of handing back the marked one.</p>
+
+      <p>That is the discover rule an agent should follow. Propose a version the range still treats as active. Leave a revoked row out of the plan even though the contract text is still in the tree. The longer answer is <a href="/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html">how an agent should react to a revoked capability during discover</a>.</p>
+
+      <p>Two surfaces already skip something, and they are not the same skip:</p>
+      <ul>
+        <li>On registry <code>main</code>, the <code>traverse-registry</code> workspace (0.27.0, not the crates.io release) skips both deprecated and revoked records during range resolution. When every match is marked, the error says only deprecated or revoked versions satisfy the range.</li>
+        <li>The public <a href="/discover.html">/discover</a> page builds its snapshot from live <code>catalog.json</code> and drops rows whose <code>deprecated</code> flag is true. It does not read the catalog's <code>revoked</code> flag. That flag is on every catalog entry, and it was false on all of them when this was checked. The page has not demonstrated a revoked skip.</li>
+      </ul>
+
+      <h2 id="marker">The marker is a sibling file</h2>
+
+      <p>A published <code>contract.json</code> and its artifact are immutable. Spec 005 says a yank adds <code>deprecated.json</code> beside the contract and does not modify <code>contract.json</code>. The file carries <code>deprecated</code>, a short <code>reason</code>, and <code>deprecated_at</code>. The index build sets <code>deprecated: true</code>. The public catalog copies that flag.</p>
+
+      <p>Revocation is the stronger marker, from registry spec 026 and decision 127. It adds <code>revoked.json</code> with <code>reason</code>, <code>evidence_url</code>, and <code>revoked_at</code>. The contract and the artifact stay untouched. The index keeps the entry with <code>status: "revoked"</code>, the revocation record, and the full rights record, and it must not present that version as active. The public catalog projects the same fact as <code>revoked: true</code> plus a <code>revocation</code> object.</p>
+
+      <p>Deprecation is already in use. Forty versions on registry <code>main</code> have a <code>deprecated.json</code>, including placeholder stubs and fixed-output fixtures replaced by a later version. There is no <code>revoked.json</code> in the tree. The shape is specified, and the index and catalog builders know how to project it. No published version has been revoked.</p>
+
+      <h2 id="pin">An exact pin is a different question</h2>
+
+      <p>Spec 005 is explicit about deprecation: exact-pin resolution ignores the flag and succeeds if the version exists. Decision 127 keeps that guarantee for revocation. An exact pin still resolves, and it carries a machine-readable do-not-run signal. The registry is not supposed to make a pinned consumer disappear. The runtime decides whether to execute. The spec 026 consumer doc says the runtime should refuse. See <a href="/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html">exact pin versus version range</a> and <a href="/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html">what that status signal means for a host</a>.</p>
+
+      <p>That is the spec. It is not what the crate does today.</p>
+
+      <p>The published <code>traverse-registry</code> on crates.io is 0.25.0 (29 September 2026). Traverse pins <code>=0.25.0</code>. That release skips deprecated records on both range and exact lookup, and it has no revoked type. Spec 026's <code>status</code> and revocation fields landed later, on registry <code>main</code>, in the unpublished 0.27.0 workspace.</p>
+
+      <p>On that main branch, exact lookup returns only an active record. A deprecated or revoked exact pin comes back as nothing. The test <code>resolution_never_selects_a_revoked_record</code> asserts that. It contradicts spec 005 and decision 127. Returning the record with its status, then publishing the crate, is <a href="https://github.com/traverse-framework/registry/issues/631" target="_blank" rel="noopener">registry#631</a>. It is open.</p>
+
+      <h2 id="execute">Execute: the runtime is supposed to refuse</h2>
+
+      <p>Once a host actually holds a revoked record, the decision is not the agent's. Hosts are clients. <code>traverse-embedder-web</code> (JS/TS), <code>traverse-embedder</code> (Rust), and <code>traverse-mcp</code> call the same <code>runtime.wasm</code>. Python has no SDK; a Python program shells out to <code>traverse-cli capability-package execute</code>. Swift, Kotlin, and .NET embedders exist in-tree and are not published packages.</p>
+
+      <p>Decision 127 leaves enforcement with Traverse: the pin resolves, the signal says do not run, and the runtime decides. Refusing the run — fail closed, rather than executing a revoked artifact — is <a href="https://github.com/traverse-framework/traverse/issues/1598" target="_blank" rel="noopener">traverse#1598</a>. It is open. It is not in the v0.14.0 release. Until it ships, do not describe the runtime as already refusing a revoked pin.</p>
+
+      <h2 id="trace">Trace</h2>
+
+      <p>A trace is the record of what the runtime decided. There is no shipped trace for "this pin was revoked, so the run was refused," because the runtime does not honor <code>revoked</code> yet. When #1598 lands, that refusal belongs in the trace the same way any other deny does. It is not a field to cite today.</p>
+
+      <h2 id="shipped">What is shipped (checked 6 October 2026)</h2>
+
+      <p>Shipped, in the registry repo:</p>
+      <ul>
+        <li><code>deprecated.json</code>, the index <code>deprecated</code> flag, and real yanked versions on <code>main</code>.</li>
+        <li>The <code>revoked.json</code> shape, index <code>status</code>, and catalog <code>revoked</code> / <code>revocation</code> fields. No version is revoked yet.</li>
+        <li>Range resolution on registry <code>main</code> that skips deprecated and revoked records.</li>
+      </ul>
+
+      <p>Open:</p>
+      <ul>
+        <li>Exact pins returning the record plus its status, and the next <code>traverse-registry</code> publish. <a href="https://github.com/traverse-framework/registry/issues/631" target="_blank" rel="noopener">registry#631</a>. crates.io is still 0.25.0.</li>
+        <li>The runtime and <code>traverse-cli</code> honoring <code>revoked</code>. <a href="https://github.com/traverse-framework/traverse/issues/1598" target="_blank" rel="noopener">traverse#1598</a>. Not shipped.</li>
+      </ul>
+
+      <p>The short version for an agent: at discover time, do not propose a deprecated or revoked version as if it were active. At execute time, the runtime is the one that is supposed to refuse, and that part is still an open ticket. The citeable page this post walks through is <a href="/questions/what-happens-when-a-capability-version-is-revoked.html">what happens when a capability version is deprecated or revoked</a>.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="toc-list">
+          <li><a href="#discover">Discover</a></li>
+          <li><a href="#marker">The marker</a></li>
+          <li><a href="#pin">Exact pins</a></li>
+          <li><a href="#execute">Execute</a></li>
+          <li><a href="#trace">Trace</a></li>
+          <li><a href="#shipped">Shipped vs open</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/what-happens-when-a-capability-version-is-revoked.html">Deprecated and revoked versions →</a></li>
+          <li><a href="/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html">Exact pin vs version range →</a></li>
+          <li><a href="/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html">Status signal for a host →</a></li>
+          <li><a href="/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html">Agent reaction at discover →</a></li>
+          <li><a href="/questions/does-the-registry-record-model-rights.html">Registry model rights →</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Start here</div>
+        <p>New to Traverse? One runtime.wasm, skill-first authoring, discover → execute → trace.</p>
+        <a href="/blog/what-is-real-today-start-here.html" class="btn btn-ghost">What is real today</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+`;
+---
+<SubpageLayout
+  title={"You don't edit a published capability. You mark it. — Traverse Blog"}
+  description={"When a registry capability version is deprecated or revoked, the contract and artifact stay. Ranges skip the marker. Exact pins still resolve under spec 005 and decision 127, and the runtime is supposed to refuse. That refusal is not shipped (traverse#1598, registry#631)."}
+  canonical={"https://traverse-framework.com/blog/you-dont-edit-a-published-capability.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

@@ -1,0 +1,48 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What does a status signal on an exact pin mean for a host?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'It is a lifecycle fact the shared runtime is supposed to read before it runs the artifact. Index status is active, deprecated, or revoked. A revoked exact pin, under decision 127, still resolves and carries a machine-readable do-not-run signal; the runtime should refuse (fail closed). That refusal is traverse#1598 and is not shipped. The published traverse-registry 0.25.0 has no revoked type. Registry main returns nothing from exact lookup for a non-active record (registry#631). Hosts are clients of one runtime.wasm, not separate runtimes.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/you-dont-edit-a-published-capability.html', label: "You don't edit a published capability. You mark it." },
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is deprecated or revoked?' },
+  { href: '/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html', label: 'Exact pin vs version range' },
+  { href: '/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html', label: 'How should an agent react to a revoked capability during discover?' },
+  { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
+];
+---
+<QuestionLayout
+  title="What does a status signal on an exact pin mean for a host?"
+  description="Index status on an exact pin is a do-not-run signal the shared runtime is supposed to honor. That refusal is traverse#1598, not shipped. Hosts are clients of one runtime.wasm."
+  canonical="https://traverse-framework.com/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> it is a lifecycle fact the runtime is supposed to read before it runs the artifact. It is not a second runtime, and the Traverse runtime does not honor it yet.</p>
+
+  <h2>What the signal is</h2>
+  <p>The registry index status is <code>active</code>, <code>deprecated</code>, or <code>revoked</code>. A revoked entry also carries the revocation record: <code>reason</code>, <code>evidence_url</code>, and <code>revoked_at</code>. Decision 127 calls the revoked case a machine-readable do-not-run signal. Spec 026 says the version must not be presented as active. The spec 026 consumer doc says the runtime should refuse to run it. That is fail closed: the pin still names the bytes, and the runtime declines to execute them.</p>
+
+  <h2>Who decides</h2>
+  <p>The host does not grow its own policy engine for this. <code>traverse-embedder-web</code> (JS/TS), <code>traverse-embedder</code> (Rust), and <code>traverse-mcp</code> are clients of one shared <code>runtime.wasm</code>. Python has no SDK; it shells out to <code>traverse-cli capability-package execute</code>. Swift, Kotlin, and .NET embedders are in-tree only, not published packages. The agent can propose the pin. The runtime is supposed to decide.</p>
+
+  <h2>What a host can observe today</h2>
+  <ul>
+    <li><strong>Published crate 0.25.0</strong> (what Traverse pins): no <code>status</code> or revocation type. Exact lookup of a deprecated version returns nothing.</li>
+    <li><strong>Registry main, workspace 0.27.0, not published:</strong> records can carry <code>status</code> and <code>revocation</code>, but exact lookup still returns nothing unless the record is active. That is the drift in <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a>.</li>
+    <li><strong>Runtime refusal:</strong> <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a> is open. It is not in v0.14.0.</li>
+  </ul>
+  <p>A host must not assume that an exact pin of a revoked version comes back today as a record plus a deny. That is the approved contract. The crate and the runtime do not implement it yet. Background: <a href="/blog/you-dont-edit-a-published-capability.html">you don't edit a published capability</a>.</p>
+</QuestionLayout>
