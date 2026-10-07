@@ -1,0 +1,50 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What happens when a Traverse capability runs out of fuel or memory?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The call fails instead of running unbounded. Each native embedder sets host-owned limits on every bridge call (artifact size, linear memory, fuel or instruction budget, and a deadline) and stops the call when one is exceeded. On the Swift host that failure is status -4 with code bridge_timeout for exhausted fuel or bridge_resource_limit for memory and size bounds; other guest traps are status -5, bridge_trap. The .NET host defaults to a 32 MiB memory ceiling, 10,000,000 fuel, and a 30-second deadline per call. Limits are set by the host app, not by the capability.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
+  { href: '/questions/what-happens-when-a-capability-fails.html', label: 'What happens when a capability fails?' },
+  { href: '/questions/is-there-a-performance-cost-to-running-the-same-binary-on-every-os.html', label: 'Is there a performance cost to running the same binary on every OS?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="What happens when a Traverse capability runs out of fuel or memory?"
+  description="The call fails with a stable resource-limit error instead of running forever or growing without bound. Limits are host-owned and enforced per call by each native embedder. Here's what each one does today."
+  canonical="https://traverse-framework.com/questions/what-happens-when-a-capability-runs-out-of-fuel-or-memory.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>The call fails. It doesn't keep spinning, and it doesn't grow memory until the app dies. A capability that loops forever or allocates past its budget gets stopped by the host and comes back as a resource-limit failure the app can handle like any other error.</p>
+
+  <p>"Fuel" is the engine's instruction budget: the host gives each call a fixed amount of work it's allowed to do, and the WASM engine stops the guest when it runs out. Memory works the same way, with a ceiling on how far the module's linear memory may grow. Neither limit is something the capability can raise for itself. The host app owns them.</p>
+
+  <h2>What each native embedder enforces</h2>
+  <ul>
+    <li><strong>Swift (iOS and macOS).</strong> <code>WasmiHostBridgeClient</code> applies <code>TraverseHostLimits</code> on every call: artifact size, a linear-memory ceiling, fuel per invocation, and input, output, and event bounds. Going over any of them fails the call with status <code>-4</code> (<code>RESOURCE_LIMIT</code>). The error code says which limit was hit: <code>bridge_timeout</code> when fuel ran out, <code>bridge_resource_limit</code> for memory growth or another size bound. Any other guest trap, such as <code>unreachable</code>, is status <code>-5</code> with <code>bridge_trap</code>. The host classifies traps by the engine's typed trap code, not by matching error strings.</li>
+    <li><strong>Kotlin (Android).</strong> <code>ChicoryRuntimeBridge</code> rejects a <code>runtime.wasm</code> over its 32 MiB default artifact limit before parsing it. Each call has a configurable instruction and deadline budget, and a module that declares memory above the host's configured ceiling fails before it's instantiated.</li>
+    <li><strong>.NET (Windows).</strong> <code>WasmtimeRuntimeBridge</code> applies a 32 MiB runtime-memory ceiling, 10,000,000 fuel, and a 30-second epoch deadline to each bridge call by default. Those budgets are reset per call. An earlier version set them once at construction, so one expensive call could exhaust the session; that was found in our security audit and fixed in July 2026 (<a href="https://github.com/traverse-framework/traverse/issues/784" target="_blank" rel="noopener">#784</a>).</li>
+  </ul>
+
+  <h2>Why the limits live in the host</h2>
+  <p>Traverse keeps business logic in the capability and keeps I/O and policy in the host. How much CPU and memory a phone app is willing to give one call is a host decision. It depends on the device, the screen the user is on, and whether the call is in the foreground. Putting the budget in the host means the same capability can run with a tight budget on a phone and a looser one on a desktop, without a different build.</p>
+
+  <p>It also means a bad or hostile guest can't argue its way out. The engine enforces the budget below the guest, and the guest never sees the knob.</p>
+
+  <h2>What this doesn't cover yet</h2>
+  <p>The details above come from the three native embedder READMEs in the <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">traverse repo</a>. The engines differ (wasmi on Apple, Chicory on Android, Wasmtime on .NET), so the exact defaults and error shapes differ too. Spec 529 calls for one host-neutral conformance suite that includes "configured resource-control rejection," but that five-platform runner is later work, so today you should test your capability's worst case on each host you ship to rather than assume identical behavior. If you hit a limit you think is wrong, <a href="https://github.com/traverse-framework/traverse/issues" target="_blank" rel="noopener">open an issue</a> with the host, the engine version, and what the call was doing.</p>
+</QuestionLayout>
