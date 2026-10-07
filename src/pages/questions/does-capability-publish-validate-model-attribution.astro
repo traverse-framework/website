@@ -1,0 +1,59 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does capability publish validate model attribution before the registry write?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, for contract-decidable rules. As of traverse#1597, traverse-cli capability publish rejects offline — before any registry Git write — an ai object that registry CI would reject on rules decidable from the contract alone. It also keeps the ai object verbatim in the generated registry contract (it used to be silently dropped). Object-shaped ai.models when model_backed; immutable 40/64-hex commit pins; SPDX via the registry license-expression symbol table; Spec 026 rights-record shape. Evidence digests, model-weights.json cross-check, and rights drift stay registry-CI-only — no network fetch in the CLI path. Decision 109 / Spec 056 v1.1.0. Production model signing is separate work.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability to the registry?' },
+  { href: '/questions/how-do-i-go-from-skill-draft-to-published-capability.html', label: 'Skill draft → published capability' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/questions/does-the-registry-record-model-rights.html', label: 'Does the registry record model licenses and usage rights?' },
+];
+---
+<QuestionLayout
+  title="Does capability publish validate model attribution before the registry write?"
+  description="Yes for contract-decidable rules — traverse-cli capability publish rejects bad ai objects offline before any registry Git write (Decision 109 / Spec 056 v1.1.0). Keeps ai verbatim. Evidence digests and rights drift stay registry-CI-only."
+  canonical="https://traverse-framework.com/questions/does-capability-publish-validate-model-attribution.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <strong>Yes, for contract-decidable rules.</strong> As of the <a href="https://github.com/traverse-framework/traverse/pull/1597">traverse#1597</a> merge (Traverse main), <code>traverse-cli capability publish</code> rejects offline — before any registry Git write — an <code>ai</code> object that registry CI would reject on rules decidable from the contract alone. It also keeps the <code>ai</code> object verbatim in the generated registry contract (it used to be silently dropped).</p>
+
+  <h2>What the CLI checks offline</h2>
+  <p>The admission rules in <code>ai_admission.rs</code> are a faithful port of the contract-decidable parts of registry <code>capability_validation.py</code>. They cover:</p>
+  <ul>
+    <li><strong>Object-shaped <code>ai.models</code></strong> when <code>model_backed</code> is true. Legacy <code>string[]</code> is accepted only when <code>model_backed</code> is false.</li>
+    <li><strong>Immutable commit pins</strong> — 40- or 64-hex digests via <code>revision</code> or embedded in <code>source_url</code>.</li>
+    <li><strong>SPDX license syntax</strong> resolved through the registry’s exported <code>license-expression</code> symbol table (licences vs. exceptions, aliases, multi-word aliases). The CLI does <strong>not</strong> live-fetch Hugging Face or any other network source.</li>
+    <li><strong>Spec 026 rights-record shape</strong> and contradictions the contract alone can decide (plus evidence-file shape, <code>derivation</code>, <code>data_obligations</code>, and <code>rights_change</code>).</li>
+    <li><strong><code>ai: null</code></strong> is treated as absent, matching registry CI.</li>
+  </ul>
+  <p>Each failure carries the same registry CI error code so local publish and CI speak the same language.</p>
+
+  <h2>What stays registry-CI-only</h2>
+  <p>Downloading evidence files to verify digests, the <code>model-weights.json</code> cross-check, and rights drift (FR-015) remain registry CI jobs. The CLI path does <strong>not</strong> network-fetch. That split is intentional: publish-time admission catches every rule the contract alone decides; CI still proves bytes and drift after the Git write.</p>
+
+  <h2>Governing decisions</h2>
+  <p>Spec <strong>056-capability-publish</strong> was amended to <strong>v1.1.0</strong> (FR-014–FR-019) under <strong>Decision 109</strong>. It mirrors registry Spec 001 FR-017 and Spec 026. The work started as a first-time contributor shape check from <a href="https://github.com/DevChiniwala">@DevChiniwala</a>, then expanded to full contract-decidable parity. Tracking issue: <a href="https://github.com/traverse-framework/traverse/issues/1459">#1459</a>. Merged PR: <a href="https://github.com/traverse-framework/traverse/pull/1597">#1597</a>.</p>
+
+  <h2>Not the same as production model signing</h2>
+  <p>Offline AI admission on publish is about the contract’s <code>ai</code> attribution record. It does <strong>not</strong> claim that production model-signing key custody, rotation, or revocation is ready. That remains open work — see <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a>. Exact-ref execute and host trust roots are separate surfaces: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a> and <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a>.</p>
+
+  <h2>Related</h2>
+  <p>Publish path: <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability to the Traverse registry?</a>. Skill → catalog: <a href="/questions/how-do-i-go-from-skill-draft-to-published-capability.html">Skill draft → published capability</a>. Artifact integrity vs. attestation: <a href="/questions/how-do-i-verify-a-signed-capability-artifact.html">How do I verify a signed capability artifact?</a>.</p>
+</QuestionLayout>

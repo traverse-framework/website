@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can I share business logic between an iOS app and an Android app with Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Not through a shipped Traverse SDK on both sides today. iOS now has a production runtime bridge — a wasmi-based Swift host, certified under ADR-0014 and ADR-0015 — while Android has a working, unreleased Kotlin runtime bridge still pending Compose reference-app integration. The capability and contract you write today carry over unchanged once both embedders ship on equal footing — the logic-sharing goal is real, just not equally mature on both mobile OSes yet.',
+      text: 'Yes at the package level, with pre-1.0 caveats. The same capability and contract run through the Swift embedder (a wasmi-based host distributed as an XCFramework) on iOS and the Kotlin embedder (Chicory, published on Maven Central at 0.14.0) on Android, and both have reference clients. Neither is Certified under Spec 529 yet, and both are still marked In progress on the Platforms page.',
     },
   }],
 });
@@ -23,18 +23,20 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can I share business logic between an iOS app and an Android app with Traverse?"
-  description="Not through a shipped SDK on both platforms today. iOS now has a production wasmi-based runtime bridge; Android has a working, unreleased embedder. The contract you write now carries over once both are equally shipped."
+  description="Yes at the package level, with pre-1.0 caveats: the Swift embedder on iOS and the Kotlin embedder on Android (Maven Central 0.14.0) run the same capability. Neither host is Certified yet."
   canonical="https://traverse-framework.com/questions/can-i-share-logic-between-ios-and-android-apps.html"
   category="Question"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>This is exactly the problem Traverse is built to eventually solve for mobile, and it's worth being precise about the word "eventually," because it isn't there yet for both platforms simultaneously.</p>
+  <p>This is exactly the problem Traverse is built to solve for mobile, and the packages to do it now exist on both sides. It's still worth being precise about how mature each side is, because "installable" and "certified" are different claims.</p>
 
-  <p>On iOS, <code>packages/swift/TraverseEmbedder</code> now ships a production runtime bridge: <code>WasmiHostBridgeClient</code> embeds the <code>wasmi</code> interpreter behind a narrow C ABI, packaged as the <code>TraverseSwiftHost</code> XCFramework, with host-enforced memory and fuel limits. That's the certification path defined by Spec 074 and governed by ADR-0014 and ADR-0015 — it replaced the earlier WasmKit-based bridge, which is now deprecated and kept only for source compatibility.</p>
+  <p>On iOS, <code>packages/swift/TraverseEmbedder</code> now ships a production runtime bridge: <code>WasmiHostBridgeClient</code> embeds the <code>wasmi</code> interpreter behind a narrow C ABI, packaged as the <code>TraverseSwiftHost</code> XCFramework, with host-enforced memory and fuel limits. Its resource controls follow Spec 074, governed by ADR-0014 and ADR-0015. The earlier WasmKit-based bridge has been removed from the package; WasmKit is not supported.</p>
 
-  <p>On Android, <code>packages/kotlin/TraverseEmbedder</code> has a working runtime bridge built on Chicory, with bundle validation and lifecycle handling done. What's left is Compose reference-app integration and a public release — real, tracked, in-progress work, not a stalled idea.</p>
+  <p>On Android, <code>packages/kotlin/TraverseEmbedder</code> has a working runtime bridge built on Chicory, published on Maven Central as <code>com.traverse-framework:traverse-embedder</code> (<code>0.14.0</code>). The iOS and Android clients in <a href="https://github.com/traverse-framework/reference-apps" target="_blank" rel="noopener">reference-apps</a> run the runtime in-process, with no sidecar server.</p>
+
+  <p>What's not done: both hosts are pre-1.0, and Spec 529's host-neutral Certified/Preview classification needs a five-platform conformance runner that's later work, so no host is Certified today.</p>
 
   <h2>What you can do about it now</h2>
-  <p>Write the shared rule as a well-scoped Traverse capability today, targeting the platforms with the most mature support — native desktop, the browser, and now iOS. The contract doesn't change when the Android embedder ships too; the work isn't wasted, it's just not deployable to both phones on equal footing yet. Watch <a href="/platforms.html">Platforms</a> for exactly when that changes, rather than guessing from a roadmap date.</p>
+  <p>Write the shared rule as one well-scoped Traverse capability and embed it on both phones, keeping UI native on each side. Pin exact package versions, test on both hosts, and watch <a href="/platforms.html">Platforms</a> for status changes rather than guessing from a roadmap date. If you need a certified, post-1.0 host today, that isn't here yet.</p>
 </QuestionLayout>
