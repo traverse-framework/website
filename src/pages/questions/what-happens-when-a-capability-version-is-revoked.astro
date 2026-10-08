@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What happens when a Traverse registry capability version is deprecated or revoked?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Nothing is edited or deleted. A deprecation adds a sibling deprecated.json (registry spec 005) and a revocation adds a sibling revoked.json with a reason and evidence (registry spec 026). The index keeps the entry and marks its status. Range resolution such as ^1.2.0 skips deprecated and revoked versions. Under the approved specs, an exact pin still resolves and returns the record with its status, so a pinned consumer never silently breaks and the runtime decides whether to run it. Traverse runtime handling of revoked is tracked in traverse#1598, and the registry crate is being brought in line with the exact-pin rule in registry#631.',
+      text: 'Nothing is edited or deleted. A deprecation adds a sibling deprecated.json (registry spec 005) and a revocation adds a sibling revoked.json with a reason and evidence (registry spec 026). The index keeps the entry and marks its status. Range resolution such as ^1.2.0 skips deprecated and revoked versions. An exact pin still resolves and returns the record with its status. Published traverse-registry 0.27.0 does that (registry#632; registry#631 is closed). The runtime is supposed to fail closed, and that refusal is traverse#1598, not shipped in v0.14.0.',
     },
   }],
 });
@@ -27,13 +27,13 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What happens when a registry capability version is deprecated or revoked?"
-  description="Versions are never edited or deleted. Deprecated and revoked versions drop out of range resolution, while exact pins still resolve with a status the runtime can act on. Traverse-side revoked handling is tracked in traverse#1598."
+  description="Versions are never edited or deleted. Ranges skip deprecated and revoked versions. Exact pins in traverse-registry 0.27.0 still resolve with a status. Runtime refusal is traverse#1598, not shipped in v0.14.0."
   canonical="https://traverse-framework.com/questions/what-happens-when-a-capability-version-is-revoked.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> nothing gets edited or deleted. A published contract and its artifact are immutable, so the registry marks a version with a separate file instead. That version stops being picked by version ranges, but a consumer that pinned it exactly still gets it back, along with a status that says what happened.</p>
+  <p><strong>Short answer:</strong> nothing gets edited or deleted. A published contract and its artifact are immutable, so the registry marks a version with a separate file instead. That version stops being picked by version ranges. A consumer that pinned it exactly still gets the record back, along with a status. Published <code>traverse-registry</code> 0.27.0 does that. The runtime refusal is still open.</p>
 
   <h2>Deprecated: the cargo-yank shape</h2>
   <p>Registry spec 005 adds a sibling <code>deprecated.json</code> next to the version's <code>contract.json</code>. The index marks the version deprecated. Range resolution (<code>^1.2.0</code> style) skips it. Exact-pin resolution ignores the flag and succeeds if the version exists. It's the same pattern most package registries use: you stop new installs from landing on a bad version without breaking anyone who already depends on it.</p>
@@ -43,11 +43,11 @@ const relatedLinks = [
   <p>Registry spec 026 adds a sibling <code>revoked.json</code> with a <code>reason</code>, an <code>evidence_url</code> and a <code>revoked_at</code> time. It's meant for cases like a model whose rights turned out to be wrong. The index keeps the entry with <code>status: "revoked"</code>, its revocation record and its full rights record, and it must never be presented as active.</p>
   <p>The decision behind it (registry decision-log entry 127) keeps the same pin guarantee: range resolution skips revoked versions, and an exact pin still resolves but carries a machine-readable do-not-run signal. The registry doesn't silently break your build; the runtime decides whether to execute, and it is expected to fail closed.</p>
 
-  <h2>Where this stands today (October 5, 2026)</h2>
+  <h2>Where this stands today (8 October 2026)</h2>
   <ul>
-    <li><strong>Registry side:</strong> the <code>revoked.json</code> marker, index <code>status</code>, and the crate types have landed on the registry's main branch. The published <code>traverse-registry</code> crate on crates.io is still 0.25.0.</li>
-    <li><strong>Exact-pin alignment:</strong> the crate's current exact lookup skips deprecated and revoked records, which doesn't match the rule above. That fix and the next crate publish are tracked in <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a>.</li>
-    <li><strong>Traverse side:</strong> honoring <code>revoked</code> in the runtime and showing lifecycle status in <code>traverse-cli</code> is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, not shipped yet.</li>
+    <li><strong>Registry crate:</strong> <code>traverse-registry</code> 0.27.0 is on crates.io (tag <code>v0.27.0</code>). Exact-pin resolution returns deprecated and revoked records with lifecycle status and, when revoked, the revocation record. Range resolution still skips both. <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a> is closed. The fix merged as <a href="https://github.com/traverse-framework/registry/pull/632">registry#632</a>.</li>
+    <li><strong>Markers on main:</strong> the <code>revoked.json</code> shape and index <code>status</code> are in the registry tree. No <code>revoked.json</code> file was present when this was checked. Forty <code>deprecated.json</code> files were.</li>
+    <li><strong>Traverse side:</strong> honoring <code>revoked</code> in the runtime and showing lifecycle status in <code>traverse-cli</code> is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, open, and not in v0.14.0. That release still pins <code>=0.25.0</code>. The consumer slice can leave that pin; the refusal is not shipped.</li>
   </ul>
 
   <h2>Related</h2>

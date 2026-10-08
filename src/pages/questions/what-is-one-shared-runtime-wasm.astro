@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is one shared runtime.wasm in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Traverse uses one shared runtime.wasm orchestrator. Browser, native desktop, CLI, and MCP are embedders and clients — not different Traverse runtimes per language. Published consumers today include JS/TS (traverse-embedder-web), Rust (traverse-embedder), and agents via traverse-mcp. Python shells out to traverse-cli; Swift, Kotlin, and .NET exist in-tree but are not first-class public packages yet.',
+      text: 'Traverse uses one shared runtime.wasm orchestrator. Browser, native desktop, CLI, and MCP are embedders and clients — not different Traverse runtimes per language. Published consumers today include JS/TS (traverse-embedder-web), Rust (traverse-embedder), and agents via traverse-mcp. Python shells out to traverse-cli. Swift (xcframework on swift-host-v* tags), Kotlin (Maven Central com.traverse-framework:traverse-embedder 0.14.0), and .NET (nuget.org TraverseEmbedder 0.14.0) are published, pre-1.0, and not Certified.',
     },
   }],
 });
@@ -26,7 +26,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What is one shared runtime.wasm in Traverse?"
-  description="One shared runtime.wasm; browser, native, CLI, and MCP are clients. Honest consumers: JS/TS, Rust, MCP published; Python via CLI; Swift/Kotlin/.NET in-tree only."
+  description="One shared runtime.wasm; browser, native, CLI, and MCP are clients. Honest consumers: JS/TS, Rust, MCP published; Python via CLI; Swift/Kotlin/.NET published, pre-1.0, not Certified."
   canonical="https://traverse-framework.com/questions/what-is-one-shared-runtime-wasm.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
@@ -43,7 +43,7 @@ const relatedLinks = [
     <li><strong>Rust</strong> — published crates.io <code>traverse-embedder@0.14.0</code></li>
     <li><strong>AI agents</strong> — published <code>traverse-mcp</code> (stdio bootstrap)</li>
     <li><strong>Python</strong> — works by shelling out to <code>traverse-cli capability-package execute</code>. There is <strong>no Python SDK</strong>.</li>
-    <li><strong>Swift / Kotlin / .NET</strong> — exist in-tree and are usable for experimentation; they are not first-class public package releases yet.</li>
+    <li><strong>Swift / Kotlin / .NET</strong> — published, pre-1.0, marked In progress, not Certified. Swift xcframework on <code>swift-host-v*</code> tags; Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central; .NET <code>TraverseEmbedder</code> 0.14.0 on nuget.org.</li>
   </ul>
   <p>Edge is planned. Cloud placement is an explicit non-goal for v0.1. Before assuming a host works, read <a href="/platforms.html">Platforms</a> and <a href="/what-is-real-today.html">what is real today</a>.</p>
 

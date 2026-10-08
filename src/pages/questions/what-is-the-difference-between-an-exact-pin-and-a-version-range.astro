@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is the difference between an exact capability pin and a version range?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'A version range such as ^1.2.0 resolves to the highest active version that satisfies it and skips deprecated and revoked versions. An exact pin names one version. Under registry spec 005 and decision 127, that pin still resolves after deprecation or revocation and carries a status. The published traverse-registry 0.25.0 skips deprecated on both paths and has no revoked type. Registry main (workspace 0.27.0, not published) also returns nothing for an exact pin to a deprecated or revoked record. That exact-pin drift is registry#631, open.',
+      text: 'A version range such as ^1.2.0 resolves to the highest active version that satisfies it and skips deprecated and revoked versions. An exact pin names one version. Under registry spec 005 and decision 127, that pin still resolves after deprecation or revocation and carries a status. Published traverse-registry 0.27.0 does both: range resolution skips deprecated and revoked versions, and exact-pin resolution returns the record with lifecycle status and revocation (registry#632; registry#631 is closed). Traverse v0.14.0 still pins =0.25.0, which does not. Runtime refusal is traverse#1598 and is not shipped.',
     },
   }],
 });
@@ -24,7 +24,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What is the difference between an exact capability pin and a version range?"
-  description="A range resolves to the highest active match and skips deprecated and revoked versions. An exact pin, under spec 005 and decision 127, still resolves with a status. The published crate does not do that yet."
+  description="A range resolves to the highest active match and skips deprecated and revoked versions. An exact pin in traverse-registry 0.27.0 still resolves with lifecycle status. Runtime refusal of a revoked pin is traverse#1598, not shipped."
   canonical="https://traverse-framework.com/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
@@ -33,11 +33,11 @@ const relatedLinks = [
   <p><strong>Short answer:</strong> a range such as <code>^1.2.0</code> asks for the highest active version that satisfies it. An exact pin names one version string. Under registry spec 005 and decision 127, deprecation and revocation change the range result and leave the exact pin resolvable, with a status attached.</p>
 
   <h2>What a range does</h2>
-  <p>Spec 005 says range resolution skips deprecated versions. Decision-log entry 127, question 11, says range resolution skips revoked versions too. On registry <code>main</code>, the workspace resolver (0.27.0, not published) does both. If every match is deprecated or revoked, it errors instead of returning one. The published <code>traverse-registry</code> 0.25.0, which Traverse pins with <code>=0.25.0</code>, skips deprecated only. That release has no revoked type.</p>
+  <p>Spec 005 says range resolution skips deprecated versions. Decision-log entry 127, question 11, says range resolution skips revoked versions too. Published <code>traverse-registry</code> 0.27.0 does both. If every match is deprecated or revoked, it errors instead of returning one. Traverse v0.14.0 still pins <code>=0.25.0</code>. That older crate skips deprecated only and has no revoked type.</p>
 
   <h2>What an exact pin does</h2>
   <p>Spec 005 says exact-pin resolution ignores the deprecated flag and succeeds if the version exists. Decision 127 says a revoked exact pin still resolves and carries a machine-readable do-not-run signal. The runtime, not the registry, is supposed to decide whether to run it.</p>
-  <p>On registry <code>main</code> the exact lookup returns only an active record, so a deprecated or revoked pin comes back empty. That contradicts the spec. The fix and the next crate publish are <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a>, still open. crates.io is still 0.25.0.</p>
+  <p>In 0.27.0, exact-pin resolution returns the record with lifecycle status and, when revoked, the revocation record, so the consumer can fail closed. The fix merged as <a href="https://github.com/traverse-framework/registry/pull/632">registry#632</a>. <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a> is closed. crates.io published 0.27.0 on 8 October 2026 (tag <code>v0.27.0</code>).</p>
 
   <h2>What this is not</h2>
   <p>Hosts do not keep a separate version line. <code>traverse-embedder-web</code>, <code>traverse-embedder</code>, and <code>traverse-mcp</code> are clients of one <code>runtime.wasm</code>. The pin is a registry fact. Whether the runtime refuses a revoked pin is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, not shipped. The narrative walkthrough is <a href="/blog/you-dont-edit-a-published-capability.html">you don't edit a published capability</a>.</p>

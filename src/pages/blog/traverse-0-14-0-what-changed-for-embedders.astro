@@ -52,14 +52,14 @@ const _body = `
       <ul>
         <li><strong>Rust native + web</strong> — exact-ref execute shipped in the v0.14.0 product cut.</li>
         <li><strong>Swift</strong> — <code>ExactModelHost</code> executes signed exact-ref via the published <code>TraverseSwiftHost</code> xcframework (<code>swift-host-v0.14.0-1</code>) and the in-repo <code>Package.swift</code> binary pin. Still not a CocoaPods / Swift Package Index first-class package; distribution is GitHub Release + SPM binary target.</li>
-        <li><strong>Kotlin / .NET</strong> — in-tree embedders continue; they do <strong>not</strong> execute exact-ref models yet.</li>
+        <li><strong>Kotlin / .NET</strong> — published packages (Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.14.0, nuget.org <code>TraverseEmbedder</code> 0.14.0); they do <strong>not</strong> execute exact-ref models yet.</li>
       </ul>
 
       <p>SDKs, MCP, and CLI are embedders and clients of the same orchestrator — not different Traverse runtimes.</p>
 
       <h2 id="pins">Pins</h2>
 
-      <p>crates.io lockstep at <strong>0.14.0</strong> with <code>traverse-embedder-web@0.14.0</code>. Pin <code>traverse-registry =0.25.0</code> if you consume the registry crate directly.</p>
+      <p>crates.io lockstep at <strong>0.14.0</strong> with <code>traverse-embedder-web@0.14.0</code>. This release pins <code>traverse-registry</code> at <code>=0.25.0</code>. crates.io has since published <code>traverse-registry</code> 0.27.0.</p>
 
       <h2 id="upgrade">Upgrade</h2>
 

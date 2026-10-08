@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How should an agent react to a revoked capability during discover?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Do not propose it as an active candidate. Range resolution on registry main skips revoked versions; if nothing active matches, resolution fails and the agent should stop or pick a different active version. The public catalog keeps the row and sets revoked. The website /discover snapshot only skips deprecated rows and does not read revoked. No revoked.json exists on registry main today. The runtime refusal on an exact pin is traverse#1598 and is not shipped. The agent proposes; the runtime decides.',
+      text: 'Do not propose it as an active candidate. Range resolution in published traverse-registry 0.27.0 skips revoked versions; if nothing active matches, resolution fails and the agent should stop or pick a different active version. The public catalog keeps the row and sets revoked. The website /discover snapshot only skips deprecated rows and does not read revoked. No revoked.json was on registry main on 8 October 2026. The runtime refusal on an exact pin is traverse#1598 and is not shipped in v0.14.0. The agent proposes; the runtime decides.',
     },
   }],
 });
@@ -34,11 +34,11 @@ const relatedLinks = [
   <p><strong>Short answer:</strong> do not propose it as an active candidate. Discover is where the agent looks. Execute is where the runtime decides, and that refusal is not shipped yet.</p>
 
   <h2>If you are resolving a range</h2>
-  <p>Decision 127 says range resolution skips revoked versions. On registry <code>main</code> the workspace resolver already does that, and it fails when the only matches are deprecated or revoked. Propose a different active version that satisfies the range, or stop. Retrying the revoked version as if the marker were optional is the agent deciding. That is not its job.</p>
-  <p>The published <code>traverse-registry</code> 0.25.0, which Traverse pins, has no revoked type. It skips deprecated ranges only. Do not describe today's published crate as already filtering revoked versions.</p>
+  <p>Decision 127 says range resolution skips revoked versions. Published <code>traverse-registry</code> 0.27.0 does that, and it fails when the only matches are deprecated or revoked. Propose a different active version that satisfies the range, or stop. Retrying the revoked version as if the marker were optional is the agent deciding. That is not its job.</p>
+  <p>Traverse v0.14.0 still pins <code>traverse-registry</code> <code>=0.25.0</code>. That older crate has no revoked type and skips deprecated ranges only. Do not describe the v0.14.0 pin as already filtering revoked versions. The published 0.27.0 crate does.</p>
 
   <h2>If you are reading the public catalog</h2>
-  <p><code>catalog.json</code> keeps the row. A revoked version is <code>revoked: true</code> with a <code>revocation</code> object. Nothing is deleted. Read those fields and leave the row out of the proposal. The website <a href="/discover.html">/discover</a> snapshot only skips <code>deprecated: true</code>. It does not consult <code>revoked</code>. No <code>revoked.json</code> exists on registry <code>main</code>, and the live catalog's <code>revoked</code> flag was false on every entry when this was checked, so that page is not a demonstration of revoked handling.</p>
+  <p><code>catalog.json</code> keeps the row. A revoked version is <code>revoked: true</code> with a <code>revocation</code> object. Nothing is deleted. Read those fields and leave the row out of the proposal. The website <a href="/discover.html">/discover</a> snapshot only skips <code>deprecated: true</code>. It does not consult <code>revoked</code>. On 8 October 2026 there was no <code>revoked.json</code> on registry <code>main</code>, and the live catalog's <code>revoked</code> flag was false on all 227 entries, so that page is not a demonstration of revoked handling.</p>
 
   <h2>An exact pin is not a discover miss</h2>
   <p>If a caller already pinned the version, report the pin and its status. Do not execute the artifact yourself. There is one shared <code>runtime.wasm</code>. <code>traverse-embedder-web</code>, <code>traverse-embedder</code>, and <code>traverse-mcp</code> are clients; Python only reaches it through <code>traverse-cli capability-package execute</code>, and there is no Python SDK. The runtime is supposed to refuse a revoked pin. That work is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, open, not in a release.</p>
