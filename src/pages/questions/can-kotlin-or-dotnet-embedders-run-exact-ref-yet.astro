@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can Kotlin or .NET embedders run exact-ref models in Traverse yet?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'No. Kotlin and .NET embedders are in-tree only and do not execute signed exact-ref models yet (tracked as #1580 and #1602). Native Rust, web, and Swift ExactModelHost (swift-host-v0.14.0-1) do execute exact-ref as of v0.14.0 / #1579. Check Platforms and what-is-real-today; do not invent first-class Kotlin/.NET packages.',
+      text: 'No for exact-ref execute. Kotlin (Maven Central com.traverse-framework:traverse-embedder 0.14.0) and .NET (nuget.org TraverseEmbedder 0.14.0) are published packages and do not execute signed exact-ref models yet (#1580 and #1602). Native Rust, web, and Swift ExactModelHost (swift-host-v0.14.0-1) do, as of v0.14.0 / #1579.',
     },
   }],
 });
@@ -25,13 +25,13 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can Kotlin or .NET embedders run exact-ref models in Traverse yet?"
-  description="Honest no for execute: Kotlin/.NET are in-tree only (#1580/#1602). Swift ExactModelHost, native Rust, and web do execute exact-ref as of v0.14.0 / swift-host-v0.14.0-1."
+  description="Honest no for exact-ref execute (#1580/#1602). Kotlin and .NET packages are published. Swift ExactModelHost, native Rust, and web do execute exact-ref as of v0.14.0 / swift-host-v0.14.0-1."
   canonical="https://traverse-framework.com/questions/can-kotlin-or-dotnet-embedders-run-exact-ref-yet.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> <strong>no</strong> for Kotlin and .NET exact-ref execute today. They remain in-tree embedders, not first-class published packages with Spec 138 parity.</p>
+  <p><strong>Short answer:</strong> <strong>no</strong> for Kotlin and .NET exact-ref execute today. The packages are published — Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central, .NET <code>TraverseEmbedder</code> 0.14.0 on nuget.org — and they do not have Spec 138 exact-ref parity yet.</p>
 
   <h2>What works instead</h2>
   <p>Native Rust and the web embedder execute signed exact-ref in the v0.14.0 cut. Swift <code>ExactModelHost</code> reached parity via <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-1"><code>swift-host-v0.14.0-1</code></a> (#1579) — GitHub Release + SPM binary target, not a CocoaPods claim. Full matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
