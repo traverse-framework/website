@@ -1,0 +1,192 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 9, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Agents</span>
+      <span class="badge">Models</span>
+    </div>
+    <h1 class="t-h1">Agent speaks MCP. Exact pin kills the freestyle.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Last week a signed model ran bit-identical on Browser and Node. This week an <strong>agent</strong> gets the same package through MCP-shaped tool calls — and tries to cheat. It tampers a WASM byte, empties the trust roots, and lies about rights. Every attempt fails closed with a stable reason. The legitimate classify still matches Browser and Node byte for byte.</p>
+
+      <div class="callout">
+        Short version: one signed <code>digits-mlp-1.0.0</code> package, one manifest pin, one shared <code>runtime.wasm</code>. Browser, Node, and an agent over MCP-shaped JSON-RPC all hit the same <code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.14.0</code>. Tamper → <code>digest_mismatch</code>. Empty trust → <code>key_untrusted</code>. Rights lie → <code>rights_mismatch</code>. The agent proposes; the runtime decides.
+      </div>
+
+      <p>Public proof is this write-up and the screenshots. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-09-agent-mcp-exact-ref" target="_blank" rel="noopener"><code>weekly-demos/2026-10-09-agent-mcp-exact-ref</code></a> is for people who already have access (access required, repo private). <code>weekly-demos</code> is still <strong>not publicly cloneable</strong> (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>). There is no public-clone CTA.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/agent-mcp-exact-ref-2026-10-09/01-landing.webp" alt="Agent MCP exact-ref demo landing: agent freestyle blocked banner, Browser host, Node proof and Agent MCP transcript columns" width="1280" height="1961" loading="lazy" />
+        <figcaption>Landing: the agent-freestyle banner, then three columns — Browser host, Node proof, Agent MCP transcript — on one pin digest.</figcaption>
+      </figure>
+
+      <h2 id="the-agent">What the agent gets</h2>
+
+      <p>The agent sees MCP-shaped tools: <code>exact_model_register</code>, <code>exact_model_execute</code>, <code>exact_model_rights</code>. JSON-RPC <code>initialize</code>, then <code>tools/call</code>. Behind them is the published <code>ExactModelBrowserHost</code> running under Node — the same host and the same package bytes the Browser column uses.</p>
+
+      <p>Be precise about what that column is. It is an <strong>in-process MCP-shaped façade</strong> over the published web exact-ref host. It is <strong>not</strong> the checksum-pinned Mode A <code>traverse-mcp</code> binary. Pinning and verifying that packaged binary is the longer-term story, not this week’s proof.</p>
+
+      <h2 id="what-happened">What happened</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Check</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Node classify</td><td>Digits <strong>0 → 0</strong>, <strong>7 → 7</strong>, <strong>4 → 4</strong>. Output frames match the conformance fixture byte for byte (<code>hexMatch</code>).</td></tr>
+            <tr><td>Browser ↔ Node</td><td>Label 0 on the Browser host is bit-identical to the Node case.</td></tr>
+            <tr><td>Agent MCP execute</td><td><code>exact_model_execute</code> → predicted 0, same <code>output_frame_hex</code>, <code>hexMatch</code>.</td></tr>
+            <tr><td>Agent: tamper one WASM byte</td><td>Fail closed. <code>model_incompatible</code> / <code>digest_mismatch</code>.</td></tr>
+            <tr><td>Agent: empty trust roots</td><td>Fail closed. <code>model_incompatible</code> / <code>key_untrusted</code>.</td></tr>
+            <tr><td>Agent: rights lie</td><td>Pin claims <code>commercial_use: forbidden</code> against a package that says otherwise. Fail closed. <code>model_incompatible</code> / <code>rights_mismatch</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/agent-mcp-exact-ref-2026-10-09/02-three-hosts.webp" alt="Three hosts agree: digit 0 predicted 0, Browser, Node and Agent MCP output hex bit-identical" width="1280" height="2183" loading="lazy" />
+        <figcaption>Three hosts agree: Browser ↔ Node ↔ Agent MCP on the same output hex for label 0.</figcaption>
+      </figure>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/agent-mcp-exact-ref-2026-10-09/03-attack-fail-closed.webp" alt="Agent freestyle fail-closed: ExactModelError digest_mismatch after a one-byte WASM tamper, plus key_untrusted and rights_mismatch in the MCP transcript" width="1280" height="2166" loading="lazy" />
+        <figcaption>Freestyle fail-closed: one WASM byte swapped → <code>digest_mismatch</code>. The MCP transcript also shows <code>key_untrusted</code> and <code>rights_mismatch</code>.</figcaption>
+      </figure>
+
+      <h2 id="why">Why the pin wins</h2>
+
+      <p>The agent controls its tool arguments. It does not control the pin, the signature, or the host’s trust roots. The pin binds the SHA-256 of the manifest bytes. An Ed25519 <code>model.sig.json</code> must verify against a key the <strong>host</strong> trusts. The signed package’s rights must match what the pin declares. Break any one and nothing executes. One shared <code>runtime.wasm</code>; hosts are UI + I/O. Discover → execute → trace.</p>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> Agent speaks MCP. Exact pin kills the freestyle (week of 2026-10-09).</li>
+          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-09-agent-mcp-exact-ref" target="_blank" rel="noopener">2026-10-09-agent-mcp-exact-ref</a>. Not a public clone — <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
+          <li><strong>Product pins:</strong> Traverse <code>v0.14.0</code> @ <code>4dac877c2fe0b28491848016747850ae31327ebc</code>. npm <code>traverse-embedder-web@0.14.0</code>.</li>
+          <li><strong>Model:</strong> <code>traverse.digits-mlp@1.0.0</code> (<code>digits-mlp-1.0.0</code>). Manifest schema <code>2.0.0</code>. Governing spec <code>138-governed-exact-model-execution</code>.</li>
+          <li><strong>Manifest / pin sha256:</strong> <code>3068f3ae464fbbb43b45b089ab225a1371060a94a214c10629b4d8e402e8eadf</code></li>
+          <li><strong>WASM sha256:</strong> <code>6eeea06029ce4210842edfe70d7e0d8d7e926953ead5f18a0dca3c351ad5dc88</code></li>
+          <li><strong>Agent column:</strong> MCP-shaped JSON-RPC tools (<code>exact_model_register</code>, <code>exact_model_execute</code>, <code>exact_model_rights</code>) over the published <code>ExactModelBrowserHost</code> under Node. Not the Mode A <code>traverse-mcp</code> binary.</li>
+          <li><strong>Smoke:</strong> 0→0, 7→7, 4→4 on Node (<code>hexMatch</code>); Browser label 0 bit-identical to Node; MCP execute matches. Tamper → <code>digest_mismatch</code>; empty trust → <code>key_untrusted</code>; rights lie → <code>rights_mismatch</code>.</li>
+          <li><strong>Signing key:</strong> test-only fixture. Production signing is <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">traverse#1567</a>. Do not trust this key in a real host.</li>
+          <li><strong>Not claimed:</strong> Hugging Face. Catalog <code>model.execute</code> (the catalog still has none). A checksum-pinned Mode A <code>traverse-mcp</code> binary. Swift, Kotlin, or .NET exact-ref execute on the published <code>0.14.0</code> pins. Unreleased <code>main</code> work. A separate runtime.</li>
+          <li><strong>Lead claim:</strong> one shared <code>runtime.wasm</code>. Hosts = UI + I/O. Discover → execute → trace. The agent proposes; the runtime decides.</li>
+        </ul>
+      </div>
+
+      <p>Same signed bytes. Three callers. The agent can ask for anything — only the exact pin runs.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#the-agent">What the agent gets</a></li>
+          <li><a href="#what-happened">What happened</a></li>
+          <li><a href="#why">Why the pin wins</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/signed-exact-ref-digits.html">Signed model. Exact pin. Bit-identical hosts. →</a></li>
+          <li><a href="/blog/model-rights-are-data.html">Model rights are data, not a README →</a></li>
+          <li><a href="/blog/traverse-0-14-0-what-changed-for-embedders.html">v0.14.0 for embedders →</a></li>
+          <li><a href="/questions/how-does-the-mcp-server-work.html">How does the MCP server work? →</a></li>
+          <li><a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution? →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Agent proposes. Pin decides.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Browser, Node, and an MCP-shaped agent share one signed model package. Tamper, empty trust, or a rights lie fails closed.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="/blog/signed-exact-ref-digits.html" class="btn btn-ghost">Last week’s demo →</a>
+      <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html" class="btn btn-ghost">Weekly demos are blog-first →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Agent speaks MCP. Exact pin kills the freestyle. — Traverse Blog"
+  description="Weekly demo: an agent calls MCP-shaped tools against the signed digits-mlp-1.0.0 exact-ref package. Browser + Node bit-identical; tamper, empty trust and rights lie fail closed. Traverse v0.14.0."
+  canonical="https://traverse-framework.com/blog/agent-mcp-exact-ref.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
