@@ -36,7 +36,7 @@ const relatedLinks = [
   <p>A 64→32→10 multilayer perceptron trained on the UCI Optical Recognition of Handwritten Digits dataset (<strong>CC BY 4.0</strong>). Held-out accuracy is <strong>96.10%</strong>. The guest runs bit-identically in the trainer, on the native host, and in the browser embedder — same pinned bytes, same scores.</p>
 
   <h2>How it fits the product</h2>
-  <p>Exact-ref means the app pins the package by digest and signature and calls governed <code>model.execute</code> — never a naked URL. See <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>. Hosts that execute that path today: native Rust, web, and Swift <code>ExactModelHost</code> (<code>swift-host-v0.14.0-1</code>). Kotlin and .NET do not execute exact-ref yet.</p>
+  <p>Exact-ref means the app pins the package by digest and signature and calls governed <code>model.execute</code> — never a naked URL. Discover → execute → trace, on one shared <code>runtime.wasm</code>. See <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>. Published hosts that execute that path: native Rust, web, and Swift <code>ExactModelHost</code> (<code>swift-host-v0.14.0-4</code>). Kotlin and .NET <code>ExactModelHost</code> are on traverse main and are not in the published 0.14.0 packages.</p>
 
   <h2>Honest limits</h2>
   <ul>

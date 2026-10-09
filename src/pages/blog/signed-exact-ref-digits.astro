@@ -81,7 +81,7 @@ const _body = `
           <tbody>
             <tr><td>Browser</td><td><code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.14.0</code>. <code>registerPackage(manifestBytes, wasm, signatureBytes)</code>.</td></tr>
             <tr><td>Node</td><td>The same npm host under Node. Not a native Rust CLI invoke.</td></tr>
-            <tr><td>Not in this proof</td><td>Swift, Kotlin, and .NET do <strong>not</strong> execute exact-ref on the published <code>v0.14.0</code> pins used here.</td></tr>
+            <tr><td>Not in this proof</td><td>This demo is Browser + Node only, on one shared <code>runtime.wasm</code>. Swift <code>ExactModelHost</code> is published separately on <code>swift-host-v0.14.0-4</code>. The published Kotlin and .NET <code>0.14.0</code> packages do not include exact-ref execute.</td></tr>
           </tbody>
         </table>
       </div>
@@ -99,7 +99,7 @@ const _body = `
           <li><strong>Path:</strong> <code>ExactModelBrowserHost</code> + <code>registerPackage</code> (not <code>insertVerified</code>). Host-owned trust roots only.</li>
           <li><strong>Smoke:</strong> 0→0, 7→7, 4→4 on Node; Browser label 0 bit-identical to Node; tamper → <code>digest_mismatch</code>; empty trust → <code>key_untrusted</code>.</li>
           <li><strong>Signing key:</strong> test-only fixture. Production signing is <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">traverse#1567</a>. Do not trust this key in a real host.</li>
-          <li><strong>Not claimed:</strong> Hugging Face. Catalog <code>model.execute</code> (the catalog still has none). Swift / Kotlin / .NET exact-ref execute on published 0.14.0. A separate native CLI. A second runtime.</li>
+          <li><strong>Not claimed:</strong> Hugging Face. Catalog <code>model.execute</code> (the catalog still has none). Exact-ref execute from the published Kotlin or .NET <code>0.14.0</code> packages. A separate native CLI. A second runtime.</li>
           <li><strong>Lead claim:</strong> one shared <code>runtime.wasm</code>. Hosts = UI + I/O. Discover → execute → trace.</li>
         </ul>
       </div>

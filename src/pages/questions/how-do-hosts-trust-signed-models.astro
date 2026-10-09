@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do hosts trust signed models in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'As of Traverse v0.14.0 (signed Spec 138), model packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json. Host-owned trust roots gate register_package / registerPackage; apps never add trust. Pin by digest and signature, never a naked URL. The first trained package digits-mlp-1.0.0 ships with a test-only key; production signing is #1567. Exact-ref execute is native Rust, web, and Swift ExactModelHost (swift-host-v0.14.0-1); Kotlin and .NET do not execute exact-ref yet. ONNX as a generic runner is not shipped.',
+      text: 'Discover → execute → trace. One shared runtime.wasm. As of Traverse v0.14.0 (signed Spec 138), model packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json. Host-owned trust roots gate register_package / registerPackage; apps never add trust. Pin by digest and signature, never a naked URL. The first trained package digits-mlp-1.0.0 ships with a test-only key; production signing is #1567. Published exact-ref execute is native Rust, web, and Swift ExactModelHost (swift-host-v0.14.0-4). Kotlin and .NET ExactModelHost are on traverse main and are not in the published 0.14.0 packages (#1651). ONNX as a generic runner is not shipped.',
     },
   }],
 });
@@ -28,7 +28,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="How do hosts trust signed models in Traverse?"
-  description="v0.14.0 signed Spec 138: schema 2.0.0 + model.sig.json; host-owned trust roots; pin by digest; digits-mlp test-only key; exact-ref execute on native+web+Swift; Kotlin/.NET not yet."
+  description="Discover → execute → trace on one shared runtime.wasm. v0.14.0 signed Spec 138. Published exact-ref: native, web, Swift swift-host-v0.14.0-4. Kotlin and .NET hosts are on main, not in 0.14.0 (#1651)."
   canonical="https://traverse-framework.com/questions/how-do-hosts-trust-signed-models.html"
   category="Runtime and Architecture"
   relatedLinks={relatedLinks}
@@ -46,5 +46,5 @@ const relatedLinks = [
   <p>The first trained package <code>digits-mlp-1.0.0</code> is signed with a <strong>test-only</strong> key so CI and demos can exercise the path. Production model signing is tracked separately as <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>. Do not treat the test key as a production trust root.</p>
 
   <h2>Host honesty</h2>
-  <p>Exact-ref execute is implemented on native Rust, the web embedder, and Swift <code>ExactModelHost</code> (xcframework <code>swift-host-v0.14.0-1</code> + <code>Package.swift</code> pin). Kotlin and .NET do <em>not</em> execute exact-ref yet — check <a href="/platforms.html">Platforms</a>. This page is about signed-model trust for Spec 138 exact-ref; it does <strong>not</strong> claim a generic ONNX runner is shipped. Deeper loop: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a></p>
+  <p>Discover → execute → trace, on one shared <code>runtime.wasm</code>. Published exact-ref execute is native Rust, the web embedder, and Swift <code>ExactModelHost</code> (xcframework <code>swift-host-v0.14.0-4</code> + <code>Package.swift</code> pin). Kotlin and .NET <code>ExactModelHost</code> are on traverse main and are not in the published 0.14.0 packages (<a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a>) — check <a href="/platforms.html">Platforms</a>. This page is about signed-model trust for Spec 138 exact-ref; it does <strong>not</strong> claim a generic ONNX runner is shipped. Deeper loop: <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a></p>
 </QuestionLayout>
