@@ -52,7 +52,7 @@ const _body = `
 
       <h2 id="host">4. Host: trust roots belong to the host</h2>
 
-      <p>Traverse v0.14.0 shipped signed model packages (schema 2.0.0 manifests plus a detached Ed25519 <code>model.sig.json</code>). The app pins the manifest digest and the expected rights; the host owns the trusted keys, and apps can't inject their own. A naked URL is never identity. Exact-ref execute runs on native Rust, the web embedder and Swift today; Kotlin and .NET don't execute exact-ref yet. See <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a></p>
+      <p>Traverse v0.14.0 shipped signed model packages (schema 2.0.0 manifests plus a detached Ed25519 <code>model.sig.json</code>). The app pins the manifest digest and the expected rights; the host owns the trusted keys, and apps can't inject their own. A naked URL is never identity. Discover → execute → trace, on one shared <code>runtime.wasm</code>. Published exact-ref execute is native Rust, the web embedder, and Swift <code>ExactModelHost</code> (<code>swift-host-v0.14.0-4</code>). Kotlin and .NET <code>ExactModelHost</code> are on traverse main and are not in the published 0.14.0 packages. See <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a></p>
 
       <h2 id="open">What's still open (as of October 6, 2026)</h2>
 

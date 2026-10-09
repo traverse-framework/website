@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is exact-ref model execution in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Hosts call the Spec 137 model.execute surface with opaque input_ref / output_ref handles. As of Traverse v0.14.0, packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json; host-owned trust roots gate register_package; the first trained digits-mlp-1.0.0 ships signed with a test-only key (production signing is separate). Exact-ref execute is implemented on native Rust, web, and Swift ExactModelHost (Package.swift pin to swift-host-v0.14.0-1); Kotlin and .NET do not execute exact-ref yet. First landed in v0.12.0; Swift parity closed #1579 on 2026-09-30.',
+      text: 'Exact-ref model execution is how Traverse runs a WASM model package that an app has pinned by digest and signature — never by a naked URL. Discover → execute → trace. One shared runtime.wasm; embedders are clients. Hosts call the Spec 137 model.execute surface with opaque input_ref / output_ref handles. As of Traverse v0.14.0, packages use schema 2.0.0 manifests plus a detached Ed25519 model.sig.json; host-owned trust roots gate register_package; the first trained digits-mlp-1.0.0 ships signed with a test-only key (production signing is separate). Published exact-ref execute: native Rust, web, and Swift ExactModelHost (Package.swift pin to swift-host-v0.14.0-4). Kotlin and .NET ExactModelHost are on traverse main and are not in the published 0.14.0 packages (#1651). First landed in v0.12.0; Swift parity closed #1579 on 2026-09-30.',
     },
   }],
 });
@@ -31,7 +31,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What is exact-ref model execution in Traverse?"
-  description="Signed schema 2.0.0 + model.sig.json; host-owned trust; digits-mlp-1.0.0 (test-only key). Spec 137 model.execute; native+web+Swift ExactModelHost; Kotlin/.NET not yet."
+  description="Discover → execute → trace on one shared runtime.wasm. Signed schema 2.0.0 + model.sig.json. Published exact-ref: native, web, Swift swift-host-v0.14.0-4. Kotlin and .NET hosts are on main, not in 0.14.0 (#1651)."
   canonical="https://traverse-framework.com/questions/what-is-exact-ref-model-execution.html"
   category="Runtime and Architecture"
   relatedLinks={relatedLinks}
@@ -50,8 +50,8 @@ const relatedLinks = [
 
   <h2>What landed in v0.14.0</h2>
   <p>Spec 138 first shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">v0.12.0</a> (see the <a href="/blog/traverse-0-12-0-exact-ref-model-execute.html">historical v0.12.0 write-up</a>). <strong>v0.14.0</strong> adds signed packages, host-owned trust, machine-readable rights, and the first trained model <code>digits-mlp-1.0.0</code> (64→32→10 MLP on UCI digits, CC BY 4.0, 96.10% held-out, bit-identical trainer / native / browser). That package is signed with the <strong>test-only</strong> key; production model signing is <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>.</p>
-  <p><strong>Host honesty:</strong> exact-ref execute is implemented in the Rust native runtime, the web embedder, and Swift <code>ExactModelHost</code> (published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-1"><code>swift-host-v0.14.0-1</code></a>; <code>Package.swift</code> binary pin; digits conformance byte-identical). Kotlin and .NET do <em>not</em> execute exact-ref yet. Pin the Traverse crates and npm at <code>0.14.0</code>. That release still pins <code>traverse-registry</code> at <code>=0.25.0</code>; crates.io has since published <code>traverse-registry</code> 0.27.0.</p>
+  <p><strong>Host honesty:</strong> discover → execute → trace, on one shared <code>runtime.wasm</code>. Published exact-ref execute is the Rust native runtime, the web embedder, and Swift <code>ExactModelHost</code> (published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.14.0-4"><code>swift-host-v0.14.0-4</code></a>; <code>Package.swift</code> binary pin). Kotlin <code>ExactModelHost</code> is on traverse main (<a href="https://github.com/traverse-framework/traverse/issues/1580">#1580</a>, closed) and is not in Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.14.0. .NET <code>ExactModelHost</code> is on traverse main (<a href="https://github.com/traverse-framework/traverse/issues/1602">#1602</a>, closed) and is not in nuget.org <code>TraverseEmbedder</code> 0.14.0. Next package cuts: <a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a>. Pin the Traverse crates and npm at <code>0.14.0</code>. That release still pins <code>traverse-registry</code> at <code>=0.25.0</code>; crates.io has since published <code>traverse-registry</code> 0.27.0.</p>
 
   <h2>What it is not</h2>
-  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity, or to assume Kotlin/.NET already execute exact-ref.</p>
+  <p>It is not “the model is in charge.” It is not Spec 045. It is not a guest <code>model_invoke</code> import — that stays out of scope for Spec 138 v1. And it is not permission to treat a URL as a model identity, or to assume the published Kotlin or .NET 0.14.0 packages already execute exact-ref.</p>
 </QuestionLayout>
