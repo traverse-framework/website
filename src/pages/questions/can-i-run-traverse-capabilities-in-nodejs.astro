@@ -1,0 +1,73 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can I run Traverse capabilities in Node.js?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, through the same npm package the browser uses. traverse-embedder-web@0.14.0 exports NodeFsBundleLoader, which reads your application bundle from disk instead of fetching it. The embedder loads the bundle\'s own runtime/runtime.wasm, checks its sha256 digest, and runs each capability through it, so a Node process discovers, executes, and traces against the same runtime.wasm a browser tab loads. Node is a host, not a separate Traverse runtime. Workflows are limited to linear direct-triggered pipelines today, and Node is not listed as its own target on the Platforms page.',
+    },
+  }],
+});
+
+const nodeExample = `import { BundleEmbedder, NodeFsBundleLoader } from "traverse-embedder-web";
+
+const embedder = await BundleEmbedder.init({
+  manifestPath: "./bundles/my-app/app.manifest.json",
+  loader: new NodeFsBundleLoader(),
+  platform: "web",
+});
+
+embedder.subscribe((event) => console.log(event.event_type, event.data));
+const outcome = embedder.submit("my-app.process", { note: "hello" });
+// outcome.status is "accepted" or "rejected" (with a stable error code)
+
+embedder.shutdown();`;
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-embed-traverse-in-a-web-app.html', label: 'How do I embed Traverse in a web app?' },
+  { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
+  { href: '/questions/can-i-use-traverse-with-electron.html', label: 'Can I use Traverse with Electron?' },
+  { href: '/questions/does-traverse-have-a-python-sdk.html', label: 'Does Traverse have a Python SDK?' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs (platform status)' },
+];
+---
+<QuestionLayout
+  title="Can I run Traverse capabilities in Node.js?"
+  description="Yes. The published traverse-embedder-web package ships a filesystem bundle loader for Node, and runs capabilities through the same runtime.wasm the browser loads. Here's how, and what it doesn't cover yet."
+  canonical="https://traverse-framework.com/questions/can-i-run-traverse-capabilities-in-nodejs.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Yes. There's no separate Node package. You use <code>traverse-embedder-web</code>, the same npm package a browser app uses, and give it a different bundle loader.</p>
+
+  <p>In the browser, <code>FetchBundleLoader</code> pulls the app bundle over HTTP. In Node, <code>NodeFsBundleLoader</code> reads the same files from disk. Both are exported from the published <code>0.14.0</code> package. Everything after loading is the same: the embedder loads the bundle's <code>runtime/runtime.wasm</code>, checks it against <code>runtime/runtime.wasm.sha256</code>, and runs your capabilities through it. So a Node script discovers, executes, and traces against the same <code>runtime.wasm</code> a browser tab would. Node is just another host.</p>
+
+  <pre><code>{nodeExample}</code></pre>
+
+  <p>We ran this on Node 20 with <code>traverse-embedder-web@0.14.0</code> from npm and the <code>traverse-starter</code> bundle checked into the <a href="https://github.com/traverse-framework/traverse/tree/main/examples/applications/traverse-starter" target="_blank" rel="noopener">traverse repo</a>. The submit came back <code>accepted</code>, the subscriber saw <code>capability_invoked</code> then <code>capability_result</code>, and <code>traceList</code> returned one completed trace for <code>traverse-starter.process</code>. No <code>traverse-cli serve</code> sidecar was running.</p>
+
+  <h2>Where this is useful</h2>
+  <ul>
+    <li><strong>Scripts and back-office tools</strong> that need to run the same governed rule your app runs, without a second copy written in JavaScript.</li>
+    <li><strong>Electron's main process</strong> or server-side prerendering. The loader's own source comments name both as intended hosts.</li>
+    <li><strong>Integration tests</strong>. The package's own <code>node --test</code> suite runs the real starter bundle this way.</li>
+  </ul>
+
+  <p>The Node process stays thin: it reads files, passes JSON in, and handles what comes back. The business rule itself lives in the capability, not in your Node code.</p>
+
+  <h2>What to know before you rely on it</h2>
+  <ul>
+    <li><strong>The runtime isn't inside the npm package.</strong> Your bundle has to ship <code>runtime/runtime.wasm</code> and its <code>.sha256</code> file. If either is missing, or the digest doesn't match, <code>init</code> fails closed.</li>
+    <li><strong>Linear pipelines only.</strong> Workflows still support <code>direct</code>-triggered linear steps. Event-driven or conditional edges are rejected at <code>init</code> with a stable error.</li>
+    <li><strong>It's the Web embedder.</strong> You pass <code>platform: "web"</code>, and the trace's placement reports <code>browser</code>. Node doesn't have its own row on the <a href="/platforms.html">Platforms</a> page, and no host is Certified under Spec 529 yet. Treat Node as a supported way to use the Web package, not as a separately certified target.</li>
+    <li><strong>Python isn't covered by this.</strong> There's no Python SDK. From Python, shell out to <code>traverse-cli capability-package execute</code>.</li>
+  </ul>
+
+  <p>If you need a Rust process instead, the Rust embedder is <code>traverse-embedder@0.14.0</code> on crates.io. For agents, use <code>traverse-mcp</code>. All of them are clients of the same capability contracts. Nobody reimplements the rule.</p>
+</QuestionLayout>

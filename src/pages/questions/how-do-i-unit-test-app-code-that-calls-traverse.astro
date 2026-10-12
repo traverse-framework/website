@@ -1,0 +1,87 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I unit-test app code that calls Traverse without running WASM?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Swap the real embedder for the deterministic test double that ships in the same package. traverse-embedder-web and the Rust traverse-embedder crate (both 0.14.0) export EmbedderTestDouble, which implements the same embedder API: you script an output or an error per target id, and it emits the same event envelope with deterministic ids (sess-*, req-*, evt-*), rejects unknown targets with target_not_found, and rejects calls after shutdown with runtime_stopped. Swift, Kotlin, and .NET ship a smaller InMemoryTraverseEmbedder harness. A test double never loads WASM, so it tests your host code, not the capability.',
+    },
+  }],
+});
+
+const tsExample = `import { EmbedderTestDouble } from "traverse-embedder-web";
+
+const embedder = new EmbedderTestDouble({ appId: "my-app", platform: "web" })
+  .withTargetOutput("my-app.quote", { total_cents: 4200 })
+  .withTargetError("my-app.charge", "execution_failed", "card declined");
+
+const events = [];
+embedder.subscribe((event) => events.push(event));
+
+embedder.submit("my-app.quote", { items: 3 });
+// events: capability_invoked, then capability_result with the scripted output
+
+embedder.submit("my-app.nope", {});
+// returns status "rejected", error.code "target_not_found"`;
+
+const rustExample = `use serde_json::json;
+use traverse_embedder::{EmbedderTestDouble, TraverseEmbedderApi};
+
+let mut embedder = EmbedderTestDouble::new("local-default", "my-app", "1.0.0", "linux")
+    .with_target_output("my-app.quote", json!({ "total_cents": 4200 }))
+    .with_target_error("my-app.charge", "execution_failed", "card declined");
+
+embedder.subscribe(Box::new(|event| println!("{event}")));
+embedder.submit("my-app.quote", &json!({ "items": 3 }));
+embedder.shutdown();`;
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-test-a-capability-before-shipping-it-to-multiple-platforms.html', label: 'How do I test a capability before shipping it to multiple platforms?' },
+  { href: '/questions/can-i-run-traverse-capabilities-in-nodejs.html', label: 'Can I run Traverse capabilities in Node.js?' },
+  { href: '/questions/how-do-i-read-traverse-traces-from-inside-my-app.html', label: 'How do I read Traverse execution traces from inside my app?' },
+  { href: '/questions/how-does-traverse-handle-errors.html', label: 'How does Traverse handle errors?' },
+];
+---
+<QuestionLayout
+  title="How do I unit-test app code that calls Traverse without running WASM?"
+  description="Use the deterministic test double that ships in each embedder package. Script outputs and errors per target, assert on stable event JSON, and keep real WASM for integration tests."
+  canonical="https://traverse-framework.com/questions/how-do-i-unit-test-app-code-that-calls-traverse.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Swap the real embedder for the test double that ships in the same package. Your screen, handler, or job talks to the embedder API: submit, subscribe, shutdown. The double implements that same API without loading a bundle or any WASM. You tell it what each target should return, and your test checks how your code reacts.</p>
+
+  <h2>JS/TS and Rust: <code>EmbedderTestDouble</code></h2>
+  <p>Both <code>traverse-embedder-web@0.14.0</code> and the Rust <code>traverse-embedder@0.14.0</code> crate export <code>EmbedderTestDouble</code>. For each target id you can script a success with an output, or a failure with a runtime-shaped error code and message.</p>
+
+  <pre><code>{tsExample}</code></pre>
+
+  <pre><code>{rustExample}</code></pre>
+
+  <p>Why it's useful for assertions:</p>
+  <ul>
+    <li><strong>Same event envelope as production.</strong> Events carry <code>kind: "embedder_event"</code>, <code>event_id</code>, <code>sequence</code>, <code>event_type</code>, and <code>data</code>, just like a real <code>BundleEmbedder</code>.</li>
+    <li><strong>Deterministic ids.</strong> Sessions, requests, and events are numbered (<code>sess-00000001</code>, <code>req-00000001</code>, <code>evt-00000001</code>), so snapshot tests don't flake.</li>
+    <li><strong>Real boundary failures.</strong> An unknown target is rejected with <code>target_not_found</code>. Anything after <code>shutdown()</code> is rejected with <code>runtime_stopped</code>. Shutdown is idempotent.</li>
+    <li><strong>Trace browsing works too.</strong> <code>traceList</code> and <code>traceGet</code> return the same safe trace records the real embedder does, so a trace viewer can be tested without WASM.</li>
+    <li><strong>Compatible-capability lifecycle.</strong> <code>withCompatibleTarget</code> lets you test start, stop, and kill, including the <code>platforms[]</code> allowlist guard.</li>
+  </ul>
+
+  <h2>Swift, Kotlin, and .NET: <code>InMemoryTraverseEmbedder</code></h2>
+  <p>The native packages ship a smaller deterministic harness called <code>InMemoryTraverseEmbedder</code>. You set one target output with <code>withTargetOutput</code>, submit, and read ordered runtime-shaped events back. It also covers compatible start, stop, and kill. It doesn't have per-target scripting or trace browsing. These packages are published but pre-1.0, and none is Certified yet.</p>
+
+  <h2>What a test double doesn't test</h2>
+  <p>It never runs the capability. A double doesn't validate the contract, check the bundle digest, or load <code>runtime.wasm</code>, so it can't tell you the pricing rule is right. Test that in two other places:</p>
+  <ul>
+    <li><strong>The capability itself</strong>, against its contract, before it ships. See <a href="/questions/how-do-i-test-a-capability-before-shipping-it-to-multiple-platforms.html">how to test a capability before shipping it to multiple platforms</a>.</li>
+    <li><strong>One real integration test</strong> per host that loads your actual bundle with <code>BundleEmbedder</code> and runs discover, execute, and trace end to end. The web package's own suite does this with the checked-in <code>traverse-starter</code> bundle.</li>
+  </ul>
+
+  <p>One known gotcha: in <code>traverse-embedder-web@0.14.0</code>, <code>releaseEvidence().package.version</code> reports <code>0.9.0</code> because the version is hard-coded (<a href="https://github.com/traverse-framework/traverse/issues/1654" target="_blank" rel="noopener">#1654</a>). Don't assert on that field until the fix ships.</p>
+</QuestionLayout>

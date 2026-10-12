@@ -1,0 +1,87 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I read Traverse execution traces from inside my app?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Call the Embedded Trace API on the embedder you already have. In traverse-embedder-web and the Rust traverse-embedder crate (0.14.0), traceList(version, pageSize, cursor) pages through the current session\'s traces, newest first, and traceGet(version, traceId) opens one. Each record is a safe public projection: target id and version, outcome, execution phases, placement, and a stable failure code. It never includes raw inputs, outputs, caller identity, or private hashes. History is process-local, capped at the last 100 executions, and cleared on shutdown. No HTTP sidecar is involved. The Swift, Kotlin, and .NET packages do not expose this API yet.',
+    },
+  }],
+});
+
+const traceExample = `const page = embedder.traceList("1.0.0", 10);
+// { summaries: [...], nextCursor: null, retentionLimit: 100 }
+
+const detail = embedder.traceGet("1.0.0", page.summaries[0].traceId);`;
+
+const traceOutput = `{
+  "summary": {
+    "traceId": "embedded-trace-00000001-00000001",
+    "executionId": "workflow-req-00000001",
+    "targetId": "traverse-starter.process",
+    "completedAt": "1970-01-01T00:00:01Z",
+    "completionSequence": 1,
+    "outcome": "completed"
+  },
+  "phases": [{ "code": "workflow_completed" }],
+  "selectedTarget": { "targetId": "traverse-starter.process", "targetVersion": "1.0.0" },
+  "placement": { "target": "browser" },
+  "failureCode": null,
+  "stateMachineValid": null
+}`;
+
+const relatedLinks = [
+  { href: '/questions/what-is-a-trace-artifact.html', label: 'What is a trace artifact in Traverse?' },
+  { href: '/questions/what-does-discover-execute-trace-mean.html', label: 'What does discover → execute → trace mean?' },
+  { href: '/questions/how-do-i-unit-test-app-code-that-calls-traverse.html', label: 'How do I unit-test app code that calls Traverse?' },
+  { href: '/questions/can-i-run-traverse-capabilities-in-nodejs.html', label: 'Can I run Traverse capabilities in Node.js?' },
+];
+---
+<QuestionLayout
+  title="How do I read Traverse execution traces from inside my app?"
+  description="Use the Embedded Trace API on your embedder: list the session's traces, open one, and get a safe record of what ran and how it ended, with no payloads and no HTTP sidecar."
+  canonical="https://traverse-framework.com/questions/how-do-i-read-traverse-traces-from-inside-my-app.html"
+  category="Question"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Ask the embedder your app already holds. Discover → execute → trace means every execution leaves a record. The Embedded Trace API (<code>embedded-trace-api/1.0.0</code>, Spec 517) is how a host reads those records back without starting <code>traverse-cli serve</code> or calling anything over HTTP.</p>
+
+  <p>It ships today in <code>traverse-embedder-web@0.14.0</code> (browser and Node) and the Rust <code>traverse-embedder@0.14.0</code> crate. There are two calls:</p>
+
+  <pre><code>{traceExample}</code></pre>
+
+  <p>Both take the trace API version you expect. If the host doesn't speak that version, you get a stable <code>incompatible_version</code> error. It doesn't fall back to some other transport. In Rust they're <code>trace_list</code> and <code>trace_get</code>.</p>
+
+  <h2>What a record contains</h2>
+  <p>Here's the detail record we got running the repo's <code>traverse-starter</code> bundle through the published web package on Node:</p>
+
+  <pre><code>{traceOutput}</code></pre>
+
+  <ul>
+    <li><strong>Summary.</strong> Trace id, execution id, the target that ran, outcome, and its position in the session.</li>
+    <li><strong>Phases.</strong> Safe phase codes for how execution went.</li>
+    <li><strong>Selected target and placement.</strong> Which capability or workflow version the runtime picked, and where it ran.</li>
+    <li><strong>Failure code.</strong> A stable classification when something failed, not the raw error text.</li>
+  </ul>
+
+  <p><code>completedAt</code> is a logical time derived from the completion sequence, not a wall-clock timestamp. Use it for ordering. If you need real times, record them in your own host.</p>
+
+  <h2>What it deliberately leaves out</h2>
+  <p>The submitted input and the capability's output aren't in the record. Neither are caller identity, correlation metadata, private trace hashes, or unfiltered error messages. That's a requirement of Spec 517, and the package tests check it: they submit a unique secret-looking value and confirm it never shows up in any trace response. That way you can put a trace viewer in front of operators without turning it into a way to pull user data out of the app.</p>
+
+  <h2>Limits today</h2>
+  <ul>
+    <li><strong>Process-local and bounded.</strong> The embedder keeps the last 100 executions (<code>retentionLimit</code>). Older ones are evicted and return <code>trace_not_found</code>. Shutdown or re-init clears the history.</li>
+    <li><strong>Paged, newest first.</strong> Pass <code>nextCursor</code> to keep going. A malformed or stale cursor returns <code>invalid_cursor</code>.</li>
+    <li><strong>No durable store, export, or live streaming.</strong> Those are out of scope for this version. Refresh the list after events if you need it current.</li>
+    <li><strong>Not on the native packages yet.</strong> The Swift, Kotlin, and .NET embedders (published, pre-1.0, not Certified) don't expose the trace API. The spec allows them to add it in a later compatible release.</li>
+  </ul>
+
+  <p>For tests, <code>EmbedderTestDouble</code> implements the same <code>traceList</code> and <code>traceGet</code> behavior, so you can build and test a trace screen without loading any WASM.</p>
+</QuestionLayout>
