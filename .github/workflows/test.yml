@@ -5,9 +5,11 @@ on:
   push:
     branches: [main]
   schedule:
-    # Weekly check that the pinned discover-real bundle digest still matches
-    # the live public registry catalog. Non-blocking for PRs; a failure here
-    # is the signal to re-vendor public/bundles/discover-real/.
+    # Weekly live registry check. Non-blocking for PRs: this job runs only
+    # on schedule and workflow_dispatch. It runs tests/discover-planning.test.mjs
+    # with CHECK_REGISTRY=1. Offline pins for that file live in
+    # public/bundles/discover-real-pipeline/. The networked checks are the
+    # CHECK_REGISTRY tests in the same file.
     - cron: "17 6 * * 1"
   workflow_dispatch: {}
 
@@ -51,6 +53,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: node --test tests/discover-bundle.test.mjs
+      - run: node --test tests/discover-planning.test.mjs
         env:
           CHECK_REGISTRY: "1"
