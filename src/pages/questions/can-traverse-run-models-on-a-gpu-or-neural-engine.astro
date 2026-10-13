@@ -1,0 +1,52 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can Traverse run models on a GPU or the Apple Neural Engine?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Not in a published release. In Traverse v0.14.0, governed exact-ref models run on the wasm-cpu path inside the one shared runtime. On traverse main (unreleased), the runtime now has a generic native accelerator adapter framework (Decision 112, Spec 138 FR-060 to FR-065): the host policy lists ordered placements, default wasm-cpu; a placement is chosen only if the host supports it, the signed package carries a variant for it, the variant passes an on-device self-check against its conformance vector, and it fits the host memory ceiling. If nothing qualifies, the call fails closed with placement_unavailable before the input is consumed, and the result records which placement ran. The real Core ML adapter is not landed yet: the conversion spike is #1663 and the iPhone evidence is #1630.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/what-happens-when-a-capability-runs-out-of-fuel-or-memory.html', label: 'What happens when a capability runs out of fuel or memory?' },
+  { href: '/questions/is-there-a-performance-cost-to-running-the-same-binary-on-every-os.html', label: 'Is there a performance cost to running the same binary on every OS?' },
+];
+---
+<QuestionLayout
+  title="Can Traverse run models on a GPU or the Apple Neural Engine?"
+  description="Not in a published release. v0.14.0 runs governed exact-ref models on wasm-cpu. Traverse main has an unreleased accelerator adapter framework: policy placements, on-device self-check, fail-closed fallback, placement evidence. Core ML adapter not landed yet."
+  canonical="https://traverse-framework.com/questions/can-traverse-run-models-on-a-gpu-or-neural-engine.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> not in a published release. In Traverse v0.14.0, governed exact-ref models run on the <code>wasm-cpu</code> path inside the one shared runtime. Hardware acceleration is being built on traverse main, and the part that has landed is the policy and evidence layer, not a working GPU or Neural Engine adapter.</p>
+
+  <h2>What is on main today (unreleased)</h2>
+  <p>As of October 13, 2026, <code>traverse-runtime</code> on main has a generic native accelerator adapter framework (Decision 112, Spec 138 FR-060 to FR-065, <a href="https://github.com/traverse-framework/traverse/pull/1667">traverse#1667</a>). It is not in any published crate or package yet.</p>
+  <ul>
+    <li><strong>The host chooses, in policy.</strong> The execution policy lists placements in order. An empty list means <code>wasm-cpu</code> only. An unknown or repeated placement id is <code>policy_denied</code>.</li>
+    <li><strong>A placement has to earn its turn.</strong> The runtime takes the first listed placement that the host supports, that the signed package carries a variant for, that passed its device self-check, that fits the host memory ceiling, and that meets <code>require_fuel_metering</code> when the host asks for it.</li>
+    <li><strong>The self-check is real.</strong> The variant's conformance vector runs on the device and is compared under the variant's declared tolerance. The result is cached per variant digest, adapter, platform version, and compute units, so an OS update re-runs it. A failed check makes that variant unavailable.</li>
+    <li><strong>It fails closed.</strong> If nothing qualifies, the call fails with <code>placement_unavailable</code> before the input is consumed. A late adapter result after cancel or deadline is discarded.</li>
+    <li><strong>The trace says where it ran.</strong> Every result carries placement evidence: the placement, the compute units, and whether fuel metering applied.</li>
+  </ul>
+
+  <h2>What is not done yet</h2>
+  <p>No real accelerator adapter has landed. The first one planned is Core ML on Apple devices, called from Rust. An earlier converter wrapped ONNX in a way Core ML could only run on the CPU, so it is being replaced through a spike-gated ONNX to Core ML route (<a href="https://github.com/traverse-framework/traverse/issues/1663">#1663</a>), with on-device iPhone timing evidence tracked in <a href="https://github.com/traverse-framework/traverse/issues/1630">#1630</a>. There is no GPU adapter for the web, Android, or desktop, and no date for one.</p>
+
+  <h2>Why it is built this way</h2>
+  <p>An accelerator is an implementation detail of the host, not a second runtime. The contract, the signed package, and <strong>discover → execute → trace</strong> stay the same. The adapter only runs a variant the package already signed, only after it matched the <code>wasm-cpu</code> reference on that device, and the trace records which path produced the answer. An agent or app can ask for speed, but the runtime decides whether the faster path is trustworthy on this hardware.</p>
+
+  <p>This is a different thing from capability <a href="/questions/how-do-placement-targets-work.html">placement targets</a> (<code>local</code>, <code>browser</code>, and so on), which decide where a capability can be placed. Model placements decide which compute path runs a signed model inside a host.</p>
+</QuestionLayout>
