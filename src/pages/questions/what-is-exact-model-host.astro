@@ -1,0 +1,49 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is ExactModelHost?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'ExactModelHost is the host-side connector for governed exact-ref model packages (Spec 138). A host registers a signed package under host-owned trust roots, then executes it under discover → execute → trace. It is not a second Traverse runtime. Published in Traverse v0.14.0: the native connector and web ExactModelBrowserHost, plus Swift ExactModelHost on the xcframework swift-host-v0.14.0-4. Kotlin and .NET ExactModelHost code is on traverse main and is not in Maven Central or nuget.org 0.14.0 (#1651). digits-mlp-1.0.0 uses a test-only key; production signing is #1567. This is not catalog model.execute, and it is not a Hugging Face integration.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+  { href: '/questions/can-kotlin-or-dotnet-embedders-run-exact-ref-yet.html', label: 'Can Kotlin or .NET run exact-ref yet?' },
+];
+---
+<QuestionLayout
+  title="What is ExactModelHost?"
+  description="ExactModelHost is the host-side connector for signed exact-ref model packages (Spec 138). Not a second runtime. Published: native, web ExactModelBrowserHost, Swift swift-host-v0.14.0-4. Kotlin and .NET are not in the 0.14.0 packages."
+  canonical="https://traverse-framework.com/questions/what-is-exact-model-host.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <code>ExactModelHost</code> is the host-side connector for governed exact-ref model packages (Spec 138). The host registers a signed package under trust roots the host owns, then executes that package under <strong>discover → execute → trace</strong>. It is a connector on the host. It is not a second Traverse runtime.</p>
+
+  <h2>What the host actually does</h2>
+  <p>The app names a package by digest and signature. The connector checks that pin against a key the host already trusts, caches the package, and runs it. Apps do not add trust roots. A naked URL is not the name of the model that ran. The same loop applies on every host that has shipped the connector: discover the pinned package, execute it, leave a trace.</p>
+
+  <h2>What is published</h2>
+  <ul>
+    <li><strong>Native</strong> — the connector ships in the Traverse v0.14.0 crates (<code>ExactModelHostConnector</code>).</li>
+    <li><strong>Web</strong> — published <code>traverse-embedder-web@0.14.0</code> includes <code>ExactModelBrowserHost</code>.</li>
+    <li><strong>Swift</strong> — <code>ExactModelHost</code> is on the published xcframework <code>swift-host-v0.14.0-4</code>.</li>
+    <li><strong>Kotlin and .NET</strong> — <code>ExactModelHost</code> code is on traverse main. It is <strong>not</strong> in Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.14.0 or nuget.org <code>TraverseEmbedder</code> 0.14.0. Those package cuts are <a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a>.</li>
+  </ul>
+  <p>Swift, Kotlin, and .NET embedders are published, pre-1.0, and not Certified under Spec 529. Check <a href="/platforms.html">Platforms</a> before treating a host as able to run exact-ref.</p>
+
+  <h2>What this is not</h2>
+  <p>The first trained package, <code>digits-mlp-1.0.0</code>, is signed with a <strong>test-only</strong> key. Production custody, rotation, and revocation are <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>, still open. This connector is not catalog <code>model.execute</code>. The public catalog does not offer that. It is not a Hugging Face integration. The matrix of which published hosts can run a signed package is <a href="/questions/which-hosts-run-signed-exact-ref-models.html">which hosts run signed exact-ref models</a>.</p>
+</QuestionLayout>
