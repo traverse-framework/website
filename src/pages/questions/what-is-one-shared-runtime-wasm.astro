@@ -9,12 +9,13 @@ const jsonLd = JSON.stringify({
     name: 'What is one shared runtime.wasm in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Traverse uses one shared runtime.wasm orchestrator. Browser, native desktop, CLI, and MCP are embedders and clients — not different Traverse runtimes per language. Published consumers today include JS/TS (traverse-embedder-web), Rust (traverse-embedder), and agents via traverse-mcp. Python shells out to traverse-cli. Swift (xcframework on swift-host-v* tags), Kotlin (Maven Central com.traverse-framework:traverse-embedder 0.14.0), and .NET (nuget.org TraverseEmbedder 0.14.0) are published, pre-1.0, and not Certified.',
+      text: 'Traverse uses one shared runtime contract and host ABI. Browser, native desktop, CLI, and MCP are embedders and clients — not different Traverse runtimes per language. The web package loads the bundle’s digest-checked runtime/runtime.wasm. The Rust crate links traverse-runtime natively and does not ship a separate runtime-WASM file. Published consumers today include JS/TS (traverse-embedder-web), Rust (traverse-embedder), and agents via traverse-mcp. Python shells out to traverse-cli. There is no Python SDK. Swift (xcframework on swift-host-v* tags), Kotlin (Maven Central com.traverse-framework:traverse-embedder 0.14.0), and .NET (nuget.org TraverseEmbedder 0.14.0) are published, pre-1.0, and not Certified.',
     },
   }],
 });
 
 const relatedLinks = [
+  { href: '/blog/one-shared-runtime-two-loading-paths.html', label: 'One shared runtime. Not one shared .wasm file on every host.' },
   { href: '/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html', label: 'Does the Rust embedder use the same runtime.wasm?' },
   { href: '/what-is-real-today.html', label: 'What is real today' },
   { href: '/platforms.html', label: 'Platforms' },
@@ -33,10 +34,11 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>Traverse is one orchestrator binary — <code>runtime.wasm</code> — shared across hosts that have actually shipped. WASM is how the sandbox and portable artifacts work. It is not the product identity, and it is not a license to claim every OS and cloud placement.</p>
+  <p>Traverse is one product runtime and one host ABI, shared across hosts that have actually shipped. People call that contract <code>runtime.wasm</code>. WASM is how the sandbox and portable artifacts work. It is not the product identity, and it is not a license to claim every OS and cloud placement.</p>
 
   <h2>Embedders are clients</h2>
-  <p>The browser package, native Rust embedder, CLI, and MCP server load and talk to the same runtime model. They do not each reinvent a separate “Traverse runtime” in their language. When you call a capability from npm, crates.io, or an MCP client, you are asking that shared runtime to discover → execute → trace against a known contract.</p>
+  <p>The browser package, native Rust embedder, CLI, and MCP server talk to one runtime contract. They do not each reinvent a separate Traverse runtime in their language. When you call a capability from npm, crates.io, or an MCP client, you are asking that runtime to discover → execute → trace against a known contract.</p>
+  <p>Shared means the contract and the host ABI. It does not mean every package ships the same <code>runtime.wasm</code> bytes. <code>traverse-embedder-web@0.14.0</code> loads the bundle’s digest-checked <code>runtime/runtime.wasm</code>. <code>traverse-embedder@0.14.0</code> links <code>traverse-runtime</code> natively and ships no separate runtime-WASM file. The walk-through is <a href="/blog/one-shared-runtime-two-loading-paths.html">one shared runtime, two loading paths</a>.</p>
 
   <h2>Honest consumers today</h2>
   <ul>
@@ -49,5 +51,5 @@ const relatedLinks = [
   <p>Edge is planned. Cloud placement is an explicit non-goal for v0.1. Before assuming a host works, read <a href="/platforms.html">Platforms</a> and <a href="/what-is-real-today.html">what is real today</a>.</p>
 
   <h2>What this is not</h2>
-  <p>It is not “write once, run on any OS forever.” It is one governed capability on the hosts Traverse has actually shipped. Capability WASM and the shared runtime are different layers: your business rule is a capability artifact; the orchestrator that validates and runs it is <code>runtime.wasm</code>.</p>
+  <p>It is not “write once, run on any OS forever.” It is one governed capability on the hosts Traverse has actually shipped. Capability WASM and the shared runtime are different layers: your business rule is a capability artifact; the orchestrator that validates and runs it is that one runtime contract.</p>
 </QuestionLayout>

@@ -1,0 +1,45 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can a Traverse capability access the filesystem?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No. A Traverse capability has no ambient filesystem. Today’s execution I/O is stdin/stdout JSON through the host. The capability must not assume it can open paths, read environment variables, or reach the network on its own. Hosts are thin clients: they own UI and WASI/WIT I/O. The capability holds the non-UI business rule under discover → execute → trace.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-io-boundary-do-capabilities-use-today.html', label: 'What I/O boundary do capabilities use today?' },
+  { href: '/questions/where-does-business-logic-live-in-traverse.html', label: 'Where does business logic live?' },
+  { href: '/blog/where-business-logic-lives.html', label: 'Where business logic lives (hosts stay thin)' },
+  { href: '/platforms.html', label: 'Where Traverse actually runs' },
+  { href: '/questions/can-traverse-capabilities-call-native-os-apis.html', label: 'Can capabilities call native OS APIs?' },
+];
+---
+<QuestionLayout
+  title="Can a Traverse capability access the filesystem?"
+  description="No ambient filesystem. Capabilities exchange stdin/stdout JSON through the host. They do not open paths, read the environment, or reach the network on their own. Hosts own UI and I/O."
+  canonical="https://traverse-framework.com/questions/can-a-capability-access-the-filesystem.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>No.</strong> A Traverse capability does not get an ambient filesystem. It cannot assume a current directory, a path it may <code>open</code>, or a disk that happens to look the same on every machine.</p>
+
+  <h2>What it gets instead</h2>
+  <p>Today’s execution I/O is <strong>stdin/stdout JSON through the host</strong>. The host stages a payload the contract accepts, the capability runs, and the host reads a JSON result or a structured failure back. That channel is described in <a href="/questions/what-io-boundary-do-capabilities-use-today.html">what I/O boundary capabilities use today</a>. Mesh bytes, tables, and other payloads ride inside that JSON shape. They do not arrive as files the guest opened itself.</p>
+
+  <h2>Who owns the disk</h2>
+  <p>Hosts are thin clients. They do UI, and they do the I/O — including WASI/WIT when that host implements it. The capability holds the non-UI business rule: the price, the eligibility check, the codec, the policy gate. <a href="/questions/where-does-business-logic-live-in-traverse.html">Where business logic lives</a> is the split. <a href="/blog/where-business-logic-lives.html">The narrative</a> walks the same line. A capability that reaches out for files, environment variables, or the network on its own has left that split.</p>
+
+  <p>A contract may name a specific host call. The host implements that call. The capability invokes the name. That is still host-owned I/O, the same idea as <a href="/questions/can-traverse-capabilities-call-native-os-apis.html">native OS APIs</a>. It is not permission for the guest to wander the filesystem.</p>
+
+  <h2>Check the host before you generalize</h2>
+  <p>Discover → execute → trace stays the loop on every host that has shipped. Which hosts have shipped, and in what shape, is <a href="/platforms.html">Platforms</a>. Do not read this page as "every language embedder exposes the same filesystem API." Read it as: the capability does not have one.</p>
+</QuestionLayout>

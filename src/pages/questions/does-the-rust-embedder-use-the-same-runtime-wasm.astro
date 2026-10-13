@@ -15,6 +15,7 @@ const jsonLd = JSON.stringify({
 });
 
 const relatedLinks = [
+  { href: '/blog/one-shared-runtime-two-loading-paths.html', label: 'One shared runtime. Not one shared .wasm file on every host.' },
   { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
   { href: '/questions/how-do-i-embed-traverse-in-a-web-app.html', label: 'How do I embed Traverse in a web app?' },
   { href: '/questions/can-i-run-traverse-capabilities-in-nodejs.html', label: 'Can I run Traverse capabilities in Node.js?' },
@@ -55,5 +56,5 @@ const relatedLinks = [
     <li><strong>Python</strong> — shell out to <code>traverse-cli capability-package execute</code>. There is <strong>no Python SDK</strong>.</li>
     <li><strong>Swift / Kotlin / .NET</strong> — published, pre-1.0, and not Certified under Spec 529. Swift xcframework on <code>swift-host-v*</code> tags; Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central; .NET <code>TraverseEmbedder</code> 0.14.0 on nuget.org.</li>
   </ul>
-  <p>The published 0.14.0 Maven and NuGet packages do not include <code>ExactModelHost</code>. Check <a href="/platforms.html">Platforms</a> before treating a host as shipped.</p>
+  <p>The published 0.14.0 Maven and NuGet packages do not include <code>ExactModelHost</code>. Check <a href="/platforms.html">Platforms</a> before treating a host as shipped. The narrative version of this page is <a href="/blog/one-shared-runtime-two-loading-paths.html">one shared runtime, two loading paths</a>.</p>
 </QuestionLayout>

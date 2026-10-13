@@ -1,0 +1,145 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 13, 2026</span>
+      <span class="badge">Runtime</span>
+      <span class="badge">Honesty</span>
+      <span class="badge">Embedders</span>
+    </div>
+    <h1 class="t-h1">One shared runtime. Not one shared .wasm file on every host.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse has one product runtime, one host ABI, and one loop: <strong>discover → execute → trace</strong>. An app or an agent finds a versioned capability. The runtime runs that known artifact, or it refuses. A trace records what was decided. The phrase <strong>one shared <code>runtime.wasm</code></strong> is the short name for that contract. It is easy to hear it as a file-copy claim. It is a product claim.</p>
+
+      <div class="callout">
+        Short version: the contract is shared. The loading path is not. <code>traverse-embedder-web@0.14.0</code> loads the app bundle's <code>runtime/runtime.wasm</code> and checks <code>runtime/runtime.wasm.sha256</code>. <code>traverse-embedder@0.14.0</code> links <code>traverse-runtime</code> through Cargo and ships no separate runtime-WASM file. Capability artifacts stay WASM and still target that host ABI. Hosts stay thin clients. The citeable page is <a href="/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html">does the Rust embedder use the same runtime.wasm?</a>
+      </div>
+
+      <p>Authors usually do not write the artifact by hand. The usual path is skill-first, via <code>traverse-capability-author</code>: interview, registry check, contract, WASM, human-reviewed pull request. Under the hood it is still Rust compiled to WASM. You do not need to write Rust for that path. What you publish is a capability. What runs it is one runtime, reached through hosts that are clients.</p>
+
+      <h2 id="phrase">What the phrase is for</h2>
+
+      <p>A host asks the runtime to run a capability. The host does not become a second Traverse. Browser, native desktop, CLI, and MCP are clients of that same contract: UI and I/O around a rule that lives in the capability. The promise is that a capability means the same thing on every host that runs it through that ABI. The language you embedded from is not supposed to fork the rule.</p>
+
+      <p>The file name <code>runtime.wasm</code> shows up because the web path really does load a WASM orchestrator. People then generalize. They picture every package — npm, crates.io, Swift, Kotlin, .NET — dropping the same bytes on disk and dlopen-ing them. That picture is tidy. It is not how v0.14.0 is built. Two published paths already diverge, on purpose, and they still share the ABI.</p>
+
+      <h2 id="web">The web path loads a file</h2>
+
+      <p><code>traverse-embedder-web@0.14.0</code> does not hide the orchestrator inside the npm package. <code>BundleEmbedder</code> reads <code>runtime/runtime.wasm</code> from the application bundle and checks it against <code>runtime/runtime.wasm.sha256</code>. Missing file, missing digest, or a mismatch: <code>init</code> fails closed. There is no quiet fallback to a different engine.</p>
+
+      <p>The package README's Runtime-WASM section describes that check. <code>BundleEmbedder</code> digest-verifies the bundle orchestrator and drives the host ABI native hosts use: <code>traverse_init</code>, <code>traverse_submit</code>, <code>traverse_next_event</code>. The file belongs to the app bundle. You ship it beside the capabilities. You do not fish it out of <code>node_modules</code> and hope.</p>
+
+      <p>Node is the same path. <code>NodeFsBundleLoader</code> is how a Node process reads that bundle off disk. The host is Node. The runtime is still the bundle's digest-checked file. Platforms does not grow a separate "Node runtime" because of the loader. If you are embedding from JavaScript, browser or Node, you are on this path.</p>
+
+      <p>The public <a href="/discover.html">/discover</a> page is this web path. It executes a reviewed plan through a digest-verified nested <code>runtime.wasm</code>. That is evidence for the browser load. It is not evidence that the Rust crate ships the same file.</p>
+
+      <h2 id="rust">The Rust path links the runtime</h2>
+
+      <p><code>traverse-embedder@0.14.0</code> on crates.io does not load a separate runtime-WASM artifact. Its <code>Cargo.toml</code> depends on <code>traverse-runtime</code> as a workspace dependency, so the crate links the Traverse runtime at the same version. The crate README's Runtime-WASM compatibility section says the Rust package ships no separate runtime-WASM artifact. That sentence is the whole distinction.</p>
+
+      <p>Capability artifacts in the bundle are still WASM. They have to target the Traverse host ABI that linked runtime supports. An unsupported schema, a digest mismatch, or an invalid manifest is rejected at <code>init</code> with a stable error code. The crate does not fall back to a <code>traverse-cli serve</code> sidecar.</p>
+
+      <p>Same contract. Different loading. If the question is "did both hosts dlopen this byte string," v0.14.0 does not promise yes. If the question is "did both hosts run this capability through the same host ABI and the same discover → execute → trace loop," that is the promise. The <a href="/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html">Rust embedder Q&amp;A</a> is the short form of this section. Quote that page. This post is the walk-through.</p>
+
+      <h2 id="hosts">Capabilities stay WASM. Hosts stay clients.</h2>
+
+      <p>The business rule is a WASM capability. Pricing, eligibility, a codec, a policy gate: that lives in the artifact, with a contract. The web package, the Rust crate, the CLI, and <code>traverse-mcp</code> call into the runtime. They do not reimplement the rule in the host language. <a href="/blog/where-business-logic-lives.html">Where business logic lives</a> is the longer version of that split. Hosts stay thin on purpose.</p>
+
+      <p>Python has no SDK. A Python program shells out to <code>traverse-cli capability-package execute</code>. That shell-out is a client of the same runtime. It is not a second orchestrator, and it is not an embedder you can import.</p>
+
+      <h2 id="non-claims">What this post does not say</h2>
+
+      <p>Swift, Kotlin, and .NET are published, pre-1.0, and not Certified under Spec 529. This post does not say those hosts load one <code>runtime.wasm</code> the same way the web package does. Check <a href="/platforms.html">Platforms</a> before you treat a host as shipped in a particular shape. Swift ships an xcframework on <code>swift-host-v*</code> tags. Platforms currently lists <code>swift-host-v0.14.0-4</code>. Kotlin is <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central. .NET is <code>TraverseEmbedder</code> 0.14.0 on nuget.org.</p>
+
+      <p>The published 0.14.0 Maven and NuGet packages do not include <code>ExactModelHost</code>. That connector is how a host registers a signed exact-ref model package and executes it. It is not a second Traverse runtime. Kotlin and .NET code for it is on main; the published 0.14.0 packages do not carry it (<a href="https://github.com/traverse-framework/traverse/issues/1651" target="_blank" rel="noopener">#1651</a>). Nothing here is Certified. Nothing here is a Python SDK.</p>
+
+      <h2 id="cite">What to cite</h2>
+
+      <p>If you need one sentence, use <a href="/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html">does the Rust embedder use the same runtime.wasm?</a> If you need the picture — web file, Rust link, capabilities still WASM, hosts still clients — you are already on it. <a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm?</a> is the shorter product definition. Platforms is the status page. When those three disagree with a slide, trust the Q&amp;A and Platforms.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="toc-list">
+          <li><a href="#phrase">What the phrase is for</a></li>
+          <li><a href="#web">The web path</a></li>
+          <li><a href="#rust">The Rust path</a></li>
+          <li><a href="#hosts">Capabilities and hosts</a></li>
+          <li><a href="#non-claims">What this does not say</a></li>
+          <li><a href="#cite">What to cite</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html">Does the Rust embedder use the same runtime.wasm? →</a></li>
+          <li><a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm? →</a></li>
+          <li><a href="/blog/where-business-logic-lives.html">Where business logic lives →</a></li>
+          <li><a href="/platforms.html">Platforms →</a></li>
+          <li><a href="/questions/can-i-run-traverse-capabilities-in-nodejs.html">Can I run capabilities in Node.js? →</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Start here</div>
+        <p>New to Traverse? One runtime contract, skill-first authoring, discover → execute → trace.</p>
+        <a href="/blog/what-is-real-today-start-here.html" class="btn btn-ghost">What is real today</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+`;
+---
+<SubpageLayout
+  title={"One shared runtime. Not one shared .wasm file on every host. — Traverse Blog"}
+  description={"One product runtime and one host ABI, two loading paths. traverse-embedder-web@0.14.0 digest-checks the bundle's runtime.wasm. traverse-embedder@0.14.0 links traverse-runtime natively. Hosts stay clients."}
+  canonical={"https://traverse-framework.com/blog/one-shared-runtime-two-loading-paths.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

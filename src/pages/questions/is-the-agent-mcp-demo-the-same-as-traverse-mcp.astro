@@ -1,0 +1,43 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Is the agent MCP exact-ref demo the same as traverse-mcp?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'No. The October 9 weekly demo (agent-mcp-exact-ref) uses an in-process MCP-shaped JSON-RPC façade over ExactModelBrowserHost under Node. It is not the checksum-pinned Mode A traverse-mcp binary. Mode A traverse-mcp is the published stdio MCP server for discover, inspect, and execute of registry capabilities. Pinning a packaged Mode A binary is longer-term work tracked as #1653.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/agent-mcp-exact-ref.html', label: 'Agent speaks MCP. Exact pin kills the freestyle.' },
+  { href: '/agents.html', label: 'For AI agents (traverse-mcp)' },
+  { href: '/docs/guides/mcp-setup.html', label: 'MCP setup guide' },
+  { href: '/questions/how-does-the-mcp-server-work.html', label: 'How does the Traverse MCP server work?' },
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+];
+---
+<QuestionLayout
+  title="Is the agent MCP exact-ref demo the same as traverse-mcp?"
+  description="No. The Oct 9 demo is an in-process MCP-shaped façade over ExactModelBrowserHost under Node. Mode A traverse-mcp is the published stdio server for registry capabilities. Pinning that binary is #1653."
+  canonical="https://traverse-framework.com/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html"
+  category="AI and MCP"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>No.</strong> The October 9 weekly demo and Mode A <code>traverse-mcp</code> both speak something an agent can call. They are not the same program.</p>
+
+  <h2>What the demo is</h2>
+  <p>The write-up <a href="/blog/agent-mcp-exact-ref.html">Agent speaks MCP. Exact pin kills the freestyle.</a> shows an agent calling MCP-shaped tools against a signed exact-ref package. Behind those tools is an <strong>in-process JSON-RPC façade</strong> over <code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.14.0</code>, running under Node. The host is the published web exact-ref connector. The façade is demo code for that week. It is not a binary you pin from a release.</p>
+
+  <h2>What traverse-mcp is</h2>
+  <p>Mode A <code>traverse-mcp</code> is the published stdio MCP server. An agent uses it to discover, inspect, and execute registry capabilities: <code>list_entrypoints</code>, <code>describe_entrypoint</code>, <code>execute_entrypoint</code>, and the rest of the ten-command set on <a href="/agents.html">For AI agents</a>. Setup is the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>. Stdio is the packaged bootstrap. That server is a client of the shared runtime contract. It is not the demo façade, and it is not a second runtime.</p>
+
+  <h2>What is still open</h2>
+  <p>Pinning and checksum-verifying a packaged Mode A binary, the way you would pin any other release artifact, is longer-term work: <a href="https://github.com/traverse-framework/traverse/issues/1653">#1653</a>. Until that lands, do not describe the October 9 column as "the checksum-pinned <code>traverse-mcp</code>." Quote the blog for what the façade did. Quote this page, or <a href="/agents.html">agents</a>, for what the server is.</p>
+</QuestionLayout>
