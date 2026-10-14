@@ -16,6 +16,6 @@
     "traverse-embedder-web": "^0.15.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0"
+    "@playwright/test": "^1.64.0"
   }
 }
