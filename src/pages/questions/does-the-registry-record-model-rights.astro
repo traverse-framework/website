@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Does the Traverse registry record model licenses and usage rights?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Yes, on the registry side. Registry spec 026 (model rights compliance) requires every newly added model-backed contract to declare commercial_use, redistribution and derivatives for each ai.models entry, with unknown rejected. It also pins LICENSE and NOTICE files by sha256, requires an immutable upstream commit, records how shipped weights were derived, and signs the contract bytes so the rights record is authenticated. The index projects a usage_class (unrestricted, evaluation-only or conditional). The record is a signed maintainer declaration, not a legal certification. Traverse CLI inspection and runtime enforcement are tracked in traverse#1598 and are not shipped yet.',
+      text: 'Yes, on the registry side. Registry spec 026 (model rights compliance) requires every newly added model-backed contract to declare commercial_use, redistribution and derivatives for each ai.models entry, with unknown rejected. It also pins LICENSE and NOTICE files by sha256, requires an immutable upstream commit, records how shipped weights were derived, and signs the contract bytes so the rights record is authenticated. The index projects a usage_class (unrestricted, evaluation-only or conditional). The record is a signed maintainer declaration, not a legal certification. Traverse CLI inspection of that registry record, honoring a revoked capability, and verifying the contract signature are still traverse#1598 and are not shipped. Host-side exact-ref model_usage enforcement is a different gate and did ship in Traverse v0.15.0.',
     },
   }],
 });
@@ -25,7 +25,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Does the Traverse registry record model licenses and usage rights?"
-  description="Yes. Registry spec 026 makes model-backed contracts declare commercial use, redistribution and derivative rights, pins LICENSE/NOTICE by digest, and signs the contract. Traverse-side enforcement is still open (traverse#1598)."
+  description="Yes. Registry spec 026 makes model-backed contracts declare commercial use, redistribution and derivative rights, pins LICENSE/NOTICE by digest, and signs the contract. Registry-side runtime enforcement is still open (traverse#1598). Exact-ref model_usage shipped in v0.15.0."
   canonical="https://traverse-framework.com/questions/does-the-registry-record-model-rights.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
@@ -53,7 +53,7 @@ const relatedLinks = [
 
   <h2>What is still open (as of October 5, 2026)</h2>
   <ul>
-    <li><strong>Traverse-side enforcement.</strong> Showing the full rights record in <code>traverse-cli</code>, honoring <code>revoked</code> at runtime, and verifying the contract signature are tracked in <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>. They are not in a published Traverse release yet.</li>
+    <li><strong>Registry spec 026 on the Traverse side.</strong> Showing the full registry rights record in <code>traverse-cli</code>, honoring a revoked capability at runtime, and verifying the contract signature are tracked in <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>. That issue is still open. It is not the same gate as exact-ref <code>model_usage</code>, which v0.15.0 does enforce on every published host.</li>
     <li><strong>Existing agents.</strong> Already-published versions are never judged retroactively. The five existing model-backed agents get compliant new MINOR versions under <a href="https://github.com/traverse-framework/registry/issues/623">registry#623</a>.</li>
   </ul>
   <p>The publish path already checks the parts of this record that the contract alone can decide, offline: see <a href="/questions/does-capability-publish-validate-model-attribution.html">Does capability publish validate model attribution?</a>.</p>

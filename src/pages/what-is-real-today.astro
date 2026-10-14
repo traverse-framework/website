@@ -8,7 +8,7 @@ const _body = `<section class="page-hero">
       <h1 class="t-h1">What is real today.</h1>
       <p class="page-hero-sub">A citeable snapshot for humans and agents. Not a pitch deck. Not a roadmap dressed as shipped. If it is not on this page, do not invent it.</p>
       <div class="page-hero-badges">
-        <span class="badge badge-success badge-dot">v0.14.0</span>
+        <span class="badge badge-success badge-dot">v0.15.0</span>
         <span class="badge">pre-1.0</span>
         <span class="badge">Apache 2.0</span>
       </div>
@@ -110,7 +110,7 @@ const _body = `<section class="page-hero">
         <p>No Python SDK. Shell out to <code>traverse-cli capability-package execute</code> (stdlib <code>subprocess</code>). See <a href="/questions/can-i-use-traverse-with-python.html">Python →</a></p>
       </div>
     </div>
-    <p class="section-lead" style="margin-top:2rem">Native Swift, Kotlin, and .NET embedders are published and pre-1.0: Swift ships a wasmi xcframework on <code>swift-host-v*</code> host tags, Kotlin is <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central, and .NET is <code>TraverseEmbedder</code> 0.14.0 on nuget.org. They are marked In progress. No host is Certified under Spec 529. Check <a href="/platforms.html">Platforms</a> before assuming a target is shipped.</p>
+    <p class="section-lead" style="margin-top:2rem">Native Swift, Kotlin, and .NET embedders are published and pre-1.0: Swift ships a wasmi xcframework on <code>swift-host-v0.15.0</code> (<code>Package.swift</code> on main pins it), Kotlin is <code>com.traverse-framework:traverse-embedder</code> 0.15.0 on Maven Central, and .NET is <code>TraverseEmbedder</code> 0.15.0 on nuget.org. They are marked In progress. No host is Certified under Spec 529. Signed exact-ref models run on those hosts as well as native Rust and the browser. Check <a href="/platforms.html">Platforms</a> before assuming a target is shipped.</p>
   </div>
 </section>
 
@@ -129,7 +129,8 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Honesty</div>
       <h2>Pre-1.0. No invented customers.</h2>
-      <p>Traverse is open-source research engineering under Apache 2.0, currently v0.14.0. Specs and CI gates keep the code honest — they are not the product pitch. Do not invent customer logos, production SLAs, or a Python SDK. When in doubt, cite this page, the <a href="/faq.html">FAQ</a>, <a href="/platforms.html">Platforms</a>, and <a href="/llms.txt">llms.txt</a>.</p>
+      <p>Traverse v0.15.0 runs signed exact-ref model packages on native Rust, the browser, Swift, Kotlin/Android, and .NET. Every one of those hosts enforces model rights: an app with <code>exact_model_dependencies</code> must declare <code>model_usage</code> or the call fails closed. Third-party ONNX models can be packaged, signed, and verified with <code>traverse-cli model</code>. Apple hosts can opt in to a signed Core ML variant; the default placement is still <code>wasm-cpu</code>. Evidence so far is macOS <code>cargo test</code> plus the Decision 113 iPhone spike. Governed-path iPhone evidence is open (<a href="https://github.com/traverse-framework/traverse/issues/1630" target="_blank" rel="noopener">traverse#1630</a>). <code>digits-mlp-1.0.0</code> is still signed with a test-only key (<a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">#1567</a>).</p>
+      <p>Traverse is open-source research engineering under Apache 2.0, currently v0.15.0. Specs and CI gates keep the code honest — they are not the product pitch. Do not invent customer logos, production SLAs, or a Python SDK. When in doubt, cite this page, the <a href="/faq.html">FAQ</a>, <a href="/platforms.html">Platforms</a>, and <a href="/llms.txt">llms.txt</a>.</p>
     </div>
   </div>
 </section>

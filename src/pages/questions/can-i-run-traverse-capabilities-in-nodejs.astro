@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can I run Traverse capabilities in Node.js?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Yes, through the same npm package the browser uses. traverse-embedder-web@0.14.0 exports NodeFsBundleLoader, which reads your application bundle from disk instead of fetching it. The embedder loads the bundle\'s own runtime/runtime.wasm, checks its sha256 digest, and runs each capability through it, so a Node process discovers, executes, and traces against the same runtime.wasm a browser tab loads. Node is a host, not a separate Traverse runtime. Workflows are limited to linear direct-triggered pipelines today, and Node is not listed as its own target on the Platforms page.',
+      text: 'Yes, through the same npm package the browser uses. traverse-embedder-web@0.15.0 exports NodeFsBundleLoader, which reads your application bundle from disk instead of fetching it. The embedder loads the bundle\'s own runtime/runtime.wasm, checks its sha256 digest, and runs each capability through it, so a Node process discovers, executes, and traces against the same runtime.wasm a browser tab loads. Node is a host, not a separate Traverse runtime. Workflows are limited to linear direct-triggered pipelines today, and Node is not listed as its own target on the Platforms page.',
     },
   }],
 });
@@ -47,11 +47,11 @@ const relatedLinks = [
 >
   <p>Yes. There's no separate Node package. You use <code>traverse-embedder-web</code>, the same npm package a browser app uses, and give it a different bundle loader.</p>
 
-  <p>In the browser, <code>FetchBundleLoader</code> pulls the app bundle over HTTP. In Node, <code>NodeFsBundleLoader</code> reads the same files from disk. Both are exported from the published <code>0.14.0</code> package. Everything after loading is the same: the embedder loads the bundle's <code>runtime/runtime.wasm</code>, checks it against <code>runtime/runtime.wasm.sha256</code>, and runs your capabilities through it. So a Node script discovers, executes, and traces against the same <code>runtime.wasm</code> a browser tab would. Node is just another host.</p>
+  <p>In the browser, <code>FetchBundleLoader</code> pulls the app bundle over HTTP. In Node, <code>NodeFsBundleLoader</code> reads the same files from disk. Both are exported from the published <code>0.15.0</code> package. Everything after loading is the same: the embedder loads the bundle's <code>runtime/runtime.wasm</code>, checks it against <code>runtime/runtime.wasm.sha256</code>, and runs your capabilities through it. So a Node script discovers, executes, and traces against the same <code>runtime.wasm</code> a browser tab would. Node is just another host.</p>
 
   <pre><code>{nodeExample}</code></pre>
 
-  <p>We ran this on Node 20 with <code>traverse-embedder-web@0.14.0</code> from npm and the <code>traverse-starter</code> bundle checked into the <a href="https://github.com/traverse-framework/traverse/tree/main/examples/applications/traverse-starter" target="_blank" rel="noopener">traverse repo</a>. The submit came back <code>accepted</code>, the subscriber saw <code>capability_invoked</code> then <code>capability_result</code>, and <code>traceList</code> returned one completed trace for <code>traverse-starter.process</code>. No <code>traverse-cli serve</code> sidecar was running.</p>
+  <p>We ran this shape on Node 20 with <code>traverse-embedder-web@0.14.0</code> from npm and the <code>traverse-starter</code> bundle checked into the <a href="https://github.com/traverse-framework/traverse/tree/main/examples/applications/traverse-starter" target="_blank" rel="noopener">traverse repo</a>. The submit came back <code>accepted</code>, the subscriber saw <code>capability_invoked</code> then <code>capability_result</code>, and <code>traceList</code> returned one completed trace for <code>traverse-starter.process</code>. No <code>traverse-cli serve</code> sidecar was running. The published package is now <code>0.15.0</code> and still exports <code>NodeFsBundleLoader</code>. That Node 20 run was not repeated against 0.15.0 for this page.</p>
 
   <h2>Where this is useful</h2>
   <ul>
@@ -70,5 +70,5 @@ const relatedLinks = [
     <li><strong>Python isn't covered by this.</strong> There's no Python SDK. From Python, shell out to <code>traverse-cli capability-package execute</code>.</li>
   </ul>
 
-  <p>If you need a Rust process instead, the Rust embedder is <code>traverse-embedder@0.14.0</code> on crates.io. For agents, use <code>traverse-mcp</code>. All of them are clients of the same capability contracts. Nobody reimplements the rule.</p>
+  <p>If you need a Rust process instead, the Rust embedder is <code>traverse-embedder@0.15.0</code> on crates.io. For agents, use <code>traverse-mcp</code>. All of them are clients of the same capability contracts. Nobody reimplements the rule.</p>
 </QuestionLayout>

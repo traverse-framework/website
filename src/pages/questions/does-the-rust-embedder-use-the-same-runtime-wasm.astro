@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Does the Rust embedder use the same runtime.wasm?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Yes, at the contract. Discover, execute, and trace go through one shared runtime contract and one product runtime. One shared runtime.wasm means that orchestrator contract and ABI, not that every package ships a .wasm file you load. traverse-embedder-web@0.14.0 loads the app bundle\'s runtime/runtime.wasm, checks runtime/runtime.wasm.sha256, and runs capabilities through it. traverse-embedder@0.14.0 links traverse-runtime natively as a Cargo workspace dependency and ships no separate runtime-WASM artifact. Capability artifacts stay WASM and still target the Traverse host ABI that linked or loaded runtime supports. Hosts and embedders are clients (UI and I/O), not separate Traverse runtimes. Published consumers today are JS/TS, Rust, and MCP. Python shells out to traverse-cli. There is no Python SDK. Swift, Kotlin, and .NET are published, pre-1.0, and not Certified under Spec 529. The published 0.14.0 Maven and NuGet packages do not include ExactModelHost.',
+      text: 'Yes, at the contract. Discover, execute, and trace go through one shared runtime contract and one product runtime. One shared runtime.wasm means that orchestrator contract and ABI, not that every package ships a .wasm file you load. traverse-embedder-web@0.15.0 loads the app bundle\'s runtime/runtime.wasm, checks runtime/runtime.wasm.sha256, and runs capabilities through it. traverse-embedder@0.15.0 links traverse-runtime natively as a Cargo workspace dependency and ships no separate runtime-WASM artifact. Capability artifacts stay WASM and still target the Traverse host ABI that linked or loaded runtime supports. Hosts and embedders are clients (UI and I/O), not separate Traverse runtimes. Published consumers today are JS/TS, Rust, and MCP. Python shells out to traverse-cli. There is no Python SDK. Swift, Kotlin, and .NET are published, pre-1.0, and not Certified under Spec 529. The published 0.15.0 Maven and NuGet packages include ExactModelHost. The 0.14.0 packages did not.',
     },
   }],
 });
@@ -36,12 +36,12 @@ const relatedLinks = [
   <p><strong>One shared <code>runtime.wasm</code></strong> means one orchestrator contract and ABI, and one product runtime. It does not mean every package literally ships a <code>.wasm</code> file you load.</p>
 
   <h2>Web loads the bundle file</h2>
-  <p><code>traverse-embedder-web@0.14.0</code> loads <code>runtime/runtime.wasm</code> from the application bundle, checks it against <code>runtime/runtime.wasm.sha256</code>, and runs each capability through that orchestrator. The file is not inside the npm package. If either file is missing, or the digest does not match, <code>init</code> fails closed. The package README's Runtime-WASM execution section says <code>BundleEmbedder</code> digest-verifies that bundle orchestrator and drives the same host ABI native hosts use (<code>traverse_init</code>, <code>traverse_submit</code>, <code>traverse_next_event</code>). Node uses the same package with <code>NodeFsBundleLoader</code>. It still loads the bundle's own file.</p>
+  <p><code>traverse-embedder-web@0.15.0</code> loads <code>runtime/runtime.wasm</code> from the application bundle, checks it against <code>runtime/runtime.wasm.sha256</code>, and runs each capability through that orchestrator. The file is not inside the npm package. If either file is missing, or the digest does not match, <code>init</code> fails closed. The package README's Runtime-WASM execution section says <code>BundleEmbedder</code> digest-verifies that bundle orchestrator and drives the same host ABI native hosts use (<code>traverse_init</code>, <code>traverse_submit</code>, <code>traverse_next_event</code>). Node uses the same package with <code>NodeFsBundleLoader</code>. It still loads the bundle's own file.</p>
 
   <p>The public <a href="/discover.html">/discover</a> page is that web path. It executes a reviewed plan through a digest-verified nested <code>runtime.wasm</code>. The page cites Spec 1402 for that nested orchestrator file. Spec 1402, as the discover page uses it, names the file the browser loads. It is not a claim that the Rust crate ships the same file.</p>
 
   <h2>Rust links the runtime natively</h2>
-  <p><code>traverse-embedder@0.14.0</code> on crates.io does not load a separate runtime-WASM file. Its <code>Cargo.toml</code> depends on <code>traverse-runtime</code> as a workspace dependency, so the crate links the Traverse runtime at the same workspace version. The crate README's Runtime-WASM compatibility section says the Rust package ships no separate runtime-WASM artifact.</p>
+  <p><code>traverse-embedder@0.15.0</code> on crates.io does not load a separate runtime-WASM file. Its <code>Cargo.toml</code> depends on <code>traverse-runtime</code> as a workspace dependency, so the crate links the Traverse runtime at the same workspace version. The crate README's Runtime-WASM compatibility section says the Rust package ships no separate runtime-WASM artifact.</p>
 
   <p>Capability artifacts in the bundle are still WASM. They have to target the Traverse host ABI that linked runtime supports. An unsupported schema, a digest mismatch, or an invalid manifest is rejected at <code>init</code> with a stable error code. The crate does not fall back to a <code>traverse-cli serve</code> sidecar.</p>
 
@@ -50,11 +50,11 @@ const relatedLinks = [
 
   <h2>Honest consumers</h2>
   <ul>
-    <li><strong>JS/TS</strong> — published npm <code>traverse-embedder-web@0.14.0</code>. Loads the bundle's <code>runtime/runtime.wasm</code>.</li>
-    <li><strong>Rust</strong> — published crates.io <code>traverse-embedder@0.14.0</code>. Links <code>traverse-runtime</code> natively. No separate runtime-WASM artifact.</li>
+    <li><strong>JS/TS</strong> — published npm <code>traverse-embedder-web@0.15.0</code>. Loads the bundle's <code>runtime/runtime.wasm</code>.</li>
+    <li><strong>Rust</strong> — published crates.io <code>traverse-embedder@0.15.0</code>. Links <code>traverse-runtime</code> natively. No separate runtime-WASM artifact.</li>
     <li><strong>AI agents</strong> — published <code>traverse-mcp</code> (stdio bootstrap).</li>
     <li><strong>Python</strong> — shell out to <code>traverse-cli capability-package execute</code>. There is <strong>no Python SDK</strong>.</li>
-    <li><strong>Swift / Kotlin / .NET</strong> — published, pre-1.0, and not Certified under Spec 529. Swift xcframework on <code>swift-host-v*</code> tags; Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central; .NET <code>TraverseEmbedder</code> 0.14.0 on nuget.org.</li>
+    <li><strong>Swift / Kotlin / .NET</strong> — published, pre-1.0, and not Certified under Spec 529. Swift xcframework on <code>swift-host-v*</code> tags; Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.15.0 on Maven Central; .NET <code>TraverseEmbedder</code> 0.15.0 on nuget.org.</li>
   </ul>
-  <p>The published 0.14.0 Maven and NuGet packages do not include <code>ExactModelHost</code>. Check <a href="/platforms.html">Platforms</a> before treating a host as shipped. The narrative version of this page is <a href="/blog/one-shared-runtime-two-loading-paths.html">one shared runtime, two loading paths</a>.</p>
+  <p>The published 0.15.0 Maven and NuGet packages include <code>ExactModelHost</code>. The 0.14.0 packages did not. Check <a href="/platforms.html">Platforms</a> before treating a host as Certified. The narrative version of this page is <a href="/blog/one-shared-runtime-two-loading-paths.html">one shared runtime, two loading paths</a> (written against v0.14.0).</p>
 </QuestionLayout>

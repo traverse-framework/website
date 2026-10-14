@@ -33,7 +33,8 @@ import {
 const FIXTURE_WASM_B64 = 'AGFzbQEAAAABCQFgBH9/f38BfwMCAQAFAwEAAgcaAgZtZW1vcnkCAA1tb2RlbF9leGVjdXRlAAAK9AEB8QEBB38gAUEMSQRAQX8PCyAAKAIIIQQgAEEMaiEFQQwgBGogAUsEQEF/DwtBACEIQQAhBgJAA0AgBkECaiAESw0BIAUgBmotAABB6ABGIAUgBkEBamotAABB6QBGcQRAQQEhCAwCCyAGQQFqIQYMAAsLIAhBAUYEQEHKuAIhCUEIIQoFQd64AiEJQQMhCgtBDCAKaiADSwRAQX8PCyACQQE7AQAgAkEEOgACIAJBAToAAyACIAo2AgQgAiAKNgIIQQAhBwJAA0AgByAKTw0BIAJBDGogB2ogCSAHai0AADoAACAHQQFqIQcMAAsLQQwgCmoLCyMDAEHAuAILAmhpAEHKuAILCGhpIHRoZXJlAEHeuAILA2htbQCUAQRuYW1lAmIBAAsABmluX3B0cgEGaW5fbGVuAgdvdXRfcHRyAwdvdXRfY2FwBAtwYXlsb2FkX2xlbgULcGF5bG9hZF9wdHIGAWkHAWoIB21hdGNoZWQJCHJlc3BfcHRyCghyZXNwX2xlbgMpAQAEAgtzZWFyY2hfZG9uZQMGc2VhcmNoBwljb3B5X2RvbmUIBGNvcHk=';
 
 // The same fixture's signed Spec 138 package files (traverse-embedder-web
-// 0.14 admits packages only through registerPackage): the exact bytes of
+// admits packages only through registerPackage; 0.15 also requires
+// modelUsage whenever pins exist): the exact bytes of
 // fixtures/models/fixture-responder-1.0.0/model.manifest.json (its SHA-256
 // is the pin digest) and its detached Ed25519 model.sig.json.
 const FIXTURE_MANIFEST_B64 = 'ewogICJzY2hlbWFfdmVyc2lvbiI6ICIyLjAuMCIsCiAgIm1vZGVsX2lkIjogImZpeHR1cmUucmVzcG9uZGVyIiwKICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgIndhc21fZGlnZXN0IjogImJmMDQ3NjBiMTkzN2MyZjJiODEzYjZlMjhmMmZkYzZlMzM0ODMzYzJkZmFkYzFmN2M4NzJmM2YyOGMzNDEyOTQiLAogICJyZWdpc3RyeV9yZWYiOiAicmVnaXN0cnk6Zml4dHVyZS5yZXNwb25kZXJAMS4wLjAiLAogICJleGVjdXRhYmxlX2Zvcm1hdCI6ICJ0cmF2ZXJzZS1tb2RlbC13YXNtIiwKICAiYWJpX3ZlcnNpb24iOiAxLAogICJpbnB1dF9zY2hlbWFfcmVmIjogInNjaGVtYTpicmlkZ2VkLWdlbmVyYXRlLWluIiwKICAiaW5wdXRfc2NoZW1hX3ZlcnNpb24iOiAiMS4wLjAiLAogICJvdXRwdXRfc2NoZW1hX3JlZiI6ICJzY2hlbWE6YnJpZGdlZC1nZW5lcmF0ZS1vdXQiLAogICJvdXRwdXRfc2NoZW1hX3ZlcnNpb24iOiAiMS4wLjAiLAogICJyaWdodHMiOiB7CiAgICAibGljZW5zZV9pZCI6ICJBcGFjaGUtMi4wIiwKICAgICJhdHRyaWJ1dGlvbiI6ICJUcmF2ZXJzZSBTcGVjIDA0NS8xMzggYnJpZGdlIGNvbmZvcm1hbmNlIGZpeHR1cmUiLAogICAgInJlZGlzdHJpYnV0aW9uIjogInRlc3Qtb25seTsgbm90IGZvciBwcm9kdWN0aW9uIHJlZGlzdHJpYnV0aW9uIGNsYWltcyIsCiAgICAiY29tbWVyY2lhbF91c2UiOiAiYWxsb3dlZCIsCiAgICAic291cmNlX3VybCI6ICJodHRwczovL2dpdGh1Yi5jb20vdHJhdmVyc2UtZnJhbWV3b3JrL1RyYXZlcnNlL3RyZWUvbWFpbi9maXh0dXJlcy9tb2RlbHMvZml4dHVyZS1yZXNwb25kZXItMS4wLjAiCiAgfSwKICAic3VwcG9ydGVkX3Byb2ZpbGVzIjogWwogICAgIndhc20tY3B1IgogIF0sCiAgIm1heF9tZW1vcnlfYnl0ZXMiOiAxMzEwNzIsCiAgIm1heF9mdWVsIjogMTAwMDAwMCwKICAibWF4X2lucHV0X2J5dGVzIjogNDA5NiwKICAibWF4X291dHB1dF9ieXRlcyI6IDQwOTYsCiAgIm1heF9leGVjdXRpb25fbXMiOiA1MDAwLAogICJvZmZsaW5lX2FsbG93ZWQiOiB0cnVlCn0K';
@@ -75,7 +76,9 @@ export async function runResponderDemo(promptText) {
       model_id: MODEL_ID, version: MODEL_VERSION, digest, offline_allowed: true,
       target: PLACEMENT_WASM_CPU, rights: { license_id: 'Apache-2.0', commercial_use: 'allowed' },
     }],
-    { trustedPublicKeysHex: [FIXTURE_TEST_KEY_HEX] },
+    // v0.15.0 fails closed with usage_undeclared when pins exist and
+    // modelUsage is omitted. This demo is not a commercial product.
+    { trustedPublicKeysHex: [FIXTURE_TEST_KEY_HEX], modelUsage: 'non_commercial' },
   );
   // Real verification: Ed25519 signature by a trusted key over the exact
   // manifest bytes, pin digest, WASM digest, rights, target, and limits.

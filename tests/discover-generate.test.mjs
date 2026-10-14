@@ -35,6 +35,7 @@ test('the fixture digests match the real checked-in traverse-framework/traverse 
 test('admission goes through registerPackage with a real signature, not the removed insertVerified', async () => {
   const gen = await read('src/scripts/discover-generate.js');
   assert.match(gen, /registerPackage\(/);
+  assert.match(gen, /modelUsage:\s*'non_commercial'/);
   assert.doesNotMatch(gen, /insertVerified/);
   // The test-only fixture key is labelled as such, never presented as production trust.
   assert.match(gen, /TEST-ONLY public key/);
