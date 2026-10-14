@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can I build a mobile app with Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Partially. Traverse runs your business logic on mobile, not your UI. iOS has a production wasmi-based Swift host (Spec 074, ADR-0014, ADR-0015) distributed as an XCFramework, and the Android embedder (Chicory-based) is published on Maven Central at 0.14.0. Both are pre-1.0 and marked In progress on the Platforms page; no host is Certified under Spec 529 yet.',
+      text: 'Partially. Traverse runs your business logic on mobile, not your UI. iOS has a production wasmi-based Swift host (Spec 074, ADR-0014, ADR-0015) distributed as an XCFramework, and the Android embedder (Chicory-based) is published on Maven Central at 0.15.0. Both are pre-1.0 and marked In progress on the Platforms page; no host is Certified under Spec 529 yet.',
     },
   }],
 });
@@ -23,22 +23,22 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can I build a mobile app with Traverse?"
-  description="Partially: Traverse runs business logic on mobile, not UI. iOS has a production wasmi host; Android and .NET embedders are published at 0.14.0. All are pre-1.0 and none is Certified yet. Here's the exact status."
+  description="Partially: Traverse runs business logic on mobile, not UI. iOS has a production wasmi host; Android and .NET embedders are published at 0.15.0. All are pre-1.0 and none is Certified yet. Here's the exact status."
   canonical="https://traverse-framework.com/questions/can-traverse-build-mobile-apps.html"
   category="Question"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>Partially — and the status is no longer the same across both major mobile OSes, so it's worth being precise about which platform you mean. Traverse's shipped targets are native (Windows, macOS, Linux) and the browser. The Swift (iOS/macOS), Kotlin (Android), and .NET (Windows) embedders all have published packages at 0.14.0, but they're pre-1.0 and still marked In progress on the Platforms page.</p>
+  <p>Partially — and the status is no longer the same across both major mobile OSes, so it's worth being precise about which platform you mean. Traverse's shipped targets are native (Windows, macOS, Linux) and the browser. The Swift (iOS/macOS), Kotlin (Android), and .NET (Windows) embedders all have published packages at 0.15.0, but they're pre-1.0 and still marked In progress on the Platforms page.</p>
 
   <h2>iOS — a production runtime bridge</h2>
   <p><code>packages/swift/TraverseEmbedder</code> now ships <code>WasmiHostBridgeClient</code> as its production runtime loader: it embeds the <code>wasmi</code> interpreter behind a narrow, audited C ABI, packaged as the <code>TraverseSwiftHost</code> XCFramework, and enforces host-owned memory and fuel limits on every call. Its resource controls follow Spec 074 (Swift Native Resource-Control Certification), governed by ADR-0014 (selecting <code>wasmi</code> for the Apple runtime profile) and ADR-0015 (the production C-ABI boundary). The earlier WasmKit-based bridge has been removed from the package; WasmKit is not supported. The original feasibility spike that unblocked this — <a href="/blog/native-ios-runtime-foundation.html">written up here</a> — is history at this point, not the current state.</p>
 
   <h2>Android — published, in progress</h2>
-  <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to Chicory 1.7.5, and it's published on Maven Central as <code>com.traverse-framework:traverse-embedder</code> (<code>0.14.0</code>). Android Compose clients live in <a href="https://github.com/traverse-framework/reference-apps" target="_blank" rel="noopener">reference-apps</a>.</p>
+  <p><code>packages/kotlin/TraverseEmbedder</code> has a working <code>ChicoryRuntimeBridge</code> pinned to Chicory 1.7.5, and it's published on Maven Central as <code>com.traverse-framework:traverse-embedder</code> (<code>0.15.0</code>). Android Compose clients live in <a href="https://github.com/traverse-framework/reference-apps" target="_blank" rel="noopener">reference-apps</a>.</p>
 
   <h2>.NET / WinUI — published, in progress</h2>
-  <p>The same shape as Android: <code>packages/dotnet/TraverseEmbedder</code> has a working bridge on Wasmtime .NET 44.0.0, published on nuget.org as <code>TraverseEmbedder</code> (<code>0.14.0</code>), with WinUI clients in reference-apps.</p>
+  <p>The same shape as Android: <code>packages/dotnet/TraverseEmbedder</code> has a working bridge on Wasmtime .NET 44.0.0, published on nuget.org as <code>TraverseEmbedder</code> (<code>0.15.0</code>), with WinUI clients in reference-apps.</p>
 
   <p>If your app's core problem is mobile UI, Traverse isn't a full toolkit for that yet on either platform. If you're building a mobile app today, the embedders are real and installable, but they're pre-1.0, no host is Certified under Spec 529 yet, and each one enforces resource limits through its own engine. The contract you write now doesn't change as those hosts mature. Track live status on the <a href="/platforms.html">Platforms page</a> — it's the same page we link internally, not a separate marketing version.</p>
 </QuestionLayout>

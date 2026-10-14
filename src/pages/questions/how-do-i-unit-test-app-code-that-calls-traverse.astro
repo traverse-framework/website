@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do I unit-test app code that calls Traverse without running WASM?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Swap the real embedder for the deterministic test double that ships in the same package. traverse-embedder-web and the Rust traverse-embedder crate (both 0.14.0) export EmbedderTestDouble, which implements the same embedder API: you script an output or an error per target id, and it emits the same event envelope with deterministic ids (sess-*, req-*, evt-*), rejects unknown targets with target_not_found, and rejects calls after shutdown with runtime_stopped. Swift, Kotlin, and .NET ship a smaller InMemoryTraverseEmbedder harness. A test double never loads WASM, so it tests your host code, not the capability.',
+      text: 'Swap the real embedder for the deterministic test double that ships in the same package. traverse-embedder-web and the Rust traverse-embedder crate (both 0.15.0) export EmbedderTestDouble, which implements the same embedder API: you script an output or an error per target id, and it emits the same event envelope with deterministic ids (sess-*, req-*, evt-*), rejects unknown targets with target_not_found, and rejects calls after shutdown with runtime_stopped. Swift, Kotlin, and .NET ship a smaller InMemoryTraverseEmbedder harness. A test double never loads WASM, so it tests your host code, not the capability.',
     },
   }],
 });
@@ -58,7 +58,7 @@ const relatedLinks = [
   <p>Swap the real embedder for the test double that ships in the same package. Your screen, handler, or job talks to the embedder API: submit, subscribe, shutdown. The double implements that same API without loading a bundle or any WASM. You tell it what each target should return, and your test checks how your code reacts.</p>
 
   <h2>JS/TS and Rust: <code>EmbedderTestDouble</code></h2>
-  <p>Both <code>traverse-embedder-web@0.14.0</code> and the Rust <code>traverse-embedder@0.14.0</code> crate export <code>EmbedderTestDouble</code>. For each target id you can script a success with an output, or a failure with a runtime-shaped error code and message.</p>
+  <p>Both <code>traverse-embedder-web@0.15.0</code> and the Rust <code>traverse-embedder@0.15.0</code> crate export <code>EmbedderTestDouble</code>. For each target id you can script a success with an output, or a failure with a runtime-shaped error code and message.</p>
 
   <pre><code>{tsExample}</code></pre>
 
@@ -83,5 +83,5 @@ const relatedLinks = [
     <li><strong>One real integration test</strong> per host that loads your actual bundle with <code>BundleEmbedder</code> and runs discover, execute, and trace end to end. The web package's own suite does this with the checked-in <code>traverse-starter</code> bundle.</li>
   </ul>
 
-  <p>One known gotcha: in <code>traverse-embedder-web@0.14.0</code>, <code>releaseEvidence().package.version</code> reports <code>0.9.0</code> because the version is hard-coded (<a href="https://github.com/traverse-framework/traverse/issues/1654" target="_blank" rel="noopener">#1654</a>). Don't assert on that field until the fix ships.</p>
+  <p>In <code>traverse-embedder-web@0.14.0</code>, <code>releaseEvidence().package.version</code> reported <code>0.9.0</code> because the version was hard-coded (<a href="https://github.com/traverse-framework/traverse/issues/1654" target="_blank" rel="noopener">#1654</a>). The published 0.15.0 package sets that constant to <code>0.15.0</code>.</p>
 </QuestionLayout>

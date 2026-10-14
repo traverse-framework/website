@@ -36,12 +36,12 @@ const relatedLinks = [
   <p>A 64→32→10 multilayer perceptron trained on the UCI Optical Recognition of Handwritten Digits dataset (<strong>CC BY 4.0</strong>). Held-out accuracy is <strong>96.10%</strong>. The guest runs bit-identically in the trainer, on the native host, and in the browser embedder — same pinned bytes, same scores.</p>
 
   <h2>How it fits the product</h2>
-  <p>Exact-ref means the app pins the package by digest and signature and calls governed <code>model.execute</code> — never a naked URL. Discover → execute → trace, on one shared <code>runtime.wasm</code>. See <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>. Published hosts that execute that path: native Rust, web, and Swift <code>ExactModelHost</code> (<code>swift-host-v0.14.0-4</code>). Kotlin and .NET <code>ExactModelHost</code> are on traverse main and are not in the published 0.14.0 packages.</p>
+  <p>Exact-ref means the app pins the package by digest and signature and calls governed <code>model.execute</code> — never a naked URL. Discover → execute → trace, on one shared <code>runtime.wasm</code>. See <a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution?</a>. As of v0.15.0 the published hosts for that path are native Rust, the web embedder, Swift <code>ExactModelHost</code> on <code>swift-host-v0.15.0</code>, and Kotlin and .NET <code>ExactModelHost</code> in the 0.15.0 Maven and NuGet packages. The held-out 96.10% figure above is the v0.14.0 trainer / native / browser result.</p>
 
   <h2>Honest limits</h2>
   <ul>
-    <li><strong>Test-only signing.</strong> The package is signed so CI and demos can exercise the path. It is <strong>not</strong> a production trust root. Production custody, rotation, and revocation: <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a> · <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a>.</li>
+    <li><strong>Test-only signing.</strong> The package is signed so CI and demos can exercise the path. It is <strong>not</strong> a production trust root. Custody, rotation, and revocation are still open: <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a> · <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a>.</li>
     <li><strong>Not a general LLM.</strong> Fixed digit classification guest. Do not invent tool-use, chat, or Hub-download claims from this package alone.</li>
-    <li><strong>Not “every host.”</strong> Matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</li>
+    <li><strong>No host is Certified.</strong> Matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</li>
   </ul>
 </QuestionLayout>

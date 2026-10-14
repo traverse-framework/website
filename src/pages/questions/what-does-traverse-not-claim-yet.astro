@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What does Traverse not claim yet?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Traverse does not claim a Python SDK; that Swift/Kotlin/.NET hosts are Certified; that the published Kotlin or .NET 0.14.0 packages execute exact-ref (both ExactModelHost types are on main; package cuts are #1651); that it is a general agent-orchestration framework or web framework; cloud placement as a v0.1 goal; invented customers or production SLAs; or that approved-spec counts are the product pitch. Discover → execute → trace. One shared runtime.wasm. Swift ExactModelHost is published on swift-host-v0.14.0-4. Swift, Kotlin, and .NET packages are published and pre-1.0. Shipped consumers today are JS/TS and Rust embedders plus MCP; Python is CLI-only; check platforms.html and what-is-real-today.html before assuming a host.',
+      text: 'Traverse does not claim a Python SDK; that any host is Certified under Spec 529; a web, Android, or desktop GPU adapter; governed-path iPhone Core ML evidence (traverse#1630 is still open); that production model-signing custody is finished (#1567 is still open); that it is a general agent-orchestration framework or web framework; cloud placement as a v0.1 goal; invented customers or production SLAs; or that approved-spec counts are the product pitch. Discover → execute → trace. One shared runtime.wasm. v0.15.0 runs signed exact-ref models on native, web, Swift swift-host-v0.15.0, Kotlin, and .NET, and model_usage is required. Swift, Kotlin, and .NET packages are published and pre-1.0. Shipped consumers today are JS/TS and Rust embedders plus MCP; Python is CLI-only.',
     },
   }],
 });
@@ -37,7 +37,9 @@ const relatedLinks = [
   <h2>Consumers and packages</h2>
   <ul>
     <li><strong>No Python SDK.</strong> Python shells out to <code>traverse-cli capability-package execute</code>. See <a href="/questions/does-traverse-have-a-python-sdk.html">Does Traverse have a Python SDK?</a>.</li>
-    <li><strong>Swift / Kotlin / .NET</strong> packages are published and pre-1.0 (Swift xcframework on <code>swift-host-v*</code> tags, currently <code>swift-host-v0.14.0-4</code>, Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central, .NET <code>TraverseEmbedder</code> 0.14.0 on nuget.org). They are marked In progress. No host is Certified. Swift <code>ExactModelHost</code> on that xcframework executes exact-ref. Kotlin and .NET <code>ExactModelHost</code> are on traverse main and are not in those 0.14.0 packages (<a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a>).</li>
+    <li><strong>Swift / Kotlin / .NET</strong> packages are published and pre-1.0 (Swift xcframework <code>swift-host-v0.15.0</code>, Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.15.0 on Maven Central, .NET <code>TraverseEmbedder</code> 0.15.0 on nuget.org). They are marked In progress. No host is Certified. All three published packages include <code>ExactModelHost</code>. <code>model_usage</code> is required.</li>
+    <li><strong>Core ML</strong> is an opt-in Apple placement. Default stays <code>wasm-cpu</code>. Governed-path iPhone evidence is still <a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>. There is no web, Android, or desktop GPU adapter.</li>
+    <li><strong>Production model-signing custody</strong> is still <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>. <code>digits-mlp-1.0.0</code> uses a test-only key.</li>
     <li><strong>Edge</strong> is planned; <strong>cloud placement</strong> is an explicit non-goal for v0.1.</li>
   </ul>
 
@@ -53,7 +55,7 @@ const relatedLinks = [
   <ul>
     <li>No invented customer logos, production SLAs, or “enterprise ready” claims beyond what the roadmap and security pages say.</li>
     <li>Approved-spec counts and registry catalog size are governance hygiene — not the product pitch. Lead with discover → execute → trace.</li>
-    <li>Pre-1.0: currently v0.12.0 under Apache 2.0.</li>
+    <li>Pre-1.0: currently v0.15.0 under Apache 2.0.</li>
   </ul>
 
   <h2>What is claimed</h2>

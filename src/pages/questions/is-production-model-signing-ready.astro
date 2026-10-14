@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Is production model signing ready in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'No. digits-mlp-1.0.0 is signed with a test-only key so CI and demos can exercise Spec 138. Production model-signing key custody, distribution, rotation, and revocation are tracked as traverse#1567. Do not treat the test key as a production trust root. Signed package format (schema 2.0.0 + model.sig.json) and host-owned trust roots ship in v0.14.0; production operations are separate work.',
+      text: 'No, not as a finished production key program. digits-mlp-1.0.0 is signed with a test-only key so CI and demos can exercise Spec 138. v0.15.0 ships key generation, an opt-in TRAVERSE_MODEL_SIGNING_KEYS path, and a dispatch-only signing workflow (Decision 103). Custody, distribution, rotation, and revocation are still traverse#1567, which is open. Do not treat the test key as a production trust root.',
     },
   }],
 });
@@ -32,14 +32,14 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> <strong>no</strong> for production trust operations. The signed Spec 138 path exists in v0.14.0; the first trained package uses a test-only key. Production custody is open work.</p>
+  <p><strong>Short answer:</strong> <strong>no</strong> for a finished production trust program. The signed Spec 138 path has existed since v0.14.0. v0.15.0 adds key-generation tooling. The first trained package still uses a test-only key. Custody, rotation, and revocation are open work.</p>
 
   <h2>What shipped vs what did not</h2>
-  <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> lands schema <code>2.0.0</code> manifests, detached Ed25519 <code>model.sig.json</code>, and host-owned trust roots that gate <code>register_package</code> / <code>registerPackage</code>. That is the format and the host gate — not a finished production key program.</p>
+  <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.14.0">Traverse v0.14.0</a> landed schema <code>2.0.0</code> manifests, detached Ed25519 <code>model.sig.json</code>, and host-owned trust roots that gate <code>register_package</code> / <code>registerPackage</code>. <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.15.0">v0.15.0</a> adds key generation, an opt-in <code>TRAVERSE_MODEL_SIGNING_KEYS</code> path, and a dispatch-only signing workflow (Decision 103). That is tooling. It is not a finished production key program.</p>
 
   <h2>Test-only key</h2>
   <p><code>digits-mlp-1.0.0</code> is signed with a <strong>test-only</strong> key so CI and demos can exercise the path. Do <strong>not</strong> treat that key as a production trust root. Do not ship products that depend on it as the sole signer of record.</p>
 
   <h2>Tracked work</h2>
-  <p>Production model-signing key custody, distribution, rotation, and revocation: <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>. Trust mechanics for callers: <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a>. Host matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
+  <p>Production model-signing key custody, distribution, rotation, and revocation: <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>, still open as of 2026-10-14. Trust mechanics for callers: <a href="/questions/how-do-hosts-trust-signed-models.html">How do hosts trust signed models?</a>. Host matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
 </QuestionLayout>

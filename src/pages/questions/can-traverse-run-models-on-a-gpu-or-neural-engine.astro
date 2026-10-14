@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can Traverse run models on a GPU or the Apple Neural Engine?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Not in a published release. In Traverse v0.14.0, governed exact-ref models run on the wasm-cpu path inside the one shared runtime. On traverse main (unreleased), the runtime now has a generic native accelerator adapter framework (Decision 112, Spec 138 FR-060 to FR-065): the host policy lists ordered placements, default wasm-cpu; a placement is chosen only if the host supports it, the signed package carries a variant for it, the variant passes an on-device self-check against its conformance vector, and it fits the host memory ceiling. If nothing qualifies, the call fails closed with placement_unavailable before the input is consumed, and the result records which placement ran. The real Core ML adapter is not landed yet: the conversion spike is #1663 and the iPhone evidence is #1630.',
+      text: 'Core ML is an opt-in placement on Apple hosts in Traverse v0.15.0. The default placement is still wasm-cpu inside the one shared runtime. A signed Core ML variant runs only when the host asks for it and the variant passes an on-device self-check against its conformance vector. Published evidence so far is macOS cargo test plus the Decision 113 iPhone spike. Governed-path iPhone evidence is still open (traverse#1630). There is no web, Android, or desktop GPU adapter. No host is Certified.',
     },
   }],
 });
@@ -24,29 +24,28 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can Traverse run models on a GPU or the Apple Neural Engine?"
-  description="Not in a published release. v0.14.0 runs governed exact-ref models on wasm-cpu. Traverse main has an unreleased accelerator adapter framework: policy placements, on-device self-check, fail-closed fallback, placement evidence. Core ML adapter not landed yet."
+  description="v0.15.0 can opt in to a signed Core ML variant on Apple hosts. Default stays wasm-cpu. Evidence is macOS cargo test plus the Decision 113 spike. Governed-path iPhone evidence is traverse#1630."
   canonical="https://traverse-framework.com/questions/can-traverse-run-models-on-a-gpu-or-neural-engine.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> not in a published release. In Traverse v0.14.0, governed exact-ref models run on the <code>wasm-cpu</code> path inside the one shared runtime. Hardware acceleration is being built on traverse main, and the part that has landed is the policy and evidence layer, not a working GPU or Neural Engine adapter.</p>
+  <p><strong>Short answer:</strong> Apple hosts in Traverse v0.15.0 can opt in to a package's signed <strong>Core ML</strong> variant. The default placement is still <code>wasm-cpu</code> inside the one shared runtime. There is no web, Android, or desktop GPU adapter.</p>
 
-  <h2>What is on main today (unreleased)</h2>
-  <p>As of October 13, 2026, <code>traverse-runtime</code> on main has a generic native accelerator adapter framework (Decision 112, Spec 138 FR-060 to FR-065, <a href="https://github.com/traverse-framework/traverse/pull/1667">traverse#1667</a>). It is not in any published crate or package yet.</p>
+  <h2>What shipped in v0.15.0</h2>
+  <p>The accelerator adapter framework is in the published release (Decision 112, <a href="https://github.com/traverse-framework/traverse/pull/1667">traverse#1667</a>), together with a real ONNX to Core ML converter (<a href="https://github.com/traverse-framework/traverse/issues/1663">#1663</a>) and the Swift <code>ExactModelHost</code> Core ML path.</p>
   <ul>
-    <li><strong>The host chooses, in policy.</strong> The execution policy lists placements in order. An empty list means <code>wasm-cpu</code> only. An unknown or repeated placement id is <code>policy_denied</code>.</li>
-    <li><strong>A placement has to earn its turn.</strong> The runtime takes the first listed placement that the host supports, that the signed package carries a variant for, that passed its device self-check, that fits the host memory ceiling, and that meets <code>require_fuel_metering</code> when the host asks for it.</li>
-    <li><strong>The self-check is real.</strong> The variant's conformance vector runs on the device and is compared under the variant's declared tolerance. The result is cached per variant digest, adapter, platform version, and compute units, so an OS update re-runs it. A failed check makes that variant unavailable.</li>
-    <li><strong>It fails closed.</strong> If nothing qualifies, the call fails with <code>placement_unavailable</code> before the input is consumed. A late adapter result after cancel or deadline is discarded.</li>
-    <li><strong>The trace says where it ran.</strong> Every result carries placement evidence: the placement, the compute units, and whether fuel metering applied.</li>
+    <li><strong>The host chooses, in policy.</strong> The execution policy lists placements in order. An empty list means <code>wasm-cpu</code> only.</li>
+    <li><strong>A variant has to earn its turn.</strong> It runs only after an on-device self-check against its signed conformance vector, within the declared tolerance, and only if it fits the host memory ceiling. <code>require_fuel_metering</code> keeps a call on metered placements.</li>
+    <li><strong>It fails closed.</strong> If nothing qualifies, the call fails with <code>placement_unavailable</code>. Every result carries placement evidence.</li>
+    <li><strong>Core ML is opt-in.</strong> Swift's <code>ExactModelHost</code> gains <code>coreML</code>, variant files, and placements. Without that opt-in, the call stays on <code>wasm-cpu</code>.</li>
   </ul>
 
-  <h2>What is not done yet</h2>
-  <p>No real accelerator adapter has landed. The first one planned is Core ML on Apple devices, called from Rust. An earlier converter wrapped ONNX in a way Core ML could only run on the CPU, so it is being replaced through a spike-gated ONNX to Core ML route (<a href="https://github.com/traverse-framework/traverse/issues/1663">#1663</a>), with on-device iPhone timing evidence tracked in <a href="https://github.com/traverse-framework/traverse/issues/1630">#1630</a>. There is no GPU adapter for the web, Android, or desktop, and no date for one.</p>
+  <h2>What the evidence is, and what it is not</h2>
+  <p>Published evidence so far is macOS <code>cargo test</code> plus the Decision 113 iPhone spike. Governed-path iPhone evidence is still open (<a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>). This page does not quote spike timings as product performance. No host is Certified under Spec 529.</p>
 
   <h2>Why it is built this way</h2>
-  <p>An accelerator is an implementation detail of the host, not a second runtime. The contract, the signed package, and <strong>discover → execute → trace</strong> stay the same. The adapter only runs a variant the package already signed, only after it matched the <code>wasm-cpu</code> reference on that device, and the trace records which path produced the answer. An agent or app can ask for speed, but the runtime decides whether the faster path is trustworthy on this hardware.</p>
+  <p>An accelerator is an implementation detail of the host, not a second runtime. The contract, the signed package, and <strong>discover → execute → trace</strong> stay the same. The adapter only runs a variant the package already signed, and the trace records which path produced the answer.</p>
 
   <p>This is a different thing from capability <a href="/questions/how-do-placement-targets-work.html">placement targets</a> (<code>local</code>, <code>browser</code>, and so on), which decide where a capability can be placed. Model placements decide which compute path runs a signed model inside a host.</p>
 </QuestionLayout>

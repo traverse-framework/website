@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do I read Traverse execution traces from inside my app?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Call the Embedded Trace API on the embedder you already have. In traverse-embedder-web and the Rust traverse-embedder crate (0.14.0), traceList(version, pageSize, cursor) pages through the current session\'s traces, newest first, and traceGet(version, traceId) opens one. Each record is a safe public projection: target id and version, outcome, execution phases, placement, and a stable failure code. It never includes raw inputs, outputs, caller identity, or private hashes. History is process-local, capped at the last 100 executions, and cleared on shutdown. No HTTP sidecar is involved. The Swift, Kotlin, and .NET packages do not expose this API yet.',
+      text: 'Call the Embedded Trace API on the embedder you already have. In traverse-embedder-web and the Rust traverse-embedder crate (0.15.0), traceList(version, pageSize, cursor) pages through the current session\'s traces, newest first, and traceGet(version, traceId) opens one. Each record is a safe public projection: target id and version, outcome, execution phases, placement, and a stable failure code. It never includes raw inputs, outputs, caller identity, or private hashes. History is process-local, capped at the last 100 executions, and cleared on shutdown. No HTTP sidecar is involved. The Swift, Kotlin, and .NET packages do not expose this API yet.',
     },
   }],
 });
@@ -52,7 +52,7 @@ const relatedLinks = [
 >
   <p>Ask the embedder your app already holds. Discover → execute → trace means every execution leaves a record. The Embedded Trace API (<code>embedded-trace-api/1.0.0</code>, Spec 517) is how a host reads those records back without starting <code>traverse-cli serve</code> or calling anything over HTTP.</p>
 
-  <p>It ships today in <code>traverse-embedder-web@0.14.0</code> (browser and Node) and the Rust <code>traverse-embedder@0.14.0</code> crate. There are two calls:</p>
+  <p>It ships today in <code>traverse-embedder-web@0.15.0</code> (browser and Node) and the Rust <code>traverse-embedder@0.15.0</code> crate. There are two calls:</p>
 
   <pre><code>{traceExample}</code></pre>
 
