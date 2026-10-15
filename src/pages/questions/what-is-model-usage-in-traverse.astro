@@ -1,0 +1,53 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is model_usage in Traverse, and why does my app fail with usage_undeclared?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'model_usage is the app’s declaration of how it uses pinned models: commercial or non_commercial. Since Traverse v0.15.0 (a breaking change, Spec 138 0.8.0, Decision 107) an app with exact_model_dependencies must declare it, or registration and execution fail closed with usage_undeclared. A commercial usage rejects packages whose rights say commercial_use: prohibited, with rights_policy_denied. Every result carries model_evidence. Caveat: published traverse-embedder-web@0.15.0 does not validate the value yet (traverse#1685), and traverse-cli-rs 0.15.0 model verify has no usage flag (traverse#1686, fixed on main after the release).',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/signed-models-on-every-host.html', label: 'Signed models on every host (v0.15.0)' },
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/what-happens-when-a-host-marks-a-model-package-revoked.html', label: 'What happens when a model package is revoked?' },
+  { href: '/questions/does-the-registry-record-model-rights.html', label: 'Does the registry record model rights?' },
+  { href: '/blog/model-rights-are-data.html', label: 'Model rights are data, not a README' },
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+];
+---
+<QuestionLayout
+  title="What is model_usage in Traverse, and why does my app fail with usage_undeclared?"
+  description="Since v0.15.0, apps that pin models must declare model_usage: commercial or non_commercial. Without it, calls fail closed with usage_undeclared. Breaking change. Web value validation is traverse#1685."
+  canonical="https://traverse-framework.com/questions/what-is-model-usage-in-traverse.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <code>model_usage</code> is how an app says it uses its pinned models: <code>commercial</code> or <code>non_commercial</code>. Since Traverse v0.15.0, an app with <code>exact_model_dependencies</code> must declare it. Without it, registration and execution fail closed with <code>usage_undeclared</code>. That is a breaking change (Spec 138 0.8.0, Decision 107). It is one more step in <strong>discover → execute → trace</strong>: the host checks the package's rights against your declared use before anything runs.</p>
+
+  <h2>Where to set it</h2>
+  <ul>
+    <li><strong>Rust</strong> — <code>ExactModelHostConnector::model_usage</code>.</li>
+    <li><strong>Web</strong> — <code>modelUsage</code> in the <code>ExactModelBrowserHost</code> options (<code>traverse-embedder-web@0.15.0</code>).</li>
+    <li><strong>Swift</strong> — the <code>modelUsage:</code> argument of <code>ExactModelHost(pins:trustedPublicKeysHex:modelUsage:…)</code>. It has no default, so existing call sites stop compiling until you add it.</li>
+    <li><strong>Kotlin and .NET</strong> — the <code>modelUsage</code> parameter of <code>ExactModelHost</code> in Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.15.0 and nuget.org <code>TraverseEmbedder</code> 0.15.0. It is a nullable string, so pass the exact value.</li>
+  </ul>
+
+  <h2>What the host does with it</h2>
+  <p>A <code>commercial</code> usage, declared by the app or forced by the host, rejects any package whose rights say <code>commercial_use: prohibited</code>, with <code>rights_policy_denied</code>. A <code>non_commercial</code> app can load it. Every result carries <code>model_evidence</code>, the verified rights record, so the trace shows which rights the call ran under. The rights themselves come from the signed package manifest (<code>license_id</code>, <code>attribution</code>, <code>redistribution</code>, <code>commercial_use</code>, <code>source_url</code>). An app cannot loosen them.</p>
+
+  <h2>Known gaps in 0.15.0</h2>
+  <ul>
+    <li><strong>Web accepts any string.</strong> Published <code>traverse-embedder-web@0.15.0</code> does not check that the value is exactly <code>commercial</code> or <code>non_commercial</code>. A typo like <code>"Commercial"</code> skips the commercial check without an error. Tracked in <a href="https://github.com/traverse-framework/traverse/issues/1685">traverse#1685</a>, with a fix in review and not in a release. Native Rust uses an enum and cannot express a bad value.</li>
+    <li><strong>CLI verify has no usage flag.</strong> <code>traverse-cli model verify</code> in <code>traverse-cli-rs</code> 0.15.0 always verifies as <code>non_commercial</code>. <code>--model-usage</code> landed on main after the release (<a href="https://github.com/traverse-framework/traverse/issues/1686">traverse#1686</a>) and is not in 0.15.0.</li>
+  </ul>
+  <p>Until those ship, pass the exact value and test the commercial path once on purpose. No host is Certified under Spec 529. The upgrade notes are in <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/upgrade-to-v0.15.0.md">docs/upgrade-to-v0.15.0.md</a>.</p>
+</QuestionLayout>

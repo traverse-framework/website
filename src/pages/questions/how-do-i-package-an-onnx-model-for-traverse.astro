@@ -1,0 +1,63 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I package my own ONNX model for Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Install the CLI with cargo install traverse-cli-rs --version =0.15.0 --locked (Rust 1.94 or newer; crates.io traverse-cli is an unrelated tool). Download the audited runner.wasm from the onnx-runner-v0.15.0 GitHub release and check its sha256, then run traverse-cli model package-onnx runner.wasm model.onnx model.package.json out/dir. Sign the manifest with a key kept outside the repo, verify, generate and check a conformance vector, and pin. The app then declares the pin and model_usage, and the host runs it under discover → execute → trace. Today the packager supports one input and one output tensor (traverse#1661).',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/signed-models-on-every-host.html', label: 'Signed models on every host (v0.15.0)' },
+  { href: '/questions/what-is-the-traverse-cli.html', label: 'What is the Traverse CLI?' },
+  { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+  { href: '/questions/can-traverse-run-models-on-a-gpu-or-neural-engine.html', label: 'Can Traverse run models on a GPU or Neural Engine?' },
+];
+---
+<QuestionLayout
+  title="How do I package my own ONNX model for Traverse?"
+  description="traverse-cli-rs 0.15.0: model package-onnx turns a one-input, one-output ONNX model into a signed Spec 138 package on an audited runner guest. Then sign, verify, conformance, pin."
+  canonical="https://traverse-framework.com/questions/how-do-i-package-an-onnx-model-for-traverse.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> since Traverse v0.15.0, <code>traverse-cli model package-onnx</code> turns an ONNX file into a Spec 138 exact-ref package without writing a guest. It copies an audited, import-free runner guest (built on tract) byte for byte and appends your model as data. You then sign, verify, generate a conformance vector, and pin. The app declares that pin and its <code>model_usage</code>, and every host runs it under <strong>discover → execute → trace</strong>.</p>
+
+  <h2>1. Install the CLI</h2>
+  <pre><code>cargo install traverse-cli-rs --version =0.15.0 --locked</code></pre>
+  <p>The crate is <code>traverse-cli-rs</code>; the binary is <code>traverse-cli</code>. <code>traverse-cli</code> on crates.io is an unrelated tool. You need Rust 1.94 or newer.</p>
+
+  <h2>2. Get the runner guest</h2>
+  <p>The runner is not inside the crate. Download <code>runner.wasm</code> from the <a href="https://github.com/traverse-framework/traverse/releases/tag/onnx-runner-v0.15.0">onnx-runner-v0.15.0</a> release and check that its sha256 is <code>f3902703fe79cc161c13b87cf507dcb25cb53ea3c2a68bed6cc753f9df100966</code>. Those are the same bytes as <code>fixtures/onnx/runner.wasm</code> at the tag, and the runner rebuilds byte for byte in CI.</p>
+
+  <h2>3. Package, sign, verify, pin</h2>
+  <pre><code>traverse-cli model package-onnx runner.wasm my-model.onnx my-model.package.json out/my-model
+traverse-cli model sign out/my-model/model.manifest.json --key ~/keys/model-signing.hex
+traverse-cli model verify out/my-model --trusted-key &lt;public-key-hex&gt; --json
+traverse-cli model conformance generate out/my-model --trusted-key &lt;public-key-hex&gt; --input frames/0.bin --out out/my-model/conformance.json
+traverse-cli model conformance check out/my-model out/my-model/conformance.json --trusted-key &lt;public-key-hex&gt;
+traverse-cli model pin out/my-model --json</code></pre>
+  <p><code>my-model.package.json</code> holds the manifest fields you own (identity, schemas, <code>rights</code>, limits), the fixed tensor config, and a required <code>source</code> with the ONNX model's licence, commercial-use terms, and URL. The packager writes an unsigned schema 2.2.0, ABI v3 manifest whose <code>rights.derivation</code> records the ONNX file's digest. A package can never be more permissive than its source; otherwise verify and every host reject it with <code>rights_inconsistent</code>. Keep the signing key outside any repository, and configure each host to trust its public key. Apps cannot add trust.</p>
+
+  <h2>Where the logic goes</h2>
+  <p>The runner returns raw output values. Sigmoid, labels, thresholds, and the decision built on them are business logic. Put them in app capabilities, not in host code. Hosts stay UI and I/O.</p>
+
+  <h2>Limits today</h2>
+  <ul>
+    <li>One input tensor and one output tensor. Most Hugging Face text encoders take several inputs, so they do not fit yet (<a href="https://github.com/traverse-framework/traverse/issues/1661">traverse#1661</a>).</li>
+    <li><code>model verify</code> in 0.15.0 always checks as <code>non_commercial</code>; <code>--model-usage</code> landed on main after the release (<a href="https://github.com/traverse-framework/traverse/issues/1686">traverse#1686</a>).</li>
+    <li>Traverse's own production signing-key custody is <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>, still open. Your key is yours to manage.</li>
+    <li>This is the host connector path, not a catalog <code>model.execute</code> capability, and not a Hugging Face integration. No host is Certified.</li>
+  </ul>
+  <p>The full guide is <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/model-packaging-guide.md">docs/model-packaging-guide.md</a>. It also covers adding an opt-in Core ML variant for Apple hosts.</p>
+</QuestionLayout>
