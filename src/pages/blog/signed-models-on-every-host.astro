@@ -1,0 +1,159 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 15, 2026</span>
+      <span class="badge">Release</span>
+      <span class="badge">Models</span>
+      <span class="badge">Honesty</span>
+    </div>
+    <h1 class="t-h1">Signed models on every host. The rights travel with them.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>8 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse v0.15.0 shipped on October 13. In v0.14.0 a signed exact-ref model package ran on native Rust and in the browser. In v0.15.0 the same package runs on the Swift, Kotlin/Android, and .NET embedders too, and every one of those hosts checks the package's rights before it runs. The loop is the one Traverse always had: <strong>discover → execute → trace</strong>. Find the pinned package, run exactly those bytes or refuse, and leave a record of what ran and under which rights.</p>
+
+      <div class="callout">
+        Short version: pin a model by the digest of its manifest, and check its detached signature against keys the host already trusts. That now works on five published hosts: native Rust, <code>traverse-embedder-web@0.15.0</code>, Swift <code>swift-host-v0.15.0</code>, Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.15.0, and nuget.org <code>TraverseEmbedder</code> 0.15.0. Declaring <code>model_usage</code> is now required, and that is a breaking change. Core ML on Apple is opt-in. No host is Certified. The citeable matrix is <a href="/questions/which-hosts-run-signed-exact-ref-models.html">which hosts run signed exact-ref models?</a>
+      </div>
+
+      <h2 id="hosts">Three more hosts, one small boundary each</h2>
+
+      <p>Each new host gets a small, audited native boundary. None of them gets its own copy of the model path. Swift's <code>ExactModelHost</code> (Decision 104) runs packages on <code>wasmi</code> behind one C-ABI symbol, <code>traverse_swift_host_model_call</code>. Execution runs in fuel slices, so cancelling a Swift <code>Task</code> or hitting a deadline interrupts an inference that is already running. Kotlin/Android (Decision 108) runs on <code>wasmi</code> through the <code>traverse-android-host</code> JNI shim. The AAR ships <code>arm64-v8a</code> and <code>x86_64</code> libraries, 16 KB page-aligned, and an emulator CI job runs the instrumented model tests against them. .NET (Decision 111) goes through two audited P/Invoke functions, and the NuGet package carries the native engine for <code>win-x64</code>, <code>win-arm64</code>, and <code>linux-x64</code>.</p>
+
+      <p>The part that matters is underneath. All three share one framed protocol crate, <code>traverse-model-host-frame</code>. They match the signed conformance vectors byte for byte, and they pass the same 21-case rights suite. "Every host" is a claim about behavior, not a row of logos. If a pinned package meant one thing in Swift and another in .NET, the pin would not be worth much.</p>
+
+      <p>Hosts still do UI and I/O. The model hands back raw values. Turning those into a label, a threshold, or a decision is business logic. It belongs in a capability with a contract, not once in a Kotlin view model and again in a Swift one. <a href="/blog/where-business-logic-lives.html">Where business logic lives</a> is the longer version of that rule.</p>
+
+      <h2 id="rights">Rights are checked, not just written down</h2>
+
+      <p>This is the breaking change. An app with <code>exact_model_dependencies</code> must declare <code>model_usage</code>: <code>commercial</code> or <code>non_commercial</code>. Leave it out and registration and execution fail closed with <code>usage_undeclared</code>. Rust sets <code>ExactModelHostConnector::model_usage</code>. Web passes <code>modelUsage</code> to <code>ExactModelBrowserHost</code>. Swift's <code>ExactModelHost</code> initializer takes <code>modelUsage:</code> with no default, so existing Swift call sites stop compiling until you add it. That is on purpose. A rights check you can forget to turn on is not much of a check.</p>
+
+      <p>A <code>commercial</code> usage, declared by the app or forced by the host, rejects any package whose rights say <code>commercial_use: prohibited</code>, with <code>rights_policy_denied</code>. Hosts also own a package-status map: a <code>revoked</code> package is blocked and a <code>deprecated</code> one is flagged. Every result carries <code>model_evidence</code>, the verified rights record, so the trace shows which rights the answer ran under. Earlier this month I wrote that <a href="/blog/model-rights-are-data.html">model rights are data, not a README</a>. v0.15.0 is the release where every host acts on that data.</p>
+
+      <p>One caveat, and it is a real one. The published web host does not validate the value yet. <code>traverse-embedder-web@0.15.0</code> accepts strings other than <code>commercial</code> and <code>non_commercial</code>, so a typo such as <code>"Commercial"</code> quietly skips the commercial check. That is <a href="https://github.com/traverse-framework/traverse/issues/1685" target="_blank" rel="noopener">#1685</a>. A fix is in review (<a href="https://github.com/traverse-framework/traverse/pull/1698" target="_blank" rel="noopener">#1698</a>) and is not in a release. Native Rust uses an enum and cannot express a bad value. Until a release fixes the web host, pass exactly <code>commercial</code> or <code>non_commercial</code>, and test the commercial path once on purpose. The short page is <a href="/questions/what-is-model-usage-in-traverse.html">what is model_usage?</a></p>
+
+      <h2 id="onnx">Package your own ONNX model</h2>
+
+      <p>Before v0.15.0, getting a model into a signed package meant writing a guest yourself. Now <code>traverse-cli model</code> covers <code>digest</code>, <code>sign</code>, <code>verify</code>, <code>pin</code>, and <code>conformance generate|check</code>. <code>model package-onnx</code> turns an ONNX file into a Spec 138 package on an audited, import-free runner guest built on tract. The runner rebuilds byte for byte in CI. The <code>digits-onnx-1.0.0</code> fixture scores 1727 of 1797 on every engine.</p>
+
+      <p>Watch the crate name. The CLI is published as <code>traverse-cli-rs</code> (the binary is <code>traverse-cli</code>). <code>traverse-cli</code> on crates.io is an unrelated tool. You need Rust 1.94 or newer:</p>
+
+      <pre><code>cargo install traverse-cli-rs --version =0.15.0 --locked</code></pre>
+
+      <p>The runner guest is not inside the crate. Download <code>runner.wasm</code> from the <a href="https://github.com/traverse-framework/traverse/releases/tag/onnx-runner-v0.15.0" target="_blank" rel="noopener">onnx-runner-v0.15.0</a> release, check its sha256 (<code>f3902703fe79cc161c13b87cf507dcb25cb53ea3c2a68bed6cc753f9df100966</code>), and pass it as the first argument to <code>package-onnx</code>. Then sign with a key you keep outside the repo, verify, generate a conformance vector, and pin. The walk-through is <a href="/questions/how-do-i-package-an-onnx-model-for-traverse.html">how do I package an ONNX model?</a></p>
+
+      <p>Two limits to know before you start. The packager handles one input tensor and one output tensor, so most Hugging Face text encoders, which take <code>input_ids</code> and <code>attention_mask</code>, do not fit yet (<a href="https://github.com/traverse-framework/traverse/issues/1661" target="_blank" rel="noopener">#1661</a>). And <code>model verify</code> in <code>traverse-cli-rs</code> 0.15.0 cannot take a model usage; it always verifies as <code>non_commercial</code>. That is <a href="https://github.com/traverse-framework/traverse/issues/1686" target="_blank" rel="noopener">#1686</a>, fixed on main after the release and not in 0.15.0.</p>
+
+      <h2 id="prepare">Prepare once, run many</h2>
+
+      <p>Guest ABI v3 lets the host run <code>model_prepare</code> once, then restore a clean snapshot into a fresh instance on every call, bounded by a new <code>max_snapshot_bytes</code> ceiling. Output is byte-identical on the fresh path and the snapshot path, on every host. ONNX packages built by <code>package-onnx</code> prepare once. ABI v1 and v2 guests keep working, and packages signed for v0.14.0 do not need re-signing.</p>
+
+      <h2 id="coreml">Core ML on Apple, if you ask for it</h2>
+
+      <p>A package can carry a signed Core ML variant. It runs only if the execution policy lists that placement and the variant passes an on-device self-check against its signed conformance vector, within tolerance. If it does not qualify, the call falls back down the ordered placements and the trace says so. If nothing qualifies, the call fails with <code>placement_unavailable</code>. Every result carries <code>placement_evidence</code>. The default placement is still <code>wasm-cpu</code>. The accelerator is a host detail. The package, the contract, and the trace stay the same.</p>
+
+      <p>Evidence so far is macOS test runs, where the signed <code>digits-onnx-coreml</code> package matches <code>wasm-cpu</code> within tolerance on every compute-unit setting, plus an earlier iPhone spike. Governed-path iPhone evidence is <a href="https://github.com/traverse-framework/traverse/issues/1630" target="_blank" rel="noopener">#1630</a>, still open, so this post quotes no iPhone timings. There is no GPU adapter for web, Android, or desktop. More detail: <a href="/questions/can-traverse-run-models-on-a-gpu-or-neural-engine.html">can Traverse run models on a GPU or the Neural Engine?</a></p>
+
+      <h2 id="non-claims">What this release does not say</h2>
+
+      <ul>
+        <li>No host is Certified under Spec 529. Swift, Kotlin, and .NET are published and pre-1.0.</li>
+        <li><code>digits-mlp-1.0.0</code> is signed with a test-only key. v0.15.0 adds signing-key tooling (key generation, opt-in <code>TRAVERSE_MODEL_SIGNING_KEYS</code>, a dispatch-only signing workflow). Custody, rotation, and revocation of a production key are <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">#1567</a>, still open. See <a href="/questions/is-production-model-signing-ready.html">is production model signing ready?</a></li>
+        <li>The host package-status map is not registry revocation. Runtime refusal of a revoked registry capability is <a href="https://github.com/traverse-framework/traverse/issues/1598" target="_blank" rel="noopener">#1598</a>, not shipped. See <a href="/questions/what-happens-when-a-host-marks-a-model-package-revoked.html">what happens when a host marks a model package revoked?</a></li>
+        <li>This is the host connector path. It is not a catalog <code>model.execute</code> capability, and it is not a Hugging Face integration.</li>
+        <li>Python is still CLI-only. There is no Python SDK.</li>
+      </ul>
+
+      <h2 id="upgrade">Upgrading</h2>
+
+      <p>Read <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/upgrade-to-v0.15.0.md" target="_blank" rel="noopener">docs/upgrade-to-v0.15.0.md</a>. Short version: declare <code>model_usage</code> on every host that runs pinned models. If you build <code>ExecutionPolicy</code> or <code>HostConnectorHostResult</code> with struct literals, or match every <code>ModelFailureReason</code>, add the new fields and variants. Pin the crates and <code>traverse-embedder-web</code> together at 0.15.0, with <code>traverse-registry</code> at 0.28.0. On Swift, <code>Package.swift</code> on main now pins the <code>swift-host-v0.15.0-1</code> rebuild, which adds the Spec 138 guest reject codes (<a href="https://github.com/traverse-framework/traverse/pull/1695" target="_blank" rel="noopener">#1695</a>).</p>
+
+      <p>The <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.15.0" target="_blank" rel="noopener">release notes</a> and the <a href="https://github.com/orgs/traverse-framework/discussions/1683" target="_blank" rel="noopener">v0.15.0 announcement</a> are the source for everything above. If this post and those disagree, trust them, and open an issue.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="toc-list">
+          <li><a href="#hosts">Three more hosts</a></li>
+          <li><a href="#rights">Rights are checked</a></li>
+          <li><a href="#onnx">Package your own ONNX</a></li>
+          <li><a href="#prepare">Prepare once</a></li>
+          <li><a href="#coreml">Core ML on Apple</a></li>
+          <li><a href="#non-claims">What this does not say</a></li>
+          <li><a href="#upgrade">Upgrading</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models? →</a></li>
+          <li><a href="/questions/what-is-model-usage-in-traverse.html">What is model_usage? →</a></li>
+          <li><a href="/questions/how-do-i-package-an-onnx-model-for-traverse.html">How do I package an ONNX model? →</a></li>
+          <li><a href="/questions/what-happens-when-a-host-marks-a-model-package-revoked.html">What happens when a model package is revoked? →</a></li>
+          <li><a href="/blog/model-rights-are-data.html">Model rights are data, not a README →</a></li>
+          <li><a href="/questions/what-is-exact-model-host.html">What is ExactModelHost? →</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Start here</div>
+        <p>New to Traverse? One runtime contract, skill-first authoring, discover → execute → trace.</p>
+        <a href="/blog/what-is-real-today-start-here.html" class="btn btn-ghost">What is real today</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+`;
+---
+<SubpageLayout
+  title={"Signed models on every host. The rights travel with them. — Traverse Blog"}
+  description={"Traverse v0.15.0: signed exact-ref model packages now run on Swift, Kotlin/Android, and .NET as well as native Rust and the browser. model_usage is required (breaking). ONNX packaging, ABI v3 snapshot reuse, opt-in Core ML on Apple. No host is Certified."}
+  canonical={"https://traverse-framework.com/blog/signed-models-on-every-host.html"}
+  crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

@@ -1,0 +1,44 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What happens when a host marks a model package revoked or deprecated?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Since Traverse v0.15.0, every exact-ref host owns a package-status map for signed model packages. A package marked revoked is blocked and the call fails closed (package_revoked). A package marked deprecated still runs and is flagged. The result carries model_evidence, so the trace shows what ran. This is host-side model package status. It is not registry capability revocation: runtime refusal of a revoked registry capability is traverse#1598, not shipped.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/signed-models-on-every-host.html', label: 'Signed models on every host (v0.15.0)' },
+  { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a registry capability version is revoked?' },
+  { href: '/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html', label: 'What does a status signal on an exact pin mean for a host?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/blog/you-dont-edit-a-published-capability.html', label: "You don't edit a published capability. You mark it." },
+];
+---
+<QuestionLayout
+  title="What happens when a host marks a model package revoked or deprecated?"
+  description="Traverse v0.15.0 hosts own a package-status map for signed model packages: revoked blocks the call, deprecated is flagged. Not registry capability revocation, which is traverse#1598."
+  canonical="https://traverse-framework.com/questions/what-happens-when-a-host-marks-a-model-package-revoked.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> since Traverse v0.15.0, every host that runs signed exact-ref model packages owns a package-status map. A package marked <code>revoked</code> is blocked, and the call fails closed with <code>package_revoked</code>. A package marked <code>deprecated</code> still runs and is flagged. Either way, <strong>discover → execute → trace</strong> leaves a record: every result carries <code>model_evidence</code>.</p>
+
+  <h2>Who decides</h2>
+  <p>The host does. Trust roots are host-owned, and so is package status. An app manifest cannot add a trusted key, and it cannot un-revoke a package. That matches the rest of the exact-ref path: the app names a package by digest, and the host decides whether those bytes may run. The same behavior is on native Rust, <code>traverse-embedder-web@0.15.0</code>, Swift <code>swift-host-v0.15.0</code>, and the Kotlin and .NET 0.15.0 packages, which share one rights suite.</p>
+
+  <h2>Revoked is not edited</h2>
+  <p>Revoking a package does not change its bytes or its digest. The pin still names exactly what it named before. The host just refuses to run it. That keeps the trace honest: you can see that a call asked for a revoked package and was refused, instead of quietly getting something else.</p>
+
+  <h2>What this is not</h2>
+  <p>This is host-side status for <strong>model packages</strong>. It is not registry revocation of a <strong>capability</strong>. The registry marks capability versions with <code>deprecated.json</code> / <code>revoked.json</code> siblings, and exact pins in <code>traverse-registry</code> 0.28.0 resolve with that lifecycle status. Runtime refusal of a revoked registry capability is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, not shipped. This page also does not claim that hosts pull model revocations from anywhere automatically; the host supplies its own map. No host is Certified under Spec 529.</p>
+</QuestionLayout>

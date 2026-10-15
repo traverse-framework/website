@@ -34,7 +34,7 @@ const relatedLinks = [
   <p><strong>Short answer:</strong> yes, in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.15.0">Traverse v0.15.0</a>. Discover → execute → trace, on one shared <code>runtime.wasm</code>. Kotlin <code>com.traverse-framework:traverse-embedder</code> 0.15.0 on Maven Central and .NET <code>TraverseEmbedder</code> 0.15.0 on nuget.org both include <code>ExactModelHost</code>. <a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a> is closed. The published 0.14.0 packages did not include it.</p>
 
   <h2>What a published consumer can run</h2>
-  <p>Native Rust and <code>traverse-embedder-web@0.15.0</code> execute signed exact-ref. Swift <code>ExactModelHost</code> is on the <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.15.0"><code>swift-host-v0.15.0</code></a> xcframework, which <code>Package.swift</code> on main pins. Distribution is GitHub Release + SPM binary target, not a CocoaPods claim. Full matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
+  <p>Native Rust and <code>traverse-embedder-web@0.15.0</code> execute signed exact-ref. Swift <code>ExactModelHost</code> is on the <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.15.0"><code>swift-host-v0.15.0</code></a> xcframework; <code>Package.swift</code> on main pins its rebuild <code>swift-host-v0.15.0-1</code>. Distribution is GitHub Release + SPM binary target, not a CocoaPods claim. Full matrix: <a href="/questions/which-hosts-run-signed-exact-ref-models.html">Which hosts run signed exact-ref models?</a>.</p>
 
   <h2>What shipped in the 0.15.0 packages</h2>
   <ul>
