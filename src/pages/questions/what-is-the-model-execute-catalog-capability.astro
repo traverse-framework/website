@@ -15,6 +15,7 @@ const jsonLd = JSON.stringify({
 });
 
 const relatedLinks = [
+  { href: '/blog/catalog-model-execute.html', label: 'Weekly demo: catalog model.execute on Browser, Node and Native' },
   { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
   { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
   { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
@@ -48,7 +49,7 @@ const relatedLinks = [
   <ul>
     <li><strong>It needs an unreleased connector version.</strong> The contract pins <code>traverse.model-runtime</code> 2.3.0. That version is on Traverse main. The published v0.15.0 hosts carry 2.2.0.</li>
     <li><strong>Its spec is a draft.</strong> Registry spec <code>027-catalog-model-execute</code> is in <code>draft_specs</code>, waiting for owner approval.</li>
-    <li><strong>No published-release demo yet.</strong> A Browser, Node, and native demo of the catalog capability on a published Traverse release is still an open item. The reference package for that demo is <code>traverse.digits-onnx@1.0.0</code> from the Traverse fixtures, signed with a test-only key (<a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>).</li>
+    <li><strong>No published host binds it out of the box.</strong> The <a href="/blog/catalog-model-execute.html">October 16 weekly demo</a> runs it on v0.15.0 Browser, Node and Native: Native through <code>traverse-runtime</code> plus a small host-written bridge, Browser and Node through labelled demo glue. The published browser <code>BundleEmbedder</code> + <code>runtime.wasm</code> cannot link the <code>connector_invoke</code> import yet (<a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a>). The demo package is signed with a test-only key (<a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>).</li>
     <li>No host is Certified under Spec 529.</li>
   </ul>
 </QuestionLayout>
