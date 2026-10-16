@@ -9,12 +9,13 @@ const jsonLd = JSON.stringify({
     name: 'Can Traverse run models on a GPU or the Apple Neural Engine?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Core ML is an opt-in placement on Apple hosts in Traverse v0.15.0. The default placement is still wasm-cpu inside the one shared runtime. A signed Core ML variant runs only when the host asks for it and the variant passes an on-device self-check against its conformance vector. Published evidence so far is macOS cargo test plus the Decision 113 iPhone spike. Governed-path iPhone evidence is still open (traverse#1630). There is no web, Android, or desktop GPU adapter. No host is Certified.',
+      text: 'Core ML is an opt-in placement on Apple hosts in Traverse v0.15.0. The default placement is still wasm-cpu inside the one shared runtime. A signed Core ML variant runs only when the host asks for it and the variant passes an on-device self-check against its conformance vector. Published-release evidence is macOS cargo test plus the Decision 113 iPhone spike. After v0.15.0, governed-path iPhone evidence landed on main (traverse#1630): BirdNET on one iPhone 14 Pro Max ran at p95 141 ms per 3 s clip under the policy [coreml, wasm-cpu], within tolerance of wasm-cpu. It relies on the unreleased schema 2.3.0 score_transform. The cpu_and_neural_engine setting failed its self-check and fell back to wasm-cpu. There is no web, Android, or desktop GPU adapter. No host is Certified.',
     },
   }],
 });
 
 const relatedLinks = [
+  { href: '/questions/how-fast-does-a-model-run-on-iphone-with-traverse.html', label: 'How fast does a model run on iPhone with Traverse?' },
   { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
   { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
   { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
@@ -24,7 +25,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Can Traverse run models on a GPU or the Apple Neural Engine?"
-  description="v0.15.0 can opt in to a signed Core ML variant on Apple hosts. Default stays wasm-cpu. Evidence is macOS cargo test plus the Decision 113 spike. Governed-path iPhone evidence is traverse#1630."
+  description="v0.15.0 can opt in to a signed Core ML variant on Apple hosts; default stays wasm-cpu. Governed-path iPhone evidence (#1630) landed on main: BirdNET p95 141 ms per 3 s clip on one iPhone 14 Pro Max."
   canonical="https://traverse-framework.com/questions/can-traverse-run-models-on-a-gpu-or-neural-engine.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
@@ -42,7 +43,13 @@ const relatedLinks = [
   </ul>
 
   <h2>What the evidence is, and what it is not</h2>
-  <p>Published evidence so far is macOS <code>cargo test</code> plus the Decision 113 iPhone spike. Governed-path iPhone evidence is still open (<a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>). This page does not quote spike timings as product performance. No host is Certified under Spec 529.</p>
+  <p>For the published v0.15.0 release, the evidence is macOS <code>cargo test</code> plus the Decision 113 iPhone spike.</p>
+  <p>After the release, governed-path iPhone evidence landed on main (<a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>, <a href="https://github.com/traverse-framework/traverse/blob/main/docs/evidence/birdnet-iphone-governed-2026-10-15.md">evidence write-up</a>). On one iPhone 14 Pro Max, BirdNET v2.4 ran under the policy <code>[coreml, wasm-cpu]</code> at p95 141 ms per 3 s clip with Core ML's default compute units, against about 10 s on <code>wasm-cpu</code>. Top-5 matched <code>wasm-cpu</code> on 21 of 21 clips. Two things to know:</p>
+  <ul>
+    <li><strong>The Neural Engine-only setting did not qualify.</strong> With <code>cpu_and_neural_engine</code>, the variant failed its on-device self-check, so the policy fell back to <code>wasm-cpu</code>, as designed (<a href="https://github.com/traverse-framework/traverse/issues/1708">#1708</a>).</li>
+    <li><strong>It is not reproducible on v0.15.0 alone.</strong> BirdNET outputs logits, so its variant needs the new <code>score_transform</code> tolerance in manifest schema 2.3.0, which is on main and not released.</li>
+  </ul>
+  <p>The full scope and the open follow-ups are on <a href="/questions/how-fast-does-a-model-run-on-iphone-with-traverse.html">how fast does a model run on iPhone with Traverse?</a> No host is Certified under Spec 529.</p>
 
   <h2>Why it is built this way</h2>
   <p>An accelerator is an implementation detail of the host, not a second runtime. The contract, the signed package, and <strong>discover → execute → trace</strong> stay the same. The adapter only runs a variant the package already signed, and the trace records which path produced the answer.</p>

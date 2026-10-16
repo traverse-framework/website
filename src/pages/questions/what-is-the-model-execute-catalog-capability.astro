@@ -1,0 +1,54 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What is the model.execute catalog capability?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'model.execute@1.0.0 is a capability in the Traverse registry catalog (published Oct 15, 2026, registry#639, index-v407) that lets agents and apps find governed model execution through discover → execute → trace. It is a thin shim over the host connector traverse.model-runtime: the caller supplies an exact-ref model pin (model_id, version, digest), a host-staged input_ref, model_usage (commercial or non_commercial), and a trust_root of allowed signer key ids. The capability checks those inputs, dispatches through the mediated connector, and returns the host model_evidence or a fail-closed Spec 138 reason unchanged. It does not fetch models, hold keys, or pick a model. It pins traverse.model-runtime 2.3.0, which is on Traverse main and not in the published v0.15.0 hosts, and its registry spec (027) is still a draft.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+  { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/how-do-ai-agents-discover-capabilities.html', label: 'How do AI agents discover capabilities?' },
+];
+---
+<QuestionLayout
+  title="What is the model.execute catalog capability?"
+  description="model.execute@1.0.0 is a registry catalog shim over Traverse's model-runtime connector: exact pin, model_usage, trust root in; model_evidence or a fail-closed reason out. Draft spec; needs a connector version not yet released."
+  canonical="https://traverse-framework.com/questions/what-is-the-model-execute-catalog-capability.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <code>model.execute@1.0.0</code> is a capability in the Traverse registry catalog, published on October 15, 2026 (<a href="https://github.com/traverse-framework/registry/pull/639">registry#639</a>). It makes governed model execution something an agent or app can <strong>discover</strong>, then <strong>execute</strong> and <strong>trace</strong> like any other capability. It does not run models itself. It forwards a checked request to the host's model connector.</p>
+
+  <h2>What goes in and what comes out</h2>
+  <ul>
+    <li><strong>An exact pin.</strong> <code>model_id</code>, <code>version</code>, and <code>digest</code>. No URL, no "latest".</li>
+    <li><strong>A staged input.</strong> The host stages the input bytes and passes an <code>input_ref</code> handle.</li>
+    <li><strong>A usage declaration.</strong> <code>model_usage</code> is <code>commercial</code> or <code>non_commercial</code>. Leave it out and the call fails with <code>usage_undeclared</code>.</li>
+    <li><strong>A trust root.</strong> A non-empty list of allowed signer key ids. An empty list fails with <code>key_untrusted</code> before anything is dispatched.</li>
+  </ul>
+  <p>On success, the output carries the host's <code>model_evidence</code>. On failure, the host's own reason comes back unchanged: <code>digest_mismatch</code>, <code>key_untrusted</code>, <code>signature_invalid</code>, <code>rights_mismatch</code>, <code>rights_policy_denied</code>, <code>usage_undeclared</code>, <code>package_revoked</code>, or <code>model_unavailable</code>.</p>
+
+  <h2>How it relates to ExactModelHost</h2>
+  <p>The work still happens in the host connector, <code>traverse.model-runtime</code>, which is what <a href="/questions/what-is-exact-model-host.html">ExactModelHost</a> implements on each host. The catalog capability is a shim in front of it, called through the runtime's mediated connector path. It does not copy the connector's schemas, it does not fetch from Hugging Face, it holds no signing keys, and it never chooses a model for you. The caller supplies the pin.</p>
+
+  <h2>What is not true yet</h2>
+  <ul>
+    <li><strong>It needs an unreleased connector version.</strong> The contract pins <code>traverse.model-runtime</code> 2.3.0. That version is on Traverse main. The published v0.15.0 hosts carry 2.2.0.</li>
+    <li><strong>Its spec is a draft.</strong> Registry spec <code>027-catalog-model-execute</code> is in <code>draft_specs</code>, waiting for owner approval.</li>
+    <li><strong>No published-release demo yet.</strong> A Browser, Node, and native demo of the catalog capability on a published Traverse release is still an open item. The reference package for that demo is <code>traverse.digits-onnx@1.0.0</code> from the Traverse fixtures, signed with a test-only key (<a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>).</li>
+    <li>No host is Certified under Spec 529.</li>
+  </ul>
+</QuestionLayout>

@@ -1,0 +1,70 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How fast does a model run on iPhone with Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'One measured case, on unreleased main: on an iPhone 14 Pro Max (iOS 26.6, Release build), BirdNET v2.4 running through the governed Swift ExactModelHost under the policy [coreml, wasm-cpu] took p95 141.3 ms per 3 s audio clip with Core ML default compute units, against p95 10.0 s on wasm-cpu. Top-5 labels matched wasm-cpu on 21 of 21 clips. The timing covers the whole governed call: policy, rights, placement, and evidence. The evidence is traverse#1630 (PR #1709, Oct 15, 2026). It relies on manifest schema 2.3.0 score_transform, which is not in v0.15.0. One device, one model, test-only signing key. No host is Certified.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/can-traverse-run-models-on-a-gpu-or-neural-engine.html', label: 'Can Traverse run models on a GPU or the Apple Neural Engine?' },
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+  { href: '/questions/how-do-i-package-an-onnx-model-for-traverse.html', label: 'How do I package my own ONNX model?' },
+  { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+];
+---
+<QuestionLayout
+  title="How fast does a model run on iPhone with Traverse?"
+  description="One measured case on unreleased main: BirdNET on an iPhone 14 Pro Max through the governed Swift host, p95 141 ms per 3 s clip on Core ML vs about 10 s on wasm-cpu. Scope, caveats, follow-ups."
+  canonical="https://traverse-framework.com/questions/how-fast-does-a-model-run-on-iphone-with-traverse.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> we have one measured case. On an iPhone 14 Pro Max, the BirdNET v2.4 bird-sound model ran through Traverse's governed path at <strong>p95 141 ms per 3 s audio clip</strong> on Core ML, against about 10 s on <code>wasm-cpu</code>. That evidence is on main, not in a published release yet (<a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>).</p>
+
+  <h2>What was measured</h2>
+  <p>The run used a Release build on iOS 26.6. The host was Swift <code>ExactModelHost</code> on <code>TraverseSwiftHost.xcframework</code>, with <code>modelUsage: non_commercial</code> and the execution policy <code>[coreml, wasm-cpu]</code>. The package was built with <code>traverse-cli model package-onnx</code> from the BirdNET v2.4 int8 ONNX model, plus a signed Core ML variant made with <code>model convert-coreml</code>. It ran on 21 three-second clips.</p>
+  <p>The timing wraps <code>ExactModelHost.execute</code>, so it is the whole governed call: policy, rights, placement, and evidence. It is not a raw Core ML prediction.</p>
+
+  <table>
+    <thead><tr><th>Host Core ML setting</th><th>Placement the policy picked</th><th>Steady p95 per clip</th></tr></thead>
+    <tbody>
+      <tr><td>none (<code>wasm-cpu</code> with snapshot reuse)</td><td><code>wasm-cpu</code></td><td>10.0 s</td></tr>
+      <tr><td><code>all</code> (default)</td><td><code>coreml</code></td><td>141.3 ms</td></tr>
+      <tr><td><code>cpu_and_gpu</code></td><td><code>coreml</code></td><td>133.8 ms</td></tr>
+      <tr><td><code>cpu_and_neural_engine</code></td><td><code>wasm-cpu</code> (the variant failed its self-check)</td><td>10.5 s</td></tr>
+      <tr><td><code>cpu_only</code></td><td>the first call timed out at the 60 s deadline</td><td>none</td></tr>
+    </tbody>
+  </table>
+
+  <p>On Core ML, the top-5 labels matched the device's own <code>wasm-cpu</code> output on 21 of 21 clips, and the worst sigmoid score difference was 4.79×10⁻³, inside the 5×10⁻³ bar. The first call on the default setting took 6.9 s, because it compiles the variant on the device and runs the self-check. The raw numbers are in the <a href="https://github.com/traverse-framework/traverse/blob/main/docs/evidence/birdnet-iphone-governed-2026-10-15.md">evidence write-up</a>.</p>
+
+  <h2>Why the fallbacks matter</h2>
+  <p>The Core ML variant only runs after it passes an on-device check against the package's own signed reference outputs. With the Neural Engine-only setting, it did not pass on this phone, so the call ran on <code>wasm-cpu</code> instead and the trace recorded why. A slower, correct answer beats a fast, wrong one. If nothing qualifies, the call fails closed with <code>placement_unavailable</code>.</p>
+
+  <h2>What this does not show</h2>
+  <ul>
+    <li><strong>Not on v0.15.0.</strong> BirdNET outputs logits, so its variant needs the new <code>score_transform</code> tolerance (manifest schema 2.3.0). That is on main and not released.</li>
+    <li><strong>One device, one model.</strong> This is not a benchmark across iPhones or models.</li>
+    <li><strong>Test-only signing key.</strong> Production key custody is <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>, still open.</li>
+    <li><strong>Non-commercial weights.</strong> BirdNET's weights are CC BY-NC-SA 4.0, which is why the app declared <code>non_commercial</code>. The weights and clips are not in the repository.</li>
+    <li><strong>No host is Certified</strong> under Spec 529, and there is no web, Android, or desktop GPU adapter.</li>
+  </ul>
+
+  <h2>Open follow-ups</h2>
+  <ul>
+    <li><a href="https://github.com/traverse-framework/traverse/issues/1706">#1706</a>: the <code>cpu_only</code> first call runs out of time because compile and self-check count against the call deadline.</li>
+    <li><a href="https://github.com/traverse-framework/traverse/issues/1707">#1707</a>: the governed call adds about 120 ms over a raw prediction.</li>
+    <li><a href="https://github.com/traverse-framework/traverse/issues/1708">#1708</a>: record why the Neural Engine setting fails the self-check.</li>
+  </ul>
+</QuestionLayout>
