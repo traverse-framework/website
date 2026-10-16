@@ -1,0 +1,209 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 16, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Agents</span>
+      <span class="badge">Models</span>
+    </div>
+    <h1 class="t-h1">An agent picks a model off the shelf. The contract still decides.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Last week an agent tried to cheat a signed model through MCP-shaped tools and every attempt failed closed. This week the agent does not get a hand-wired model. It <strong>discovers</strong> one in the catalog: <code>model/model.execute@1.0.0</code>, the governed model capability published to the registry on October 15 (<a href="https://github.com/traverse-framework/registry/pull/639" target="_blank" rel="noopener">registry#639</a>). We pulled that exact capability WASM, checked its digest against the catalog, and pointed it at a signed ONNX package of <code>onnxmodelzoo/mnist-12</code>. It ran on Browser, Node and Native with one fingerprint. Then the agent freestyled, and the model never ran.</p>
+
+      <div class="callout">
+        Short version: discover → execute → trace. Catalog <code>model/model.execute@1.0.0</code> runs a signed ONNX package (exact-ref pin <code>d820ea39…</code>) on <strong>Browser, Node and Native</strong>. All 14 scenarios are byte-identical across the three hosts (fingerprint <code>12fea82f…c9d9</code>), and the digits come back 7, 2, 1, 0. Every freestyle attempt fails closed the same way on every host. Everything is pinned to the published <strong>v0.15.0</strong>. The agent proposes; the runtime decides.
+      </div>
+
+      <p>Public proof is this write-up and the screenshots. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-16-catalog-model-execute" target="_blank" rel="noopener"><code>weekly-demos/2026-10-16-catalog-model-execute</code></a> is for people who already have access (repo private). <code>weekly-demos</code> is still <strong>not publicly cloneable</strong> (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>).</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/catalog-model-execute-2026-10-16/01-full-page-three-hosts.webp" alt="Catalog model.execute demo: four MNIST digits bit-identical on Browser, Node and Native, a freestyle refusal table, the connector trace, and a product-path truth panel" width="1280" height="731" loading="lazy" />
+        <figcaption>The whole demo on one page: same capability on three hosts, the agent's refusals, the trace of what the WASM asked the host, and what is and isn't the product path.</figcaption>
+      </figure>
+
+      <h2 id="discover">Off the shelf, not hand-wired</h2>
+
+      <p>The catalog has 228 capabilities. <code>model/model.execute@1.0.0</code> is one of them: an 8 KB WASM shim that takes an exact pin, a staged input, a <code>model_usage</code> declaration and a trust root, then asks the host's model connector to run exactly that package. The capability WASM sha256 (<code>5ccfa372…4275</code>) and contract sha256 (<code>a96db38b…ef1c</code>) are checked against the catalog entry on every host before anything runs.</p>
+
+      <p>The model came from the ONNX model zoo on Hugging Face (<code>onnxmodelzoo/mnist-12</code>). We packaged and signed it ourselves for the demo. The host runs the pinned package or nothing.</p>
+
+      <h2 id="execute">Same bytes on three hosts</h2>
+
+      <p>14 scenarios: 4 digits and 10 freestyle attempts. The capability's stdout JSON and the model's output frame are byte-identical on Browser (Chrome), Node and Native (wasmtime). Predictions are 7, 2, 1, 0, all correct, and the digit frames match the conformance vector.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/catalog-model-execute-2026-10-16/02-hero-bit-identical-digits.webp" alt="Four MNIST digits 7, 2, 1, 0 predicted correctly, bytes identical on Browser, Node and Native, fingerprint 12fea82f…c9d9" width="1280" height="237" loading="lazy" />
+        <figcaption>Browser = Node = Native. One fingerprint, <code>12fea82f…c9d9</code>.</figcaption>
+      </figure>
+
+      <h2 id="freestyle">The agent freestyles</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Agent tries</th><th>Refused by</th><th>Reason, on every host</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Drops <code>model_usage</code>, or invents <code>"research"</code></td><td>Capability WASM, before any host call</td><td><code>usage_undeclared</code></td></tr>
+            <tr><td>Sends an empty trust root</td><td>Capability WASM</td><td><code>key_untrusted</code></td></tr>
+            <tr><td>Trusts a signer it made up</td><td>Spec 138 host</td><td><code>key_untrusted</code></td></tr>
+            <tr><td>Swaps in another model digest, or asks for a bigger model under the same digest</td><td>Spec 138 host</td><td><code>pin_mismatch</code></td></tr>
+            <tr><td>One bit flipped in the ONNX weights</td><td>Spec 138 host</td><td><code>digest_mismatch</code></td></tr>
+            <tr><td>Host revokes the package</td><td>Spec 138 host</td><td><code>package_revoked</code></td></tr>
+            <tr><td>No connector bound</td><td>Runtime ABI (no ambient authority)</td><td><code>connector_unavailable</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>In every one of those cases, the model never ran.</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/catalog-model-execute-2026-10-16/03-agent-freestyle-refusals.webp" alt="Agent freestyle refusals: identical stable reasons on Browser, Node and Native" width="1280" height="253" loading="lazy" />
+        <figcaption>Same refusal, same reason, three hosts.</figcaption>
+      </figure>
+
+      <h2 id="honest">What is not true yet</h2>
+
+      <ul>
+        <li><strong>The browser product path does not run it.</strong> Published <code>BundleEmbedder</code> + <code>runtime.wasm</code> fails to instantiate the capability: the <code>connector_invoke</code> import is missing. Filed as <a href="https://github.com/traverse-framework/traverse/issues/1719" target="_blank" rel="noopener">traverse#1719</a>.</li>
+        <li><strong>Browser and Node use demo glue.</strong> About 55 lines of labelled demo glue bind the connector to the published <code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.15.0</code>, which does the verify and execute.</li>
+        <li><strong>Native is the real product path.</strong> crates.io <code>traverse-runtime 0.15.0</code> <code>run_bytes_with_mediated_connectors</code> plus the crate's own <code>ExactModelHostConnector</code>, joined by a small host-written bridge.</li>
+        <li><strong>No production signing.</strong> The package is signed with a throwaway test key; only its public half is in the tree. Production key custody is <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">traverse#1567</a>.</li>
+        <li><strong>Extra input fields are not rejected yet.</strong> The demo accepted an undeclared <code>prompt</code> field on every host. Enforcement is <a href="https://github.com/traverse-framework/traverse/issues/1671" target="_blank" rel="noopener">#1671</a> on main, not in v0.15.0.</li>
+      </ul>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/catalog-model-execute-2026-10-16/04-product-path-truth.webp" alt="Product-path truth panel: BundleEmbedder 0.15.0 cannot find connector_invoke import; Native is the real product path; Browser and Node bind the connector in demo glue; extra fields accepted" width="930" height="318" loading="lazy" />
+        <figcaption>The red badge stays on the page: published <code>BundleEmbedder</code> can't link <code>connector_invoke</code> yet.</figcaption>
+      </figure>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> An agent picks a model off the shelf. The contract still decides (week of 2026-10-16).</li>
+          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-16-catalog-model-execute" target="_blank" rel="noopener">2026-10-16-catalog-model-execute</a>. Not a public clone — <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
+          <li><strong>Capability:</strong> catalog <code>model/model.execute@1.0.0</code> (registry#639). WASM <code>5ccfa372…4275</code>, contract <code>a96db38b…ef1c</code>, both equal to the catalog entry. Catalog size: 228 caps.</li>
+          <li><strong>Model:</strong> signed ONNX package of <code>onnxmodelzoo/mnist-12</code>, exact-ref pin <code>d820ea39…</code>. The model came from the ONNX model zoo on Hugging Face; nothing more is implied.</li>
+          <li><strong>Product pins:</strong> Traverse <code>v0.15.0</code>. npm <code>traverse-embedder-web@0.15.0</code>. crates <code>traverse-runtime</code> / <code>traverse-contracts</code> <code>0.15.0</code>.</li>
+          <li><strong>Result:</strong> 14 scenarios byte-identical on Browser, Node and Native (fingerprint <code>12fea82f…c9d9</code>). Predictions 7, 2, 1, 0.</li>
+          <li><strong>Freestyle:</strong> <code>usage_undeclared</code>, <code>key_untrusted</code>, <code>pin_mismatch</code>, <code>digest_mismatch</code>, <code>package_revoked</code>, <code>connector_unavailable</code>, identical on every host; the model never runs.</li>
+          <li><strong>Hosts:</strong> Native (<code>traverse-runtime</code> <code>run_bytes_with_mediated_connectors</code> + <code>ExactModelHostConnector</code>) is the real product path. Browser and Node use about 55 lines of labelled demo glue over <code>ExactModelBrowserHost</code>.</li>
+          <li><strong>Not claimed:</strong> browser <code>BundleEmbedder</code> + <code>runtime.wasm</code> running it (missing <code>connector_invoke</code> import, traverse#1719). Production signing (test key; traverse#1567). Rejection of extra input fields (#1671, main only). Any Hugging Face partnership or integration.</li>
+          <li><strong>Lead claim:</strong> discover → execute → trace. The agent proposes; the runtime decides.</li>
+        </ul>
+      </div>
+
+      <p>The agent can pick from the shelf. It cannot pick what runs.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#discover">Off the shelf</a></li>
+          <li><a href="#execute">Same bytes on three hosts</a></li>
+          <li><a href="#freestyle">The agent freestyles</a></li>
+          <li><a href="#honest">What is not true yet</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/agent-mcp-exact-ref.html">Agent speaks MCP. Exact pin kills the freestyle. →</a></li>
+          <li><a href="/blog/signed-models-on-every-host.html">Signed models on every host →</a></li>
+          <li><a href="/questions/what-is-the-model-execute-catalog-capability.html">What is the model.execute catalog capability? →</a></li>
+          <li><a href="/questions/what-is-exact-ref-model-execution.html">What is exact-ref model execution? →</a></li>
+          <li><a href="/questions/is-production-model-signing-ready.html">Is production model signing ready? →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Agent picks. Contract decides.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">One catalog capability, one signed model, three hosts, one fingerprint. Freestyle fails closed everywhere.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="/blog/agent-mcp-exact-ref.html" class="btn btn-ghost">Last week’s demo →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="An agent picks a model off the shelf. The contract still decides. — Traverse Blog"
+  description="Weekly demo: the catalog capability model/model.execute@1.0.0 runs a signed ONNX mnist-12 package byte-identically on Browser, Node and Native. Agent freestyle fails closed the same way on every host. Traverse v0.15.0."
+  canonical="https://traverse-framework.com/blog/catalog-model-execute.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
