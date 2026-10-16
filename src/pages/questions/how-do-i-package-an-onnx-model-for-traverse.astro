@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do I package my own ONNX model for Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Install the CLI with cargo install traverse-cli-rs --version =0.15.0 --locked (Rust 1.94 or newer; crates.io traverse-cli is an unrelated tool). Download the audited runner.wasm from the onnx-runner-v0.15.0 GitHub release and check its sha256, then run traverse-cli model package-onnx runner.wasm model.onnx model.package.json out/dir. Sign the manifest with a key kept outside the repo, verify, generate and check a conformance vector, and pin. The app then declares the pin and model_usage, and the host runs it under discover → execute → trace. Today the packager supports one input and one output tensor (traverse#1661).',
+      text: 'Install the CLI with cargo install traverse-cli-rs --version =0.15.0 --locked (Rust 1.94 or newer; crates.io traverse-cli is an unrelated tool). Download the audited runner.wasm from the onnx-runner-v0.15.0 GitHub release and check its sha256, then run traverse-cli model package-onnx runner.wasm model.onnx model.package.json out/dir. Sign the manifest with a key kept outside the repo, verify, generate and check a conformance vector, and pin. The app then declares the pin and model_usage, and the host runs it under discover → execute → trace. In 0.15.0 the packager supports one input and one output tensor. Multi-input, multi-output packaging for Hugging Face-style text encoders merged on main after the release (traverse#1661, PR #1704) and is not in a published release yet.',
     },
   }],
 });
@@ -54,10 +54,10 @@ traverse-cli model pin out/my-model --json</code></pre>
 
   <h2>Limits today</h2>
   <ul>
-    <li>One input tensor and one output tensor. Most Hugging Face text encoders take several inputs, so they do not fit yet (<a href="https://github.com/traverse-framework/traverse/issues/1661">traverse#1661</a>).</li>
+    <li>In 0.15.0, one input tensor and one output tensor. Most Hugging Face text encoders take several inputs (<code>input_ids</code>, <code>attention_mask</code>), so they do not fit the published packager. Named multi-input, multi-output packaging merged on main after the release (<a href="https://github.com/traverse-framework/traverse/issues/1661">traverse#1661</a>, <a href="https://github.com/traverse-framework/traverse/pull/1704">PR #1704</a>). It is not in a release yet, and the rebuilt audited runner and a signed reference encoder package are still pending.</li>
     <li><code>model verify</code> in 0.15.0 always checks as <code>non_commercial</code>; <code>--model-usage</code> landed on main after the release (<a href="https://github.com/traverse-framework/traverse/issues/1686">traverse#1686</a>).</li>
     <li>Traverse's own production signing-key custody is <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>, still open. Your key is yours to manage.</li>
-    <li>This is the host connector path, not a catalog <code>model.execute</code> capability, and not a Hugging Face integration. No host is Certified.</li>
+    <li>This page is the host connector path, and it is not a Hugging Face integration. The registry now also lists a catalog <a href="/questions/what-is-the-model-execute-catalog-capability.html"><code>model.execute@1.0.0</code></a> shim over that same connector (its registry spec is still a draft). No host is Certified.</li>
   </ul>
   <p>The full guide is <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/model-packaging-guide.md">docs/model-packaging-guide.md</a>. It also covers adding an opt-in Core ML variant for Apple hosts.</p>
 </QuestionLayout>
