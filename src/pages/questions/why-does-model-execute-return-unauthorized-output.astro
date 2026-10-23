@@ -1,0 +1,49 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Why does model.execute return unauthorized_output when my host passes model evidence through?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The Spec 104 host-private output filter in the native executor rejects any connector output string that starts with / or contains ://. The full ModelRightsRecord that Spec 138 hosts return carries source_url values (https:// URLs), so forwarding it verbatim from a connector bridge into the catalog model.execute@1.0.0 guest fails with unauthorized_output (-4). Bridges currently have to pick fields by hand. registry#641 tracks defining a normative model_evidence shape so every host emits the same bytes; it is open.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-model-execute-catalog-capability.html', label: 'What is the model.execute catalog capability?' },
+  { href: '/questions/why-does-bundleembedder-fail-with-cannot-find-definition-for-import-connector-invoke.html', label: 'Why does BundleEmbedder fail on the connector_invoke import?' },
+  { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/blog/catalog-model-execute.html', label: 'Weekly demo: catalog model.execute' },
+];
+---
+<QuestionLayout
+  title="Why does model.execute return unauthorized_output when my host passes model evidence through?"
+  description="Traverse's host-private output filter rejects strings with :// or a leading /, and the full ModelRightsRecord carries source URLs. Bridges must pick evidence fields for now; registry#641 tracks a normative model_evidence shape."
+  canonical="https://traverse-framework.com/questions/why-does-model-execute-return-unauthorized-output.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> the runtime is protecting the guest from host-private data, and the full rights record has URLs in it. Traverse's connector output filter rejects any string that starts with <code>/</code> or contains <code>://</code>. If your bridge forwards the host's whole <code>ModelRightsRecord</code> into <a href="/questions/what-is-the-model-execute-catalog-capability.html"><code>model.execute@1.0.0</code></a>, its <code>source_url</code> fields trip that filter and the call fails with <code>unauthorized_output</code> (<code>-4</code>).</p>
+
+  <h2>Why the filter is there</h2>
+  <p>A capability guest shouldn't see host paths or endpoints. That's part of the mediated connector rules in Spec 104: the host does the I/O, and only checked, host-neutral data crosses back into the WASM. Paths and URLs are the easiest leak to catch, so the native executor refuses them outright rather than guessing which ones are safe.</p>
+
+  <h2>What the record looks like</h2>
+  <p>Both Spec 138 hosts, native <code>traverse_runtime::exact_model</code> and the web <code>ExactModelBrowserHost</code>, return a nested record: model id, version and digest, a <code>rights</code> object (license, commercial use, attribution, redistribution, <code>source_url</code>, and a derivation block that can also carry a URL), plus <code>status</code> and <code>effective_usage</code>. The catalog contract's example shows a flat <code>{"{"} license_id, commercial_use {"}"}</code>, so the two don't line up exactly.</p>
+
+  <h2>What to do for now</h2>
+  <ul>
+    <li><strong>Pick fields in your bridge.</strong> Forward only the fields your app needs and leave URLs out. Our demo bridges send <code>license_id</code>, <code>commercial_use</code>, <code>derivation</code>, <code>effective_usage</code> and <code>status</code>.</li>
+    <li><strong>Expect this to change.</strong> Hand-picked fields mean two hosts can return different evidence for the same model, which breaks "same capability, same output bytes." <a href="https://github.com/traverse-framework/registry/issues/641">registry#641</a> tracks a normative <code>model_evidence</code> schema in the contract, and <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a> tracks a shipped binding that emits it on every host. Both are open.</li>
+  </ul>
+
+  <h2>One more caveat</h2>
+  <p>The contract declares <code>additionalProperties: false</code> on inputs, but on v0.15.0 the WASM still accepts an extra field and runs. Runtime-side enforcement (traverse#1671) is on <code>main</code> and not in a release yet.</p>
+</QuestionLayout>
