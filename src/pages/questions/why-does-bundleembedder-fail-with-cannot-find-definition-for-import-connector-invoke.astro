@@ -1,0 +1,56 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Why does BundleEmbedder fail with "cannot find definition for import (traverse_host, connector_invoke)"?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'The capability you submitted calls a host connector through traverse_host.connector_invoke (Spec 104), and the published browser and Node runtime.wasm in traverse-embedder-web 0.15.0 does not link that import yet. BundleEmbedder.init succeeds, then submit returns constraint_violated with the instantiate error. Today only the native wasmtime executor in traverse-runtime implements connector_invoke, and a native host still has to write a small MediatedConnector bridge itself. The catalog model.execute@1.0.0 capability hits this on every published Browser, Node and Swift host. The fix is tracked in traverse#1719 and is not released.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-model-execute-catalog-capability.html', label: 'What is the model.execute catalog capability?' },
+  { href: '/blog/catalog-model-execute.html', label: 'Weekly demo: catalog model.execute on Browser, Node and Native' },
+  { href: '/questions/why-does-model-execute-return-unauthorized-output.html', label: 'Why does model.execute return unauthorized_output?' },
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+  { href: '/questions/what-io-boundary-do-capabilities-use-today.html', label: 'What I/O boundary do capabilities use today?' },
+];
+---
+<QuestionLayout
+  title="Why does BundleEmbedder fail with “cannot find definition for import (traverse_host, connector_invoke)”?"
+  description="The published browser/Node runtime.wasm (traverse-embedder-web 0.15.0) doesn't link traverse_host.connector_invoke yet, so capabilities that call a host connector, like catalog model.execute, fail at instantiate. Tracked in traverse#1719."
+  canonical="https://traverse-framework.com/questions/why-does-bundleembedder-fail-with-cannot-find-definition-for-import-connector-invoke.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> your capability calls a host connector through the <code>traverse_host.connector_invoke</code> import, and the published browser and Node <code>runtime.wasm</code> doesn't provide that import yet. It's a known gap in v0.15.0, tracked in <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a>. It isn't a problem with your bundle or its digest.</p>
+
+  <h2>What you see</h2>
+  <p>With <code>traverse-embedder-web@0.15.0</code>, <code>BundleEmbedder.init</code> accepts the bundle and verifies its digests. The failure comes on <code>submit</code>, which returns <code>constraint_violated</code> with:</p>
+  <pre><code>instantiate: cannot find definition for import (traverse_host,connector_invoke) with type Func(FuncType {"{"} params: [I32, I32, I32, I32], results: [I32] {"}"})</code></pre>
+  <p>We reproduced the same result in Node 22.12 and in Chrome, using the catalog <a href="/questions/what-is-the-model-execute-catalog-capability.html"><code>model.execute@1.0.0</code></a> WASM unchanged.</p>
+
+  <h2>Why it happens</h2>
+  <p>Capabilities reach host-side services (like the model runtime) through the mediated connector path from Spec 104. On <code>main</code>, host support for <code>connector_invoke</code> exists only in the native wasmtime executor in <code>traverse-runtime</code>. The nested runtime inside <code>runtime.wasm</code>, the web embedder, and the Swift, Android and .NET hosts don't link it.</p>
+  <p><code>BundleEmbedder.registerHostConnectorAdapter</code> looks like the right hook, but it's the app-command port (Specs 137 and 139). There's no public JavaScript API yet that activates a Spec 104 connector for a capability guest.</p>
+
+  <h2>What you can do today</h2>
+  <ul>
+    <li><strong>Native, with a small bridge.</strong> A native host using <code>traverse-runtime</code> can run the capability if you write your own <code>MediatedConnector</code> that forwards to the host's model connector. Our demo bridge is about 60 lines. No such bridge ships in the crate yet.</li>
+    <li><strong>Browser or Node, only with your own glue.</strong> The <a href="/blog/catalog-model-execute.html">October 16 weekly demo</a> runs the same WASM in Browser and Node through labelled demo glue that supplies the import. That's a demo, not the product path.</li>
+    <li><strong>Or call the host connector directly.</strong> If you only need signed model execution, the host's <a href="/questions/what-is-exact-model-host.html">ExactModelHost</a> path works on published hosts without the catalog shim.</li>
+  </ul>
+
+  <h2>What isn't true yet</h2>
+  <ul>
+    <li>No published host runs <code>model.execute@1.0.0</code> out of the box. The fix in traverse#1719 (a linked import in <code>runtime.wasm</code>, a public web API, and a shipped native binding) is open and unreleased.</li>
+    <li>No host is Certified under Spec 529.</li>
+  </ul>
+</QuestionLayout>
