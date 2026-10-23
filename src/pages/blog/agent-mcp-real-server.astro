@@ -1,0 +1,216 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 23, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Agents</span>
+      <span class="badge">MCP</span>
+    </div>
+    <h1 class="t-h1">The agent gets the real MCP server, and still can't freestyle.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Five weeks ago an ops agent tried to <a href="/blog/agent-freestyle-blocked.html">freestyle a $2.4M offshore wire</a> for a junior analyst, and the runtime said no. This week the scene is the same, but the agent gets something it never had before: the <strong>real, published <code>traverse-mcp</code> 0.15.0 server</strong>, not a demo façade. It still can't freestyle. And running the same decision on three hosts turned up a real bug we would not have found any other way.</p>
+
+      <div class="callout">
+        Short version: discover → execute → trace. Atlas, an ops agent, tries a $2.4M offshore wire for a junior analyst. Catalog <code>core.authorize@1.2.0</code> (WASM sha256 <code>0c318fff…</code>) decides on three hosts: Browser, Node, and the published <code>traverse-mcp</code> 0.15.0 built from crates.io with <code>cargo install</code>, running Mode A over stdio. The cheat is denied everywhere. The legit <code>treasury_ops</code> request is allowed with MFA and dual control. Five MCP freestyle moves each get a typed refusal. Decision, reason, obligations and trace match on every host, but <code>policy_hash</code> does not, and that is this week's finding. The agent proposes; the runtime decides.
+      </div>
+
+      <p>Public proof is this write-up and the screenshot. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-23-agent-mcp" target="_blank" rel="noopener"><code>weekly-demos/2026-10-23-agent-mcp</code></a> is for people who already have access (repo private). <code>weekly-demos</code> is still <strong>not publicly cloneable</strong> (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>).</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/agent-mcp-real-server-2026-10-23/01-three-hosts-truth-freestyle.webp" alt="Three host columns (Browser, Node, Agent via traverse-mcp) deciding the $2.4M wire, a cross-host truth table, a finding card on the policy_hash split, and the agent freestyle refusal table" width="1280" height="800" loading="lazy" />
+        <figcaption>One button, three hosts. The columns, the cross-host truth table, what running it three ways found, and the five freestyle refusals from the real MCP server.</figcaption>
+      </figure>
+
+      <h2 id="three-hosts">One capability, three hosts</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Host</th><th>Path</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Browser</td><td><code>traverse-embedder-web</code> 0.15.0 <code>BundleEmbedder</code> over the digest-checked <code>runtime.wasm</code> (<code>a254c161…</code>), in the tab.</td></tr>
+            <tr><td>Node</td><td>The same npm package, in a Node process.</td></tr>
+            <tr><td>Agent</td><td>The published <code>traverse-mcp</code> 0.15.0, built from crates.io with <code>cargo install --locked</code>. Mode A (<code>verified_public</code>) over stdio, serving only what is in a digest-verified registry cache prepared from <code>index-v407</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>All three run the same <code>core.authorize@1.2.0</code> bytes: the bundle WASM, the verified cache entry and the catalog entry share one sha256, <code>0c318fff…</code>. On every host the junior analyst cheat comes back <code>deny</code> / <code>no_matching_rule</code>, and the legit <code>treasury_ops</code> request comes back <code>allow</code> with <code>require_mfa</code> and <code>dual_control</code>.</p>
+
+      <p>Be precise about the agent column. There is no prebuilt <code>traverse-mcp</code> release binary yet; we built 0.15.0 from crates.io with <code>cargo install</code>. It also can't start outside a Traverse checkout on its own: the demo stages 13 fixture files from the v0.15.0 tag to get it running (<a href="https://github.com/traverse-framework/traverse/issues/1720" target="_blank" rel="noopener">traverse#1720</a>). Mode A checks the cache by <strong>digest only</strong>. There is no signature check on the cache today.</p>
+
+      <h2 id="freestyle">The agent freestyles through MCP</h2>
+
+      <p>The agent talks to the real server over stdio: <code>describe_server</code>, <code>search_capabilities</code>, <code>describe_entrypoint</code>, <code>execute_entrypoint</code>. Then it tries to route around the decision. Every attempt gets a typed refusal.</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Agent tries</th><th>traverse-mcp answers</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Invents <code>core.authorize@1.3.0</code></td><td><code>not_found</code></td></tr>
+            <tr><td>Downgrades to <code>@1.0.0</code> (in the index, never pinned into the cache)</td><td><code>registry_cache_entry_missing</code></td></tr>
+            <tr><td>Asks for 1.0.0 inside a request to the 1.2.0 entrypoint</td><td><code>invalid_request</code></td></tr>
+            <tr><td>Calls a made-up <code>core.approve-wire@1.0.0</code></td><td><code>not_found</code></td></tr>
+            <tr><td>Flips one bit in the cached WASM</td><td><code>registry_artifact_digest_mismatch</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The agent controls its arguments. It does not control what is in the verified cache or which bytes match the digest. If the pinned bytes aren't there, nothing runs.</p>
+
+      <h2 id="finding">What running it three ways found</h2>
+
+      <p>This is the honest part, and the best part. Decision, reason, obligations and trace match on all three hosts. The full output does not. <code>policy_hash</code>, the audit fingerprint of which policy ran, splits:</p>
+
+      <ul>
+        <li>Browser and Node: <code>fnv1a64:2a126b86…</code></li>
+        <li><code>traverse-mcp</code>: <code>fnv1a64:51a64653…</code></li>
+      </ul>
+
+      <p>Same WASM, same logical input. The cause: <code>core.authorize</code> hashes the raw policy bytes it receives. <code>traverse-mcp</code> re-serializes the request input with sorted keys before the capability sees it, while the embedders pass the caller's bytes through unchanged. Send sorted-key input to the embedders and all three hosts are byte-identical. The decision never changed, only the fingerprint, but the fingerprint is exactly the field you would use to prove which policy ran. It is filed as <a href="https://github.com/traverse-framework/traverse/issues/1722" target="_blank" rel="noopener">traverse#1722</a> (a cross-host input-bytes contract). A single-host demo would never have caught it.</p>
+
+      <h2 id="open">Still open</h2>
+
+      <ul>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1720" target="_blank" rel="noopener">traverse#1720</a>: the crates.io <code>traverse-mcp</code> can't start stdio outside a monorepo checkout (a fixture path is compiled in).</li>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1721" target="_blank" rel="noopener">traverse#1721</a>: no prebuilt binaries, no sync command for Mode A state, and an opaque cache-validation error.</li>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1722" target="_blank" rel="noopener">traverse#1722</a>: the <code>policy_hash</code> divergence above.</li>
+        <li>Mode A verifies the cache by digest only; no signature on the cache yet.</li>
+        <li>From last week, still open: <a href="https://github.com/traverse-framework/traverse/issues/1719" target="_blank" rel="noopener">traverse#1719</a> (published <code>runtime.wasm</code> and <code>BundleEmbedder</code> don't link <code>connector_invoke</code>) and <a href="https://github.com/traverse-framework/registry/issues/641" target="_blank" rel="noopener">registry#641</a> (a normative <code>model_evidence</code> shape).</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> The agent gets the real MCP server, and still can't freestyle (week of 2026-10-23).</li>
+          <li><strong>Public proof:</strong> this post and its screenshot. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-23-agent-mcp" target="_blank" rel="noopener">2026-10-23-agent-mcp</a>. Not a public clone (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>).</li>
+          <li><strong>Product pins:</strong> Traverse <code>v0.15.0</code>. crates.io <code>traverse-mcp</code> 0.15.0. npm <code>traverse-embedder-web@0.15.0</code>. <code>traverse-registry</code> 0.28.0. Registry index <code>index-v407</code>.</li>
+          <li><strong>Capability:</strong> catalog <code>core.authorize@1.2.0</code>, WASM sha256 <code>0c318fff…</code>, identical in bundle, verified cache and catalog. <code>runtime.wasm</code> sha256 <code>a254c161…</code>.</li>
+          <li><strong>Hosts:</strong> Browser (<code>BundleEmbedder</code> over <code>runtime.wasm</code>), Node (same npm package), Agent (<code>traverse-mcp</code> 0.15.0, Mode A <code>verified_public</code>, stdio, digest-verified registry cache).</li>
+          <li><strong>Result:</strong> cheat → <code>deny</code> / <code>no_matching_rule</code>; legit <code>treasury_ops</code> → <code>allow</code> + <code>require_mfa</code> + <code>dual_control</code>, on all three hosts.</li>
+          <li><strong>Freestyle refusals:</strong> <code>not_found</code>, <code>registry_cache_entry_missing</code>, <code>invalid_request</code>, <code>not_found</code>, <code>registry_artifact_digest_mismatch</code>.</li>
+          <li><strong>Finding:</strong> <code>policy_hash</code> differs (<code>fnv1a64:2a126b86…</code> on embedders vs <code>fnv1a64:51a64653…</code> on <code>traverse-mcp</code>) because <code>traverse-mcp</code> re-serializes input with sorted keys. Sorted-key input is byte-identical on all hosts. traverse#1722.</li>
+          <li><strong>Not claimed:</strong> a prebuilt <code>traverse-mcp</code> release binary (built with <code>cargo install</code>). <code>traverse-mcp</code> running outside a checkout without staging 13 fixture files (#1720). Signature checks in Mode A (digest only). Swift, .NET or Android runs this week. Production signing. A separate runtime.</li>
+          <li><strong>Lead claim:</strong> one shared runtime contract; hosts are clients. Discover → execute → trace. The agent proposes; the runtime decides.</li>
+        </ul>
+      </div>
+
+      <p>Same WASM. Three hosts. A real MCP server. The agent can ask for anything; only the pinned, verified bytes run.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#three-hosts">One capability, three hosts</a></li>
+          <li><a href="#freestyle">The agent freestyles through MCP</a></li>
+          <li><a href="#finding">What running it three ways found</a></li>
+          <li><a href="#open">Still open</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/agent-freestyle-blocked.html">The original scene: the agent freestyled a $2.4M wire →</a></li>
+          <li><a href="/blog/same-wasm-multi-host.html">Same WASM. Browser and Node match. →</a></li>
+          <li><a href="/blog/agent-mcp-exact-ref.html">Agent speaks MCP. Exact pin kills the freestyle. →</a></li>
+          <li><a href="/blog/catalog-model-execute.html">An agent picks a model off the shelf →</a></li>
+          <li><a href="/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html">Is the agent MCP demo the same as traverse-mcp? →</a></li>
+          <li><a href="/questions/how-does-the-mcp-server-work.html">How does the MCP server work? →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Real server. Same answer.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Browser, Node and the published traverse-mcp run one core.authorize WASM. The cheat is denied on all three, and every freestyle move gets a typed refusal.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/agents.html" class="btn btn-primary">For AI agents →</a>
+      <a href="/blog/catalog-model-execute.html" class="btn btn-ghost">Last week’s demo →</a>
+      <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html" class="btn btn-ghost">Weekly demos are blog-first →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="The agent gets the real MCP server, and still can't freestyle. — Traverse Blog"
+  description="Weekly demo: catalog core.authorize@1.2.0 decides a $2.4M wire cheat on Browser, Node and the published traverse-mcp 0.15.0 (Mode A, digest-verified cache). Five MCP freestyle moves get typed refusals. Finding: policy_hash splits on key order (traverse#1722). Traverse v0.15.0."
+  canonical="https://traverse-framework.com/blog/agent-mcp-real-server.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

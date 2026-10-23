@@ -9,12 +9,13 @@ const jsonLd = JSON.stringify({
     name: 'Is the agent MCP exact-ref demo the same as traverse-mcp?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'No. The October 9 weekly demo (agent-mcp-exact-ref) uses an in-process MCP-shaped JSON-RPC façade over ExactModelBrowserHost under Node. It is not the checksum-pinned Mode A traverse-mcp binary. Mode A traverse-mcp is the published stdio MCP server for discover, inspect, and execute of registry capabilities. Checksum-pinned Mode A binaries are #1653: the packaging workflow merged on main and the first traverse-mcp-v* artifact release comes with the next product tag. None is published yet.',
+      text: 'It depends on the week. The October 9 weekly demo (agent-mcp-exact-ref) used an in-process MCP-shaped JSON-RPC façade over ExactModelBrowserHost under Node, not traverse-mcp. The October 23 weekly demo (agent-mcp-real-server) does use the real published traverse-mcp 0.15.0, built from crates.io with cargo install and run in Mode A over stdio against a digest-verified registry cache. Mode A traverse-mcp is the published stdio MCP server for discover, inspect, and execute of registry capabilities. There is no prebuilt traverse-mcp release binary yet (traverse#1721), and the crates.io build needs 13 staged fixture files to start outside a checkout (traverse#1720).',
     },
   }],
 });
 
 const relatedLinks = [
+  { href: '/blog/agent-mcp-real-server.html', label: 'The agent gets the real MCP server, and still can\'t freestyle.' },
   { href: '/blog/agent-mcp-exact-ref.html', label: 'Agent speaks MCP. Exact pin kills the freestyle.' },
   { href: '/agents.html', label: 'For AI agents (traverse-mcp)' },
   { href: '/docs/guides/mcp-setup.html', label: 'MCP setup guide' },
@@ -24,20 +25,23 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Is the agent MCP exact-ref demo the same as traverse-mcp?"
-  description="No. The Oct 9 demo is an in-process MCP-shaped façade over ExactModelBrowserHost under Node. Mode A traverse-mcp is the published stdio server for registry capabilities. Pinned binaries (#1653) ship with the next product tag."
+  description="The Oct 9 demo was an MCP-shaped façade over ExactModelBrowserHost. The Oct 23 demo uses the real published traverse-mcp 0.15.0 (built with cargo install, Mode A). No prebuilt release binary yet."
   canonical="https://traverse-framework.com/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html"
   category="AI and MCP"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>No.</strong> The October 9 weekly demo and Mode A <code>traverse-mcp</code> both speak something an agent can call. They are not the same program.</p>
+  <p><strong>For the October 9 demo, no. For the October 23 demo, yes.</strong> The October 9 weekly demo and Mode A <code>traverse-mcp</code> both speak something an agent can call, but they are not the same program. The October 23 demo, <a href="/blog/agent-mcp-real-server.html">The agent gets the real MCP server, and still can't freestyle.</a>, puts the real published <code>traverse-mcp</code> 0.15.0 in the agent column.</p>
 
-  <h2>What the demo is</h2>
+  <h2>What the October 23 demo uses</h2>
+  <p>The agent talks over stdio to <code>traverse-mcp</code> 0.15.0, built from crates.io with <code>cargo install</code>. It runs in Mode A (<code>verified_public</code>) and serves only what is in a digest-verified registry cache prepared from <code>index-v407</code>. Catalog <code>core.authorize@1.2.0</code> gives the same decision there as in the browser and Node embedders, and five freestyle moves get typed refusals. Two limits: there is no prebuilt release binary (<a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a>), and the crates.io build needs 13 staged fixture files to start outside a Traverse checkout (<a href="https://github.com/traverse-framework/traverse/issues/1720">traverse#1720</a>). Mode A checks the cache by digest only. Running it alongside the embedders also found a <code>policy_hash</code> split caused by key re-sorting (<a href="https://github.com/traverse-framework/traverse/issues/1722">traverse#1722</a>).</p>
+
+  <h2>What the October 9 demo is</h2>
   <p>The write-up <a href="/blog/agent-mcp-exact-ref.html">Agent speaks MCP. Exact pin kills the freestyle.</a> shows an agent calling MCP-shaped tools against a signed exact-ref package. Behind those tools is an <strong>in-process JSON-RPC façade</strong> over <code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.14.0</code>, running under Node. The host is the published web exact-ref connector. The façade is demo code for that week. It is not a binary you pin from a release.</p>
 
   <h2>What traverse-mcp is</h2>
   <p>Mode A <code>traverse-mcp</code> is the published stdio MCP server. An agent uses it to discover, inspect, and execute registry capabilities: <code>list_entrypoints</code>, <code>describe_entrypoint</code>, <code>execute_entrypoint</code>, and the rest of the ten-command set on <a href="/agents.html">For AI agents</a>. Setup is the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>. Stdio is the packaged bootstrap. That server is a client of the shared runtime contract. It is not the demo façade, and it is not a second runtime.</p>
 
   <h2>What is still open</h2>
-  <p>Pinning and checksum-verifying a packaged Mode A binary, the way you would pin any other release artifact, is <a href="https://github.com/traverse-framework/traverse/issues/1653">#1653</a>. The packaging workflow merged on main on October 15 (<a href="https://github.com/traverse-framework/traverse/pull/1701">#1701</a>). It builds Linux x86_64 and macOS arm64 binaries on the next product tag and publishes them as a non-Latest <code>traverse-mcp-v*</code> release with <code>SHA256SUMS</code> and build provenance. No such release exists yet. Until one does, do not describe the October 9 column as "the checksum-pinned <code>traverse-mcp</code>." Quote the blog for what the façade did. Quote this page, or <a href="/agents.html">agents</a>, for what the server is.</p>
+  <p>Pinning and checksum-verifying a packaged Mode A binary, the way you would pin any other release artifact, is <a href="https://github.com/traverse-framework/traverse/issues/1653">#1653</a>. The packaging workflow merged on main on October 15 (<a href="https://github.com/traverse-framework/traverse/pull/1701">#1701</a>). It builds Linux x86_64 and macOS arm64 binaries on the next product tag and publishes them as a non-Latest <code>traverse-mcp-v*</code> release with <code>SHA256SUMS</code> and build provenance. No such release exists yet; the October 23 demo built the binary with <code>cargo install</code> instead. Until a release exists, do not describe either demo's agent column as "the checksum-pinned <code>traverse-mcp</code>," and do not describe the October 9 column as <code>traverse-mcp</code> at all. Quote the blog for what the façade did. Quote this page, or <a href="/agents.html">agents</a>, for what the server is.</p>
 </QuestionLayout>
