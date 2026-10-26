@@ -1,0 +1,60 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Why does traverse-mcp from crates.io fail with catalog_load_failed?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'traverse-mcp 0.15.0 installed with cargo install loads the expedition example bundle at startup, even in Mode A, and it looks for it at a path compiled in from CARGO_MANIFEST_DIR. That path only exists inside a traverse repo checkout, so the installed binary exits with catalog_load_failed before it answers describe_server. Workarounds: run it from a checkout at tag v0.15.0 (cargo run -p traverse-mcp -- stdio), or stage the 13 expedition fixture files from v0.15.0 at the path the error prints, which is what the October 23 weekly demo does. The fix is tracked in traverse#1720 and is open.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/why-does-traverse-mcp-fail-with-registry-metadata-cache-invalid.html', label: 'Why does traverse-mcp fail with registry_metadata_cache_invalid?' },
+  { href: '/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html', label: 'Is the agent MCP demo the same as traverse-mcp?' },
+  { href: '/questions/how-does-the-mcp-server-work.html', label: 'How does the Traverse MCP server work?' },
+  { href: '/blog/agent-mcp-real-server.html', label: 'Weekly demo: the agent gets the real MCP server' },
+  { href: '/agents.html', label: 'For AI agents (traverse-mcp)' },
+];
+---
+<QuestionLayout
+  title="Why does traverse-mcp from crates.io fail with catalog_load_failed?"
+  description="traverse-mcp 0.15.0 from cargo install looks for the expedition example bundle at a compiled-in repo path, so it can't start outside a traverse checkout. Two workarounds, and the open fix (traverse#1720)."
+  canonical="https://traverse-framework.com/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html"
+  category="AI and MCP"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> it's a packaging bug in <code>traverse-mcp</code> 0.15.0, not your setup. The installed binary goes looking for the expedition example bundle at a path that only exists inside a traverse repo checkout. It does this before it checks whether you asked for Mode A, so it fails even with <code>--cache</code>. The fix is <a href="https://github.com/traverse-framework/traverse/issues/1720">traverse#1720</a>, which is open.</p>
+
+  <h2>What you see</h2>
+  <p>You install the published crate and start the stdio server:</p>
+  <pre><code>cargo install traverse-mcp --version 0.15.0 --locked
+echo '{"{"}"command":"describe_server"{"}"}' | traverse-mcp stdio --cache ./cache</code></pre>
+  <p>and it exits with:</p>
+  <pre><code>traverse-mcp stdio server failed: StdioServerFailure {"{"} code: "catalog_load_failed",
+  message: "Failed to load expedition registry bundle
+  ~/.cargo/registry/src/index.crates.io-…/traverse-mcp-0.15.0/../../examples/expedition/registry-bundle/manifest.json:
+  … No such file or directory" {"}"}</code></pre>
+
+  <h2>Why it happens</h2>
+  <p>On startup the server loads the canonical execution context and discovery catalog from <code>examples/expedition/registry-bundle/manifest.json</code>, relative to a repo root that is computed at compile time from <code>CARGO_MANIFEST_DIR</code>. Inside the monorepo that resolves to the real example. In a crates.io install it resolves to a folder next to Cargo's registry source cache, which is empty. Mode A (Spec 119) isn't supposed to fall back to the expedition example at all, but startup still requires it.</p>
+
+  <h2>Workarounds on v0.15.0</h2>
+  <ul>
+    <li><strong>Run it from a checkout.</strong> Clone <code>traverse</code>, check out tag <code>v0.15.0</code>, and use <code>cargo run -p traverse-mcp -- stdio</code>. That is the path the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a> uses, and the compiled-in path exists there.</li>
+    <li><strong>Stage the fixture files.</strong> Copy the 13 files the server reads (the expedition registry bundle manifest, six capability contracts, five event contracts, one workflow) from tag <code>v0.15.0</code> to the path the error prints, under <code>$CARGO_HOME/registry/src/</code>. The October 23 weekly demo does exactly this with a small script before it starts Mode A. After that, the server comes up in <code>verified_public</code> mode and executes correctly.</li>
+  </ul>
+  <p>Both are workarounds. The second one writes into Cargo's cache directory, so treat it as a demo trick, not something to ship.</p>
+
+  <h2>What the fix looks like</h2>
+  <p>traverse#1720 asks for three things: don't load the expedition bundle at all in Mode A, embed the example (or take an explicit <code>--bundle</code> flag) in contributor mode, and add a CI test that installs the binary and runs it from a temp directory outside the workspace. It's on the issue tracker, not on <code>main</code> yet.</p>
+
+  <h2>Related: no prebuilt binary yet</h2>
+  <p>You only hit this because <code>cargo install</code> is the way to get the binary today. The packaging workflow for checksum-pinned Linux x86_64 and macOS arm64 binaries merged on <code>main</code> on October 15 (<a href="https://github.com/traverse-framework/traverse/pull/1701">#1701</a>) and runs on the next product tag. No <code>traverse-mcp-v*</code> release exists yet. <a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a> tracks the broader ask: prebuilt binaries on more platforms plus a sync command, so an outside developer doesn't need a Rust toolchain at all.</p>
+</QuestionLayout>

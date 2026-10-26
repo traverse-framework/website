@@ -19,6 +19,7 @@ const relatedLinks = [
   { href: '/questions/what-is-the-wasm-sandbox.html', label: 'What is the WASM sandbox?' },
   { href: '/questions/how-do-ci-pipelines-test-traverse-across-operating-systems.html', label: 'How does Traverse verify cross-OS behavior actually matches?' },
   { href: '/questions/what-is-a-contract-in-traverse.html', label: 'What is a contract in Traverse?' },
+  { href: '/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html', label: 'Does the same WASM give byte-identical output on every host?' },
 ];
 ---
 <QuestionLayout
@@ -35,4 +36,6 @@ const relatedLinks = [
   <p>If a capability's contract declares a host call — something like a system clock read or a lookup the host implements — then the behavior of that specific call depends on how the host application implements it, and a host implementation genuinely could differ across operating systems (a timezone lookup implemented one way on Windows and another on Linux, say). That's not the capability behaving inconsistently; it's a declared external dependency whose implementation is the host's responsibility, and it's visible in the contract's <code>host_calls</code> list rather than buried invisibly in the capability's logic.</p>
 
   <p>In practice, most well-scoped capabilities (pricing rules, eligibility checks, validation logic) have no legitimate reason to declare any host calls at all, which is exactly what keeps them behaviorally identical everywhere. If you're seeing inconsistent results across operating systems for the same capability and the same input, the contract's declared dependencies — not the capability's own logic — are the first place to look.</p>
+  <h2>A second place to look: the input bytes</h2>
+  <p>"Same input" has to mean the same bytes. On v0.15.0 that isn't guaranteed across host types: <code>traverse-mcp</code> re-serializes request JSON with sorted keys, while the browser and Node embedders pass the caller's bytes through. A capability that hashes its input, like catalog <code>core.authorize@1.2.0</code> and its <code>policy_hash</code>, then gives a different value on <code>traverse-mcp</code> even though the decision and trace match. That's a host difference, not an OS one, and it's open as <a href="https://github.com/traverse-framework/traverse/issues/1722">traverse#1722</a>. Details: <a href="/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html">Does the same WASM give byte-identical output on every host?</a></p>
 </QuestionLayout>
