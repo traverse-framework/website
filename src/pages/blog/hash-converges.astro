@@ -1,0 +1,213 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 30, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Determinism</span>
+      <span class="badge">MCP</span>
+    </div>
+    <h1 class="t-h1">One audit fingerprint, every host</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Last Friday, the same <code>core.authorize@1.2.0</code> WASM ran on Browser, Node and the real <code>traverse-mcp</code> server. Same bytes, same decision, but the agent's host produced a different <code>policy_hash</code> than the embedders (<a href="https://github.com/traverse-framework/traverse/issues/1722" target="_blank" rel="noopener">traverse#1722</a>). This morning's post, <a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes</a>, explains why and the rule that fixed it. This is the rerun: before and after, live, four columns, one button.</p>
+
+      <div class="callout">
+        <strong>Read this first: this is unreleased <code>main</code>, not a tag.</strong> Everything after the "before" column runs traverse <code>main</code> at <code>70f3ee7</code>. npm and crates.io are still 0.15.0, and v0.16.0 is pending (<a href="https://github.com/traverse-framework/traverse/issues/1740" target="_blank" rel="noopener">#1740</a>, which waits on <a href="https://github.com/traverse-framework/registry/issues/642" target="_blank" rel="noopener">registry#642</a>). The Browser and Node columns run the npm 0.15.0 JS with main's <code>runtime.wasm</code> swapped into the app bundle. Canonicalization lives in <code>runtime.wasm</code>, so that is the real code path, but it isn't a published package. <code>traverse-mcp</code> is built from main and needs Rust 1.95.0. There is still no prebuilt binary (<a href="https://github.com/traverse-framework/traverse/issues/1721" target="_blank" rel="noopener">#1721</a> is open). Mode A still verifies its cache by digest only, with no signature check.
+      </div>
+
+      <p>Public proof is this write-up and the screenshot. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-30-hash-converges" target="_blank" rel="noopener"><code>weekly-demos/2026-10-30-hash-converges</code></a> is for people who already have access. <code>weekly-demos</code> is still <strong>not publicly cloneable</strong> (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>).</p>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/hash-converges-2026-10-30/01-before-after-four-hosts.webp" alt="Four host columns (Before: Browser on the v0.15.0 runtime, Browser on main, Node on main, Agent via traverse-mcp built from main) deciding the $2.4M wire, a cross-host truth table, a before-vs-after card for policy_hash, and the agent freestyle refusal table" width="1280" height="800" loading="lazy" />
+        <figcaption>One click, four columns. The v0.15.0-era Browser column still shows <code>2a126b86…</code>; the three columns on main all show <code>51a64653…</code>, and the full output is byte-identical across them.</figcaption>
+      </figure>
+
+      <h2 id="before-after">Before and after</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Column</th><th>Path</th><th><code>policy_hash</code></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0 · Before, Browser</td><td><code>traverse-embedder-web</code> 0.15.0 + v0.15.0-era <code>runtime.wasm</code> (<code>a254c161…</code>)</td><td><code>2a126b86…</code></td></tr>
+            <tr><td>1 · Browser (main)</td><td>Same npm package + main <code>runtime.wasm</code> (<code>ec49cb76…</code>), nested wasmi in the tab</td><td><code>51a64653…</code></td></tr>
+            <tr><td>2 · Node (main)</td><td>Same npm package, <code>NodeFsBundleLoader</code>, same main <code>runtime.wasm</code></td><td><code>51a64653…</code></td></tr>
+            <tr><td>3 · Agent (main)</td><td><code>traverse-mcp</code> built from main, stdio, Mode A <code>verified_public</code>, native wasmtime</td><td><code>51a64653…</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Atlas, the ops agent, is still trying to push a $2.4M offshore wire for a junior analyst. All four columns run the same <code>core.authorize@1.2.0</code> bytes (<code>sha256:0c318fff…</code>) and give the same decision: the cheat is denied, and the legit <code>treasury_ops</code> request is allowed with MFA and dual control. The difference is the fingerprint. The caller deliberately sends <strong>unsorted</strong> JSON. On main every host hands the guest the RFC 8785 canonical bytes of that input (<a href="https://github.com/traverse-framework/traverse/pull/1739" target="_blank" rel="noopener">#1739</a>, Decision 118), so Browser, Node and the agent produce byte-identical full output, <code>policy_hash</code> included. The caller didn't sort anything. The runtime did, on every host.</p>
+
+      <p>Why it matters: <code>policy_hash</code> is the field an auditor uses to prove which policy ran. If it depends on which host ran the decision, it isn't a fingerprint. For the why and the rule itself, read <a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes</a>. This post is the proof that it holds end to end.</p>
+
+      <h2 id="papercuts">The two papercuts around it</h2>
+
+      <ul>
+        <li><strong>No more staged fixtures.</strong> Last week the agent's binary needed 13 expedition fixture files staged into Cargo's cache before it would start (<a href="https://github.com/traverse-framework/traverse/issues/1720" target="_blank" rel="noopener">#1720</a>). That is closed by <a href="https://github.com/traverse-framework/traverse/pull/1725" target="_blank" rel="noopener">#1725</a>: the main-built binary runs from an empty directory, the staging script is gone, and no source path is compiled in.</li>
+        <li><strong>The agent syncs the live registry.</strong> <code>traverse-mcp sync</code> shipped today (<a href="https://github.com/traverse-framework/traverse/pull/1758" target="_blank" rel="noopener">#1758</a>). The demo's Mode A state now comes from syncing the live <code>index-v412</code> (232 records), not a hand-built file. <code>prepare-cache</code> then pins <code>core.authorize@=1.2.0</code> into the verified cache. The other half of #1721, a prebuilt binary, is still open.</li>
+      </ul>
+
+      <h2 id="freestyle">Freestyle still fails closed</h2>
+
+      <p>The five moves from last week, rerun through the main-built binary over MCP. Every one still gets a typed refusal:</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Agent tries</th><th>traverse-mcp answers</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Invents <code>core.authorize@1.3.0</code></td><td><code>not_found</code></td></tr>
+            <tr><td>Downgrades to <code>@1.0.0</code> (in the index, never pinned into the cache)</td><td><code>registry_cache_entry_missing</code></td></tr>
+            <tr><td>Asks for 1.0.0 inside a request to the 1.2.0 entrypoint</td><td><code>invalid_request</code></td></tr>
+            <tr><td>Calls a made-up <code>core.approve-wire@1.0.0</code></td><td><code>not_found</code></td></tr>
+            <tr><td>Flips one bit in the cached WASM</td><td><code>registry_artifact_digest_mismatch</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The agent proposes; the runtime decides. Syncing the live registry gives the agent more to discover, not more authority: only the pinned, digest-verified bytes run.</p>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li><strong>Not a release.</strong> traverse <code>main</code> <code>70f3ee7</code>, after v0.15.0. npm and crates.io are 0.15.0; v0.16.0 is pending (#1740, waiting on registry#642). If you're on 0.15.0, last week's behavior still applies.</li>
+        <li><strong>Not a published browser package.</strong> Browser and Node use npm 0.15.0 JS with main's <code>runtime.wasm</code> in the bundle.</li>
+        <li><strong>No prebuilt <code>traverse-mcp</code>.</strong> #1721 is still open. Building from main needs Rust 1.95.0 (1.94 fails on wasmtime 48.0.7).</li>
+        <li><strong>Digest-only Mode A.</strong> No signature check on the cache. No production signing claim.</li>
+        <li><strong><a href="https://github.com/traverse-framework/traverse/issues/1719" target="_blank" rel="noopener">traverse#1719</a></strong> (<code>model.execute</code> on the embedders) is still open, waiting on <a href="https://github.com/traverse-framework/traverse/pull/1755" target="_blank" rel="noopener">PR #1755</a>.</li>
+        <li><strong>No Swift, .NET or Android runs</strong> this week.</li>
+        <li><strong>Cosmetic:</strong> <code>prepare-cache --json</code> still reports <code>kind: mcp_mode_b_prepare_cache</code> even when the cache is used by Mode A.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> One audit fingerprint, every host (weekly demo, 2026-10-30). Demo proof of the traverse#1722 fix explained in <a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes</a>.</li>
+          <li><strong>Product pins:</strong> traverse <code>main</code> <code>70f3ee7</code> (unreleased; latest tag v0.15.0). <code>traverse-mcp</code> built from main (Rust 1.95.0). npm <code>traverse-embedder-web@0.15.0</code> + main <code>runtime.wasm</code> <code>ec49cb76…</code>. Registry <code>index-v412</code>.</li>
+          <li><strong>Capability:</strong> catalog <code>core.authorize@1.2.0</code>, WASM sha256 <code>0c318fff…</code>, identical in bundle, verified cache and catalog.</li>
+          <li><strong>Result:</strong> before (Browser, v0.15.0-era <code>runtime.wasm</code> <code>a254c161…</code>): <code>policy_hash</code> <code>fnv1a64:2a126b86…</code>. After (Browser, Node, Agent on main): <code>fnv1a64:51a64653…</code> on all three, full output byte-identical, from unsorted caller input. RFC 8785 canonical guest input, traverse#1739 (Decision 118).</li>
+          <li><strong>Papercuts:</strong> traverse#1720 closed by #1725 (binary runs from an empty directory, no staged fixtures). <code>traverse-mcp sync</code> (#1758) synced live <code>index-v412</code> (232 records).</li>
+          <li><strong>Freestyle refusals:</strong> <code>not_found</code>, <code>registry_cache_entry_missing</code>, <code>invalid_request</code>, <code>not_found</code>, <code>registry_artifact_digest_mismatch</code>.</li>
+          <li><strong>Not claimed:</strong> a release (v0.16.0 pending, #1740 / registry#642); a published package with the fix; a prebuilt <code>traverse-mcp</code> (#1721 open); signature checks in Mode A; production signing; Swift, .NET or Android runs; #1719 (PR #1755 in review).</li>
+          <li><strong>Public proof:</strong> this post and its screenshot. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-30-hash-converges" target="_blank" rel="noopener">2026-10-30-hash-converges</a>.</li>
+          <li><strong>Lead claim:</strong> one shared runtime contract; hosts are clients. Discover → execute → trace. The agent proposes; the runtime decides.</li>
+        </ul>
+      </div>
+
+      <p>Same WASM. Four columns. One fingerprint on every host running main.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#before-after">Before and after</a></li>
+          <li><a href="#papercuts">The two papercuts around it</a></li>
+          <li><a href="#freestyle">Freestyle still fails closed</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes: the fix explained →</a></li>
+          <li><a href="/blog/agent-mcp-real-server.html">Last week: the demo that found it →</a></li>
+          <li><a href="/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html">Does the same WASM give byte-identical output on every host? →</a></li>
+          <li><a href="/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html">Why does traverse-mcp fail with catalog_load_failed? →</a></li>
+          <li><a href="/questions/how-does-the-mcp-server-work.html">How does the MCP server work? →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">One fingerprint. Every host.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Browser, Node and the agent's MCP server now hand one core.authorize WASM the same bytes, and get the same policy_hash back. On main, not released yet.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/blog/same-wasm-two-hashes.html" class="btn btn-primary">The fix, explained →</a>
+      <a href="/blog/agent-mcp-real-server.html" class="btn btn-ghost">Last week’s demo →</a>
+      <a href="/agents.html" class="btn btn-ghost">For AI agents →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="One audit fingerprint, every host — Traverse Blog"
+  description="Weekly demo: the same core.authorize@1.2.0 WASM now gives one policy_hash (51a64653…) on Browser, Node and traverse-mcp built from traverse main 70f3ee7, from unsorted input (RFC 8785 canonical guest input, traverse#1739). Before: 2a126b86… on the v0.15.0 runtime. traverse-mcp sync, no staged fixtures, freestyle still fails closed. Unreleased main, not v0.16.0."
+  canonical="https://traverse-framework.com/blog/hash-converges.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

@@ -92,6 +92,8 @@ const _body = `
 
       <p><em>Update, October 30:</em> fixes for #1720 (<a href="https://github.com/traverse-framework/traverse/pull/1725" target="_blank" rel="noopener">#1725</a>) and #1722 (<a href="https://github.com/traverse-framework/traverse/pull/1739" target="_blank" rel="noopener">#1739</a>, canonical JSON input on every host) are merged on <code>main</code> and ship in the next release, which isn't out yet. The 0.15.0 behavior described here still applies to the published packages. More in <a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes</a>.</p>
 
+      <p><em>Update, October 30 (weekly demo):</em> we reran this demo on traverse <code>main</code> (unreleased). Browser, Node and <code>traverse-mcp</code> built from main now give the same <code>policy_hash</code> (<code>51a64653…</code>) from unsorted input, the binary starts without staged fixtures, and freestyle still fails closed. See <a href="/blog/hash-converges.html">One audit fingerprint, every host</a>.</p>
+
       <ul>
         <li><a href="https://github.com/traverse-framework/traverse/issues/1720" target="_blank" rel="noopener">traverse#1720</a>: the crates.io <code>traverse-mcp</code> can't start stdio outside a monorepo checkout (a fixture path is compiled in).</li>
         <li><a href="https://github.com/traverse-framework/traverse/issues/1721" target="_blank" rel="noopener">traverse#1721</a>: no prebuilt binaries, no sync command for Mode A state, and an opaque cache-validation error.</li>
