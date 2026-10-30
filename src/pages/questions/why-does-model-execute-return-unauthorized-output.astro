@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Why does model.execute return unauthorized_output when my host passes model evidence through?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'The Spec 104 host-private output filter in the native executor rejects any connector output string that starts with / or contains ://. The full ModelRightsRecord that Spec 138 hosts return carries source_url values (https:// URLs), so forwarding it verbatim from a connector bridge into the catalog model.execute@1.0.0 guest fails with unauthorized_output (-4). Bridges currently have to pick fields by hand. registry#641 tracks defining a normative model_evidence shape so every host emits the same bytes; it is open.',
+      text: 'The Spec 104 host-private output filter in the native executor rejects any connector output string that starts with / or contains ://. The full ModelRightsRecord that Spec 138 hosts return carries source_url values (https:// URLs), so forwarding it verbatim from a connector bridge into the catalog model.execute@1.0.0 guest fails with unauthorized_output (-4). As of 2026-10-29 the registry publishes model.execute@1.1.0 (registry#641, closed via registry#645), which defines a normative flat model_evidence shape: license_id, commercial_use, status, effective_usage, and an optional derivation without URLs. Hosts and bridges should emit exactly that shape. Forwarding the full nested ModelRightsRecord is non-conformant. A shipped host binding that emits it on every host is still open in traverse#1719.',
     },
   }],
 });
@@ -24,7 +24,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Why does model.execute return unauthorized_output when my host passes model evidence through?"
-  description="Traverse's host-private output filter rejects strings with :// or a leading /, and the full ModelRightsRecord carries source URLs. Bridges must pick evidence fields for now; registry#641 tracks a normative model_evidence shape."
+  description="Traverse's host-private output filter rejects strings with :// or a leading /, and the full ModelRightsRecord carries source URLs. model.execute@1.1.0 now defines a normative flat model_evidence shape without URLs; emit that."
   canonical="https://traverse-framework.com/questions/why-does-model-execute-return-unauthorized-output.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
@@ -38,10 +38,12 @@ const relatedLinks = [
   <h2>What the record looks like</h2>
   <p>Both Spec 138 hosts, native <code>traverse_runtime::exact_model</code> and the web <code>ExactModelBrowserHost</code>, return a nested record: model id, version and digest, a <code>rights</code> object (license, commercial use, attribution, redistribution, <code>source_url</code>, and a derivation block that can also carry a URL), plus <code>status</code> and <code>effective_usage</code>. The catalog contract's example shows a flat <code>{"{"} license_id, commercial_use {"}"}</code>, so the two don't line up exactly.</p>
 
-  <h2>What to do for now</h2>
+  <h2>What to do now</h2>
   <ul>
-    <li><strong>Pick fields in your bridge.</strong> Forward only the fields your app needs and leave URLs out. Our demo bridges send <code>license_id</code>, <code>commercial_use</code>, <code>derivation</code>, <code>effective_usage</code> and <code>status</code>.</li>
-    <li><strong>Expect this to change.</strong> Hand-picked fields mean two hosts can return different evidence for the same model, which breaks "same capability, same output bytes." <a href="https://github.com/traverse-framework/registry/issues/641">registry#641</a> tracks a normative <code>model_evidence</code> schema in the contract, and <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a> tracks a shipped binding that emits it on every host. Both are open.</li>
+    <li><strong>Emit the normative shape.</strong> Since 2026-10-29 the registry carries <code>model.execute@1.1.0</code> (<a href="https://github.com/traverse-framework/registry/issues/641">registry#641</a>, closed by <a href="https://github.com/traverse-framework/registry/pull/645">registry#645</a>). Its contract defines a flat <code>model_evidence</code> object: <code>license_id</code>, <code>commercial_use</code>, <code>status</code>, <code>effective_usage</code>, and an optional <code>derivation</code> with no URLs in it. Build exactly that in your bridge and leave the rest of the rights record on the host side.</li>
+    <li><strong>Don't forward the full record.</strong> The 1.1.0 contract states that passing the nested <code>ModelRightsRecord</code> through is non-conformant under Spec 104, so <code>unauthorized_output</code> here is expected behavior, not a bug.</li>
+    <li><strong>Same WASM as 1.0.0.</strong> 1.1.0 reuses the 1.0.0 artifact (same digest); what changed is the contract. The guest still copies whatever the host hands it, so byte-identical output across hosts depends on every host emitting the same shape.</li>
+    <li><strong>Still open.</strong> <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a> tracks a shipped binding that links <code>connector_invoke</code> and emits this shape on the published Browser, Node and Swift hosts. Until it lands in a release, you still write the bridge yourself.</li>
   </ul>
 
   <h2>One more caveat</h2>
