@@ -18,6 +18,7 @@ const relatedLinks = [
   { href: '/questions/why-does-traverse-mcp-fail-with-registry-metadata-cache-invalid.html', label: 'Why does traverse-mcp fail with registry_metadata_cache_invalid?' },
   { href: '/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html', label: 'Is the agent MCP demo the same as traverse-mcp?' },
   { href: '/questions/how-does-the-mcp-server-work.html', label: 'How does the Traverse MCP server work?' },
+  { href: '/blog/hash-converges.html', label: 'Weekly demo: the main-built traverse-mcp runs from an empty directory' },
   { href: '/blog/agent-mcp-real-server.html', label: 'Weekly demo: the agent gets the real MCP server' },
   { href: '/agents.html', label: 'For AI agents (traverse-mcp)' },
 ];
@@ -54,7 +55,8 @@ echo '{"{"}"command":"describe_server"{"}"}' | traverse-mcp stdio --cache ./cach
 
   <h2>What the fix looks like</h2>
   <p><a href="https://github.com/traverse-framework/traverse/pull/1725">#1725</a> merged on <code>main</code> on October 27, 2026. Packaged <code>traverse-mcp stdio</code> now picks verified-cache Mode A before it loads any contributor bundle, so Mode A never touches the expedition example. Contributor mode needs an explicit <code>--bundle &lt;manifest-path&gt;</code> instead of a path derived from <code>CARGO_MANIFEST_DIR</code>, and a missing bundle gives a stable error. The latest <code>traverse-mcp</code> on crates.io is still 0.15.0, so until the next release the workarounds above are what you need.</p>
+  <p>traverse#1720 is closed on <code>main</code>; the fix is unreleased. The <a href="/blog/hash-converges.html">October 30 weekly demo</a> runs <code>traverse-mcp</code> built from <code>main</code> (<code>70f3ee7</code>, Rust 1.95.0) from an empty directory, with no staged fixtures.</p>
 
   <h2>Related: no prebuilt binary yet</h2>
-  <p>You only hit this because <code>cargo install</code> is the way to get the binary today. The packaging workflow for checksum-pinned Linux x86_64 and macOS arm64 binaries merged on <code>main</code> on October 15 (<a href="https://github.com/traverse-framework/traverse/pull/1701">#1701</a>) and runs on the next product tag. No <code>traverse-mcp-v*</code> release exists yet. <a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a> tracks the broader ask: prebuilt binaries on more platforms plus a sync command, so an outside developer doesn't need a Rust toolchain at all.</p>
+  <p>You only hit this because <code>cargo install</code> is the way to get the binary today. The packaging workflow for checksum-pinned Linux x86_64 and macOS arm64 binaries merged on <code>main</code> on October 15 (<a href="https://github.com/traverse-framework/traverse/pull/1701">#1701</a>) and runs on the next product tag. No <code>traverse-mcp-v*</code> release exists yet. <a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a> tracks the broader ask: prebuilt binaries on more platforms plus a sync command, so an outside developer doesn't need a Rust toolchain at all. The sync half, <code>traverse-mcp sync</code>, merged on <code>main</code> on October 30 (<a href="https://github.com/traverse-framework/traverse/pull/1758">#1758</a>, unreleased); prebuilt binaries are still open.</p>
 </QuestionLayout>
