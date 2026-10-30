@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Does the same Traverse WASM give byte-identical output on every host?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'The capability logic does, but only if every host hands it the same input bytes, and on v0.15.0 they do not always. In the October 23 weekly demo, catalog core.authorize@1.2.0 returned the same decision, reason, obligations and trace on the browser embedder, the Node embedder and traverse-mcp, but a different policy_hash on traverse-mcp. traverse-mcp re-serializes the request JSON with sorted keys, the embedders pass the caller bytes through, and core.authorize hashes the bytes it receives. With sorted-key input, all three hosts were byte-identical. traverse#1722 tracks one input-bytes contract for every host plus a cross-host conformance fixture; it is open.',
+      text: 'The capability logic does, but only if every host hands it the same input bytes, and on v0.15.0 they do not always. In the October 23 weekly demo, catalog core.authorize@1.2.0 returned the same decision, reason, obligations and trace on the browser embedder, the Node embedder and traverse-mcp, but a different policy_hash on traverse-mcp. traverse-mcp re-serializes the request JSON with sorted keys, the embedders pass the caller bytes through, and core.authorize hashes the bytes it receives. With sorted-key input, all three hosts were byte-identical. traverse#1722 is now resolved on main: Decision 118 and Spec 1722 make every host feed guests the RFC 8785 (JCS) canonical bytes of their JSON input, or fail with input_not_canonicalizable, with a cross-host conformance fixture (traverse#1739, merged October 28, 2026). It ships in v0.16.0, which is not released yet.',
     },
   }],
 });
@@ -18,13 +18,14 @@ const relatedLinks = [
   { href: '/questions/do-different-operating-systems-see-different-behavior-from-the-same-capability.html', label: 'Can different operating systems see different behavior from the same capability?' },
   { href: '/questions/can-i-run-the-same-business-logic-in-browser-and-native-apps.html', label: 'Can I run the same business logic in browser and native apps?' },
   { href: '/questions/why-does-model-execute-return-unauthorized-output.html', label: 'Why does model.execute return unauthorized_output?' },
+  { href: '/blog/same-wasm-two-hashes.html', label: 'Same WASM, two hashes. The bug wasn\'t in the WASM.' },
   { href: '/blog/agent-mcp-real-server.html', label: 'Weekly demo: the agent gets the real MCP server' },
   { href: '/blog/same-wasm-multi-host.html', label: 'Weekly demo: same WASM, multiple hosts' },
 ];
 ---
 <QuestionLayout
   title="Does the same Traverse WASM give byte-identical output on every host?"
-  description="Same WASM, same bytes in, same bytes out. On v0.15.0 hosts don't always pass the same bytes in: traverse-mcp re-sorts JSON keys, so core.authorize's policy_hash differs. What matches, what doesn't, and traverse#1722."
+  description="Same WASM, same bytes in, same bytes out. On v0.15.0 hosts don't always pass the same bytes in: traverse-mcp re-sorts JSON keys, so core.authorize's policy_hash differs. What matches, what doesn't, and the canonical-input fix on main (traverse#1722, ships in v0.16.0)."
   canonical="https://traverse-framework.com/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html"
   category="Platforms and portability"
   relatedLinks={relatedLinks}
@@ -54,6 +55,8 @@ const relatedLinks = [
     <li><strong>Don't hash raw input in new capabilities</strong> unless you canonicalize it first inside the capability.</li>
   </ul>
 
-  <h2>What's open</h2>
-  <p><a href="https://github.com/traverse-framework/traverse/issues/1722">traverse#1722</a> asks for one input-bytes rule for every host, either canonical JSON everywhere or byte-preserving pass-through everywhere, stated in the spec, plus a conformance fixture (a capability that returns the sha256 of its stdin) that has to agree on browser, Node, the native runtime and <code>traverse-mcp</code> in CI. Neither the decision nor the fixture has landed. Until it does, "same output on every host" on this site means same logic and same WASM bytes, with this input-serialization caveat.</p>
+  <h2>What changed on main</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/issues/1722">traverse#1722</a> is closed. Decision 118 and Spec <code>1722-canonical-guest-input-bytes</code> chose canonical JSON over pass-through: every host now feeds a capability the RFC 8785 (JCS) canonical bytes of its JSON input, including workflow steps, nested <code>runtime.wasm</code> calls and event payloads. Input JCS can't represent exactly (integers beyond ±(2<sup>53</sup>−1), duplicate keys, invalid Unicode) fails with <code>input_not_canonicalizable</code> before the guest runs. Outputs are never rewritten.</p>
+  <p>The implementation merged on <code>main</code> on October 28, 2026 (<a href="https://github.com/traverse-framework/traverse/pull/1739">#1739</a>), with a conformance fixture, <code>fixtures/cross-host/canonical-input-v1</code>, that runs on the native runtime, <code>runtime.wasm</code> and Node. Package-level runs on Swift, Kotlin and .NET are a follow-up. It ships in v0.16.0, which isn't released yet, so everything above still applies to v0.15.0.</p>
+  <p>Two things to expect on v0.16.0: hosts agree on the canonical bytes, not the caller's original key order, so a raw-input hash computed on an embedder can change once; and very large integers or duplicate keys are now refused rather than passed through. We haven't rerun the three-host demo on the new behavior yet. The longer story is in <a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes</a>.</p>
 </QuestionLayout>

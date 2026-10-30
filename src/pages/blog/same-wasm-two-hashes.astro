@@ -1,0 +1,179 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">October 30, 2026</span>
+      <span class="badge">Determinism</span>
+      <span class="badge">Hosts</span>
+    </div>
+    <h1 class="t-h1">Same WASM, two hashes. The bug wasn't in the WASM.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse makes one promise above the others: put your business logic in one sandboxed WASM capability, and every host runs the same thing. A week ago our own demo caught that promise leaking. Not inside the capability. At the edge of it, where the host hands it its input. This is what happened, why "works on my machine" turned into "works on my host", and what changed on <code>main</code> this week.</p>
+
+      <div class="callout">
+        Short version: catalog <code>core.authorize@1.2.0</code> gave the same decision on three hosts but a different <code>policy_hash</code> on <code>traverse-mcp</code>, because that host re-sorted the JSON keys before the capability saw them (<a href="https://github.com/traverse-framework/traverse/issues/1722" target="_blank" rel="noopener">traverse#1722</a>). Decision 118 and Spec <code>1722-canonical-guest-input-bytes</code> now say every host feeds a guest the RFC 8785 (JCS) canonical bytes of its JSON input, or refuses with <code>input_not_canonicalizable</code>. The implementation merged on <code>main</code> on October 28 (<a href="https://github.com/traverse-framework/traverse/pull/1739" target="_blank" rel="noopener">#1739</a>). It ships in v0.16.0, which isn't released yet. On v0.15.0 the old behavior still applies.
+      </div>
+
+      <h2 id="what-split">What split</h2>
+
+      <p>The <a href="/blog/agent-mcp-real-server.html">October 23 weekly demo</a> ran the same <code>core.authorize@1.2.0</code> bytes (<code>sha256:0c318fff…</code>) on the browser embedder, the Node embedder and the published <code>traverse-mcp</code> 0.15.0. Decision, reason, obligations and trace matched everywhere. <code>policy_hash</code>, the field that tells an auditor which policy actually ran, did not: <code>fnv1a64:2a126b86…</code> on both embedders and <code>fnv1a64:51a64653…</code> on <code>traverse-mcp</code>.</p>
+
+      <p>The capability wasn't misbehaving. It hashes the policy bytes it receives, and it received two different byte strings that mean the same thing. <code>traverse-mcp</code> parsed the request and wrote it back out with keys sorted. The embedders passed the caller's bytes straight through. Feed the embedders sorted keys and all three hosts agreed to the byte.</p>
+
+      <h2 id="why-it-matters">Why a fingerprint mismatch matters</h2>
+
+      <p>You could shrug at this. The decision was right everywhere. But the whole point of moving logic into one artifact is that you stop asking "which platform ran this?" Any capability that hashes, signs or echoes its input inherits whatever the host did to that input. A receipt signed in the browser wouldn't verify against the same receipt computed by an agent through MCP. Nobody changed the logic, and nobody would find it by reading the capability's code.</p>
+
+      <p>That's the "works on my machine" bug wearing new clothes. The sandbox did its job: the WASM couldn't see the OS or the host, and its bytes were identical. The contract between host and capability just hadn't said which bytes the capability gets. Until it does, each host is free to pick, and they picked differently.</p>
+
+      <h2 id="the-rule">The rule we chose</h2>
+
+      <p>The issue offered two options: every host passes the caller's bytes through untouched, or every host canonicalizes first. Pass-through sounds more faithful, but it makes the output depend on how a caller's JSON library happens to order keys. Two clients sending the same logical request would still get different hashes. So Decision 118 picked canonical JSON, and Spec <code>1722-canonical-guest-input-bytes</code> pins it down:</p>
+
+      <ul>
+        <li><strong>Every host, every path.</strong> A guest reads the RFC 8785 (JCS) canonical bytes of its JSON input. That covers workflow steps, nested <code>runtime.wasm</code> calls and event payloads too, with no exceptions.</li>
+        <li><strong>Refuse what can't be represented exactly.</strong> Integers beyond ±(2<sup>53</sup>−1), duplicate keys and invalid Unicode fail with <code>input_not_canonicalizable</code> before any guest runs. A silent rounding or a quietly dropped duplicate would just be the same bug in a different place.</li>
+        <li><strong>Outputs are never rewritten.</strong> The host normalizes what goes in, not what the capability says.</li>
+      </ul>
+
+      <p>One acceptance criterion changed along the way, and it's worth saying plainly: hosts now agree on the canonical bytes, not on the caller's original key order. If your capability hashed raw input on v0.15.0 embedders, that hash can change on v0.16.0.</p>
+
+      <h2 id="how-its-checked">How it's checked</h2>
+
+      <p>A rule nobody tests drifts again. The PR adds a cross-host conformance fixture, <code>fixtures/cross-host/canonical-input-v1</code>: a 444-byte hand-written guest that returns exactly the stdin bytes it read, plus shared vectors generated from the Rust reference. Each host runs the vectors and must produce the same stdin bytes and digest, or the expected error. Today it runs on the native runtime (which covers the CLI, the HTTP API and <code>traverse-mcp</code>), on <code>runtime.wasm</code> (the runtime Swift, Kotlin and .NET embed), and on Node. Package-level runs for Swift, Kotlin and .NET are a follow-up slice, not done yet.</p>
+
+      <p>Getting there surfaced one more trap: <code>serde_json</code>'s default float parsing can be one ULP off, so Rust and JavaScript could disagree on a number like <code>333333333.33333329</code>. Traverse now builds it with <code>float_roundtrip</code>. That's the kind of thing you only find when two runtimes have to produce the same bytes and a test checks that they do.</p>
+
+      <h2 id="what-to-do">What to do today</h2>
+
+      <ul>
+        <li><strong>On v0.15.0:</strong> compare fields that carry meaning, not raw-input hashes, across host types. If you need byte-identical output now, canonicalize on the caller side; sorted keys were enough for the demo.</li>
+        <li><strong>On <code>main</code> and v0.16.0 when it ships:</strong> stop canonicalizing yourself. Expect <code>input_not_canonicalizable</code> for huge integers or duplicate keys, and expect raw-input hashes computed on embedders to change once.</li>
+        <li><strong>Writing a new capability:</strong> you can rely on canonical input, so hashing your input is fine. Just don't depend on the caller's key order.</li>
+      </ul>
+
+      <p>We'll rerun the three-host <code>core.authorize</code> demo on the v0.16.0 release and post whether <code>policy_hash</code> matches. Until then, the claim is the spec, the merged implementation and the conformance fixture, not a rerun.</p>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Finding:</strong> on v0.15.0, <code>traverse-mcp</code> re-serialized input with sorted keys and the embedders passed caller bytes through, so <code>core.authorize@1.2.0</code>'s <code>policy_hash</code> differed (<code>2a126b86…</code> vs <code>51a64653…</code>). traverse#1722, closed.</li>
+          <li><strong>Contract:</strong> Decision 118; Spec <code>1722-canonical-guest-input-bytes</code> (1.0.1). Every host feeds guests RFC 8785 (JCS) canonical JSON input. Unrepresentable input fails with <code>input_not_canonicalizable</code>. Outputs are not rewritten.</li>
+          <li><strong>Status:</strong> merged on <code>main</code> Oct 28, 2026 (traverse#1739). Ships in v0.16.0, not released as of Oct 30. Latest release is v0.15.0, which still has the old behavior.</li>
+          <li><strong>Conformance:</strong> <code>fixtures/cross-host/canonical-input-v1</code> runs on native, <code>runtime.wasm</code> and Node. Swift, Kotlin and .NET package-level runs are a follow-up.</li>
+          <li><strong>Not claimed:</strong> a rerun of the three-host demo on the new behavior; the exact post-fix <code>policy_hash</code> value; package-level conformance on Swift, Kotlin or .NET.</li>
+          <li><strong>Lead claim:</strong> one shared runtime contract; hosts are clients. Discover → execute → trace.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-split">What split</a></li>
+          <li><a href="#why-it-matters">Why a fingerprint mismatch matters</a></li>
+          <li><a href="#the-rule">The rule we chose</a></li>
+          <li><a href="#how-its-checked">How it's checked</a></li>
+          <li><a href="#what-to-do">What to do today</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/agent-mcp-real-server.html">The demo that found it →</a></li>
+          <li><a href="/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html">Does the same WASM give byte-identical output on every host? →</a></li>
+          <li><a href="/questions/do-different-operating-systems-see-different-behavior-from-the-same-capability.html">Can different operating systems see different behavior? →</a></li>
+          <li><a href="/blog/same-wasm-multi-host.html">Same WASM. Browser and Node match. →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Same logic. Same bytes in.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">The capability was deterministic all along. Now the hosts have to agree on what they feed it.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html" class="btn btn-primary">Byte-identical output, explained →</a>
+      <a href="/blog/agent-mcp-real-server.html" class="btn btn-ghost">The demo that found it →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Same WASM, two hashes. The bug wasn't in the WASM. — Traverse Blog"
+  description="Why one catalog capability gave two policy_hash values across hosts (traverse#1722), and the fix on main: every host feeds guests RFC 8785 canonical JSON input (Decision 118, Spec 1722). Ships in v0.16.0, not released yet."
+  canonical="https://traverse-framework.com/blog/same-wasm-two-hashes.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
