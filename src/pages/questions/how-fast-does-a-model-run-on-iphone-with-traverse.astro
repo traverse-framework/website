@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How fast does a model run on iPhone with Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'One measured case, on unreleased main: on an iPhone 14 Pro Max (iOS 26.6, Release build), BirdNET v2.4 running through the governed Swift ExactModelHost under the policy [coreml, wasm-cpu] took p95 141.3 ms per 3 s audio clip with Core ML default compute units, against p95 10.0 s on wasm-cpu. Top-5 labels matched wasm-cpu on 21 of 21 clips. The timing covers the whole governed call: policy, rights, placement, and evidence. The evidence is traverse#1630 (PR #1709, Oct 15, 2026). It relies on manifest schema 2.3.0 score_transform, which is not in v0.15.0. One device, one model, test-only signing key. No host is Certified.',
+      text: 'One measured case, shipped in Traverse v0.16.0: on an iPhone 14 Pro Max (iOS 26.6, Release build), BirdNET v2.4 running through the governed Swift ExactModelHost under the policy [coreml, wasm-cpu] took p95 141.3 ms per 3 s audio clip with Core ML default compute units, against p95 10.0 s on wasm-cpu. Top-5 labels matched wasm-cpu on 21 of 21 clips. The timing covers the whole governed call: policy, rights, placement, and evidence. The evidence is traverse#1630 (PR #1709, Oct 15, 2026). It relies on manifest schema 2.3.0 score_transform, which is not in v0.15.0. One device, one model, test-only signing key. No host is Certified.',
     },
   }],
 });
@@ -24,13 +24,13 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="How fast does a model run on iPhone with Traverse?"
-  description="One measured case on unreleased main: BirdNET on an iPhone 14 Pro Max through the governed Swift host, p95 141 ms per 3 s clip on Core ML vs about 10 s on wasm-cpu. Scope, caveats, follow-ups."
+  description="One measured case, in Traverse v0.16.0: BirdNET on an iPhone 14 Pro Max through the governed Swift host, p95 141 ms per 3 s clip on Core ML vs about 10 s on wasm-cpu. Scope, caveats, follow-ups."
   canonical="https://traverse-framework.com/questions/how-fast-does-a-model-run-on-iphone-with-traverse.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> we have one measured case. On an iPhone 14 Pro Max, the BirdNET v2.4 bird-sound model ran through Traverse's governed path at <strong>p95 141 ms per 3 s audio clip</strong> on Core ML, against about 10 s on <code>wasm-cpu</code>. That evidence is on main, not in a published release yet (<a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>).</p>
+  <p><strong>Short answer:</strong> we have one measured case. On an iPhone 14 Pro Max, the BirdNET v2.4 bird-sound model ran through Traverse's governed path at <strong>p95 141 ms per 3 s audio clip</strong> on Core ML, against about 10 s on <code>wasm-cpu</code>. That evidence shipped in Traverse v0.16.0 on November 2, 2026 (<a href="https://github.com/traverse-framework/traverse/issues/1630">traverse#1630</a>).</p>
 
   <h2>What was measured</h2>
   <p>The run used a Release build on iOS 26.6. The host was Swift <code>ExactModelHost</code> on <code>TraverseSwiftHost.xcframework</code>, with <code>modelUsage: non_commercial</code> and the execution policy <code>[coreml, wasm-cpu]</code>. The package was built with <code>traverse-cli model package-onnx</code> from the BirdNET v2.4 int8 ONNX model, plus a signed Core ML variant made with <code>model convert-coreml</code>. It ran on 21 three-second clips.</p>
@@ -54,7 +54,7 @@ const relatedLinks = [
 
   <h2>What this does not show</h2>
   <ul>
-    <li><strong>Not on v0.15.0.</strong> BirdNET outputs logits, so its variant needs the new <code>score_transform</code> tolerance (manifest schema 2.3.0). That is on main and not released.</li>
+    <li><strong>Not on v0.15.0.</strong> BirdNET outputs logits, so its variant needs the new <code>score_transform</code> tolerance (manifest schema 2.3.0). That shipped in v0.16.0; hosts at or below 0.15.0 reject schema 2.3.0.</li>
     <li><strong>One device, one model.</strong> This is not a benchmark across iPhones or models.</li>
     <li><strong>Test-only signing key.</strong> Production key custody is <a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>, still open.</li>
     <li><strong>Non-commercial weights.</strong> BirdNET's weights are CC BY-NC-SA 4.0, which is why the app declared <code>non_commercial</code>. The weights and clips are not in the repository.</li>

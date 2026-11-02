@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How should an agent react to a revoked capability during discover?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Do not propose it as an active candidate. Range resolution in published traverse-registry 0.28.0 skips revoked versions, as 0.27.0 did; if nothing active matches, resolution fails and the agent should stop or pick a different active version. Traverse v0.15.0 pins =0.28.0. The public catalog keeps the row and sets revoked. The website /discover snapshot only skips deprecated rows and does not read revoked. No revoked.json was on registry main on 8 October 2026. The runtime refusal on an exact pin is traverse#1598 and is not shipped in v0.15.0. The agent proposes; the runtime decides.',
+      text: 'Do not propose it as an active candidate. Range resolution in published traverse-registry 0.28.0 skips revoked versions, as 0.27.0 did; if nothing active matches, resolution fails and the agent should stop or pick a different active version. Traverse v0.15.0 pins =0.28.0. The public catalog keeps the row and sets revoked. The website /discover snapshot only skips deprecated rows and does not read revoked. No revoked.json was on registry main on 8 October 2026. The runtime refusal on an exact pin (traverse#1598) is not in v0.15.0; it shipped in Traverse v0.16.0 (November 2, 2026). The agent proposes; the runtime decides.',
     },
   }],
 });
@@ -25,7 +25,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="How should an agent react to a revoked capability during discover?"
-  description="Do not propose a revoked version as active. Range resolution on registry main skips it. The runtime's refusal is traverse#1598 and is not shipped. The agent proposes; the runtime decides."
+  description="Do not propose a revoked version as active. Range resolution on registry main skips it. Since v0.16.0 the runtime refuses it (traverse#1598). The agent proposes; the runtime decides."
   canonical="https://traverse-framework.com/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
@@ -41,6 +41,6 @@ const relatedLinks = [
   <p><code>catalog.json</code> keeps the row. A revoked version is <code>revoked: true</code> with a <code>revocation</code> object. Nothing is deleted. Read those fields and leave the row out of the proposal. The website <a href="/discover.html">/discover</a> snapshot only skips <code>deprecated: true</code>. It does not consult <code>revoked</code>. On 8 October 2026 there was no <code>revoked.json</code> on registry <code>main</code>, and the live catalog's <code>revoked</code> flag was false on all 227 entries, so that page is not a demonstration of revoked handling.</p>
 
   <h2>An exact pin is not a discover miss</h2>
-  <p>If a caller already pinned the version, report the pin and its status. Do not execute the artifact yourself. There is one shared <code>runtime.wasm</code>. <code>traverse-embedder-web</code>, <code>traverse-embedder</code>, and <code>traverse-mcp</code> are clients; Python only reaches it through <code>traverse-cli capability-package execute</code>, and there is no Python SDK. The runtime is supposed to refuse a revoked capability pin. That work is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, open, and not in v0.15.0.</p>
+  <p>If a caller already pinned the version, report the pin and its status. Do not execute the artifact yourself. There is one shared <code>runtime.wasm</code>. <code>traverse-embedder-web</code>, <code>traverse-embedder</code>, and <code>traverse-mcp</code> are clients; Python only reaches it through <code>traverse-cli capability-package execute</code>, and there is no Python SDK. The runtime is supposed to refuse a revoked capability pin. That work is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>. It is not in v0.15.0 and shipped in Traverse v0.16.0 (November 2, 2026): an exact pin to a revoked version resolves, then fails closed with the revocation record.</p>
   <p>Publishing a replacement is still skill-first, via <code>traverse-capability-author</code>. You do not need to write Rust. Revocation is a registry marker, not a prompt to reimplement the capability. The narrative is <a href="/blog/you-dont-edit-a-published-capability.html">you don't edit a published capability</a>.</p>
 </QuestionLayout>

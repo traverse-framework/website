@@ -1,0 +1,95 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I upgrade to Traverse v0.16.0?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Traverse v0.16.0 (November 2, 2026) is a minor lockstep release with four breaking changes. 1) Exact-ref model registration takes the execution policy (Spec 138 0.16.0, Decision 120): pass policy_ref, placements and require_fuel_metering when you register, register every policy_ref you call, expect slower registration and faster first calls, and stop passing placements on calls. 2) Every host gives guests RFC 8785 (JCS) canonical JSON input (Decision 118); input JCS cannot represent fails with input_not_canonicalizable, and Rust ExecutorError gains InputNotCanonicalizable. 3) Hosts enforce the contract inputs.schema before the artifact runs (#1658): unknown fields under additionalProperties: false and strings over maxLength fail with invalid_input / RequestInvalid. 4) Registry rights fail closed (Spec 045 1.1.0, #1728): ranges skip revoked versions, an exact pin to a revoked version fails closed with the revocation record, and conditional model rights need an explicit host opt-in. Building from source needs Rust 1.95. Use the onnx-runner-v0.16.0 runner. traverse-mcp Mode A now ships prebuilt binaries, so no Rust toolchain is needed. v0.16.0 also carries the wasmtime 48.0.7 security fix. When checked on November 2, the 0.16.0 crates were not yet on crates.io; npm, Maven Central, nuget.org and SwiftPM are at 0.16.0. Discover → execute → trace is unchanged on one shared runtime.wasm.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html', label: 'Does the same WASM give byte-identical output on every host?' },
+  { href: '/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html', label: 'Why does traverse-mcp fail with catalog_load_failed? (fixed in v0.16.0)' },
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is revoked?' },
+  { href: '/questions/how-do-i-package-an-onnx-model-for-traverse.html', label: 'How do I package my own ONNX model?' },
+  { href: '/changelog.html', label: 'Changelog' },
+];
+---
+<QuestionLayout
+  title="How do I upgrade to Traverse v0.16.0?"
+  description="Traverse v0.16.0 has four breaking changes: model placement at registration, RFC 8785 canonical guest input, host-enforced input schemas, and Registry rights that fail closed. Plus Rust 1.95 and Mode A binaries."
+  canonical="https://traverse-framework.com/questions/how-do-i-upgrade-to-traverse-v0-16-0.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0">Traverse v0.16.0</a>, released November 2, 2026, is a minor lockstep release with four breaking changes. Exact-ref model registration now takes the execution policy. Every host gives guests canonical JSON input. Hosts enforce the contract's input schema. Registry rights fail closed. Building from source needs Rust 1.95. The loop is still <strong>discover → execute → trace</strong> on one shared <code>runtime.wasm</code>; business logic stays in WASM capabilities, and hosts stay UI and I/O. The authoritative steps are in <a href="https://github.com/traverse-framework/traverse/blob/v0.16.0/docs/upgrade-to-v0.16.0.md">docs/upgrade-to-v0.16.0.md</a> at the tag.</p>
+
+  <h2>Package versions</h2>
+  <ul>
+    <li><strong>npm:</strong> <code>traverse-embedder-web</code> 0.16.0.</li>
+    <li><strong>Maven Central:</strong> <code>com.traverse-framework:traverse-embedder</code> 0.16.0.</li>
+    <li><strong>nuget.org:</strong> <code>TraverseEmbedder</code> 0.16.0.</li>
+    <li><strong>SwiftPM:</strong> <code>TraverseEmbedder</code>, binary target on <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.16.0"><code>swift-host-v0.16.0</code></a>. The v0.16.0 tag's <code>Package.swift</code> still pins <code>swift-host-v0.15.0-1</code>; main moved the pin to <code>swift-host-v0.16.0</code> after the tag (<a href="https://github.com/traverse-framework/traverse/pull/1769">#1769</a>).</li>
+    <li><strong>crates.io:</strong> the upgrade guide lists <code>traverse-runtime</code>, <code>traverse-embedder</code>, <code>traverse-contracts</code>, <code>traverse-mcp</code>, <code>traverse-cli-rs</code> and <code>traverse-expedition-wasm</code> at 0.16.0. When we checked on November 2, crates.io still served 0.15.0, so build from the <code>v0.16.0</code> tag with Rust 1.95 until the crates appear. The CLI crate is <code>traverse-cli-rs</code> (binary <code>traverse-cli</code>); <code>traverse-cli</code> on crates.io is an unrelated tool.</li>
+  </ul>
+  <p><code>traverse-registry</code> moves to 0.29.0.</p>
+
+  <h2>Breaking 1: model registration takes the policy</h2>
+  <p>Spec 138 0.16.0, Decision 120, <a href="https://github.com/traverse-framework/traverse/issues/1706">#1706</a>. Only apps that run exact-ref models are affected.</p>
+  <ol>
+    <li><strong>Pass the policy at registration.</strong> Give the registration call the same <code>policy_ref</code>, <code>placements</code> and <code>require_fuel_metering</code> your calls name. Rust: <code>register_package</code> / <code>register_package_with_variants</code>. Swift, Kotlin and .NET: pass an <code>ExactModelPlacementPolicy</code>. Web: <code>registerPackage(..., policy, options?)</code>. Framed protocol: <code>register</code> takes <code>policy</code>.</li>
+    <li><strong>Register every <code>policy_ref</code> you call.</strong> A call naming a <code>policy_ref</code> the package was not registered under fails with <code>model_unavailable</code> / <code>placement_unavailable</code>.</li>
+    <li><strong>Expect slower registration and faster first calls.</strong> The Core ML compile, the device self-check and <code>model_prepare</code> now run at registration. A failing <code>model_prepare</code> fails registration with <code>execution_failed</code>. Each placement's <code>preparation_budget_ms</code> is capped by <code>max_preparation_ms</code> (default five minutes).</li>
+    <li><strong>Stop passing placements on calls.</strong> The call's <code>placements</code> and <code>require_fuel_metering</code> are optional and deprecated. When present they must equal the registered policy.</li>
+  </ol>
+
+  <h2>Breaking 2: canonical guest input</h2>
+  <p>Spec 1722, Decision 118, <a href="https://github.com/traverse-framework/traverse/issues/1722">#1722</a>. Every host now gives a guest the RFC 8785 (JCS) canonical bytes of its JSON input, so the same WASM given the same logical input produces the same output on every host.</p>
+  <ul>
+    <li>Browser and Node guests now receive sorted keys and ECMAScript number formatting instead of the caller's bytes. A capability that hashes its input gets a different hash on those hosts than it did on v0.15.0.</li>
+    <li>Input JCS cannot represent fails with <code>input_not_canonicalizable</code>: numbers with magnitude above 2^53 − 1, duplicate member names, and invalid Unicode.</li>
+    <li>Rust: <code>ExecutorError</code> gains <code>InputNotCanonicalizable</code>. Update exhaustive matches.</li>
+  </ul>
+  <p>Background: <a href="/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html">Does the same WASM give byte-identical output on every host?</a></p>
+
+  <h2>Breaking 3: contract input schemas are enforced</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/issues/1658">#1658</a>. Inputs are validated against the contract's <code>inputs.schema</code> before the artifact runs, on the native runtime path and in the web <code>BundleEmbedder</code> when a component declares <code>contract_path</code>. Unknown fields under <code>additionalProperties: false</code> and strings over <code>maxLength</code> fail with <code>invalid_input</code> / <code>RequestInvalid</code>. Remove any fields your contract doesn't declare, or declare them. Raw <code>WasmExecutor::run_bytes</code> still does not validate, so use the governed runtime or embedder path.</p>
+
+  <h2>Breaking 4: Registry rights fail closed</h2>
+  <p>Spec 045 1.1.0 (#1727, #1728, #1729).</p>
+  <ul>
+    <li>Version ranges skip revoked versions. An exact pin to a revoked version resolves, then fails closed with the revocation record. Move the pin to a version that isn't revoked.</li>
+    <li>Conditional model rights need an explicit host opt-in. Unknown rights are always denied.</li>
+    <li><code>traverse-cli registry inspect</code> shows lifecycle status, revocation and model-rights records, and Registry contract signatures are verified over their exact source bytes.</li>
+  </ul>
+
+  <h2>Also check</h2>
+  <ul>
+    <li><strong>Rust 1.95.</strong> <code>wasmtime</code> 48.0.7 needs it (#1744). Building or installing this release from source needs rustc 1.95 or later.</li>
+    <li><strong>Security.</strong> <code>wasmtime</code> 48.0.7 fixes GHSA-mghf-wjfp-p5xm, an aarch64 Cranelift sandbox escape, and the ONNX runner guest moves to <code>tract-onnx</code> 0.23.9 (#1735). If you run native Rust hosts on v0.15.0, plan the upgrade.</li>
+    <li><strong>ONNX runner.</strong> Download <a href="https://github.com/traverse-framework/traverse/releases/tag/onnx-runner-v0.16.0"><code>onnx-runner-v0.16.0</code></a> (sha256 <code>ac5591fac5f37435667169e969f9117cc6f81dc66b73cd74d1aef9000f5d3a0a</code>). Its digest changed, and <code>model package-onnx</code> from this release accepts only that runner. See <a href="/questions/how-do-i-package-an-onnx-model-for-traverse.html">How do I package my own ONNX model?</a></li>
+    <li><strong><code>traverse-mcp</code> Mode A.</strong> Prebuilt, checksum-pinned binaries for Linux x64, Linux arm64, macOS arm64 and Windows x64 are on <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a> (#1653, Decision 121). No Rust toolchain needed:
+      <pre><code>curl -L https://github.com/traverse-framework/traverse/releases/download/traverse-mcp-v0.16.0/traverse-mcp-aarch64-apple-darwin.tar.gz | tar -xz
+./traverse-mcp sync --out synced-state.json
+./traverse-mcp prepare-cache --synced-state synced-state.json --cache traverse-cache --ref core/core.authorize@^1</code></pre>
+      Swap the archive name for your platform, then run <code>traverse-mcp stdio --cache /absolute/path/to/traverse-cache</code>. Contributor mode from a checkout now needs <code>--bundle &lt;manifest-path&gt;</code>. Setup: <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>.</li>
+  </ul>
+
+  <h2>What this release does not claim</h2>
+  <ul>
+    <li>No host is Certified under Spec 529.</li>
+    <li>It includes the CLI and runtime support for declared model rights. It does not establish live Registry coverage or production compliance. Production model-signing custody is still <a href="https://github.com/traverse-framework/traverse/issues/1567">#1567</a>.</li>
+    <li>The <code>connector_invoke</code> work in <a href="https://github.com/traverse-framework/traverse/issues/1719">#1719</a> is only partly shipped: <code>runtime.wasm</code> links the import and native has an activation helper, but Browser, Node, Swift, Android and .NET have no activation API yet (<a href="/questions/why-does-bundleembedder-fail-with-cannot-find-definition-for-import-connector-invoke.html">details</a>).</li>
+    <li>There is no Python SDK. Python shells out to <code>traverse-cli</code>.</li>
+  </ul>
+
+  <p>Every change is listed in the <a href="https://github.com/traverse-framework/traverse/blob/v0.16.0/docs/releases/v0.16.0.md">v0.16.0 release notes</a>. Older steps: <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/upgrade-to-v0.15.0.md">upgrade to v0.15.0</a>.</p>
+</QuestionLayout>

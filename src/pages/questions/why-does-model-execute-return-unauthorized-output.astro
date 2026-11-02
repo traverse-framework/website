@@ -47,5 +47,5 @@ const relatedLinks = [
   </ul>
 
   <h2>One more caveat</h2>
-  <p>The contract declares <code>additionalProperties: false</code> on inputs, but on v0.15.0 the WASM still accepts an extra field and runs. Runtime-side enforcement (traverse#1671) is on <code>main</code> and not in a release yet.</p>
+  <p>The contract declares <code>additionalProperties: false</code> on inputs, but on v0.15.0 the WASM still accepts an extra field and runs. Host-side enforcement (traverse#1658, PR #1671) shipped in Traverse v0.16.0 (November 2, 2026): unknown fields now fail with <code>invalid_input</code> before the artifact runs, on the native runtime path and the web <code>BundleEmbedder</code> when a component declares <code>contract_path</code>. It is one of the <a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html">v0.16.0 breaking changes</a>.</p>
 </QuestionLayout>

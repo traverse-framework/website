@@ -16,7 +16,7 @@ const _jsonLd = JSON.stringify({
     name: 'How do I connect Cursor to Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'You can point a Cursor MCP server entry at a locally built traverse-mcp binary with the stdio argument, but on v0.15.0 that alone will not give Cursor a tools list: traverse-mcp speaks its own line-delimited JSON command protocol (describe_server, list_entrypoints, execute_entrypoint and so on), not the standard MCP JSON-RPC tools/list and tools/call methods, so a generic MCP client needs a translation layer in front of it. Build from a traverse checkout; the crates.io 0.15.0 binary cannot start outside one (traverse#1720).',
+      text: 'You can point a Cursor MCP server entry at a locally built traverse-mcp binary with the stdio argument, but on v0.15.0 that alone will not give Cursor a tools list: traverse-mcp speaks its own line-delimited JSON command protocol (describe_server, list_entrypoints, execute_entrypoint and so on), not the standard MCP JSON-RPC tools/list and tools/call methods, so a generic MCP client needs a translation layer in front of it. Get the binary from the traverse-mcp-v0.16.0 release (Linux x64/arm64, macOS arm64, Windows x64; no Rust needed) or build from a checkout; the crates.io 0.15.0 binary cannot start outside a checkout (traverse#1720, fixed in v0.16.0).',
     },
   }],
 });
@@ -24,7 +24,7 @@ const _jsonLd = JSON.stringify({
 const _body = `<p>Cursor launches MCP servers as stdio subprocesses, and <code>traverse-mcp</code> is a stdio server, so the wiring is a config entry. The catch on v0.15.0: <code>traverse-mcp</code> speaks its own line-delimited JSON command protocol (one object per line with a <code>command</code> field such as <code>describe_server</code>, <code>list_entrypoints</code> or <code>execute_entrypoint</code>), not the standard MCP JSON-RPC <code>tools/list</code> / <code>tools/call</code> methods. Cursor won't show Traverse tools from this config alone; you need a small translation layer in front of the binary. Contract enforcement stays inside Traverse either way — Cursor is the IDE façade, not the authority for business rules.</p>
 
   <h2>Minimal Cursor config</h2>
-  <p>After <code>cargo build -p traverse-mcp</code> in a traverse checkout, add something like this under <code>.cursor/mcp.json</code>:</p>
+  <p>Download the prebuilt binary from <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a> (or run <code>cargo build -p traverse-mcp</code> in a traverse checkout), then add something like this under <code>.cursor/mcp.json</code>:</p>
   <pre><code>{
   "mcpServers": {
     "traverse": {
@@ -36,7 +36,7 @@ const _body = `<p>Cursor launches MCP servers as stdio subprocesses, and <code>t
   <p>The <code>stdio</code> argument is required. Relative paths break when Cursor's working directory is not the repo root — use an absolute path to the binary you just built.</p>
 
   <h2>What to expect</h2>
-  <p>Build from a checkout for now: the crates.io 0.15.0 binary from <code>cargo install</code> can't start outside one (<a href="/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html">catalog_load_failed</a>, traverse#1720), and there is no prebuilt <code>traverse-mcp-v*</code> release yet. Treat shapes you see in docs as illustrative unless you have verified them against the running binary and <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-stdio-server.md" target="_blank" rel="noopener">docs/mcp-stdio-server.md</a>. Local MCP is a trust-the-host setup; optional bearer-token guidance lives in the core docs if you need a tighter boundary.</p>
+  <p>Since v0.16.0 (November 2, 2026) there is a prebuilt, checksum-pinned binary on <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a>, and <code>traverse-mcp sync</code> + <code>prepare-cache</code> give you a verified Mode A cache in three commands; pass <code>"args": ["stdio", "--cache", "/absolute/path/to/traverse-cache"]</code>. Avoid the crates.io 0.15.0 binary from <code>cargo install</code>: it can't start outside a checkout (<a href="/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html">catalog_load_failed</a>, traverse#1720). Treat shapes you see in docs as illustrative unless you have verified them against the running binary and <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-stdio-server.md" target="_blank" rel="noopener">docs/mcp-stdio-server.md</a>. Local MCP is a trust-the-host setup; optional bearer-token guidance lives in the core docs if you need a tighter boundary.</p>
 
   <h2>Related setup</h2>
   <p>Step-by-step copy for both Cursor and Claude Desktop is on the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>. If you are choosing between "agent proposes" and "runtime decides," see <a href="/questions/what-is-the-difference-between-an-ai-agent-and-the-traverse-runtime.html">agent vs runtime</a>.</p>`;

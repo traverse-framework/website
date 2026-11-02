@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What happens when a Traverse registry capability version is deprecated or revoked?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Nothing is edited or deleted. A deprecation adds a sibling deprecated.json (registry spec 005) and a revocation adds a sibling revoked.json with a reason and evidence (registry spec 026). The index keeps the entry and marks its status. Range resolution such as ^1.2.0 skips deprecated and revoked versions. An exact pin still resolves and returns the record with its status. Published traverse-registry 0.28.0 does that, continuing the 0.27.0 behavior from registry#632 (registry#631 is closed; 0.28.0 is registry#636). Traverse v0.15.0 pins =0.28.0. The runtime is supposed to fail closed, and that refusal is traverse#1598, still not shipped.',
+      text: 'Nothing is edited or deleted. A deprecation adds a sibling deprecated.json (registry spec 005) and a revocation adds a sibling revoked.json with a reason and evidence (registry spec 026). The index keeps the entry and marks its status. Range resolution such as ^1.2.0 skips deprecated and revoked versions. An exact pin still resolves and returns the record with its status. Published traverse-registry 0.28.0 does that, continuing the 0.27.0 behavior from registry#632 (registry#631 is closed; 0.28.0 is registry#636). Traverse v0.15.0 pins =0.28.0. The runtime is supposed to fail closed. That refusal (traverse#1598) is not in v0.15.0; it shipped in Traverse v0.16.0 (November 2, 2026), which moves to traverse-registry 0.29.0.',
     },
   }],
 });
@@ -27,7 +27,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What happens when a registry capability version is deprecated or revoked?"
-  description="Versions are never edited or deleted. Ranges skip deprecated and revoked versions. Exact pins in traverse-registry 0.28.0 still resolve with a status. Runtime refusal is traverse#1598, not shipped in v0.15.0."
+  description="Versions are never edited or deleted. Ranges skip deprecated and revoked versions. Exact pins in traverse-registry 0.28.0 still resolve with a status. Runtime refusal (traverse#1598) shipped in v0.16.0."
   canonical="https://traverse-framework.com/questions/what-happens-when-a-capability-version-is-revoked.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
@@ -47,7 +47,7 @@ const relatedLinks = [
   <ul>
     <li><strong>Registry crate:</strong> <code>traverse-registry</code> 0.28.0 is on crates.io (registry#636, checked 2026-10-14). Exact-pin resolution still returns deprecated and revoked records with lifecycle status and, when revoked, the revocation record — the behavior 0.27.0 shipped. Range resolution still skips both. <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a> is closed. The exact-pin fix merged as <a href="https://github.com/traverse-framework/registry/pull/632">registry#632</a>.</li>
     <li><strong>Markers on main:</strong> the <code>revoked.json</code> shape and index <code>status</code> are in the registry tree. No <code>revoked.json</code> file was present when this was checked. Forty <code>deprecated.json</code> files were.</li>
-    <li><strong>Traverse side:</strong> honoring a revoked <em>capability</em> in the runtime and showing lifecycle status in <code>traverse-cli</code> is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>, still open, and not in v0.15.0. That release pins <code>traverse-registry</code> at <code>=0.28.0</code>. v0.14.0 pinned <code>=0.25.0</code>. Host-side exact-ref <code>model_usage</code> enforcement is a different gate and did ship in v0.15.0.</li>
+    <li><strong>Traverse side:</strong> honoring a revoked <em>capability</em> in the runtime and showing lifecycle status in <code>traverse-cli</code> is <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a>. It is not in v0.15.0 and shipped in Traverse v0.16.0 (November 2, 2026), which moves to <code>traverse-registry</code> 0.29.0. v0.15.0 pins <code>traverse-registry</code> at <code>=0.28.0</code>. v0.14.0 pinned <code>=0.25.0</code>. Host-side exact-ref <code>model_usage</code> enforcement is a different gate and did ship in v0.15.0.</li>
   </ul>
 
   <h2>Related</h2>

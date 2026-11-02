@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Why does traverse-mcp from crates.io fail with catalog_load_failed?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'traverse-mcp 0.15.0 installed with cargo install loads the expedition example bundle at startup, even in Mode A, and it looks for it at a path compiled in from CARGO_MANIFEST_DIR. That path only exists inside a traverse repo checkout, so the installed binary exits with catalog_load_failed before it answers describe_server. Workarounds: run it from a checkout at tag v0.15.0 (cargo run -p traverse-mcp -- stdio), or stage the 13 expedition fixture files from v0.15.0 at the path the error prints, which is what the October 23 weekly demo does. The fix is merged on main (traverse#1725, closing traverse#1720, October 27, 2026): Mode A no longer loads the bundle and contributor mode takes an explicit --bundle flag. It is not in a crates.io release yet, so 0.15.0 still needs a workaround.',
+      text: 'traverse-mcp 0.15.0 installed with cargo install loads the expedition example bundle at startup, even in Mode A, and it looks for it at a path compiled in from CARGO_MANIFEST_DIR. That path only exists inside a traverse repo checkout, so the installed binary exits with catalog_load_failed before it answers describe_server. Workarounds: run it from a checkout at tag v0.15.0 (cargo run -p traverse-mcp -- stdio), or stage the 13 expedition fixture files from v0.15.0 at the path the error prints, which is what the October 23 weekly demo does. The fix is merged on main (traverse#1725, closing traverse#1720, October 27, 2026): Mode A no longer loads the bundle and contributor mode takes an explicit --bundle flag. It is released in Traverse v0.16.0 (November 2, 2026): the easiest fix is the prebuilt traverse-mcp-v0.16.0 binary, which needs no Rust toolchain. 0.15.0 still needs a workaround.',
     },
   }],
 });
@@ -25,13 +25,20 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Why does traverse-mcp from crates.io fail with catalog_load_failed?"
-  description="traverse-mcp 0.15.0 from cargo install looks for the expedition example bundle at a compiled-in repo path, so it can't start outside a traverse checkout. Two workarounds, and the fix merged on main (traverse#1720), not released yet."
+  description="traverse-mcp 0.15.0 from cargo install looks for the expedition example bundle at a compiled-in repo path, so it can't start outside a traverse checkout. Two workarounds, and the fix released in v0.16.0 (traverse#1720), with prebuilt binaries."
   canonical="https://traverse-framework.com/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html"
   category="AI and MCP"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> it's a packaging bug in <code>traverse-mcp</code> 0.15.0, not your setup. The installed binary goes looking for the expedition example bundle at a path that only exists inside a traverse repo checkout. It does this before it checks whether you asked for Mode A, so it fails even with <code>--cache</code>. The fix is merged on <code>main</code> (<a href="https://github.com/traverse-framework/traverse/pull/1725">#1725</a>, closing <a href="https://github.com/traverse-framework/traverse/issues/1720">traverse#1720</a>) but isn't in a crates.io release yet.</p>
+  <p><strong>Short answer:</strong> it's a packaging bug in <code>traverse-mcp</code> 0.15.0, not your setup. The installed binary goes looking for the expedition example bundle at a path that only exists inside a traverse repo checkout. It does this before it checks whether you asked for Mode A, so it fails even with <code>--cache</code>. The fix is merged on <code>main</code> (<a href="https://github.com/traverse-framework/traverse/pull/1725">#1725</a>, closing <a href="https://github.com/traverse-framework/traverse/issues/1720">traverse#1720</a>) and released in Traverse v0.16.0 on November 2, 2026.</p>
+
+  <h2>Update, November 2, 2026: fixed in v0.16.0, with prebuilt binaries</h2>
+  <p>Skip <code>cargo install</code>. <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a> ships checksum-pinned <code>traverse-mcp</code> binaries for Linux x64, Linux arm64, macOS arm64 and Windows x64, and Mode A is three commands with no Rust toolchain:</p>
+  <pre><code>curl -L https://github.com/traverse-framework/traverse/releases/download/traverse-mcp-v0.16.0/traverse-mcp-aarch64-apple-darwin.tar.gz | tar -xz
+./traverse-mcp sync --out synced-state.json
+./traverse-mcp prepare-cache --synced-state synced-state.json --cache traverse-cache --ref core/core.authorize@^1</code></pre>
+  <p>We ran the Linux x64 binary from an empty directory on November 2: <code>--version</code> reports <code>0.16.0</code>, <code>sync</code> wrote registry <code>index-v412</code> (232 records), <code>prepare-cache</code> verified <code>core.authorize@1.2.0</code>, and <code>describe_server</code> answered from the verified cache. The 0.16.0 crates weren't on crates.io yet when we checked; the rest of this page is about the 0.15.0 crate.</p>
 
   <h2>What you see</h2>
   <p>You install the published crate and start the stdio server:</p>
@@ -54,9 +61,9 @@ echo '{"{"}"command":"describe_server"{"}"}' | traverse-mcp stdio --cache ./cach
   <p>Both are workarounds. The second one writes into Cargo's cache directory, so treat it as a demo trick, not something to ship.</p>
 
   <h2>What the fix looks like</h2>
-  <p><a href="https://github.com/traverse-framework/traverse/pull/1725">#1725</a> merged on <code>main</code> on October 27, 2026. Packaged <code>traverse-mcp stdio</code> now picks verified-cache Mode A before it loads any contributor bundle, so Mode A never touches the expedition example. Contributor mode needs an explicit <code>--bundle &lt;manifest-path&gt;</code> instead of a path derived from <code>CARGO_MANIFEST_DIR</code>, and a missing bundle gives a stable error. The latest <code>traverse-mcp</code> on crates.io is still 0.15.0, so until the next release the workarounds above are what you need.</p>
-  <p>traverse#1720 is closed on <code>main</code>; the fix is unreleased. The <a href="/blog/hash-converges.html">October 30 weekly demo</a> runs <code>traverse-mcp</code> built from <code>main</code> (<code>70f3ee7</code>, Rust 1.95.0) from an empty directory, with no staged fixtures.</p>
+  <p><a href="https://github.com/traverse-framework/traverse/pull/1725">#1725</a> merged on <code>main</code> on October 27, 2026. Packaged <code>traverse-mcp stdio</code> now picks verified-cache Mode A before it loads any contributor bundle, so Mode A never touches the expedition example. Contributor mode needs an explicit <code>--bundle &lt;manifest-path&gt;</code> instead of a path derived from <code>CARGO_MANIFEST_DIR</code>, and a missing bundle gives a stable error. It shipped in v0.16.0; on 0.15.0 the workarounds above are still what you need.</p>
+  <p>traverse#1720 is closed and the fix is released. The <a href="/blog/hash-converges.html">October 30 weekly demo</a> runs <code>traverse-mcp</code> built from <code>main</code> (<code>70f3ee7</code>, Rust 1.95.0) from an empty directory, with no staged fixtures.</p>
 
-  <h2>Related: no prebuilt binary yet</h2>
-  <p>You only hit this because <code>cargo install</code> is the way to get the binary today. The packaging workflow for checksum-pinned Linux x86_64 and macOS arm64 binaries merged on <code>main</code> on October 15 (<a href="https://github.com/traverse-framework/traverse/pull/1701">#1701</a>) and runs on the next product tag. No <code>traverse-mcp-v*</code> release exists yet. <a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a> tracks the broader ask: prebuilt binaries on more platforms plus a sync command, so an outside developer doesn't need a Rust toolchain at all. The sync half, <code>traverse-mcp sync</code>, merged on <code>main</code> on October 30 (<a href="https://github.com/traverse-framework/traverse/pull/1758">#1758</a>, unreleased); prebuilt binaries are still open.</p>
+  <h2>Related: prebuilt binaries shipped in v0.16.0</h2>
+  <p>On 0.15.0 you hit this because <code>cargo install</code> was the only way to get the binary. That changed with v0.16.0: <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a> carries checksum-pinned binaries for four targets with <code>SHA256SUMS</code> and build provenance (<a href="https://github.com/traverse-framework/traverse/issues/1653">#1653</a>), and <code>traverse-mcp sync</code> writes the synced-state for you (<a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a>, closed). An outside developer doesn't need a Rust toolchain for Mode A.</p>
 </QuestionLayout>
