@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Why does BundleEmbedder fail with "cannot find definition for import (traverse_host, connector_invoke)"?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'The capability you submitted calls a host connector through traverse_host.connector_invoke (Spec 104), and the published browser and Node runtime.wasm in traverse-embedder-web 0.15.0 does not link that import yet. BundleEmbedder.init succeeds, then submit returns constraint_violated with the instantiate error. Today only the native wasmtime executor in traverse-runtime implements connector_invoke, and a native host still has to write a small MediatedConnector bridge itself. The catalog model.execute@1.0.0 capability hits this on every published Browser, Node and Swift host. Update, November 2, 2026: on main (not released), PR #1755 makes the runtime.wasm nested runtime link connector_invoke with the same fail-closed mediation as native, and native traverse-runtime now ships ExactModelMediatedConnector and activate_exact_model_runtime so no hand-written bridge is needed. The web, Swift, Android and .NET hosts still have no public way to activate a Spec 104 connector, so on those hosts an invoke fails closed as unbound or undeclared. Remaining work is tracked in traverse#1719.',
+      text: 'The capability you submitted calls a host connector through traverse_host.connector_invoke (Spec 104), and the published browser and Node runtime.wasm in traverse-embedder-web 0.15.0 does not link that import yet. BundleEmbedder.init succeeds, then submit returns constraint_violated with the instantiate error. Today only the native wasmtime executor in traverse-runtime implements connector_invoke, and a native host still has to write a small MediatedConnector bridge itself. The catalog model.execute@1.0.0 capability hits this on every published Browser, Node and Swift host. Released in Traverse v0.16.0 (November 2, 2026): PR #1755 makes the runtime.wasm nested runtime link connector_invoke with the same fail-closed mediation as native, and native traverse-runtime now ships ExactModelMediatedConnector and activate_exact_model_runtime so no hand-written bridge is needed. The web, Swift, Android and .NET hosts still have no public way to activate a Spec 104 connector, so on those hosts an invoke fails closed as unbound or undeclared. Remaining work is tracked in traverse#1719.',
     },
   }],
 });
@@ -24,23 +24,23 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Why does BundleEmbedder fail with “cannot find definition for import (traverse_host, connector_invoke)”?"
-  description="The published browser/Node runtime.wasm (traverse-embedder-web 0.15.0) doesn't link traverse_host.connector_invoke yet, so capabilities that call a host connector, like catalog model.execute, fail at instantiate. On main (unreleased), #1755 links the import; host activation outside native is still open (traverse#1719)."
+  description="The published browser/Node runtime.wasm (traverse-embedder-web 0.15.0) doesn't link traverse_host.connector_invoke yet, so capabilities that call a host connector, like catalog model.execute, fail at instantiate. v0.16.0 (released Nov 2) links the import (#1755); host activation outside native is still open (traverse#1719)."
   canonical="https://traverse-framework.com/questions/why-does-bundleembedder-fail-with-cannot-find-definition-for-import-connector-invoke.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> your capability calls a host connector through the <code>traverse_host.connector_invoke</code> import, and the published browser and Node <code>runtime.wasm</code> doesn't provide that import yet. It's a known gap in v0.15.0, tracked in <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a>. It isn't a problem with your bundle or its digest.</p>
+  <p><strong>Short answer:</strong> your capability calls a host connector through the <code>traverse_host.connector_invoke</code> import, and the published browser and Node <code>runtime.wasm</code> doesn't provide that import yet. It's a known gap in v0.15.0, partly fixed in v0.16.0, and tracked in <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a>. It isn't a problem with your bundle or its digest.</p>
 
-  <h2>Update, November 2, 2026: partly fixed on <code>main</code>, not released</h2>
-  <p><a href="https://github.com/traverse-framework/traverse/pull/1755">traverse#1755</a> merged today. It's on <code>main</code>, not in a release, and npm and crates.io still ship 0.15.0. v0.16.0 is being prepared in <a href="https://github.com/traverse-framework/traverse/issues/1740">traverse#1740</a>, and we'll update this page when a tag actually carries the change.</p>
+  <h2>Update, November 2, 2026: partly fixed in v0.16.0</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/pull/1755">traverse#1755</a> is in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0">Traverse v0.16.0</a>, released November 2, 2026 (<code>traverse-embedder-web@0.16.0</code> on npm). The rest of <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a> is still open. Upgrading? See <a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html">How do I upgrade to Traverse v0.16.0?</a></p>
   <ul>
     <li><strong><code>runtime.wasm</code> links the import.</strong> The nested runtime inside <code>runtime.wasm</code> now provides <code>traverse_host.connector_invoke</code>, with the same checks the native wasmtime path runs: the connector must be declared, activated by the host, semver-compatible and within 64 KiB, the result passes the host-private filter, and the call leaves evidence. So a module that imports it no longer fails at instantiate.</li>
     <li><strong>Without host activation, it still fails closed.</strong> If the host hasn't activated a connector, the invoke returns <code>unbound</code> or <code>undeclared</code> with evidence instead of running anything.</li>
     <li><strong>Native no longer needs a hand-written bridge.</strong> <code>traverse-runtime</code> now ships <code>ExactModelMediatedConnector</code> and <code>activate_exact_model_runtime</code>, so a native host can activate <code>traverse.model-runtime</code> for a capability directly.</li>
-    <li><strong>Web, Swift, Android and .NET can't activate it yet.</strong> Their READMEs on <code>main</code> now say so. The web host has an extra problem: the guest ABI is synchronous and model execution is asynchronous, which still needs a design.</li>
+    <li><strong>Web, Swift, Android and .NET can't activate it yet.</strong> Their READMEs in v0.16.0 say so. The web host has an extra problem: the guest ABI is synchronous and model execution is asynchronous, which still needs a design.</li>
   </ul>
-  <p>The rest of this page describes the published 0.15.0 packages, which is still what you get from npm and crates.io.</p>
+  <p>The rest of this page describes the 0.15.0 packages, where the import is missing entirely.</p>
 
   <h2>What you see</h2>
   <p>With <code>traverse-embedder-web@0.15.0</code>, <code>BundleEmbedder.init</code> accepts the bundle and verifies its digests. The failure comes on <code>submit</code>, which returns <code>constraint_violated</code> with:</p>
@@ -60,7 +60,7 @@ const relatedLinks = [
 
   <h2>What isn't true yet</h2>
   <ul>
-    <li>No published host runs <code>model.execute@1.0.0</code> out of the box. Of the fix in traverse#1719, the linked import in <code>runtime.wasm</code> and the shipped native binding are on <code>main</code> but unreleased, and a public web API for activating the connector doesn't exist yet.</li>
+    <li>No published host runs <code>model.execute@1.0.0</code> out of the box. Of the fix in traverse#1719, the linked import in <code>runtime.wasm</code> and the native binding shipped in v0.16.0, but a public web API for activating the connector doesn't exist yet.</li>
     <li>No host is Certified under Spec 529.</li>
   </ul>
 </QuestionLayout>

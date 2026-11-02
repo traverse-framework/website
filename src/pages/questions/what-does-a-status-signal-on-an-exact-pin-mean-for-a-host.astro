@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What does a status signal on an exact pin mean for a host?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'It is a lifecycle fact the shared runtime is supposed to read before it runs the artifact. Index status is active, deprecated, or revoked. A revoked exact pin, under decision 127, still resolves and carries a machine-readable do-not-run signal; the runtime should refuse (fail closed). That refusal is traverse#1598 and is not shipped in v0.15.0. Published traverse-registry 0.28.0 returns the deprecated or revoked record with lifecycle status and revocation so the consumer can fail closed (the 0.27.0 behavior, registry#632; registry#631 is closed). Traverse v0.15.0 pins =0.28.0. Range resolution still skips both. Hosts are clients of one runtime.wasm, not separate runtimes.',
+      text: 'It is a lifecycle fact the shared runtime is supposed to read before it runs the artifact. Index status is active, deprecated, or revoked. A revoked exact pin, under decision 127, still resolves and carries a machine-readable do-not-run signal; the runtime should refuse (fail closed). That refusal (traverse#1598) is not in v0.15.0; it shipped in Traverse v0.16.0 (November 2, 2026), where an exact pin to a revoked version resolves, then fails closed with the revocation record. Published traverse-registry 0.28.0 returns the deprecated or revoked record with lifecycle status and revocation so the consumer can fail closed (the 0.27.0 behavior, registry#632; registry#631 is closed). Traverse v0.15.0 pins =0.28.0. Range resolution still skips both. Hosts are clients of one runtime.wasm, not separate runtimes.',
     },
   }],
 });
@@ -24,7 +24,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What does a status signal on an exact pin mean for a host?"
-  description="Index status on an exact pin is a do-not-run signal the shared runtime is supposed to honor. traverse-registry 0.28.0 returns the record and the status. Traverse v0.15.0 pins it. The refusal is traverse#1598, not shipped."
+  description="Index status on an exact pin is a do-not-run signal the shared runtime is supposed to honor. traverse-registry 0.28.0 returns the record and the status. Traverse v0.15.0 pins it. The refusal (traverse#1598) shipped in v0.16.0."
   canonical="https://traverse-framework.com/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
@@ -42,7 +42,7 @@ const relatedLinks = [
   <ul>
     <li><strong>Published <code>traverse-registry</code> 0.28.0</strong> (crates.io, registry#636): exact-pin resolution returns deprecated and revoked records with lifecycle status and, when revoked, the revocation record. That is the 0.27.0 behavior. Range resolution still skips both. The exact-pin fix is <a href="https://github.com/traverse-framework/registry/pull/632">registry#632</a>. <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a> is closed.</li>
     <li><strong>Traverse v0.15.0</strong> pins <code>=0.28.0</code>. v0.14.0 pinned <code>=0.25.0</code>, which has no revoked type. Moving the pin is not the same as a shipped runtime refusal.</li>
-    <li><strong>Runtime refusal:</strong> <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a> is open. It is not in v0.15.0.</li>
+    <li><strong>Runtime refusal:</strong> <a href="https://github.com/traverse-framework/traverse/issues/1598">traverse#1598</a> is not in v0.15.0. It shipped in Traverse v0.16.0 (November 2, 2026): ranges skip revoked versions, and an exact pin to a revoked version fails closed with the revocation record.</li>
   </ul>
   <p>A host must not assume that an exact pin of a revoked version comes back as a record plus a runtime deny. The 0.28.0 crate returns the record and the status. The runtime still does not refuse. Background: <a href="/blog/you-dont-edit-a-published-capability.html">you don't edit a published capability</a>.</p>
 </QuestionLayout>

@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is model_usage in Traverse, and why does my app fail with usage_undeclared?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'model_usage is the app’s declaration of how it uses pinned models: commercial or non_commercial. Since Traverse v0.15.0 (a breaking change, Spec 138 0.8.0, Decision 107) an app with exact_model_dependencies must declare it, or registration and execution fail closed with usage_undeclared. A commercial usage rejects packages whose rights say commercial_use: prohibited, with rights_policy_denied. Every result carries model_evidence. Caveat: published traverse-embedder-web@0.15.0 does not validate the value yet (traverse#1685), and traverse-cli-rs 0.15.0 model verify has no usage flag (traverse#1686, fixed on main after the release).',
+      text: 'model_usage is the app’s declaration of how it uses pinned models: commercial or non_commercial. Since Traverse v0.15.0 (a breaking change, Spec 138 0.8.0, Decision 107) an app with exact_model_dependencies must declare it, or registration and execution fail closed with usage_undeclared. A commercial usage rejects packages whose rights say commercial_use: prohibited, with rights_policy_denied. Every result carries model_evidence. Caveat for 0.15.0: traverse-embedder-web@0.15.0 does not validate the value (traverse#1685), and traverse-cli-rs 0.15.0 model verify has no usage flag (traverse#1686). Both are fixed in Traverse v0.16.0 (November 2, 2026): traverse-embedder-web@0.16.0 rejects other values with usage_invalid, and model verify takes --model-usage.',
     },
   }],
 });
@@ -25,7 +25,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What is model_usage in Traverse, and why does my app fail with usage_undeclared?"
-  description="Since v0.15.0, apps that pin models must declare model_usage: commercial or non_commercial. Without it, calls fail closed with usage_undeclared. Breaking change. Web value validation is traverse#1685."
+  description="Since v0.15.0, apps that pin models must declare model_usage: commercial or non_commercial. Without it, calls fail closed with usage_undeclared. Breaking change. Web value validation (traverse#1685) is fixed in v0.16.0."
   canonical="https://traverse-framework.com/questions/what-is-model-usage-in-traverse.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
@@ -46,8 +46,8 @@ const relatedLinks = [
 
   <h2>Known gaps in 0.15.0</h2>
   <ul>
-    <li><strong>Web accepts any string.</strong> Published <code>traverse-embedder-web@0.15.0</code> does not check that the value is exactly <code>commercial</code> or <code>non_commercial</code>. A typo like <code>"Commercial"</code> skips the commercial check without an error. Tracked in <a href="https://github.com/traverse-framework/traverse/issues/1685">traverse#1685</a>. The fix (<a href="https://github.com/traverse-framework/traverse/pull/1698">#1698</a>) merged on main on October 15 and rejects any other value with <code>usage_invalid</code>, but it is not in a release yet. Native Rust uses an enum and cannot express a bad value.</li>
-    <li><strong>CLI verify has no usage flag.</strong> <code>traverse-cli model verify</code> in <code>traverse-cli-rs</code> 0.15.0 always verifies as <code>non_commercial</code>. <code>--model-usage</code> landed on main after the release (<a href="https://github.com/traverse-framework/traverse/issues/1686">traverse#1686</a>) and is not in 0.15.0.</li>
+    <li><strong>Web accepts any string.</strong> Published <code>traverse-embedder-web@0.15.0</code> does not check that the value is exactly <code>commercial</code> or <code>non_commercial</code>. A typo like <code>"Commercial"</code> skips the commercial check without an error. Tracked in <a href="https://github.com/traverse-framework/traverse/issues/1685">traverse#1685</a>. The fix (<a href="https://github.com/traverse-framework/traverse/pull/1698">#1698</a>) rejects any other value with <code>usage_invalid</code> and shipped in <code>traverse-embedder-web@0.16.0</code> (Traverse v0.16.0, November 2, 2026). Native Rust uses an enum and cannot express a bad value.</li>
+    <li><strong>CLI verify has no usage flag.</strong> <code>traverse-cli model verify</code> in <code>traverse-cli-rs</code> 0.15.0 always verifies as <code>non_commercial</code>. <code>--model-usage commercial|non_commercial</code> (and <code>--require-model-usage</code>) shipped in v0.16.0 (<a href="https://github.com/traverse-framework/traverse/issues/1686">traverse#1686</a>).</li>
   </ul>
-  <p>Until those ship, pass the exact value and test the commercial path once on purpose. No host is Certified under Spec 529. The upgrade notes are in <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/upgrade-to-v0.15.0.md">docs/upgrade-to-v0.15.0.md</a>.</p>
+  <p>On 0.15.0, pass the exact value and test the commercial path once on purpose; better, upgrade to v0.16.0 (<a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html">upgrade notes</a>). No host is Certified under Spec 529. The upgrade notes are in <a href="https://github.com/traverse-framework/traverse/blob/v0.15.0/docs/upgrade-to-v0.15.0.md">docs/upgrade-to-v0.15.0.md</a>.</p>
 </QuestionLayout>

@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Why does traverse-mcp say registry_metadata_cache_invalid after prepare-cache succeeded?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'In traverse-mcp 0.15.0, prepare-cache checks less than the Mode A server checks at startup. If the Spec 055 synced-state you fed it is missing record metadata such as service_type or lifecycle, prepare-cache still reports success, and the server then refuses to start with registry_metadata_cache_invalid: public metadata cache generation has invalid verification bindings. The message does not say which record or field. Build the synced-state from the full index-vN records rather than a trimmed copy. There is no sync command yet; traverse#1721 tracks one, plus prepare-time validation that names the record and field. It is open.',
+      text: 'In traverse-mcp 0.15.0, prepare-cache checks less than the Mode A server checks at startup. If the Spec 055 synced-state you fed it is missing record metadata such as service_type or lifecycle, prepare-cache still reports success, and the server then refuses to start with registry_metadata_cache_invalid: public metadata cache generation has invalid verification bindings. The message does not say which record or field. Build the synced-state from the full index-vN records rather than a trimmed copy. Fixed in Traverse v0.16.0 (November 2, 2026, traverse#1721): traverse-mcp sync writes the synced-state for you, prepare-cache and server startup share one validator, and the error names the record and field. Prebuilt binaries are on the traverse-mcp-v0.16.0 release.',
     },
   }],
 });
@@ -23,18 +23,20 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Why does traverse-mcp say registry_metadata_cache_invalid after prepare-cache succeeded?"
-  description="On traverse-mcp 0.15.0, prepare-cache accepts a synced-state that the Mode A server later rejects. Usually a trimmed record is missing service_type or lifecycle. How to avoid it, and the open fix (traverse#1721)."
+  description="On traverse-mcp 0.15.0, prepare-cache accepts a synced-state that the Mode A server later rejects. Usually a trimmed record is missing service_type or lifecycle. How to avoid it, and the fix released in v0.16.0 (traverse#1721)."
   canonical="https://traverse-framework.com/questions/why-does-traverse-mcp-fail-with-registry-metadata-cache-invalid.html"
   category="AI and MCP"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> <code>prepare-cache</code> and the server don't check the same things yet. <code>prepare-cache</code> was happy with your synced-state, but the Mode A server validates more metadata when it starts, finds a record it doesn't trust, and stops. The usual cause is a hand-built synced-state that kept only the obvious fields.</p>
+  <p><strong>Update, November 2, 2026:</strong> fixed in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0">Traverse v0.16.0</a>. Use the prebuilt binary from <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a>, run <code>traverse-mcp sync --out synced-state.json</code> instead of writing the file by hand, then <code>prepare-cache</code>. In 0.16.0, <code>prepare-cache</code> and server startup run one shared validator, so a cache <code>prepare-cache</code> accepts is one the server starts on; the error code stays <code>registry_metadata_cache_invalid</code>, and the <code>--json</code> envelope adds <code>record</code> and <code>field</code>. <code>prepare-cache</code> validates before it writes, so a failure keeps any existing cache. The rest of this page is about 0.15.0.</p>
+
+  <p><strong>Short answer (0.15.0):</strong> <code>prepare-cache</code> and the server don't check the same things. <code>prepare-cache</code> was happy with your synced-state, but the Mode A server validates more metadata when it starts, finds a record it doesn't trust, and stops. The usual cause is a hand-built synced-state that kept only the obvious fields.</p>
 
   <h2>The setup that hits it</h2>
   <p>Mode A is the mode where <code>traverse-mcp</code> serves only capabilities from a digest-verified local cache of the public registry. On v0.15.0 getting there takes three manual steps:</p>
   <ol>
-    <li>Get the binary (<code>cargo install traverse-mcp --version 0.15.0 --locked</code>; there's no prebuilt release yet, and see <a href="/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html">catalog_load_failed</a> for the startup bug).</li>
+    <li>Get the binary (<code>cargo install traverse-mcp --version 0.15.0 --locked</code>; on v0.16.0 use the prebuilt <code>traverse-mcp-v0.16.0</code> binary instead; see <a href="/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html">catalog_load_failed</a> for the startup bug).</li>
     <li>Write a Spec 055 synced-state JSON yourself from a published <code>index-v&lt;N&gt;</code> registry release. There's no command that does this.</li>
     <li>Run <code>traverse-mcp prepare-cache --synced-state … --cache … --ref ns/id@range</code> for each capability you want the agent to see.</li>
   </ol>
@@ -49,8 +51,8 @@ const relatedLinks = [
     <li><strong>Pin narrowly.</strong> Prepare only the exact refs your agent should run. In the demo, asking for a version that is in the index but was never prepared returns <code>registry_cache_entry_missing</code>, which is the behavior you want.</li>
   </ul>
 
-  <h2>What's being fixed</h2>
-  <p><a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a> covers three changes: prebuilt <code>traverse-mcp</code> binaries with checksums, a <code>sync</code> command (or an <code>--index-release</code> flag on <code>prepare-cache</code>) that downloads and validates the index for you, and prepare-time validation of the same bindings the server checks, with an error that names the record and the missing field. The stated goal is a Mode A quickstart of three commands or fewer. It's open; nothing for it has shipped.</p>
+  <h2>What was fixed</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/issues/1721">traverse#1721</a> covers three changes: prebuilt <code>traverse-mcp</code> binaries with checksums, a <code>sync</code> command (or an <code>--index-release</code> flag on <code>prepare-cache</code>) that downloads and validates the index for you, and prepare-time validation of the same bindings the server checks, with an error that names the record and the missing field. The stated goal is a Mode A quickstart of three commands or fewer. All three shipped in v0.16.0 (<code>sync</code> without an <code>--index-release</code> flag on <code>prepare-cache</code>), with binaries for Linux x64, Linux arm64, macOS arm64 and Windows x64.</p>
 
   <h2>One more limit worth knowing</h2>
   <p>Mode A on v0.15.0 verifies the cache by digest only. There's no signature on the cache yet, so a prepared cache proves the bytes match the index, not who published the index.</p>
