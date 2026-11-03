@@ -38,7 +38,7 @@ const relatedLinks = [
   <pre><code>curl -L https://github.com/traverse-framework/traverse/releases/download/traverse-mcp-v0.16.0/traverse-mcp-aarch64-apple-darwin.tar.gz | tar -xz
 ./traverse-mcp sync --out synced-state.json
 ./traverse-mcp prepare-cache --synced-state synced-state.json --cache traverse-cache --ref core/core.authorize@^1</code></pre>
-  <p>We ran the Linux x64 binary from an empty directory on November 2: <code>--version</code> reports <code>0.16.0</code>, <code>sync</code> wrote registry <code>index-v412</code> (232 records), <code>prepare-cache</code> verified <code>core.authorize@1.2.0</code>, and <code>describe_server</code> answered from the verified cache. The 0.16.0 crates weren't on crates.io yet when we checked; the rest of this page is about the 0.15.0 crate.</p>
+  <p>We ran the Linux x64 binary from an empty directory on November 2: <code>--version</code> reports <code>0.16.0</code>, <code>sync</code> wrote registry <code>index-v412</code> (232 records), <code>prepare-cache</code> verified <code>core.authorize@1.2.0</code>, and <code>describe_server</code> answered from the verified cache. <code>traverse-mcp</code> 0.16.0 is also on crates.io now (Rust 1.95) and carries the same fix. The rest of this page is about the 0.15.0 crate.</p>
 
   <h2>What you see</h2>
   <p>You install the published crate and start the stdio server:</p>
