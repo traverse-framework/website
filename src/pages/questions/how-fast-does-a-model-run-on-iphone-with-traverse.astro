@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How fast does a model run on iPhone with Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'One measured case, shipped in Traverse v0.16.0: on an iPhone 14 Pro Max (iOS 26.6, Release build), BirdNET v2.4 running through the governed Swift ExactModelHost under the policy [coreml, wasm-cpu] took p95 141.3 ms per 3 s audio clip with Core ML default compute units, against p95 10.0 s on wasm-cpu. Top-5 labels matched wasm-cpu on 21 of 21 clips. The timing covers the whole governed call: policy, rights, placement, and evidence. The evidence is traverse#1630 (PR #1709, Oct 15, 2026). It relies on manifest schema 2.3.0 score_transform, which is not in v0.15.0. One device, one model, test-only signing key. No host is Certified.',
+      text: 'One measured case, shipped in Traverse v0.16.0: on an iPhone 14 Pro Max (iOS 26.6, Release build), BirdNET v2.4 running through the governed Swift ExactModelHost under the policy [coreml, wasm-cpu] took p95 141.3 ms per 3 s audio clip with Core ML default compute units, against p95 10.0 s on wasm-cpu. Top-5 labels matched wasm-cpu on 21 of 21 clips. The timing covers the whole governed call: policy, rights, placement, and evidence. The evidence is traverse#1630 (PR #1709, Oct 15, 2026). It relies on manifest schema 2.3.0 score_transform, which is not in v0.15.0. A Nov 3, 2026 rerun on Traverse main (traverse#1778, docs only) after Decision 120 shows cpu_only no longer times out: it registers in 4.47 s and the first call succeeds in 4.29 s, on wasm-cpu, because the Core ML variant fails its self-check; the default all setting was p95 149.0 ms. One device, one model, test-only signing key. No host is Certified.',
     },
   }],
 });
@@ -43,7 +43,7 @@ const relatedLinks = [
       <tr><td><code>all</code> (default)</td><td><code>coreml</code></td><td>141.3 ms</td></tr>
       <tr><td><code>cpu_and_gpu</code></td><td><code>coreml</code></td><td>133.8 ms</td></tr>
       <tr><td><code>cpu_and_neural_engine</code></td><td><code>wasm-cpu</code> (the variant failed its self-check)</td><td>10.5 s</td></tr>
-      <tr><td><code>cpu_only</code></td><td>the first call timed out at the 60 s deadline</td><td>none</td></tr>
+      <tr><td><code>cpu_only</code></td><td>the first call timed out at the 60 s deadline (fixed, see the November 3 rerun below)</td><td>none</td></tr>
     </tbody>
   </table>
 
@@ -61,10 +61,26 @@ const relatedLinks = [
     <li><strong>No host is Certified</strong> under Spec 529, and there is no web, Android, or desktop GPU adapter.</li>
   </ul>
 
+  <h2>November 3, 2026 rerun after Decision 120</h2>
+  <p>Traverse v0.16.0 moved one-time placement preparation (on-device compile, self-check, <code>model_prepare</code>) from the first call to registration (Decision 120, <a href="https://github.com/traverse-framework/traverse/pull/1764">#1764</a>) and made the self-check record its worst case (<a href="https://github.com/traverse-framework/traverse/pull/1766">#1766</a>). A rerun on the same phone model, with the harness built from Traverse <code>main</code> (<code>9a3cd84</code>), is recorded in <a href="https://github.com/traverse-framework/traverse/pull/1778">#1778</a> (<a href="https://github.com/traverse-framework/traverse/blob/main/docs/evidence/birdnet-iphone-governed-2026-11-03.md">evidence write-up</a>). That PR is docs only.</p>
+  <table>
+    <thead><tr><th>Host Core ML setting</th><th>Registered placement</th><th>Registration</th><th>First call</th><th>Steady p95</th></tr></thead>
+    <tbody>
+      <tr><td><code>all</code> (default)</td><td><code>coreml</code></td><td>6.94 s</td><td>157.6 ms</td><td>149.0 ms</td></tr>
+      <tr><td><code>cpu_and_gpu</code></td><td><code>coreml</code></td><td>2.99 s</td><td>143.5 ms</td><td>147.8 ms</td></tr>
+      <tr><td><code>cpu_and_neural_engine</code></td><td><code>wasm-cpu</code> (self-check failed)</td><td>4.30 s</td><td>4.15 s</td><td>4.23 s</td></tr>
+      <tr><td><code>cpu_only</code></td><td><code>wasm-cpu</code> (self-check failed)</td><td>4.47 s</td><td>4.29 s</td><td>4.28 s</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><strong><code>cpu_only</code> no longer times out</strong> (<a href="https://github.com/traverse-framework/traverse/issues/1706">#1706</a>, closed). But the call runs on <code>wasm-cpu</code>, so this does not measure Core ML inference on <code>cpu_only</code>. The earlier 60 s timeout was not reproduced, so its exact cause was not isolated.</li>
+    <li><strong>The self-check miss is not specific to the Neural Engine</strong> (<a href="https://github.com/traverse-framework/traverse/issues/1708">#1708</a>, closed). <code>cpu_and_neural_engine</code> and <code>cpu_only</code> fail with identical numbers: 1 of 21 clips over tolerance, worst sigmoid difference 5.067×10⁻³ against the 5×10⁻³ bar, no top-5 mismatches. <code>all</code> and <code>cpu_and_gpu</code> pass at 4.411×10⁻³. Why the two settings match is an inference, not measured.</li>
+    <li><strong>Over-budget fall-through is now tested on Swift, Kotlin and .NET</strong> (<a href="https://github.com/traverse-framework/traverse/pull/1779">#1779</a>, tests only, on <code>main</code>).</li>
+    <li><strong>Not a before and after.</strong> The clips differ from the October run, so don't compare the two tables directly. One device, one run per setting, test-signed package.</li>
+  </ul>
+
   <h2>Open follow-ups</h2>
   <ul>
-    <li><a href="https://github.com/traverse-framework/traverse/issues/1706">#1706</a>: the <code>cpu_only</code> first call runs out of time because compile and self-check count against the call deadline.</li>
     <li><a href="https://github.com/traverse-framework/traverse/issues/1707">#1707</a>: the governed call adds about 120 ms over a raw prediction.</li>
-    <li><a href="https://github.com/traverse-framework/traverse/issues/1708">#1708</a>: record why the Neural Engine setting fails the self-check.</li>
   </ul>
 </QuestionLayout>
