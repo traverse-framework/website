@@ -1,0 +1,214 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">November 3, 2026</span>
+      <span class="badge">Release</span>
+      <span class="badge">Determinism</span>
+      <span class="badge">MCP</span>
+    </div>
+    <h1 class="t-h1">Traverse v0.16.0: same input, same output, on every host</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse v0.16.0 shipped on November 2. Two things in it matter most. A capability now gets the same input bytes on every host, so it gives the same output on every host. And you can run an agent against verified public capabilities without installing Rust. There are also four breaking changes and a sandbox-escape fix you should take. Here's what changed, what we checked on the released bits this morning, and what's still rough.</p>
+
+      <div class="callout">
+        Short version: every host now feeds guests RFC 8785 canonical JSON (<a href="https://github.com/traverse-framework/traverse/issues/1722" target="_blank" rel="noopener">#1722</a>). On the released packages, catalog <code>core.authorize@1.2.0</code> gives byte-identical output on Node and on the <code>traverse-mcp</code> release binary, <code>policy_hash</code> included. <code>traverse-mcp</code> now ships prebuilt for four targets with checksums and build provenance. Upgrading needs Rust 1.95 for source builds and code changes if you run exact-ref models. Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0" target="_blank" rel="noopener">release v0.16.0</a> and the <a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html">upgrade Q&amp;A</a>.
+      </div>
+
+      <h2 id="same-output">Same input, same output</h2>
+
+      <p>On October 23 our own demo caught a leak. The same <code>core.authorize@1.2.0</code> WASM gave the same decision on the browser, Node and the agent's MCP server, but a different <code>policy_hash</code> on the agent. The capability hashes the policy bytes it receives. The MCP server sorted the JSON keys first. The embedders passed the caller's bytes through. Same meaning, different bytes, different hash. We wrote that up in <a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes</a>.</p>
+
+      <p>v0.16.0 makes the rule explicit (Decision 118). Every host hands a guest the RFC 8785 (JCS) canonical bytes of its JSON input. That covers the native executor (runtime, CLI, <code>traverse-mcp</code>, workflow steps) and the nested executor in <code>runtime.wasm</code> that the browser, Node, Swift, Kotlin and .NET embed. Input JCS can't represent exactly fails before any guest runs, with <code>input_not_canonicalizable</code>: numbers above 2<sup>53</sup>−1, duplicate keys, invalid Unicode. Outputs are never rewritten.</p>
+
+      <p>On October 30 we showed this on unreleased <code>main</code> (<a href="/blog/hash-converges.html">One audit fingerprint, every host</a>). This morning we ran the same harness on released bits only: npm <code>traverse-embedder-web@0.16.0</code> with the v0.16.0 <code>runtime.wasm</code> (<code>5ab8057f…</code>) under Node, and the <code>traverse-mcp-v0.16.0</code> Linux x64 binary over stdio.</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead><tr><th>Host</th><th>Build</th><th><code>policy_hash</code></th></tr></thead>
+          <tbody>
+            <tr><td>Node (before)</td><td>npm 0.15.0 era, <code>runtime.wasm</code> <code>a254c161…</code></td><td><code>fnv1a64:2a126b86…</code></td></tr>
+            <tr><td>Agent (before)</td><td><code>traverse-mcp</code> 0.15.0, Oct 23 run</td><td><code>fnv1a64:51a64653…</code></td></tr>
+            <tr><td>Node (v0.16.0)</td><td>npm <code>traverse-embedder-web@0.16.0</code>, <code>runtime.wasm</code> <code>5ab8057f…</code></td><td><code>fnv1a64:51a64653…</code></td></tr>
+            <tr><td>Agent (v0.16.0)</td><td><code>traverse-mcp-v0.16.0</code> release binary, Mode A, commit <code>f104b83</code></td><td><code>fnv1a64:51a64653…</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>On v0.16.0 the full output is byte-identical between the two hosts for both the denied cheat wire and the allowed treasury wire, from unsorted caller input. The capability bytes are the same everywhere (<code>sha256:0c318fff…</code>). We didn't rerun the browser tab today; it uses the same <code>runtime.wasm</code> as Node, but we haven't checked the released pair in a browser.</p>
+
+      <h2 id="mode-a">An agent without a Rust toolchain</h2>
+
+      <p>Until now, running <code>traverse-mcp</code> meant <code>cargo install</code> or a checkout. The 0.15.0 server also needed fixture files staged next to it before it would start (<a href="https://github.com/traverse-framework/traverse/issues/1720" target="_blank" rel="noopener">#1720</a>). In v0.16.0 Mode A is three commands:</p>
+
+      <pre><code>curl -L https://github.com/traverse-framework/traverse/releases/download/traverse-mcp-v0.16.0/traverse-mcp-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+./traverse-mcp sync --out synced-state.json
+./traverse-mcp prepare-cache --synced-state synced-state.json --cache traverse-cache --ref core/core.authorize@^1</code></pre>
+
+      <p>Binaries exist for Linux x64, Linux arm64, macOS arm64 and Windows x64. Each has a SHA-256 in <code>SHA256SUMS</code> and a build-provenance attestation, and each is smoke-run before upload. This morning, from an empty directory, the Linux x64 archive passed <code>sha256sum -c</code> and <code>gh attestation verify</code> (signed by <code>mcp-server-publish.yml</code> at <code>refs/tags/v0.16.0</code>). <code>--version</code> reported <code>0.16.0 (f104b83…)</code>. <code>sync</code> pulled registry <code>index-v412</code> with 232 records. <code>prepare-cache</code> verified <code>core.authorize@1.2.0</code>.</p>
+
+      <p><code>sync</code> is new. It writes the synced-state file that used to be written by hand. The write is atomic, and when GitHub reports a digest for <code>index.json</code>, sync checks it. When a cached record is bad, the error now names the <code>record</code> and the <code>field</code> instead of just <code>registry_metadata_cache_invalid</code>.</p>
+
+      <p>The agent still can't freestyle. Through the release binary, an invented version gets <code>not_found</code>, a downgrade to a version never pinned into the cache gets <code>registry_cache_entry_missing</code>, a mismatched request gets <code>invalid_request</code>, a made-up capability gets <code>not_found</code>, and one flipped bit in the cached WASM gets <code>registry_artifact_digest_mismatch</code>.</p>
+
+      <p>One thing to know before you wire it into an editor. <code>traverse-mcp</code> speaks its own line-delimited JSON command protocol (<code>describe_server</code>, <code>execute_entrypoint</code> and so on). We sent a JSON-RPC <code>tools/list</code> to the v0.16.0 binary and it answered <code>invalid_request</code>. A stock MCP client needs a small translation layer in front of it today. The <a href="/docs/guides/mcp-setup.html">MCP setup guide</a> has the details.</p>
+
+      <h2 id="breaking">The four breaking changes</h2>
+
+      <p>Traverse is pre-1.0, so breaking changes take a minor bump. Most apps hit one or two of these.</p>
+
+      <ol>
+        <li><strong>Model registration takes the execution policy</strong> (<a href="https://github.com/traverse-framework/traverse/issues/1706" target="_blank" rel="noopener">#1706</a>, Decision 120). Only apps that run exact-ref models are affected. Pass <code>{policy_ref, placements, require_fuel_metering}</code> when you register, and register every <code>policy_ref</code> you call. The one-time placement work moves into registration, so the first call no longer pays it inside its own deadline. Placements on the call are deprecated.</li>
+        <li><strong>Canonical guest input</strong> (<a href="https://github.com/traverse-framework/traverse/issues/1722" target="_blank" rel="noopener">#1722</a>, Decision 118). Browser and Node guests now see sorted keys and ECMAScript number formatting. If your capability hashed raw input on an embedder, that hash changes once. Rust callers get a new <code>ExecutorError::InputNotCanonicalizable</code>.</li>
+        <li><strong>Hosts enforce the contract's input schema</strong> (<a href="https://github.com/traverse-framework/traverse/issues/1658" target="_blank" rel="noopener">#1658</a>). Unknown fields under <code>additionalProperties: false</code> and strings over <code>maxLength</code> fail with <code>invalid_input</code> before the artifact runs.</li>
+        <li><strong>Registry rights fail closed</strong> (<a href="https://github.com/traverse-framework/traverse/issues/1728" target="_blank" rel="noopener">#1728</a>). Version ranges skip revoked versions. An exact pin to a revoked version resolves, then fails with the revocation record. Conditional model rights need an explicit host opt-in.</li>
+      </ol>
+
+      <h2 id="security">Take the security fix</h2>
+
+      <p>v0.16.0 moves <code>wasmtime</code> to 48.0.7. That fixes GHSA-mghf-wjfp-p5xm: on aarch64, Cranelift could compile a large <code>br_table</code> to a wrong branch target and let a guest escape the sandbox. v0.15.0 doesn't have the fix. wasmtime 48 needs Rust 1.95, so source builds and <code>cargo install</code> now need rustc 1.95 or newer. The ONNX runner guest also moved to <code>tract-onnx</code> 0.23.9, which changed its audited digest. Use the <code>onnx-runner-v0.16.0</code> runner with the 0.16.0 CLI.</p>
+
+      <h2 id="get-it">Where to get it</h2>
+
+      <ul>
+        <li><strong>crates.io:</strong> <code>traverse-runtime</code>, <code>traverse-embedder</code>, <code>traverse-contracts</code>, <code>traverse-mcp</code>, <code>traverse-cli-rs</code> and <code>traverse-expedition-wasm</code> at 0.16.0. They landed a couple of hours after the tag on November 2. The CLI is <code>cargo install traverse-cli-rs --locked</code>; the binary is <code>traverse-cli</code>. The crate named <code>traverse-cli</code> is an unrelated tool.</li>
+        <li><strong>npm:</strong> <code>traverse-embedder-web@0.16.0</code>. <strong>Maven Central:</strong> <code>com.traverse-framework:traverse-embedder</code> 0.16.0. <strong>nuget.org:</strong> <code>TraverseEmbedder</code> 0.16.0.</li>
+        <li><strong>Swift:</strong> the xcframework is on <code>swift-host-v0.16.0</code>. The <code>Package.swift</code> at the v0.16.0 tag still points at the 0.15.0 xcframework; <code>main</code> points at 0.16.0 since <a href="https://github.com/traverse-framework/traverse/pull/1769" target="_blank" rel="noopener">#1769</a>.</li>
+        <li><strong>traverse-mcp:</strong> the <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0" target="_blank" rel="noopener">traverse-mcp-v0.16.0</a> release, or <code>cargo install traverse-mcp --locked</code> with Rust 1.95.</li>
+      </ul>
+
+      <h2 id="not-claimed">What this release doesn't claim</h2>
+
+      <ul>
+        <li>No live Registry coverage or production compliance. The CLI and runtime support declared model rights; that's all.</li>
+        <li>No host is Certified under Spec 529. Swift, Kotlin and .NET are published and pre-1.0.</li>
+        <li>Capabilities calling host connectors (<code>connector_invoke</code>) work in <code>runtime.wasm</code> and natively, but Swift, Android, .NET and the web don't bind them for guests yet (<a href="https://github.com/traverse-framework/traverse/issues/1719" target="_blank" rel="noopener">#1719</a> is still open).</li>
+        <li>Today's rerun covers Node and the Linux x64 agent binary. Not the browser tab, not the other three binaries, not Swift, Kotlin or .NET.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Release:</strong> Traverse v0.16.0, November 2, 2026 (tag commit <code>f104b83</code>). Minor lockstep release with four breaking changes: placement at registration (#1706), canonical guest input (#1722), host input-schema enforcement (#1658), Registry rights fail closed (#1728). <code>traverse-registry</code> 0.29.0.</li>
+          <li><strong>Packages:</strong> crates.io 0.16.0 for <code>traverse-runtime</code>, <code>traverse-embedder</code>, <code>traverse-contracts</code>, <code>traverse-mcp</code>, <code>traverse-cli-rs</code> (binary <code>traverse-cli</code>), <code>traverse-expedition-wasm</code>; npm <code>traverse-embedder-web@0.16.0</code>; Maven and NuGet 0.16.0; Swift <code>swift-host-v0.16.0</code>. Rust ≥ 1.95.</li>
+          <li><strong>Determinism check (Nov 3):</strong> catalog <code>core.authorize@1.2.0</code> (<code>0c318fff…</code>) on Node (npm 0.16.0 + <code>runtime.wasm</code> <code>5ab8057f…</code>) and the <code>traverse-mcp-v0.16.0</code> Linux x64 binary: full output byte-identical, <code>policy_hash</code> <code>fnv1a64:51a64653…</code> on both. Browser not rerun on released bits.</li>
+          <li><strong>Mode A:</strong> prebuilt <code>traverse-mcp</code> for Linux x64/arm64, macOS arm64, Windows x64 with <code>SHA256SUMS</code> + provenance; <code>sync</code> → <code>prepare-cache</code> → <code>stdio --cache</code>. Line-delimited command protocol, not JSON-RPC <code>tools/list</code>.</li>
+          <li><strong>Security:</strong> wasmtime 48.0.7 (GHSA-mghf-wjfp-p5xm, aarch64 sandbox escape); ONNX runner on <code>tract-onnx</code> 0.23.9, use <code>onnx-runner-v0.16.0</code>.</li>
+          <li><strong>Not claimed:</strong> live Registry coverage, production compliance, Spec 529 certification, guest <code>connector_invoke</code> on Swift/Android/.NET/web, a browser rerun on released bits.</li>
+          <li><strong>Lead claim:</strong> one shared runtime contract; hosts are clients. Discover → execute → trace.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#same-output">Same input, same output</a></li>
+          <li><a href="#mode-a">An agent without a Rust toolchain</a></li>
+          <li><a href="#breaking">The four breaking changes</a></li>
+          <li><a href="#security">Take the security fix</a></li>
+          <li><a href="#get-it">Where to get it</a></li>
+          <li><a href="#not-claimed">What this release doesn't claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html">How do I upgrade to Traverse v0.16.0? →</a></li>
+          <li><a href="/blog/same-wasm-two-hashes.html">Same WASM, two hashes →</a></li>
+          <li><a href="/blog/hash-converges.html">One audit fingerprint, every host →</a></li>
+          <li><a href="/docs/guides/mcp-setup.html">MCP setup guide →</a></li>
+          <li><a href="/changelog.html">Changelog →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Same bytes in. Same bytes out.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">v0.16.0 is out. Read the upgrade notes, then pull the binary.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html" class="btn btn-primary">Upgrade to v0.16.0 →</a>
+      <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0" class="btn btn-ghost">Release notes →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Traverse v0.16.0: same input, same output, on every host — Traverse Blog"
+  description="Traverse v0.16.0 (Nov 2, 2026): every host feeds guests RFC 8785 canonical JSON, so core.authorize gives byte-identical output on Node and the traverse-mcp release binary; Mode A prebuilt binaries for four targets, no Rust; four breaking changes; wasmtime 48.0.7 security fix."
+  canonical="https://traverse-framework.com/blog/traverse-0-16-0-same-input-same-output.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
