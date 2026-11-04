@@ -14,7 +14,7 @@ Current packages (Traverse v0.16.1, Nov 3, 2026, additive patch on v0.16.0): npm
 
 ## Required reading (agents)
 
-- [What is real today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot, skill-first, one shared `runtime.wasm`, honest consumers, pre-1.0, no invented customers.
+- [What ships today](https://traverse-framework.com/what-is-real-today.html): citeable snapshot, skill-first, one shared `runtime.wasm`, honest consumers, pre-1.0, no invented customers.
 - [What does discover → execute → trace mean?](https://traverse-framework.com/questions/what-does-discover-execute-trace-mean.html): the value loop in plain language. Agent proposes, runtime decides.
 - [Where does business logic live?](https://traverse-framework.com/questions/where-does-business-logic-live-in-traverse.html): capabilities = non-UI domain rules; hosts = UI + I/O; one concern per package; “apps not ready” ≠ leave logic in the host; utilities teach the pipe, not the ceiling. Narrative: [Where business logic lives (hosts stay thin)](https://traverse-framework.com/blog/where-business-logic-lives.html).
 - [What I/O boundary do capabilities use today?](https://traverse-framework.com/questions/what-io-boundary-do-capabilities-use-today.html): stdin/stdout JSON through the host; no ambient filesystem; hosts stay thin; discover → execute → trace.
