@@ -24,7 +24,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="How do I upgrade to Traverse v0.16.0?"
-  description="Traverse v0.16.0 has four breaking changes: model placement at registration, RFC 8785 canonical guest input, host-enforced input schemas, and Registry rights that fail closed. Plus Rust 1.95 and Mode A binaries."
+  description="Traverse v0.16.0 has four breaking changes: model placement at registration, RFC 8785 canonical guest input, host-enforced input schemas, and Registry rights that fail closed. Plus Rust 1.95 and Mode A binaries. v0.16.1 is an additive patch on top."
   canonical="https://traverse-framework.com/questions/how-do-i-upgrade-to-traverse-v0-16-0.html"
   category="Getting started"
   relatedLinks={relatedLinks}
@@ -32,7 +32,16 @@ const relatedLinks = [
 >
   <p><strong>Short answer:</strong> <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0">Traverse v0.16.0</a>, released November 2, 2026, is a minor lockstep release with four breaking changes. Exact-ref model registration now takes the execution policy. Every host gives guests canonical JSON input. Hosts enforce the contract's input schema. Registry rights fail closed. Building from source needs Rust 1.95. The loop is still <strong>discover → execute → trace</strong> on one shared <code>runtime.wasm</code>; business logic stays in WASM capabilities, and hosts stay UI and I/O. The authoritative steps are in <a href="https://github.com/traverse-framework/traverse/blob/v0.16.0/docs/upgrade-to-v0.16.0.md">docs/upgrade-to-v0.16.0.md</a> at the tag.</p>
 
-  <h2>Package versions</h2>
+  <h2>Then take v0.16.1: no extra migration</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.1">Traverse v0.16.1</a> (November 3, 2026) is an additive patch on top of v0.16.0. No breaking host ABI change, no exported symbol or bridge ABI version change. Once you're on v0.16.0, bump every pin to 0.16.1: npm <code>traverse-embedder-web</code>, Maven Central, nuget.org and all six crates are at 0.16.1, Swift's binary target is <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.16.1"><code>swift-host-v0.16.1</code></a>, and Mode A binaries are on <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.1"><code>traverse-mcp-v0.16.1</code></a>. If your web bundle ships <code>runtime/runtime.wasm</code>, swap it for the v0.16.1 one (sha256 <code>7a322a17…</code>; <a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">where to get it</a>).</p>
+  <ul>
+    <li><strong>New:</strong> Browser and Node can run the catalog <code>model.execute@1.0.0</code> capability with <code>BundleEmbedder.activateMediatedConnector</code> and <code>exactModelMediatedConnector</code>. Use <code>submitAsync</code>; sync <code>submit</code> fails these targets with <code>async_submit_required</code> (<a href="/questions/does-catalog-model-execute-run-on-published-traverse-packages.html">published-package run</a>).</li>
+    <li><strong>Fix on every host:</strong> the output filter no longer refuses a signed <code>model_evidence</code> because it contains public URLs. Before, a real package failed with <code>connector_unavailable</code>.</li>
+    <li><strong>Swift:</strong> the v0.16.1 tag's <code>Package.swift</code> pins <code>swift-host-v0.16.0</code> (#1769), which fixes the stale v0.16.0 pin; main points at <code>swift-host-v0.16.1</code> (#1780).</li>
+    <li>v0.16.1 stays on the 0.16.x line because published <code>traverse-registry</code> 0.29.0 accepts <code>traverse-contracts</code> below 0.17.0.</li>
+  </ul>
+
+  <h2>Package versions (v0.16.0)</h2>
   <ul>
     <li><strong>npm:</strong> <code>traverse-embedder-web</code> 0.16.0.</li>
     <li><strong>Maven Central:</strong> <code>com.traverse-framework:traverse-embedder</code> 0.16.0.</li>

@@ -1,0 +1,65 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does catalog model.execute run on published Traverse packages?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes on native Rust, Node and the browser, since Traverse v0.16.1 (November 3, 2026). The published model.execute@1.0.0 guest ran unchanged over the signed traverse.digits-onnx@1.0.0 package on native (crates.io traverse-runtime 0.16.1, wasmtime), Node and Chromium (npm traverse-embedder-web@0.16.1). The success output, the 56-byte output frame and six fail-closed cases (connector_unavailable, usage_undeclared, key_untrusted, pin_mismatch, digest_mismatch, package_revoked) matched on all three; native also adds placement_evidence. A CI job on a fresh GitHub-hosted runner reinstalls only published packages and gets the same result. Limits: runtime.wasm and the test-signed package come from the v0.16.1 git tag, not a package or release (traverse#1784); on native, activate_exact_model_runtime does not let you read the output frame back (traverse#1785); Swift, Android and .NET cannot activate the connector yet; registry spec 027 is still a draft; no host is Certified under Spec 529.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-model-execute-catalog-capability.html', label: 'What is the model.execute catalog capability?' },
+  { href: '/questions/where-does-bundleembedder-get-runtime-wasm.html', label: 'Where does BundleEmbedder get runtime.wasm?' },
+  { href: '/questions/why-does-bundleembedder-fail-with-cannot-find-definition-for-import-connector-invoke.html', label: 'Why does BundleEmbedder fail with “cannot find definition for import connector_invoke”?' },
+  { href: '/questions/how-do-i-upgrade-to-traverse-v0-16-0.html', label: 'How do I upgrade to Traverse v0.16.x?' },
+  { href: '/questions/what-is-exact-model-host.html', label: 'What is ExactModelHost?' },
+];
+---
+<QuestionLayout
+  title="Does catalog model.execute run on published Traverse packages?"
+  description="Yes on native, Node and the browser since v0.16.1: the published model.execute@1.0.0 guest gave identical output and identical fail-closed reasons on all three. Here is what was run, what matched, and what is still missing."
+  canonical="https://traverse-framework.com/questions/does-catalog-model-execute-run-on-published-traverse-packages.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> yes, on native Rust, Node and the browser, starting with <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.1">Traverse v0.16.1</a> (November 3, 2026). Before that release, no published host could run the catalog <a href="/questions/what-is-the-model-execute-catalog-capability.html"><code>model.execute@1.0.0</code></a> capability out of the box. Swift, Android and .NET still can't.</p>
+
+  <h2>What was run</h2>
+  <p>The evidence is in the traverse repo under <a href="https://github.com/traverse-framework/traverse/tree/main/docs/evidence/model-execute-published-2026-11-03"><code>docs/evidence/model-execute-published-2026-11-03</code></a> (<a href="https://github.com/traverse-framework/traverse/pull/1782">#1782</a>, closing <a href="https://github.com/traverse-framework/traverse/issues/1776">#1776</a>). The published <code>model.execute@1.0.0</code> guest, unchanged, ran over the signed <code>traverse.digits-onnx@1.0.0</code> package on three hosts:</p>
+  <ul>
+    <li><strong>Native:</strong> crates.io <code>traverse-runtime</code> 0.16.1, on wasmtime.</li>
+    <li><strong>Node 24:</strong> npm <code>traverse-embedder-web@0.16.1</code>, on the nested wasmi engine inside <code>runtime.wasm</code>.</li>
+    <li><strong>Chromium:</strong> the same npm package, served from localhost.</li>
+  </ul>
+  <p>The loop is the usual one: discover the capability, execute it through the host's <code>traverse.model-runtime</code> connector, and read the trace. The model work stays in WASM. The hosts only stage input, hold the trust root and answer the connector call.</p>
+
+  <h2>What matched</h2>
+  <p>The comparison file reports <code>all_identical: true</code>. On all three hosts these were the same:</p>
+  <ul>
+    <li>The success output, including the signed <code>model_evidence</code>.</li>
+    <li>The 56-byte output frame, compared byte for byte. It also equals the signed vector's expected output.</li>
+    <li>Six fail-closed cases: <code>connector_unavailable</code>, <code>usage_undeclared</code>, <code>key_untrusted</code>, <code>pin_mismatch</code>, <code>digest_mismatch</code> and <code>package_revoked</code>.</li>
+  </ul>
+  <p>Native adds a <code>placement_evidence</code> field, because only native meters fuel. Spec 1719 allows that one difference. Outputs were compared as sorted-key JSON, since the hosts expose parsed output; frames were compared as raw bytes.</p>
+  <p>The first proof run was on one Mac in empty folders with fresh caches. A CI workflow (<a href="https://github.com/traverse-framework/traverse/pull/1783">#1783</a>) now repeats it on a fresh GitHub-hosted Ubuntu runner: it deletes the checkout, installs only published npm and crates.io packages with no build cache, runs Node, native and headless Chrome, and requires the results to match each other and the committed proof. It passed on the PR runs. It is pinned to v0.16.1, so it doesn't test later releases.</p>
+
+  <h2>How a web host calls it</h2>
+  <p>v0.16.1 adds <code>BundleEmbedder.activateMediatedConnector</code> and <code>exactModelMediatedConnector</code> to <code>traverse-embedder-web</code>. The guest suspends at <code>connector_invoke</code>, the host answers asynchronously, and the guest resumes through the same Spec 104 checks. Drive it with <code>submitAsync</code>; a sync <code>submit</code> fails these targets with <code>async_submit_required</code>. Minimal Browser and Native examples are in <a href="https://github.com/traverse-framework/traverse/blob/v0.16.1/docs/host-connector-command-dispatch.md"><code>docs/host-connector-command-dispatch.md</code></a>.</p>
+
+  <h2>What isn't true yet</h2>
+  <ul>
+    <li><strong><code>runtime.wasm</code> isn't in a package or release.</strong> The demo fetched it from the <code>v0.16.1</code> git tag and checked its digest. See <a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">Where does BundleEmbedder get runtime.wasm?</a> (<a href="https://github.com/traverse-framework/traverse/issues/1784">traverse#1784</a>).</li>
+    <li><strong>Native output frames need a workaround.</strong> <code>activate_exact_model_runtime</code> takes the host by value, so a caller can't read the output frame back through it. The demo builds the activation by hand around <code>ExactModelMediatedConnector</code> instead (<a href="https://github.com/traverse-framework/traverse/issues/1785">traverse#1785</a>).</li>
+    <li><strong>Swift, Android and .NET</strong> have no activation API for this connector yet.</li>
+    <li><strong>The model is test-signed.</strong> <code>traverse.digits-onnx@1.0.0</code> is signed with the test-only key (<a href="https://github.com/traverse-framework/traverse/issues/1567">traverse#1567</a>).</li>
+    <li>Registry spec <code>027-catalog-model-execute</code> is still a draft, and no host is Certified under Spec 529.</li>
+  </ul>
+</QuestionLayout>
