@@ -33,8 +33,9 @@ import {
 const FIXTURE_WASM_B64 = 'AGFzbQEAAAABCQFgBH9/f38BfwMCAQAFAwEAAgcaAgZtZW1vcnkCAA1tb2RlbF9leGVjdXRlAAAK9AEB8QEBB38gAUEMSQRAQX8PCyAAKAIIIQQgAEEMaiEFQQwgBGogAUsEQEF/DwtBACEIQQAhBgJAA0AgBkECaiAESw0BIAUgBmotAABB6ABGIAUgBkEBamotAABB6QBGcQRAQQEhCAwCCyAGQQFqIQYMAAsLIAhBAUYEQEHKuAIhCUEIIQoFQd64AiEJQQMhCgtBDCAKaiADSwRAQX8PCyACQQE7AQAgAkEEOgACIAJBAToAAyACIAo2AgQgAiAKNgIIQQAhBwJAA0AgByAKTw0BIAJBDGogB2ogCSAHai0AADoAACAHQQFqIQcMAAsLQQwgCmoLCyMDAEHAuAILAmhpAEHKuAILCGhpIHRoZXJlAEHeuAILA2htbQCUAQRuYW1lAmIBAAsABmluX3B0cgEGaW5fbGVuAgdvdXRfcHRyAwdvdXRfY2FwBAtwYXlsb2FkX2xlbgULcGF5bG9hZF9wdHIGAWkHAWoIB21hdGNoZWQJCHJlc3BfcHRyCghyZXNwX2xlbgMpAQAEAgtzZWFyY2hfZG9uZQMGc2VhcmNoBwljb3B5X2RvbmUIBGNvcHk=';
 
 // The same fixture's signed Spec 138 package files (traverse-embedder-web
-// admits packages only through registerPackage; 0.15 also requires
-// modelUsage whenever pins exist): the exact bytes of
+// admits packages only through registerPackage; 0.15+ also requires
+// modelUsage whenever pins exist, and 0.16 takes the execution policy at
+// registration): the exact bytes of
 // fixtures/models/fixture-responder-1.0.0/model.manifest.json (its SHA-256
 // is the pin digest) and its detached Ed25519 model.sig.json.
 const FIXTURE_MANIFEST_B64 = 'ewogICJzY2hlbWFfdmVyc2lvbiI6ICIyLjAuMCIsCiAgIm1vZGVsX2lkIjogImZpeHR1cmUucmVzcG9uZGVyIiwKICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgIndhc21fZGlnZXN0IjogImJmMDQ3NjBiMTkzN2MyZjJiODEzYjZlMjhmMmZkYzZlMzM0ODMzYzJkZmFkYzFmN2M4NzJmM2YyOGMzNDEyOTQiLAogICJyZWdpc3RyeV9yZWYiOiAicmVnaXN0cnk6Zml4dHVyZS5yZXNwb25kZXJAMS4wLjAiLAogICJleGVjdXRhYmxlX2Zvcm1hdCI6ICJ0cmF2ZXJzZS1tb2RlbC13YXNtIiwKICAiYWJpX3ZlcnNpb24iOiAxLAogICJpbnB1dF9zY2hlbWFfcmVmIjogInNjaGVtYTpicmlkZ2VkLWdlbmVyYXRlLWluIiwKICAiaW5wdXRfc2NoZW1hX3ZlcnNpb24iOiAiMS4wLjAiLAogICJvdXRwdXRfc2NoZW1hX3JlZiI6ICJzY2hlbWE6YnJpZGdlZC1nZW5lcmF0ZS1vdXQiLAogICJvdXRwdXRfc2NoZW1hX3ZlcnNpb24iOiAiMS4wLjAiLAogICJyaWdodHMiOiB7CiAgICAibGljZW5zZV9pZCI6ICJBcGFjaGUtMi4wIiwKICAgICJhdHRyaWJ1dGlvbiI6ICJUcmF2ZXJzZSBTcGVjIDA0NS8xMzggYnJpZGdlIGNvbmZvcm1hbmNlIGZpeHR1cmUiLAogICAgInJlZGlzdHJpYnV0aW9uIjogInRlc3Qtb25seTsgbm90IGZvciBwcm9kdWN0aW9uIHJlZGlzdHJpYnV0aW9uIGNsYWltcyIsCiAgICAiY29tbWVyY2lhbF91c2UiOiAiYWxsb3dlZCIsCiAgICAic291cmNlX3VybCI6ICJodHRwczovL2dpdGh1Yi5jb20vdHJhdmVyc2UtZnJhbWV3b3JrL1RyYXZlcnNlL3RyZWUvbWFpbi9maXh0dXJlcy9tb2RlbHMvZml4dHVyZS1yZXNwb25kZXItMS4wLjAiCiAgfSwKICAic3VwcG9ydGVkX3Byb2ZpbGVzIjogWwogICAgIndhc20tY3B1IgogIF0sCiAgIm1heF9tZW1vcnlfYnl0ZXMiOiAxMzEwNzIsCiAgIm1heF9mdWVsIjogMTAwMDAwMCwKICAibWF4X2lucHV0X2J5dGVzIjogNDA5NiwKICAibWF4X291dHB1dF9ieXRlcyI6IDQwOTYsCiAgIm1heF9leGVjdXRpb25fbXMiOiA1MDAwLAogICJvZmZsaW5lX2FsbG93ZWQiOiB0cnVlCn0K';
@@ -48,6 +49,7 @@ const MODEL_ID = 'fixture.responder';
 const MODEL_VERSION = '1.0.0';
 const GUEST_TEXT_DTYPE = 4; // matches the fixture's own conformance test (Spec 138 guest ABI v1)
 const MAX_BYTES = 4096;
+const POLICY = { policy_ref: 'discover-generate-demo', placements: [PLACEMENT_WASM_CPU] };
 
 function b64ToBytes(value) {
   const bin = atob(value);
@@ -83,7 +85,9 @@ export async function runResponderDemo(promptText) {
   // Real verification: Ed25519 signature by a trusted key over the exact
   // manifest bytes, pin digest, WASM digest, rights, target, and limits.
   // Any mismatch throws; nothing here can fabricate an admitted package.
-  await host.registerPackage(manifestBytes, wasm, b64ToBytes(FIXTURE_SIGNATURE_B64));
+  // v0.16.0 (Decision 120): registration takes the execution policy the
+  // calls will name and prepares the placement once, here, not on the call.
+  await host.registerPackage(manifestBytes, wasm, b64ToBytes(FIXTURE_SIGNATURE_B64), POLICY);
 
   const promptBytes = new TextEncoder().encode(promptText);
   const frame = encodeGuestFrame(GUEST_TEXT_DTYPE, [promptBytes.length], promptBytes);
@@ -91,7 +95,7 @@ export async function runResponderDemo(promptText) {
   const result = await host.execute({
     model_ref: { model_id: MODEL_ID, version: MODEL_VERSION, digest },
     input_ref,
-    policy_ref: 'discover-generate-demo',
+    policy_ref: POLICY.policy_ref,
     data_classification: 'public',
     input_schema_ref: 'schema:bridged-generate-in',
     input_schema_version: '1.0.0',
