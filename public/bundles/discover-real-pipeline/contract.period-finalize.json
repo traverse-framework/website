@@ -134,8 +134,8 @@
     }
   },
   "owner": {
-    "contact": "maintainers@callweave.local",
-    "team": "callweave"
+    "contact": "https://github.com/traverse-framework",
+    "team": "traverse-web"
   },
   "permissions": [
     {
@@ -174,7 +174,7 @@
   ],
   "provenance": {
     "adr_refs": [],
-    "author": "Callweave",
+    "author": "Traverse Framework",
     "created_at": "2026-08-21T00:00:00Z",
     "exception_refs": [],
     "source": "greenfield",
