@@ -38,7 +38,7 @@ const relatedLinks = [
     <li><strong>New:</strong> Browser and Node can run the catalog <code>model.execute@1.0.0</code> capability with <code>BundleEmbedder.activateMediatedConnector</code> and <code>exactModelMediatedConnector</code>. Use <code>submitAsync</code>; sync <code>submit</code> fails these targets with <code>async_submit_required</code> (<a href="/questions/does-catalog-model-execute-run-on-published-traverse-packages.html">published-package run</a>).</li>
     <li><strong>Fix on every host:</strong> the output filter no longer refuses a signed <code>model_evidence</code> because it contains public URLs. Before, a real package failed with <code>connector_unavailable</code>.</li>
     <li><strong>Swift:</strong> the v0.16.1 tag's <code>Package.swift</code> pins <code>swift-host-v0.16.0</code> (#1769), which fixes the stale v0.16.0 pin; main points at <code>swift-host-v0.16.1</code> (#1780).</li>
-    <li>v0.16.1 stays on the 0.16.x line because published <code>traverse-registry</code> 0.29.0 accepts <code>traverse-contracts</code> below 0.17.0.</li>
+    <li>v0.16.1 stays on the 0.16.x line because published <code>traverse-registry</code> 0.29.0 accepts <code>traverse-contracts</code> below 0.17.0. <code>traverse-registry</code> 0.31.0 (published November 4, 2026) widens that to below 0.18.0 (<a href="https://github.com/traverse-framework/registry/issues/649">registry#649</a>); Traverse <code>main</code> moved to it in <a href="https://github.com/traverse-framework/traverse/pull/1788">#1788</a>, not yet in a Traverse release.</li>
   </ul>
 
   <h2>Package versions (v0.16.0)</h2>

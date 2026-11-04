@@ -1,0 +1,209 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">← Blog</a>
+      <span class="post-date">November 5, 2026</span>
+      <span class="badge">Models</span>
+      <span class="badge">Determinism</span>
+      <span class="badge">v0.16.1</span>
+    </div>
+    <h1 class="t-h1">One model capability, three published hosts, same answer</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Up to v0.16.0, the catalog <code>model.execute</code> capability ran in the browser and in Node only if you wired the model connector up yourself. Traverse v0.16.1 shipped that wiring on November 3. Then we did the boring part. We installed only what anyone can install from public registries, ran it on three hosts, and compared the results.</p>
+
+      <div class="callout">
+        Short version: the published <code>model/model.execute@1.0.0</code> WASM, unchanged, ran a signed ONNX digits package on native (crates.io <code>traverse-runtime</code> 0.16.1), Node 24 and Chromium (npm <code>traverse-embedder-web@0.16.1</code>). The success output, the 56-byte output frame and six fail-closed cases are identical on all three. A clean GitHub-hosted runner repeats the run from published packages only. Evidence: <a href="https://github.com/traverse-framework/traverse/pull/1782" target="_blank" rel="noopener">traverse#1782</a> and <a href="https://github.com/traverse-framework/traverse/pull/1783" target="_blank" rel="noopener">#1783</a>. Two inputs still come from the git tag instead of a package, and the model is signed with a test-only key. Details below.
+      </div>
+
+      <h2 id="what-we-ran">What we ran</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead><tr><th>Host</th><th>Installed from</th><th>Engine</th></tr></thead>
+          <tbody>
+            <tr><td>Native</td><td>crates.io <code>traverse-runtime</code> 0.16.1</td><td>wasmtime</td></tr>
+            <tr><td>Node 24.16.0</td><td>npm <code>traverse-embedder-web@0.16.1</code></td><td>nested wasmi in <code>runtime.wasm</code></td></tr>
+            <tr><td>Chromium 152</td><td>the same npm package, served from <code>127.0.0.1</code></td><td>nested wasmi in <code>runtime.wasm</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul>
+        <li><strong>Capability:</strong> the published catalog <code>model/model.execute@1.0.0</code> guest (<code>model-execute-agent.wasm</code>, <code>5ccfa372…</code>), unchanged.</li>
+        <li><strong>Model:</strong> the signed <code>traverse.digits-onnx@1.0.0</code> package (package digest <code>a7a8aa35…</code>). It is signed with the <strong>test-only</strong> key; production signing custody is still <a href="https://github.com/traverse-framework/traverse/issues/1567" target="_blank" rel="noopener">#1567</a>.</li>
+        <li><strong>Web wiring:</strong> <code>BundleEmbedder.activateMediatedConnector</code> with <code>exactModelMediatedConnector</code>, then <code>submitAsync</code>. Sync <code>submit</code> refuses these targets with <code>async_submit_required</code>.</li>
+        <li><strong>Shared runtime:</strong> <code>runtime.wasm</code> sha256 <code>7a322a17…7d52</code>, the digest in the v0.16.1 release notes.</li>
+      </ul>
+
+      <h2 id="what-matched">What matched</h2>
+
+      <p>The success case returns <code>status: ok</code> with signed <code>model_evidence</code>. The output and the 56-byte frame are the same on all three hosts, and the frame equals the signed vector's expected output. Then we broke things on purpose. Each failure below gives the same result on every host:</p>
+
+      <ul>
+        <li><code>connector_unavailable</code>: the host never activated the connector.</li>
+        <li><code>usage_undeclared</code>: the host declares no model usage, so the package never enters the verified cache.</li>
+        <li><code>key_untrusted</code>: no trusted keys.</li>
+        <li><code>pin_mismatch</code>: the pin names another digest.</li>
+        <li><code>digest_mismatch</code>: one byte of <code>model.wasm</code> flipped.</li>
+        <li><code>package_revoked</code>: the status map revokes the package after registration, and the call is denied with detail.</li>
+      </ul>
+
+      <p>There is one difference, and the spec allows it. Native adds <code>placement_evidence</code>, because only native meters fuel (Spec 1719 FR-014). The parsed outputs are compared as sorted-key JSON. The frames are compared byte for byte.</p>
+
+      <p>The first proof came from a Mac, in empty folders outside any git checkout, with a blank <code>HOME</code> and fresh npm and Cargo caches (<a href="https://github.com/traverse-framework/traverse/pull/1782" target="_blank" rel="noopener">#1782</a>). That isn't a clean machine, so <a href="https://github.com/traverse-framework/traverse/pull/1783" target="_blank" rel="noopener">#1783</a> added <code>published-model-execute-demo.yml</code>. It copies the demo folder out on a fresh GitHub-hosted Ubuntu runner, deletes the checkout, installs only published npm and crates.io packages, and runs native, Node and headless Chrome. It then requires all three hosts to match each other and the committed macOS proof, digests and crate checksums included. It passed on the PR and runs every Monday. It is pinned to v0.16.1, so it shows those published bits keep working. It doesn't test later releases.</p>
+
+      <h2 id="why">Why three hosts agree</h2>
+
+      <p>The hosts didn't get smarter. All the model work stays in the capability: checking the signature, rights, pin and digest, running the model, and shaping the evidence. The host answers one connector call, and the guest resumes through the same Spec 104 checks on every host. Browser and Node run the same <code>runtime.wasm</code>; native links the same runtime crate.</p>
+
+      <p>That is the Traverse loop: discover a governed capability, execute known behavior, get a trace. Agents and apps propose. The contract decides, on every host.</p>
+
+      <h2 id="not-yet">What isn't true yet</h2>
+
+      <ul>
+        <li><strong><code>runtime.wasm</code> isn't in a package.</strong> npm doesn't ship it, and the last <code>runtime-wasm-v*</code> release is v0.11.0. The demo fetches it from the <code>v0.16.1</code> tag and checks the digest (<a href="https://github.com/traverse-framework/traverse/issues/1784" target="_blank" rel="noopener">#1784</a>; <a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">where to get it today</a>). The test-signed model package also comes from the tag.</li>
+        <li><strong>Native frame readback.</strong> The one-call native <code>activate_exact_model_runtime</code> gives the same output, but a caller can't read the output frame back through it. The frame check uses <code>ExactModelMediatedConnector</code> directly (<a href="https://github.com/traverse-framework/traverse/issues/1785" target="_blank" rel="noopener">#1785</a>).</li>
+        <li><strong>Swift, Android and .NET</strong> have no activation API for this yet, and weren't run. <code>traverse-mcp</code>, Maven and NuGet weren't used.</li>
+        <li><strong>The browser run was by hand</strong> for the committed proof. The clean runner covers it in headless Chrome.</li>
+        <li><strong>No live-Registry model rights claim.</strong> Validating against live registry records is <a href="https://github.com/traverse-framework/traverse/issues/1786" target="_blank" rel="noopener">#1786</a>. No host is Certified under Spec 529.</li>
+      </ul>
+
+      <h2 id="on-main">On main, not released</h2>
+
+      <p>Application manifests and CLI activation can now declare host-connector invokes. That is <a href="https://github.com/traverse-framework/traverse/issues/1772" target="_blank" rel="noopener">#1772</a>, merged November 4 via <a href="https://github.com/traverse-framework/traverse/pull/1788" target="_blank" rel="noopener">#1788</a>, on top of the published <code>traverse-registry</code> 0.31.0 invoke union. It isn't in any release yet. A v0.16.2 release PR (<a href="https://github.com/traverse-framework/traverse/pull/1793" target="_blank" rel="noopener">#1793</a>) is open as of this writing.</p>
+
+      <h2 id="reproduce">Reproduce it</h2>
+
+      <p>Copy <code>docs/evidence/model-execute-published-2026-11-03</code> from the traverse repo to any folder outside a checkout. You need Node and Rust 1.95 or later.</p>
+
+      <pre><code>bash run.sh
+bash src/browser-run.sh   # needs Chrome; set CHROME if it isn't google-chrome
+node src/compare.mjs      # fails if the run differs from proof/comparison.json</code></pre>
+
+      <p>The CLI, if you want it, is <code>cargo install traverse-cli-rs --locked</code>. The binary is <code>traverse-cli</code>. The crate named <code>traverse-cli</code> is an unrelated tool.</p>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Claim:</strong> published catalog <code>model/model.execute@1.0.0</code> (<code>5ccfa372…</code>) over signed <code>traverse.digits-onnx@1.0.0</code> (test-only key) gives identical success output, an identical 56-byte frame and six identical fail-closed cases on native (crates.io <code>traverse-runtime</code> 0.16.1), Node 24.16.0 and Chromium 152 (npm <code>traverse-embedder-web@0.16.1</code>). Native adds <code>placement_evidence</code> (Spec 1719 FR-014).</li>
+          <li><strong>Evidence:</strong> traverse#1782 (<code>docs/evidence/model-execute-published-2026-11-03</code>, <code>all_identical: true</code>); clean-runner CI traverse#1783 (<code>published-model-execute-demo.yml</code>, weekly Mondays, pinned to v0.16.1); #1776 closed.</li>
+          <li><strong>Web API (v0.16.1):</strong> <code>BundleEmbedder.activateMediatedConnector</code> + <code>exactModelMediatedConnector</code>, <code>submitAsync</code>; sync <code>submit</code> → <code>async_submit_required</code>.</li>
+          <li><strong>Gaps:</strong> <code>runtime.wasm</code> (<code>7a322a17…</code>) and the model package come from the v0.16.1 tag (#1784); native frame readback (#1785); no Swift/Android/.NET activation API; live-Registry rights #1786; no Spec 529 certification.</li>
+          <li><strong>Unreleased on main (Nov 4):</strong> host-connector invokes in application manifests and CLI activation (#1772 via #1788, registry 0.31.0); v0.16.2 release PR #1793 open.</li>
+          <li><strong>Lead claim:</strong> one shared runtime; hosts are clients that answer connector calls. Discover → execute → trace.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-we-ran">What we ran</a></li>
+          <li><a href="#what-matched">What matched</a></li>
+          <li><a href="#why">Why three hosts agree</a></li>
+          <li><a href="#not-yet">What isn't true yet</a></li>
+          <li><a href="#on-main">On main, not released</a></li>
+          <li><a href="#reproduce">Reproduce it</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/does-catalog-model-execute-run-on-published-traverse-packages.html">Does catalog model.execute run on published packages? →</a></li>
+          <li><a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">Where does BundleEmbedder get runtime.wasm? →</a></li>
+          <li><a href="/blog/catalog-model-execute.html">An agent picks a model off the shelf →</a></li>
+          <li><a href="/blog/traverse-0-16-0-same-input-same-output.html">Traverse v0.16.0: same input, same output →</a></li>
+          <li><a href="https://github.com/orgs/traverse-framework/discussions/1787" target="_blank" rel="noopener">v0.16.1 announcement →</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability → execute known behavior → produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover →</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The model work stays in the capability.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Install the published packages, run the proof, compare the frames.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/questions/does-catalog-model-execute-run-on-published-traverse-packages.html" class="btn btn-primary">See the published-package run →</a>
+      <a href="https://github.com/traverse-framework/traverse/tree/main/docs/evidence/model-execute-published-2026-11-03" class="btn btn-ghost">Evidence folder →</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="One model capability, three published hosts, same answer — Traverse Blog"
+  description="Published catalog model.execute@1.0.0 runs a signed ONNX package with identical output, frame and six fail-closed cases on native (crates.io 0.16.1), Node and Chromium (npm traverse-embedder-web@0.16.1), rerun weekly on a clean CI runner. What is still missing: runtime.wasm packaging, native frame readback, Swift/Android/.NET."
+  canonical="https://traverse-framework.com/blog/model-execute-on-published-packages.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
