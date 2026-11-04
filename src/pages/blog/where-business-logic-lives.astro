@@ -24,7 +24,7 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>Cold readers keep landing on the same wrong picture: Traverse is a bag of tiny string utils, so real domain rules should stay in the host forever. That is not the product. This post is the narrative companion to the citeable Q&amp;A — <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live in Traverse?</a> — for when you need the argument in order, not a one-screen answer.</p>
+      <p>Cold readers keep landing on the same wrong picture: Traverse is a bag of tiny string utils, so real domain rules should stay in the host forever. That is not the product. This post is the narrative companion to the citeable Q&amp;A, <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live in Traverse?</a>, for when you need the argument in order, not a one-screen answer.</p>
 
       <div class="callout">
         Direction stays one loop: <strong>discover → execute → trace</strong>. Non-UI domain rules belong in capabilities. Hosts and embedders do UI and I/O. The agent proposes; the runtime decides.
@@ -34,11 +34,11 @@ const _body = `
 
       <p>A capability is a versioned contract plus a sandboxed WASM artifact. Pricing caps. Eligibility. Consent checks. Mesh codecs. Overhang analysis. Orientation scoring. Export gates. Anything that must behave the same way for every caller and leave a trace.</p>
 
-      <p>The host — browser app, native shell, CLI, MCP client — renders UI, holds session state, and supplies the I/O the capability is allowed to use. It is not the forever home of the domain rule.</p>
+      <p>The host (browser app, native shell, CLI, MCP client) renders UI, holds session state, and supplies the I/O the capability is allowed to use. It is not the forever home of the domain rule.</p>
 
       <p>If you are choosing where a rule should live, ask one question: would it be wrong for two hosts to disagree? If yes, put it in a capability.</p>
 
-      <h2 id="utilities-not-ceiling">Utilities teach the pipe — they are not the ceiling</h2>
+      <h2 id="utilities-not-ceiling">Utilities teach the pipe. They are not the ceiling</h2>
 
       <p>The registry includes small helpers: slugify, truncate, email validate. Those are legitimate. They teach the publish pipeline, the CI gates, and the review path. They are <strong>not</strong> the product identity and not a size limit.</p>
 
@@ -50,7 +50,7 @@ const _body = `
 
       <p>It does <strong>not</strong> mean “keep the rules in JavaScript until some future milestone.” That reading turns a GTM / contribution-sequencing note into a technical no. It is the wrong conclusion.</p>
 
-      <p>A living example of a domain pack (capabilities only): the print-support initiative — umbrella <a href="https://github.com/traverse-framework/registry/issues/596" target="_blank" rel="noopener">registry#596</a>, Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1540" target="_blank" rel="noopener">Discussion #1540</a>. Codecs, scorers, fins/braces, export gates — as governed capabilities. Not a product shell PR.</p>
+      <p>A living example of a domain pack (capabilities only): the print-support initiative. Umbrella <a href="https://github.com/traverse-framework/registry/issues/596" target="_blank" rel="noopener">registry#596</a>, Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1540" target="_blank" rel="noopener">Discussion #1540</a>. Codecs, scorers, fins/braces, export gates: as governed capabilities. Not a product shell PR.</p>
 
       <h2 id="deny-io">Deny-by-default I/O limits authority, not richness</h2>
 
@@ -62,7 +62,7 @@ const _body = `
 
       <h2 id="authoring">How to put a rule in a capability</h2>
 
-      <p>Usual path: plain English via the Claude skill <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener"><code>traverse-capability-author</code></a> — interview → registry check → contract → executable WASM → human-reviewed PR. Under the hood that still compiles Rust to WASM. You do not need to write Rust for the usual path.</p>
+      <p>Usual path: plain English via the Claude skill <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener"><code>traverse-capability-author</code></a>: interview → registry check → contract → executable WASM → human-reviewed PR. Under the hood that still compiles Rust to WASM. You do not need to write Rust for the usual path.</p>
 
       <p>More detail: <a href="/blog/you-dont-need-rust-to-publish-a-capability.html">You don't need Rust to publish a capability</a> and <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author in plain English?</a>.</p>
 
@@ -71,12 +71,12 @@ const _body = `
       <ul>
         <li>Not “Traverse is only tiny utils.”</li>
         <li>Not “leave domain logic in the host forever.”</li>
-        <li>Not a promise that every OS host or every I/O shape is shipped — check <a href="/platforms.html">Platforms</a> and <a href="/what-is-real-today.html">what is real today</a>.</li>
+        <li>Not a promise that every OS host or every I/O shape is shipped: check <a href="/platforms.html">Platforms</a> and <a href="/what-is-real-today.html">what is real today</a>.</li>
         <li>Not an invitation to invent a Python SDK or a second runtime. One shared <code>runtime.wasm</code>; Python shells out to the CLI today.</li>
       </ul>
 
       <div class="callout">
-        Prefer the Q&amp;A when you need a URL to quote. Prefer this post when you need the story. For the project direction in one scene, read the <a href="/blog/agent-freestyle-blocked.html">deny-demo blog</a> — agent freestyle → blocked, with a trace.
+        Prefer the Q&amp;A when you need a URL to quote. Prefer this post when you need the story. For the project direction in one scene, read the <a href="/blog/agent-freestyle-blocked.html">deny-demo blog</a>: agent freestyle → blocked, with a trace.
       </div>
 
     </article>
@@ -108,7 +108,7 @@ const _body = `
 
       <div class="sidebar-card sidebar-cta">
         <div class="sidebar-title">Cite the Q&amp;A</div>
-        <p>Capabilities hold non-UI rules. Hosts stay thin. Utilities teach the pipe — they are not the ceiling.</p>
+        <p>Capabilities hold non-UI rules. Hosts stay thin. Utilities teach the pipe. They are not the ceiling.</p>
         <a href="/questions/where-does-business-logic-live-in-traverse.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Where logic lives →</a>
       </div>
     </aside>
@@ -130,7 +130,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"Where business logic lives (hosts stay thin) — Traverse Blog"}
+  title={"Where business logic lives (hosts stay thin) | Traverse Blog"}
   description={"Narrative companion to the where-logic Q&A: non-UI domain rules in capabilities, hosts = UI + I/O, utilities ≠ ceiling, apps-not-ready ≠ leave logic in the host."}
   canonical={"https://traverse-framework.com/blog/where-business-logic-lives.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

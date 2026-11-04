@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do I contribute to Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Start from labeled help-wanted and good-first-issue tickets across traverse-framework, follow CONTRIBUTING.md in the core traverse repo, and open a focused PR. Current starter work includes TypeScript/Python consume examples, a small registry publish, and a claude-skills template fix — not inventing new placement targets from scratch.',
+      text: 'Start from labeled help-wanted and good-first-issue tickets across traverse-framework, follow CONTRIBUTING.md in the core traverse repo, and open a focused PR. Current starter work includes TypeScript/Python consume examples, a small registry publish, and a claude-skills template fix, not inventing new placement targets from scratch.',
     },
   }],
 });
@@ -29,7 +29,7 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>Traverse is open source (Apache-2.0). The useful first step is not inventing a new placement target from a blank page — it is picking a labeled ticket and shipping a small, reviewable change.</p>
+  <p>Traverse is open source (Apache-2.0). The useful first step is not inventing a new placement target from a blank page. It is picking a labeled ticket and shipping a small, reviewable change.</p>
 
   <h2>Start from labeled issues</h2>
   <p>Browse open tickets marked <code>help wanted</code> or <code>good first issue</code> across the org:</p>
@@ -39,15 +39,15 @@ const relatedLinks = [
   </ul>
   <p>A concrete starter batch (docs, examples, registry, site polish) lives here:</p>
   <ul>
-    <li><a href="https://github.com/traverse-framework/traverse/issues/1361" target="_blank" rel="noopener">traverse#1361</a> — minimal TypeScript consume of <code>traverse-embedder-web</code></li>
-    <li><a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> — honest Python CLI consume (real verbs)</li>
-    <li><a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485</a> — publish small <code>text.slugify</code> capability</li>
-    <li><a href="https://github.com/traverse-framework/claude-skills/issues/8" target="_blank" rel="noopener">claude-skills#8</a> — capability-author <code>use_cases</code> user-story format</li>
+    <li><a href="https://github.com/traverse-framework/traverse/issues/1361" target="_blank" rel="noopener">traverse#1361</a>: minimal TypeScript consume of <code>traverse-embedder-web</code></li>
+    <li><a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a>: honest Python CLI consume (real verbs)</li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485</a>: publish small <code>text.slugify</code> capability</li>
+    <li><a href="https://github.com/traverse-framework/claude-skills/issues/8" target="_blank" rel="noopener">claude-skills#8</a>: capability-author <code>use_cases</code> user-story format</li>
   </ul>
   <p>Comment on the issue before starting so two people do not duplicate the same PR. If an issue is already claimed or closed, pick another from the searches above.</p>
 
   <h2>Read the first-PR path</h2>
-  <p>Core repo expectations — CLA, branch hygiene, how to open a PR — are in <a href="https://github.com/traverse-framework/traverse/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">traverse/CONTRIBUTING.md</a>. Website and registry repos follow the same org governance; each has its own test command (<code>cargo test</code> / <code>npm test</code>).</p>
+  <p>Core repo expectations (CLA, branch hygiene, how to open a PR) are in <a href="https://github.com/traverse-framework/traverse/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">traverse/CONTRIBUTING.md</a>. Website and registry repos follow the same org governance; each has its own test command (<code>cargo test</code> / <code>npm test</code>).</p>
 
   <h2>What makes a good first PR</h2>
   <ul>
@@ -58,7 +58,7 @@ const relatedLinks = [
   </ul>
 
   <h2>What to ask about before building</h2>
-  <p>Large surface-area work — new placement executors, protocol changes, new crates — needs an issue or discussion first. Do not treat "placement target adapters" as the default first contribution; those are multi-PR platform projects. Open an issue, describe the gap, and wait for maintainer direction.</p>
+  <p>Large surface-area work (new placement executors, protocol changes, new crates) needs an issue or discussion first. Do not treat "placement target adapters" as the default first contribution; those are multi-PR platform projects. Open an issue, describe the gap, and wait for maintainer direction.</p>
 
   <h2>Pull request checklist</h2>
   <ul>

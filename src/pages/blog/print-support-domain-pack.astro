@@ -24,10 +24,10 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>When help-wanted says “apps are not ready,” cold readers sometimes hear “don’t bring real domain work.” That is the wrong hearing. Domain packs — related capabilities under one umbrella — are exactly in scope. The living example is the print-support pack: manufacturing-shaped rules as governed WASM, not a product shell PR.</p>
+      <p>When help-wanted says “apps are not ready,” cold readers sometimes hear “don’t bring real domain work.” That is the wrong hearing. Domain packs, related capabilities under one umbrella, are exactly in scope. The living example is the print-support pack: manufacturing-shaped rules as governed WASM, not a product shell PR.</p>
 
       <div class="callout">
-        Direction stays one loop: <strong>discover → execute → trace</strong>. The agent proposes; the runtime decides. Non-UI print rules belong in capabilities. Hosts stay thin — UI plus the I/O the capability is allowed to use.
+        Direction stays one loop: <strong>discover → execute → trace</strong>. The agent proposes; the runtime decides. Non-UI print rules belong in capabilities. Hosts stay thin: UI plus the I/O the capability is allowed to use.
       </div>
 
       <h2 id="what-the-pack-is">What the pack is</h2>
@@ -35,21 +35,21 @@ const _body = `
       <p>Umbrella <a href="https://github.com/traverse-framework/registry/issues/596" target="_blank" rel="noopener">registry#596</a> tracks eight one-capability tickets. Announcement: <a href="https://github.com/orgs/traverse-framework/discussions/1540" target="_blank" rel="noopener">Discussion #1540</a>. Citeable Q&amp;A: <a href="/questions/what-is-the-print-support-capability-pack.html">What is the print-support capability pack?</a>.</p>
 
       <ul>
-        <li><a href="https://github.com/traverse-framework/registry/issues/597" target="_blank" rel="noopener">#597</a> <code>print.mesh-parse</code> — STL/3MF bytes → mesh IR</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/598" target="_blank" rel="noopener">#598</a> <code>print.mesh-write</code> — mesh IR → STL/3MF bytes</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/599" target="_blank" rel="noopener">#599</a> <code>print.overhangs-analyze</code> — overhangs, bed reachability, fin-eligible features</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/600" target="_blank" rel="noopener">#600</a> <code>print.orientation-score</code> — load-aware orientation ranking</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/602" target="_blank" rel="noopener">#602</a> <code>print.fins-generate</code> — breakaway fin walls + tines</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/601" target="_blank" rel="noopener">#601</a> <code>print.sway-braces-generate</code> — tall-part sway braces + collision refuse</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/603" target="_blank" rel="noopener">#603</a> <code>print.export-gate</code> — allow/deny export before write</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/604" target="_blank" rel="noopener">#604</a> <code>print.bed-pad-generate</code> — bed pad under posed mesh</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/597" target="_blank" rel="noopener">#597</a> <code>print.mesh-parse</code>: STL/3MF bytes → mesh IR</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/598" target="_blank" rel="noopener">#598</a> <code>print.mesh-write</code>: mesh IR → STL/3MF bytes</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/599" target="_blank" rel="noopener">#599</a> <code>print.overhangs-analyze</code>: overhangs, bed reachability, fin-eligible features</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/600" target="_blank" rel="noopener">#600</a> <code>print.orientation-score</code>: load-aware orientation ranking</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/602" target="_blank" rel="noopener">#602</a> <code>print.fins-generate</code>: breakaway fin walls + tines</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/601" target="_blank" rel="noopener">#601</a> <code>print.sway-braces-generate</code>: tall-part sway braces + collision refuse</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/603" target="_blank" rel="noopener">#603</a> <code>print.export-gate</code>: allow/deny export before write</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/604" target="_blank" rel="noopener">#604</a> <code>print.bed-pad-generate</code>: bed pad under posed mesh</li>
       </ul>
 
       <p>None of these <code>print.*</code> capabilities are published yet. The tickets are the door. That is honesty, not a stall story.</p>
 
       <h2 id="apps-not-ready">“Apps not ready” ≠ no domain packs</h2>
 
-      <p>The phrase blocks product UI and application-shell PRs into capability repos. It does <strong>not</strong> block codecs, scorers, generators, or export gates. Packaging is one concern per PR — not a ceiling on how rich the rule can be.</p>
+      <p>The phrase blocks product UI and application-shell PRs into capability repos. It does <strong>not</strong> block codecs, scorers, generators, or export gates. Packaging is one concern per PR, not a ceiling on how rich the rule can be.</p>
 
       <p>Full phrasing: <a href="/questions/what-does-apps-not-ready-mean.html">What does “apps are not ready” mean?</a> Narrative companion: <a href="/blog/where-business-logic-lives.html">Where business logic lives (hosts stay thin)</a>.</p>
 
@@ -127,7 +127,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"Domain packs are in scope: print-support without an app rewrite — Traverse Blog"}
+  title={"Domain packs are in scope: print-support without an app rewrite | Traverse Blog"}
   description={"Print-support is a living manufacturing-shaped capability pack: discover→execute→trace, hosts stay thin, apps-not-ready ≠ no domain packs. None of the print.* capabilities are published yet."}
   canonical={"https://traverse-framework.com/blog/print-support-domain-pack.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

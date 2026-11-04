@@ -3,7 +3,7 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 import DocsSidebar from '@components/DocsSidebar.astro';
 ---
 
-<SubpageLayout title="WASM I/O Contract — Traverse Framework" description="The normative stdin/stdout JSON contract for WASM-backed capability execution in Traverse: how the runtime passes input, captures output, the deny-by-default execution boundary, and every failure mode." canonical="https://traverse-framework.com/docs/wasm-io-contract.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+<SubpageLayout title="WASM I/O Contract | Traverse Framework" description="The normative stdin/stdout JSON contract for WASM-backed capability execution in Traverse: how the runtime passes input, captures output, the deny-by-default execution boundary, and every failure mode." canonical="https://traverse-framework.com/docs/wasm-io-contract.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
   <div class="docs-layout">
     <DocsSidebar active="/docs/wasm-io-contract.html" />
     <main class="docs-content">
@@ -31,9 +31,9 @@ import DocsSidebar from '@components/DocsSidebar.astro';
         <h2 class="t-h2">Input contract</h2>
         <p class="t-body t-muted">The input payload is serialized with <code>serde_json</code> and written to stdin as UTF-8 JSON bytes. Authors should assume:</p>
         <ul>
-          <li>stdin contains exactly one JSON value — the governed runtime input</li>
+          <li>stdin contains exactly one JSON value: the governed runtime input</li>
           <li>the payload shape is defined by the approved capability contract, not by ad hoc host conventions</li>
-          <li>input is read from stdin only — not environment variables, files, or network bootstrapping</li>
+          <li>input is read from stdin only: not environment variables, files, or network bootstrapping</li>
         </ul>
         <p class="t-body t-muted">The runtime does not add framing, headers, or side-channel metadata around the JSON payload.</p>
       </section>
@@ -47,7 +47,7 @@ import DocsSidebar from '@components/DocsSidebar.astro';
           <li>the output shape must satisfy the capability's governed output contract</li>
         </ul>
         <p class="t-body t-muted">If stdout is not valid JSON, execution fails with <code>OutputDeserializationFailed</code>.</p>
-        <div class="callout"><strong>v0.10.1:</strong> the native executor accepts a WASI <code>proc_exit(0)</code> as successful completion — a capability that writes its JSON result and then exits cleanly now returns that result as intended. Nonzero process exits are still rejected. See the <a href="/changelog.html">changelog</a>.</div>
+        <div class="callout"><strong>v0.10.1:</strong> the native executor accepts a WASI <code>proc_exit(0)</code> as successful completion: a capability that writes its JSON result and then exits cleanly now returns that result as intended. Nonzero process exits are still rejected. See the <a href="/changelog.html">changelog</a>.</div>
       </section>
 
       <section class="doc-section">
@@ -64,7 +64,7 @@ import DocsSidebar from '@components/DocsSidebar.astro';
 
       <section class="doc-section">
         <h2 class="t-h2">Failure modes</h2>
-        <p class="t-body t-muted">The execution path fails explicitly — these are supported behaviors and should not be masked with fallback bootstrap logic — when:</p>
+        <p class="t-body t-muted">The execution path fails explicitly when any of the following happens. These are supported behaviors and should not be masked with fallback bootstrap logic:</p>
         <ul>
           <li>the resolved capability is not a WASM artifact</li>
           <li><code>wasm_binary_path</code> is missing</li>

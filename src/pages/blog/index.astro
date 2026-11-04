@@ -23,17 +23,17 @@ const posts = [
   { href: '/blog/you-dont-need-rust-to-publish-a-capability.html', title: "You don't need Rust to publish a Traverse capability", desc: 'Featured · Primary authoring is plain English via traverse-capability-author: interview, registry check, contract, WASM, human-reviewed PR. Under the hood still Rust→WASM.' },
   { href: '/blog/traverse-0-12-0-exact-ref-model-execute.html', title: 'Traverse v0.12.0: exact-ref model.execute', desc: 'Spec 138 / ADR-0074: host-staged model.execute for digest-pinned WASM model packages on native and browser wasm-cpu. crates.io and npm at 0.12.0.' },
   { href: '/blog/traverse-0-11-0-runtime-wasm.html', title: 'Traverse v0.11.0: one runtime.wasm, every host', desc: 'Nested-wasmi runtime.wasm convergence: native hosts and the browser embedder drive the same app-owned orchestrator. Bundles must ship runtime/runtime.wasm.' },
-  { href: '/blog/why-next-help-wanted-is-business-shaped.html', title: 'The next help-wanted batch is business-shaped — not more string utils', desc: 'Why the next labeled registry tickets are eligibility, pricing caps, authz, consent, risk, and content policy. Agents propose; governed capabilities decide. Issues #493–#507.' },
+  { href: '/blog/why-next-help-wanted-is-business-shaped.html', title: 'The next help-wanted batch is business-shaped, not more string utils', desc: 'Why the next labeled registry tickets are eligibility, pricing caps, authz, consent, risk, and content policy. Agents propose; governed capabilities decide. Issues #493–#507.' },
   { href: '/blog/traverse-0-10-2-verified-registry-mcp.html', title: 'Traverse v0.10.2: prepare once, then run offline', desc: 'Verified Registry preparation and Mode A/B MCP hosts so validate/register/activate can run from a host-owned cache. Compatibility-preserving for existing local callers.' },
-  { href: '/blog/first-external-contributor-door.html', title: 'The first external contributor door — without the hype', desc: 'Labeled one-PR help-wanted tickets, one external PR that overlapped a maintainer fix, and still-open doors. No star charts.' },
-  { href: '/blog/what-discover-proves.html', title: "What /discover proves — and what it doesn't", desc: 'A live registry pull, a deterministic structural plan, a human review gate, and governed WASM in your tab. What that browser flow actually proves — and the claims it refuses.' },
+  { href: '/blog/first-external-contributor-door.html', title: 'The first external contributor door, without the hype', desc: 'Labeled one-PR help-wanted tickets, one external PR that overlapped a maintainer fix, and still-open doors. No star charts.' },
+  { href: '/blog/what-discover-proves.html', title: "What /discover proves, and what it doesn't", desc: 'A live registry pull, a deterministic structural plan, a human review gate, and governed WASM in your tab. What that browser flow actually proves, and the claims it refuses.' },
   { href: '/blog/the-v1-gates-why-we-wont-call-this-done.html', title: "The v1.0 gates: why we won't call this done until it's actually done", desc: "Ten explicit, checkable requirements, not a date or a feeling. None are met as a complete set yet, and the roadmap says exactly which ones aren't." },
   { href: '/blog/what-a-governed-capability-buys-you.html', title: "What a governed capability buys you that a shared library doesn't", desc: 'A shared crate gets Rust callers code reuse with no ceremony. It breaks down the moment a non-Rust caller, or an audit requirement, shows up.' },
-  { href: '/blog/does-traverse-run-on-any-os-honest-answer.html', title: '"Does this work on any OS?" — the question I get the most, answered without the marketing gloss', desc: 'Full native support on Windows, macOS, and Linux, a real but scoped answer for the browser, and exactly why mobile is a different story.' },
-  { href: '/blog/same-binary-three-operating-systems.html', title: 'Same binary, three operating systems: what "write once" actually means', desc: 'What actually happens when a capability runs identically on Windows, macOS, and Linux — and what that claim honestly does not cover yet.' },
+  { href: '/blog/does-traverse-run-on-any-os-honest-answer.html', title: '"Does this work on any OS?". The question I get the most, answered without the marketing gloss', desc: 'Full native support on Windows, macOS, and Linux, a real but scoped answer for the browser, and exactly why mobile is a different story.' },
+  { href: '/blog/same-binary-three-operating-systems.html', title: 'Same binary, three operating systems: what "write once" actually means', desc: 'What actually happens when a capability runs identically on Windows, macOS, and Linux, and what that claim honestly does not cover yet.' },
   { href: '/blog/cross-platform-rarely-means-what-it-sounds-like.html', title: 'Why "cross-platform" rarely means what it sounds like', desc: 'Flutter, Electron, Tauri, React Native, and PWAs each mean something different by the word, and all of them are quieter about the logic layer underneath the UI.' },
   { href: '/blog/traverse-0-10-governed-composition.html', title: 'Traverse v0.10: governed composition, and what it means for AI-built software', desc: 'The runtime can now plan, schedule, run, and promote multi-capability workflows over MCP, and persist a durable, tamper-evident trace of what ran. An honest status report.' },
-  { href: '/blog/native-ios-runtime-foundation.html', title: 'Native iOS without a JIT: a hands-on feasibility proof', desc: 'A Swift app called a Rust wasmi interpreter, enforced host-owned memory and fuel limits, and ran clean on a physical iPhone — no JIT required.' },
+  { href: '/blog/native-ios-runtime-foundation.html', title: 'Native iOS without a JIT: a hands-on feasibility proof', desc: 'A Swift app called a Rust wasmi interpreter, enforced host-owned memory and fuel limits, and ran clean on a physical iPhone. No JIT required.' },
   { href: '/blog/ai-agents-need-contracts.html', title: 'AI agents need contracts, not just function definitions', desc: 'Function calling tells an agent what a tool does. It says nothing about what has to be true before or after it runs.' },
   { href: '/blog/logic-duplication.html', title: 'Why I stopped writing the same business logic four times', desc: 'The same pricing rule lived in the web app, the mobile app, the backend, and the AI pipeline. Each copy drifted.' },
   { href: '/blog/runtime-assumptions.html', title: 'The hidden cost of runtime assumptions', desc: 'Most bugs in business logic are not logic bugs. They are assumptions about the environment that turned out to be false.' },
@@ -42,7 +42,7 @@ const posts = [
 ];
 ---
 <SubpageLayout
-  title={"Blog — Traverse Framework"}
+  title={"Blog | Traverse Framework"}
   description={"Writing on contract-driven development, portable business logic, and the Traverse runtime."}
   canonical={"https://traverse-framework.com/blog.html"}
   crumbs={[{ label: "Home", href: "/" }]}
@@ -53,7 +53,7 @@ const posts = [
         <div class="page-hero-inner">
           <span class="section-label">Blog</span>
           <h1 class="t-h1">Notes on contract-driven development.</h1>
-          <p class="page-hero-sub">Direction first: agent freestyle → blocked, and skill-first authoring. Older posts are dated snapshots — prefer <a href="/what-is-real-today.html">what is real today</a> over Rust-era openings.</p>
+          <p class="page-hero-sub">Direction first: agent freestyle → blocked, and skill-first authoring. Older posts are dated snapshots: prefer <a href="/what-is-real-today.html">what is real today</a> over Rust-era openings.</p>
         </div>
       </div>
     </section>

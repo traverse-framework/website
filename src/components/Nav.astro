@@ -153,7 +153,7 @@ const { currentPath = '' } = Astro.props;
       <button class="nav-theme-btn" id="theme-btn" aria-label="Toggle theme">
         <span class="theme-icon" style="font-size:14px">☀</span>
       </button>
-      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub →</a>
+      <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">GitHub</a>
       <a href="/docs/quickstart.html" class="btn btn-primary btn-sm">Get started</a>
       <button class="nav-mobile-btn" id="nav-mobile-btn" aria-label="Menu">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -183,7 +183,7 @@ const { currentPath = '' } = Astro.props;
   <a href="/blog.html">Blog</a>
   <a href="/roadmap.html">Roadmap</a>
   <a href="/changelog.html">Changelog</a>
-  <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub →</a>
+  <a href="https://github.com/traverse-framework/traverse" target="_blank" rel="noopener">GitHub</a>
   <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem">Get started</a>
 </div>
 
@@ -238,7 +238,7 @@ const { currentPath = '' } = Astro.props;
 
   /* The homepage hero has a hardcoded-dark background regardless of theme
      (brand art). While the nav is transparent and sitting on top of it,
-     force light text — and the dark-ground logo mark — so light-mode's
+     force light text, and the dark-ground logo mark, so light-mode's
      variants don't vanish or mismatch against it. */
   :global(body.home) .nav:not(.scrolled) .nav-logo { color: #fdfaf1; }
   :global(body.home) .nav:not(.scrolled) .logo-mark-dark { display: block; }

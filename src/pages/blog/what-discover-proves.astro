@@ -11,7 +11,7 @@ const _body = `
       <span class="badge">Browser</span>
       <span class="badge">Governance</span>
     </div>
-    <h1 class="t-h1">What /discover proves — and what it doesn't</h1>
+    <h1 class="t-h1">What /discover proves, and what it doesn't</h1>
     <div class="post-byline">
       <span>By <strong>Enrico Piovesan</strong></span>
       <span>7 min read</span>
@@ -24,7 +24,7 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>We shipped a page on the site called <a href="/discover.html">/discover</a>. It looks like a product demo. It is one — but a narrow one on purpose. This post is the label on the jar: what that flow actually does in your browser, what it refuses to pretend, and why that refusal matters more than a prettier animation.</p>
+      <p>We shipped a page on the site called <a href="/discover.html">/discover</a>. It looks like a product demo. It is one, but a narrow one on purpose. This post is the label on the jar: what that flow actually does in your browser, what it refuses to pretend, and why that refusal matters more than a prettier animation.</p>
 
       <div class="callout">
         Short version: pick a structured goal → your browser pulls the live public registry, digests it, and a deterministic structural planner proposes a workflow → you review the field mappings → the local governed runtime executes the reviewed plan in your tab and returns a redacted per-node trace. No backend. No model. No fabricated success.
@@ -37,14 +37,14 @@ const _body = `
       <p>Concretely:</p>
 
       <ol>
-        <li><strong>Goal.</strong> You pick a structured target — not a free-text prompt. The goals on the page are authored examples of what the planner is allowed to aim at.</li>
+        <li><strong>Goal.</strong> You pick a structured target, not a free-text prompt. The goals on the page are authored examples of what the planner is allowed to aim at.</li>
         <li><strong>Discover.</strong> The browser fetches the public <code>catalog.json</code> from the live registry and builds a digest-verified snapshot of the capabilities in play.</li>
         <li><strong>Plan.</strong> A browser-local structural planner (Spec 1277) derives a candidate workflow from schema shape and declared relationships. It does not match on capability names, parse natural language, or call a model.</li>
-        <li><strong>Review.</strong> The proposal arrives with every field mapping marked <code>unconfirmed</code>. That is not UI decoration — the execute path is the only place that clears it.</li>
-        <li><strong>Execute.</strong> After you confirm, the local governed runtime validates the proposal against contracts and the snapshot binding, authorizes each node, runs the WASM offline through a minimal WASI shim, and returns a redacted trace (status and failure class per node — never raw payloads).</li>
+        <li><strong>Review.</strong> The proposal arrives with every field mapping marked <code>unconfirmed</code>. That is not UI decoration: the execute path is the only place that clears it.</li>
+        <li><strong>Execute.</strong> After you confirm, the local governed runtime validates the proposal against contracts and the snapshot binding, authorizes each node, runs the WASM offline through a minimal WASI shim, and returns a redacted trace (status and failure class per node, never raw payloads).</li>
       </ol>
 
-      <p>If the catalog cannot be retrieved, the snapshot cannot be verified, the planner rejects the inputs, a node is not authorized, or a node errors — you get that failure. The page does not catch-all and paint success.</p>
+      <p>If the catalog cannot be retrieved, the snapshot cannot be verified, the planner rejects the inputs, a node is not authorized, or a node errors. You get that failure. The page does not catch-all and paint success.</p>
 
       <h2 id="what-it-proves">What it proves</h2>
 
@@ -52,7 +52,7 @@ const _body = `
 
       <p><strong>1. Planning can be structural and deterministic.</strong> Given a registry snapshot and a structured target, the planner proposes a workflow from shape compatibility and declared event relationships, bounded to a small search. Same inputs, same plan. That is a weaker claim than "the system understands your intent," and a stronger claim than a hardcoded demo graph.</p>
 
-      <p><strong>2. A proposal is not authority.</strong> The browser proposes. The runtime decides. Until you confirm mappings and the local runtime authorizes each node, nothing has been endorsed. That split is the whole point of governed composition — including in a tab with no server behind it.</p>
+      <p><strong>2. A proposal is not authority.</strong> The browser proposes. The runtime decides. Until you confirm mappings and the local runtime authorizes each node, nothing has been endorsed. That split is the whole point of governed composition, including in a tab with no server behind it.</p>
 
       <p><strong>3. Browser-local execution can still be fail-closed.</strong> Digests, contracts, risk class, and redaction are enforced in-process. The public /discover surface only runs capabilities the host will authorize for this path (pure-read / deterministic). Drift or denial does not get rewritten into a happy path.</p>
 
@@ -64,7 +64,7 @@ const _body = `
         <li><strong>It is not an AI agent.</strong> No prompt, no LLM, no "the model chose these capabilities." If you need agent-driven composition, that is a different surface (MCP, skills, human review). /discover deliberately keeps the planner mechanical so you can see the governance boundary without a model in the loop.</li>
         <li><strong>It is not the browser becoming the runtime authority.</strong> The tab hosts the embedder and shows the proposal. Authorization and execution still go through the governed path. Copy that says otherwise would be false, and we have a truthfulness test that rejects that drift.</li>
         <li><strong>It is not a simulation with a real-looking UI.</strong> When execution runs, it runs real published WASM against real contracts from the registry snapshot. When it cannot, it says so.</li>
-        <li><strong>It is not "any goal, any capability."</strong> Goals are structured. Only a small risk class executes here. Schema-shape compatibility is not semantic correctness — that is why mappings stay unconfirmed until a human says go, and why a runtime-generated plan is a proposal until governance promotes it elsewhere.</li>
+        <li><strong>It is not "any goal, any capability."</strong> Goals are structured. Only a small risk class executes here. Schema-shape compatibility is not semantic correctness. That is why mappings stay unconfirmed until a human says go, and why a runtime-generated plan is a proposal until governance promotes it elsewhere.</li>
         <li><strong>It is not a productized multi-tenant backend.</strong> There is no Traverse server behind /discover. Your browser talks to the public catalog (and artifact mirrors) to prepare, then works offline for plan and execute. That is a feature for the demo's honesty, not a claim about how every production deploy will look.</li>
       </ul>
 
@@ -105,7 +105,7 @@ const _body = `
 
       <div class="sidebar-card sidebar-cta">
         <div class="sidebar-title">See it run</div>
-        <p>Live registry, structural plan, review gate, governed execute — in your tab.</p>
+        <p>Live registry, structural plan, review gate, governed execute: in your tab.</p>
         <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Open /discover →</a>
       </div>
     </aside>
@@ -126,8 +126,8 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"What /discover proves — and what it doesn't — Traverse Blog"}
-  description={"Pick a goal, get a structural plan from the live registry, review the mappings, then run governed WASM in your tab. What that browser flow actually proves — and the claims it refuses."}
+  title={"What /discover proves, and what it doesn't | Traverse Blog"}
+  description={"Pick a goal, get a structural plan from the live registry, review the mappings, then run governed WASM in your tab. What that browser flow actually proves, and the claims it refuses."}
   canonical={"https://traverse-framework.com/blog/what-discover-proves.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
 >

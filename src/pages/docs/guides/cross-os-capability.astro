@@ -22,9 +22,9 @@ const _docsAfter = `
         <span class="step-label">Build once</span>
       </div>
       <h2 class="t-h2" style="margin-bottom:0.75rem">Build the runtime and the example bundle</h2>
-      <p class="t-body t-muted" style="margin-bottom:1.25rem">These are the exact same three commands regardless of whether you're on Windows, macOS, or Linux. Nothing here branches on OS — there's no separate quickstart per platform, because there's nothing platform-specific to instruct.</p>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">These are the exact same three commands regardless of whether you're on Windows, macOS, or Linux. Nothing here branches on OS. There's no separate quickstart per platform, because there's nothing platform-specific to instruct.</p>
       <div class="terminal">
-        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">any OS — same three commands</span></div>
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">any OS: same three commands</span></div>
         <div class="terminal-body">
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> git clone https://github.com/traverse-framework/traverse.git</span></div>
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cd traverse</span></div>
@@ -36,7 +36,7 @@ const _docsAfter = `
           <div class="terminal-line"><span class="terminal-out">    Finished dev profile</span></div>
         </div>
       </div>
-      <p class="t-body t-muted" style="margin-top:1rem">Cargo and rustc are cross-platform build tooling by design — this is the same reason your Rust host binary doesn't need a Windows-specific or Linux-specific variant. The interesting part isn't this step; it's what happens next.</p>
+      <p class="t-body t-muted" style="margin-top:1rem">Cargo and rustc are cross-platform build tooling by design. This is the same reason your Rust host binary doesn't need a Windows-specific or Linux-specific variant. The interesting part isn't this step; it's what happens next.</p>
     </div>
 
     <div class="doc-step">
@@ -45,9 +45,9 @@ const _docsAfter = `
         <span class="step-label">Inspect the bundle</span>
       </div>
       <h2 class="t-h2" style="margin-bottom:0.75rem">Inspect the shipped capability bundle</h2>
-      <p class="t-body t-muted" style="margin-bottom:1.25rem">The expedition example ships as a registry bundle: a manifest, contracts, and WASM modules. Inspecting it shows you exactly what the runtime will load — the same output on every OS, because it's reading the same files.</p>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">The expedition example ships as a registry bundle: a manifest, contracts, and WASM modules. Inspecting it shows you exactly what the runtime will load: the same output on every OS, because it's reading the same files.</p>
       <div class="terminal">
-        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">any OS — identical output</span></div>
+        <div class="terminal-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="terminal-title">any OS: identical output</span></div>
         <div class="terminal-body">
           <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd"> cargo run -p traverse-cli-rs -- bundle inspect examples/expedition/registry-bundle/manifest.json</span></div>
           <div class="terminal-line"><span class="terminal-out"></span></div>
@@ -58,7 +58,7 @@ const _docsAfter = `
           <div class="terminal-line"><span class="terminal-out">  plan-expedition v1.0.0 ... valid</span></div>
         </div>
       </div>
-      <div class="info-box"><strong>Nothing here is OS-conditional.</strong> The manifest, the contracts, and the compiled WASM modules are plain files with no embedded platform assumptions — that's what makes step 3 unremarkable instead of requiring a rewrite.</div>
+      <div class="info-box"><strong>Nothing here is OS-conditional.</strong> The manifest, the contracts, and the compiled WASM modules are plain files with no embedded platform assumptions. That's what makes step 3 unremarkable instead of requiring a rewrite.</div>
     </div>
 
     <div class="doc-step">
@@ -67,15 +67,15 @@ const _docsAfter = `
         <span class="step-label">Run natively</span>
       </div>
       <h2 class="t-h2" style="margin-bottom:0.75rem">Run it through the native executor</h2>
-      <p class="t-body t-muted" style="margin-bottom:1.25rem">The native executor is Wasmtime-backed, and Wasmtime compiles the WASM module to native machine code for whichever host it's running on — a step that happens transparently, with no action required from you regardless of which OS you're on.</p>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">The native executor is Wasmtime-backed, and Wasmtime compiles the WASM module to native machine code for whichever host it's running on: a step that happens transparently, with no action required from you regardless of which OS you're on.</p>
       <div class="arch-diagram">
         <div><span class="arch-box">Your terminal (Windows, macOS, or Linux)</span></div>
         <div style="margin-left:2.5rem"><span class="arch-arrow">↓</span></div>
         <div style="margin-left:2.5rem"><span class="arch-box accent">traverse-runtime · NativeExecutor · WasmExecutor (Wasmtime)</span></div>
         <div style="margin-left:2.5rem"><span class="arch-arrow">↓</span></div>
-        <div style="margin-left:2.5rem"><span class="arch-box">plan-expedition.wasm — same binary on every host</span></div>
+        <div style="margin-left:2.5rem"><span class="arch-box">plan-expedition.wasm, same binary on every host</span></div>
       </div>
-      <p class="t-body t-muted">Follow the maintained repository quickstart for the exact run command for your setup — the point to notice is that the command itself doesn't fork by OS. If you have access to more than one operating system, running the identical command against the identical bundle is the fastest way to see this claim verified rather than asserted.</p>
+      <p class="t-body t-muted">Follow the maintained repository quickstart for the exact run command for your setup, the point to notice is that the command itself doesn't fork by OS. If you have access to more than one operating system, running the identical command against the identical bundle is the fastest way to see this claim verified rather than asserted.</p>
     </div>
 
     <div class="doc-step">
@@ -84,7 +84,7 @@ const _docsAfter = `
         <span class="step-label">Run in the browser</span>
       </div>
       <h2 class="t-h2" style="margin-bottom:0.75rem">Load the same bundle in a browser</h2>
-      <p class="t-body t-muted" style="margin-bottom:1.25rem">The Web embedder SDK loads the same bundle — not a rebuilt or re-exported version of it — and executes the WASM module directly in the browser's own WebAssembly host. This is the same digest-verified artifact the native executor ran in step 3.</p>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">The Web embedder SDK loads the same bundle, not a rebuilt or re-exported version of it, and executes the WASM module directly in the browser's own WebAssembly host. This is the same digest-verified artifact the native executor ran in step 3.</p>
       <div class="code-block">
         <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">load-in-browser.js (conceptual)</span></div>
         <div class="code-body"><span class="tok-key">import</span> { TraverseEmbedder } <span class="tok-key">from</span> <span class="tok-str">'traverse-embedder-web'</span>;
@@ -93,7 +93,7 @@ const _docsAfter = `
 <span class="tok-key">const</span> embedder = <span class="tok-key">await</span> TraverseEmbedder.<span class="tok-fn">init</span>(<span class="tok-str">'./bundles/expedition'</span>);
 <span class="tok-key">const</span> result = <span class="tok-key">await</span> embedder.<span class="tok-fn">submit</span>(<span class="tok-str">'plan-expedition'</span>, { destination: <span class="tok-str">'kilimanjaro'</span> });</div>
       </div>
-      <div class="info-box"><strong>Scope note:</strong> this in-browser path handles linear, directly-triggered pipelines — conditional and event-driven workflow edges aren't executed in-browser yet. See the <a href="/docs/guides/react-integration.html" style="color:var(--accent)">React integration guide</a> for the fuller, request/response pattern via the local <code>traverse-cli serve</code> HTTP/JSON API, which has no such scope limit.</div>
+      <div class="info-box"><strong>Scope note:</strong> this in-browser path handles linear, directly-triggered pipelines: conditional and event-driven workflow edges aren't executed in-browser yet. See the <a href="/docs/guides/react-integration.html" style="color:var(--accent)">React integration guide</a> for the fuller, request/response pattern via the local <code>traverse-cli serve</code> HTTP/JSON API, which has no such scope limit.</div>
     </div>
 
     <div class="doc-step">
@@ -102,7 +102,7 @@ const _docsAfter = `
         <span class="step-label">Confirm identical behavior</span>
       </div>
       <h2 class="t-h2" style="margin-bottom:0.75rem">Confirm it with the trace, not by eye</h2>
-      <p class="t-body t-muted" style="margin-bottom:1.25rem">Don't take "identical behavior" on faith — the trace artifact from each run tells you exactly what executed. Compare the <code>capability</code>, <code>version</code>, and <code>output</code> fields from a native run against a browser run with the same input; they should match exactly, because it's the same binary either way.</p>
+      <p class="t-body t-muted" style="margin-bottom:1.25rem">Don't take "identical behavior" on faith: the trace artifact from each run tells you exactly what executed. Compare the <code>capability</code>, <code>version</code>, and <code>output</code> fields from a native run against a browser run with the same input; they should match exactly, because it's the same binary either way.</p>
       <div class="code-block">
         <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">trace artifact (either host)</span></div>
         <div class="code-body"><span class="tok-section">{</span>
@@ -137,7 +137,7 @@ const _docsAfter = `
 `;
 ---
 <SubpageLayout
-  title="Write one capability, run it on Windows, macOS, Linux, and the browser — Traverse Docs"
+  title="Write one capability, run it on Windows, macOS, Linux, and the browser | Traverse Docs"
   description="A hands-on guide to the actual mechanism behind Traverse's OS portability: inspect a real bundle, run it natively, load the identical binary in a browser, and confirm the match from the trace instead of by eye."
   canonical="https://traverse-framework.com/docs/guides/cross-os-capability.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}

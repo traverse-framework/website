@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'When should a team NOT use Traverse for a cross-platform app?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: "When you need a native mobile UI shipped soon (Traverse has no UI layer; mobile embedders are working but not yet certified public releases), when the logic in question lives in exactly one place and is unlikely to need reuse, or when your platform target is mobile on a timeline that cannot wait for a certified release. Authoring no longer requires your team to write Rust if you use traverse-capability-author — but you still need willingness to review the PR the skill opens.",
+      text: "When you need a native mobile UI shipped soon (Traverse has no UI layer; mobile embedders are working but not yet certified public releases), when the logic in question lives in exactly one place and is unlikely to need reuse, or when your platform target is mobile on a timeline that cannot wait for a certified release. Authoring no longer requires your team to write Rust if you use traverse-capability-author, but you still need willingness to review the PR the skill opens.",
     },
   }],
 });
@@ -32,11 +32,11 @@ const relatedLinks = [
   <p>Most of this site makes the case for when Traverse fits. It's at least as useful to be specific about when it doesn't, since a mismatched tool costs more than a missing feature.</p>
 
   <ul>
-    <li><strong>You need a native mobile UI on a near-term timeline.</strong> Traverse has no UI layer at all, and its mobile embedders — Android, .NET/WinUI, and iOS — all have working runtime bridges but none is a certified public release yet. If mobile is the product, not just a future extension, a mobile-first UI framework is the right starting point today.</li>
-    <li><strong>You need a hand-written capability without reviewing a skill PR, and nobody will touch Rust.</strong> The plain-English path is the Claude skill <code>traverse-capability-author</code> (still Rust→WASM under the hood, human-reviewed PR). The manual path still expects Rust. If neither works for your team, stick to consuming existing capabilities — that needs no Rust.</li>
+    <li><strong>You need a native mobile UI on a near-term timeline.</strong> Traverse has no UI layer at all, and its mobile embedders (Android, .NET/WinUI, and iOS) all have working runtime bridges but none is a certified public release yet. If mobile is the product, not just a future extension, a mobile-first UI framework is the right starting point today.</li>
+    <li><strong>You need a hand-written capability without reviewing a skill PR, and nobody will touch Rust.</strong> The plain-English path is the Claude skill <code>traverse-capability-author</code> (still Rust→WASM under the hood, human-reviewed PR). The manual path still expects Rust. If neither works for your team, stick to consuming existing capabilities. That needs no Rust.</li>
     <li><strong>The logic genuinely lives in exactly one place.</strong> If a rule is never called from more than one runtime, never needs an audit trail, and isn't drifting because there's only one copy of it, the contract-authoring overhead buys you very little. <a href="/blog/logic-duplication.html">The case for Traverse</a> is specifically about logic that's duplicated or at risk of duplicating.</li>
-    <li><strong>Your target is a mobile platform, on a timeline that can't absorb waiting for a certified release.</strong> This is worth saying plainly rather than hoping it resolves in time — see <a href="/platforms.html">Platforms</a> for the actual, current status before committing a deadline to it.</li>
+    <li><strong>Your target is a mobile platform, on a timeline that can't absorb waiting for a certified release.</strong> This is worth saying plainly rather than hoping it resolves in time: see <a href="/platforms.html">Platforms</a> for the actual, current status before committing a deadline to it.</li>
   </ul>
 
-  <p>None of this is a knock on the project — a tool that's honest about its worst fit is more trustworthy about its best one.</p>
+  <p>None of this is a knock on the project: a tool that's honest about its worst fit is more trustworthy about its best one.</p>
 </QuestionLayout>

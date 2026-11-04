@@ -23,7 +23,7 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>The most common pushback I get on Traverse, from Rust teams specifically, is some version of: "couldn't I just put this in a shared crate?" It's a good question, and the honest answer is usually yes — right up until it isn't. Here's where the line actually sits.</p>
+      <p>The most common pushback I get on Traverse, from Rust teams specifically, is some version of: "couldn't I just put this in a shared crate?" It's a good question, and the honest answer is usually yes. Right up until it isn't. Here's where the line actually sits.</p>
 
       <h2 id="the-crate-case">The case for just using a crate</h2>
 
@@ -31,19 +31,19 @@ const _body = `
 
       <h2 id="where-it-breaks">Where it breaks down</h2>
 
-      <p>The crate approach starts to strain the moment a caller outside your Rust ecosystem needs the same logic. Your frontend is JavaScript. Someone wants to call the rule from Python for a data pipeline. An AI agent needs to invoke it as a tool. None of them can just <code>use</code> your crate. Each one now needs its own binding: an FFI layer, a WASM build of the crate compiled separately for that purpose, or a network service wrapping it — and you're maintaining integration surface per caller, which is exactly the duplication problem you were trying to avoid in the first place, just moved one level up.</p>
+      <p>The crate approach starts to strain the moment a caller outside your Rust ecosystem needs the same logic. Your frontend is JavaScript. Someone wants to call the rule from Python for a data pipeline. An AI agent needs to invoke it as a tool. None of them can just <code>use</code> your crate. Each one now needs its own binding: an FFI layer, a WASM build of the crate compiled separately for that purpose, or a network service wrapping it, and you're maintaining integration surface per caller, which is exactly the duplication problem you were trying to avoid in the first place, just moved one level up.</p>
 
       <p>There's a second, quieter problem even within an all-Rust system: a crate's public function signature is a type contract, not a behavioral one. Nothing stops a caller from passing a technically well-typed but semantically invalid input. Nothing records, later, what was actually passed and returned when something goes wrong in production. You get compile-time safety and approximately nothing at runtime.</p>
 
       <h2 id="what-changes">What a governed capability changes</h2>
 
-      <p>A Traverse capability compiles to WASM instead of a native crate, which sounds like a downgrade in a Rust-only world and is actually the thing that makes it callable from everywhere else — any WASM-hosting environment loads it through the same interface, with no per-language binding to maintain. The contract attached to it isn't just types; it's declared preconditions and postconditions the runtime actually checks on every call, and a trace artifact that records what happened, every time, without anyone remembering to add a log line.</p>
+      <p>A Traverse capability compiles to WASM instead of a native crate, which sounds like a downgrade in a Rust-only world and is actually the thing that makes it callable from everywhere else: any WASM-hosting environment loads it through the same interface, with no per-language binding to maintain. The contract attached to it isn't just types; it's declared preconditions and postconditions the runtime actually checks on every call, and a trace artifact that records what happened, every time, without anyone remembering to add a log line.</p>
 
-      <div class="callout">A shared crate answers "can multiple Rust services call this function." A governed capability answers "can I prove, after the fact, exactly what ran, with what inputs, and whether it was valid" — for any caller, in any language.</div>
+      <div class="callout">A shared crate answers "can multiple Rust services call this function." A governed capability answers "can I prove, after the fact, exactly what ran, with what inputs, and whether it was valid": for any caller, in any language.</div>
 
       <h2 id="the-real-tradeoff">The real tradeoff, stated plainly</h2>
 
-      <p>Writing a contract is more upfront work than writing a function signature. WASM sandboxing has real, measurable overhead compared to an in-process native call. Neither of those costs disappears because the benefits sound good. Pay them for the logic where drift, misuse, or an unexplained failure would actually cost you — pricing, eligibility, compliance, anything an AI agent might call unsupervised. Don't pay them for logic that's genuinely internal to one Rust service with no other callers in sight. Most systems have both kinds of logic in them; the skill is telling which is which before you've built four divergent copies of the wrong one.</p>
+      <p>Writing a contract is more upfront work than writing a function signature. WASM sandboxing has real, measurable overhead compared to an in-process native call. Neither of those costs disappears because the benefits sound good. Pay them for the logic where drift, misuse, or an unexplained failure would actually cost you: pricing, eligibility, compliance, anything an AI agent might call unsupervised. Don't pay them for logic that's genuinely internal to one Rust service with no other callers in sight. Most systems have both kinds of logic in them; the skill is telling which is which before you've built four divergent copies of the wrong one.</p>
 
     </article>
 
@@ -90,7 +90,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"What a governed capability buys you that a shared library doesn't — Traverse Blog"}
+  title={"What a governed capability buys you that a shared library doesn't | Traverse Blog"}
   description={"A shared crate gets Rust callers code reuse with no ceremony. It breaks down the moment a non-Rust caller, or an audit requirement, shows up. Here's exactly where that line sits."}
   canonical={"https://traverse-framework.com/blog/what-a-governed-capability-buys-you.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

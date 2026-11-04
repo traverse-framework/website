@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do I run the agent-blocked weekly demo?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Read the public blog write-up for the deny story (agent proposes; runtime decides). The runnable weekly-demos folder is not publicly cloneable yet — tracked in traverse-framework/.github#30. Do not invent a local path or assume git clone works.',
+      text: 'Read the public blog write-up for the deny story (agent proposes; runtime decides). The runnable weekly-demos folder is not publicly cloneable yet: tracked in traverse-framework/.github#30. Do not invent a local path or assume git clone works.',
     },
   }],
 });
@@ -35,7 +35,7 @@ const relatedLinks = [
   <p>The project direction in one scene: an agent freestyles a large wire; <code>core.authorize@1.2.0</code> denies; you get a trace. <strong>Discover → execute → trace.</strong> The agent proposes; the runtime decides.</p>
 
   <h2>What you can run today (public)</h2>
-  <p>Start with the write-up — that is the citeable public surface:</p>
+  <p>Start with the write-up. That is the citeable public surface:</p>
   <ul>
     <li><a href="/blog/agent-freestyle-blocked.html">The agent freestyled a $2.4M wire. The runtime said no.</a></li>
     <li>Follow-up multi-host scene: <a href="/blog/same-wasm-multi-host.html">Same WASM. Browser and Node match. Agent still can’t freestyle.</a></li>
@@ -43,7 +43,7 @@ const relatedLinks = [
   </ul>
 
   <h2>Runnable repo status</h2>
-  <p>The shared monorepo <code>traverse-framework/weekly-demos</code> holds dated runnable folders for maintainers, but it is <strong>not publicly cloneable yet</strong> (unauthenticated API returns 404). Do <strong>not</strong> follow old <code>git clone https://github.com/traverse-framework/weekly-demos.git</code> instructions — they hit a closed door. Visibility vs public docs is tracked in <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>. No public zip/mirror is published from this page; we will not invent one.</p>
+  <p>The shared monorepo <code>traverse-framework/weekly-demos</code> holds dated runnable folders for maintainers, but it is <strong>not publicly cloneable yet</strong> (unauthenticated API returns 404). Do <strong>not</strong> follow old <code>git clone https://github.com/traverse-framework/weekly-demos.git</code> instructions. They hit a closed door. Visibility vs public docs is tracked in <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>. No public zip/mirror is published from this page; we will not invent one.</p>
 
   <h2>What you should take away</h2>
   <p>Freestyle prose is not authority. A governed capability under discover → execute → trace is. When the runnable repo is public (or a published artifact replaces it), this page will say so explicitly.</p>

@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What does human review mean for a Traverse capability PR?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Human review means a person still has to read and merge the pull request before a capability becomes public. The Claude skill traverse-capability-author can draft the contract, produce executable WASM, and open the PR — it does not get a side-door upload. Reviewers check that the rule matches the contract, CI and coverage gates pass, artifact digests stay stable, and the capability is worth publishing (prefer business-shaped rules over generic utilities).',
+      text: 'Human review means a person still has to read and merge the pull request before a capability becomes public. The Claude skill traverse-capability-author can draft the contract, produce executable WASM, and open the PR. It does not get a side-door upload. Reviewers check that the rule matches the contract, CI and coverage gates pass, artifact digests stay stable, and the capability is worth publishing (prefer business-shaped rules over generic utilities).',
     },
   }],
 });
@@ -25,7 +25,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What does human review mean for a Traverse capability PR?"
-  description="A person still merges the PR. The skill can draft contract + WASM and open the PR — no side-door upload. Reviewers check rule fit, CI, digests, and whether it belongs in the catalog."
+  description="A person still merges the PR. The skill can draft contract + WASM and open the PR: no side-door upload. Reviewers check rule fit, CI, digests, and whether it belongs in the catalog."
   canonical="https://traverse-framework.com/questions/what-does-human-review-mean-for-a-capability-pr.html"
   category="Contracts and Capabilities"
   relatedLinks={relatedLinks}
@@ -38,7 +38,7 @@ const relatedLinks = [
 
   <h2>What a reviewer is actually checking</h2>
   <ul>
-    <li><strong>Does the contract match the rule?</strong> Inputs, outputs, fail-closed cases, and placement should describe the business behavior you meant — not a vague stub.</li>
+    <li><strong>Does the contract match the rule?</strong> Inputs, outputs, fail-closed cases, and placement should describe the business behavior you meant, not a vague stub.</li>
     <li><strong>Does CI pass?</strong> Registry PRs still hit coverage gates, digest checks, and the repo's pre-merge pipeline. Green checks are required; the skill does not waive them.</li>
     <li><strong>Are digests stable?</strong> <code>artifact.digest</code> / URL metadata has to survive review. Hand-edited digests usually fail for a reason.</li>
     <li><strong>Is this worth publishing?</strong> Prefer business-shaped rules agents should not free-hand (eligibility, pricing caps, authz, consent, risk, policy). Tiny utilities can teach the pipeline; they are not the ceiling. See the <a href="/blog/why-next-help-wanted-is-business-shaped.html">business-shaped help-wanted</a> write-up.</li>

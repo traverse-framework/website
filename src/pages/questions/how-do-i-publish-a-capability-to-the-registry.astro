@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'How do I publish a capability to the Traverse registry?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Primary path: author in plain English with the Claude skill traverse-capability-author, then land a human-reviewed PR in traverse-framework/registry. Secondary path: implement manually in Rust, meet coverage and CI gates, and use the documented publish path so artifact digests survive review. After merge, the capability appears in the next public catalog release — there is no side-door upload.',
+      text: 'Primary path: author in plain English with the Claude skill traverse-capability-author, then land a human-reviewed PR in traverse-framework/registry. Secondary path: implement manually in Rust, meet coverage and CI gates, and use the documented publish path so artifact digests survive review. After merge, the capability appears in the next public catalog release. There is no side-door upload.',
     },
   }],
 });
@@ -37,14 +37,14 @@ const relatedLinks = [
 >
   <p>The Traverse registry is a git repository with CI, not a free-form CDN. A capability becomes public when a pull request merges with a valid contract, a digest-addressed WASM artifact, and the publish metadata the pipeline expects.</p>
 
-  <h2>Primary path — plain English via the Claude skill</h2>
+  <h2>Primary path: plain English via the Claude skill</h2>
   <p>For most authors, start with <code>traverse-capability-author</code> in <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener">traverse-framework/claude-skills</a>. The skill interviews you, checks the registry, writes the contract, produces executable WASM, and opens a human-reviewed PR. You describe the business rule; you review the PR; you do not have to write the Rust yourself. Under the hood the implementation is still Rust→WASM. Details: <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a></p>
 
-  <h2>Secondary path — manual Rust in the registry repo</h2>
+  <h2>Secondary path: manual Rust in the registry repo</h2>
   <ol>
     <li>Work in <a href="https://github.com/traverse-framework/registry" target="_blank" rel="noopener">traverse-framework/registry</a>. Read <code>CONTRIBUTING.md</code> before scaffolding.</li>
     <li>Add the capability source (Rust tests included) and the contract that describes inputs, outputs, and placement expectations.</li>
-    <li>Use the documented <code>traverse-cli</code> capability publish / scaffold path so <code>artifact.digest</code> and <code>artifact.url</code> are produced correctly — hand-edited digests usually fail CI.</li>
+    <li>Use the documented <code>traverse-cli</code> capability publish / scaffold path so <code>artifact.digest</code> and <code>artifact.url</code> are produced correctly: hand-edited digests usually fail CI.</li>
     <li>Meet the coverage gates the registry enforces (function coverage at 100%, line/region thresholds in the CONTRIBUTING notes).</li>
     <li>Run the repo's pre-PR check script, open a PR with <code>## Governing Spec</code> and <code>## Validation</code> filled, and wait for CI.</li>
   </ol>
@@ -56,5 +56,5 @@ const relatedLinks = [
   <p>If you want a tiny first capability rather than inventing a domain model, see the labeled starter <a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485 (text.slugify)</a>. For business-shaped rules agents should not free-hand, see registry issues <a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493</a>–<a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507</a> and the <a href="/blog/why-next-help-wanted-is-business-shaped.html">help-wanted write-up</a>.</p>
 
   <h2>Offline AI admission before the Git write</h2>
-  <p>When the contract carries an <code>ai</code> attribution object, <code>traverse-cli capability publish</code> now rejects — offline, before any registry Git write — every rule registry CI would reject from the contract alone (Decision 109 / Spec 056 v1.1.0). It also keeps <code>ai</code> verbatim in the generated registry contract. Details: <a href="/questions/does-capability-publish-validate-model-attribution.html">Does capability publish validate model attribution before the registry write?</a></p>
+  <p>When the contract carries an <code>ai</code> attribution object, <code>traverse-cli capability publish</code> now rejects (offline, before any registry Git write) every rule registry CI would reject from the contract alone (Decision 109 / Spec 056 v1.1.0). It also keeps <code>ai</code> verbatim in the generated registry contract. Details: <a href="/questions/does-capability-publish-validate-model-attribution.html">Does capability publish validate model attribution before the registry write?</a></p>
 </QuestionLayout>

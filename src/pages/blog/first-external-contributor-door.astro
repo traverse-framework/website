@@ -10,7 +10,7 @@ const _body = `
       <span class="badge">Community</span>
       <span class="badge">Open source</span>
     </div>
-    <h1 class="t-h1">The first external contributor door — without the hype</h1>
+    <h1 class="t-h1">The first external contributor door, without the hype</h1>
     <div class="post-byline">
       <span>By <strong>Enrico Piovesan</strong></span>
       <span>6 min read</span>
@@ -23,12 +23,12 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>For a while, Traverse looked like a project you could only watch. Specs, CI gates, CLA, approved-governance — that machinery is real, and it also reads like a locked door if you are standing outside with a first PR in your head.</p>
+      <p>For a while, Traverse looked like a project you could only watch. Specs, CI gates, CLA, approved-governance. That machinery is real, and it also reads like a locked door if you are standing outside with a first PR in your head.</p>
 
       <p>This week we deliberately opened a small door. Not a "join the community" campaign. A few labeled tickets you can finish in one PR, with an honest done-when, and without inventing a new platform adapter from a blank page.</p>
 
       <div class="callout">
-        Short version: the door is <code>help wanted</code> / <code>good first issue</code> tickets with a one-PR ask. We already had a first external PR land in the overlap (MCP client configs). Timing meant a duplicate closed; the next picks are still open. That is the whole story — no star charts, no fake contributor counts.
+        Short version: the door is <code>help wanted</code> / <code>good first issue</code> tickets with a one-PR ask. We already had a first external PR land in the overlap (MCP client configs). Timing meant a duplicate closed; the next picks are still open. That is the whole story: no star charts, no fake contributor counts.
       </div>
 
       <h2 id="what-we-opened">What we opened</h2>
@@ -36,17 +36,17 @@ const _body = `
       <p>Four concrete asks, sized for a second person who has not memorized the repo:</p>
 
       <ul>
-        <li><a href="https://github.com/traverse-framework/traverse/issues/1361" target="_blank" rel="noopener">traverse#1361</a> — a tiny TypeScript consume of <code>traverse-embedder-web</code> (load → submit → print events).</li>
-        <li><a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> — an honest Python script that shells out to a <em>real</em> CLI verb against a checked-in package.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485</a> — publish a small <code>text.slugify</code> capability through the normal registry path.</li>
-        <li><a href="https://github.com/traverse-framework/claude-skills/issues/8" target="_blank" rel="noopener">claude-skills#8</a> — update the capability-author skill so new <code>use_cases</code> follow the full user-story format.</li>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1361" target="_blank" rel="noopener">traverse#1361</a>: a tiny TypeScript consume of <code>traverse-embedder-web</code> (load → submit → print events).</li>
+        <li><a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a>: an honest Python script that shells out to a <em>real</em> CLI verb against a checked-in package.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/485" target="_blank" rel="noopener">registry#485</a>: publish a small <code>text.slugify</code> capability through the normal registry path.</li>
+        <li><a href="https://github.com/traverse-framework/claude-skills/issues/8" target="_blank" rel="noopener">claude-skills#8</a>: update the capability-author skill so new <code>use_cases</code> follow the full user-story format.</li>
       </ul>
 
       <p>There is also an org-wide search if those four are taken: labeled <a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22help+wanted%22&amp;type=issues" target="_blank" rel="noopener">help wanted</a> and <a href="https://github.com/search?q=org%3Atraverse-framework+is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22&amp;type=issues" target="_blank" rel="noopener">good first issue</a>. The contribute FAQ on the site points at the same path.</p>
 
       <h2 id="what-happened-first">What happened first</h2>
 
-      <p>Before those tickets had been sitting long, someone from outside the maintainer set opened a PR with Cursor and Claude Desktop MCP launcher snippets — CLA signed, <code>stdio</code> made explicit, absolute binary path documented. Useful work. It closed as a duplicate because the same surface had already merged from the maintainer side in the same hour. That is not a failure of the door; it is what a busy overlap looks like when you finally make the ask concrete.</p>
+      <p>Before those tickets had been sitting long, someone from outside the maintainer set opened a PR with Cursor and Claude Desktop MCP launcher snippets: CLA signed, <code>stdio</code> made explicit, absolute binary path documented. Useful work. It closed as a duplicate because the same surface had already merged from the maintainer side in the same hour. That is not a failure of the door; it is what a busy overlap looks like when you finally make the ask concrete.</p>
 
       <p>We left a pointer at the still-open issues. Nobody has claimed #1361, #1362, or registry#485 yet as I write this. If you want the next first contribution, comment on one of those and take it.</p>
 
@@ -54,7 +54,7 @@ const _body = `
 
       <ul>
         <li><strong>Not a metrics launch.</strong> I am not going to invent a contributor graph or a "community momentum" number. One solid external PR attempt and a few open doors is the true state.</li>
-        <li><strong>Not "build us a placement target."</strong> Large platform work needs an issue and direction first. The first door is docs, examples, and one small registry publish — things you can validate locally without redesigning the runtime.</li>
+        <li><strong>Not "build us a placement target."</strong> Large platform work needs an issue and direction first. The first door is docs, examples, and one small registry publish: things you can validate locally without redesigning the runtime.</li>
         <li><strong>Not a lowering of the gates.</strong> CLA still applies. PR bodies still need <code>## Governing Spec</code> and <code>## Validation</code>. CI still has to go green. The door is small on purpose so the gates stay real.</li>
       </ul>
 
@@ -67,7 +67,7 @@ const _body = `
         <li>Run the local validation the ticket names. Open the PR. Wait for CI.</li>
       </ol>
 
-      <p>If something in the ticket is wrong — a CLI verb that drifted, a path that moved — say so in the PR. Correcting the ask is part of contributing. Inventing a parallel API is not.</p>
+      <p>If something in the ticket is wrong (a CLI verb that drifted, a path that moved) say so in the PR. Correcting the ask is part of contributing. Inventing a parallel API is not.</p>
 
       <div class="callout">
         I would rather have three boring, green, honest first PRs than one flashy demo that cannot be reproduced. The door is sized for the boring ones.
@@ -77,7 +77,7 @@ const _body = `
 
       <p>Because "we welcome contributions" is empty until there is a ticket with a done-when. And because the first person who tried already taught us the failure mode we care about: duplicate work when maintainer and outsider land on the same gap. Labeling the next gaps in public is how we avoid wasting the next person's evening.</p>
 
-      <p>If you only have ten minutes: open the help-wanted search, read one issue end to end, and decide whether the done-when is something you can finish this week. If yes, claim it. If not, leave it for someone else — that is also useful.</p>
+      <p>If you only have ten minutes: open the help-wanted search, read one issue end to end, and decide whether the done-when is something you can finish this week. If yes, claim it. If not, leave it for someone else. That is also useful.</p>
 
     </article>
 
@@ -125,8 +125,8 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"The first external contributor door — without the hype — Traverse Blog"}
-  description={"We labeled a few one-PR help-wanted tickets so a first external contributor has a real door — not a campaign, not fake metrics, and not a platform redesign from scratch."}
+  title={"The first external contributor door, without the hype | Traverse Blog"}
+  description={"We labeled a few one-PR help-wanted tickets so a first external contributor has a real door, not a campaign, not fake metrics, and not a platform redesign from scratch."}
   canonical={"https://traverse-framework.com/blog/first-external-contributor-door.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
 >

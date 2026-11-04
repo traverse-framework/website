@@ -28,7 +28,7 @@ const {
       <main class="q-main">
         <Breadcrumb crumbs={[...crumbs, { label: category }]} />
         <div class="t-label" style="margin-bottom:1rem">{category}</div>
-        <h1 class="q-title">{title.replace(' — Traverse Framework', '').replace(' — Traverse', '')}</h1>
+        <h1 class="q-title">{title.replace(' | Traverse Framework', '').replace(' | Traverse', '')}</h1>
         <div class="q-body">
           <slot />
         </div>
@@ -43,7 +43,7 @@ const {
         )}
         <div class="q-cta">
           <p>Ready to build with Traverse?</p>
-          <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart →</a>
+          <a href="/docs/quickstart.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center">Quickstart</a>
         </div>
       </aside>
     </div>

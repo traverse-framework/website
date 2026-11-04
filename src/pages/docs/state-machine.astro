@@ -3,7 +3,7 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 import DocsSidebar from '@components/DocsSidebar.astro';
 ---
 
-<SubpageLayout title="App State Machine — Traverse Framework" description="Reference for the runtime-owned state machine declared in a Traverse app manifest: states, invoke blocks, transitions, conditional routing, and the error events the runtime emits." canonical="https://traverse-framework.com/docs/state-machine.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+<SubpageLayout title="App State Machine | Traverse Framework" description="Reference for the runtime-owned state machine declared in a Traverse app manifest: states, invoke blocks, transitions, conditional routing, and the error events the runtime emits." canonical="https://traverse-framework.com/docs/state-machine.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
   <div class="docs-layout">
     <DocsSidebar active="/docs/state-machine.html" />
     <main class="docs-content">
@@ -33,7 +33,7 @@ import DocsSidebar from '@components/DocsSidebar.astro';
           <tbody>
             <tr><td><code>id</code></td><td>Unique, non-empty identifier for the state.</td></tr>
             <tr><td><code>invoke.capability_id</code></td><td>When present, the runtime invokes this capability on entry to the state. Must reference a capability provided by a component declared in the same app manifest.</td></tr>
-            <tr><td><code>invoke.input_from</code></td><td>Explicit source of the capability input. The first supported value is <code>command.payload</code> — the payload carried on the command event that entered the state.</td></tr>
+            <tr><td><code>invoke.input_from</code></td><td>Explicit source of the capability input. The first supported value is <code>command.payload</code>: the payload carried on the command event that entered the state.</td></tr>
             <tr><td><code>transitions[]</code></td><td>The events this state responds to and where each one leads.</td></tr>
           </tbody>
         </table>
@@ -48,7 +48,7 @@ import DocsSidebar from '@components/DocsSidebar.astro';
             <tr><td><code>on</code></td><td>Yes</td><td>The event that triggers the transition.</td></tr>
             <tr><td><code>to</code></td><td>Yes</td><td>The state to move to. Must be a declared state.</td></tr>
             <tr><td><code>condition</code></td><td>No</td><td>A predicate evaluated against capability output. See <a href="#conditional">Conditional transitions</a>.</td></tr>
-            <tr><td><code>with_last_payload</code></td><td>No</td><td>Defaults to <code>false</code>. When <code>true</code>, the transition re-uses the payload from the previous command instead of requiring a fresh one — used for <code>retry</code> into an <code>invoke</code> state.</td></tr>
+            <tr><td><code>with_last_payload</code></td><td>No</td><td>Defaults to <code>false</code>. When <code>true</code>, the transition re-uses the payload from the previous command instead of requiring a fresh one: used for <code>retry</code> into an <code>invoke</code> state.</td></tr>
           </tbody>
         </table>
       </section>
@@ -92,9 +92,9 @@ import DocsSidebar from '@components/DocsSidebar.astro';
   "to": "auto_approved"
 &#125;</code></pre>
         <ul>
-          <li><code>condition.field</code> — a non-empty dot path rooted at <code>output</code>.</li>
-          <li><code>condition.op</code> — one of the operators below.</li>
-          <li><code>condition.value</code> — required for every operator except <code>exists</code>.</li>
+          <li><code>condition.field</code>: a non-empty dot path rooted at <code>output</code>.</li>
+          <li><code>condition.op</code>: one of the operators below.</li>
+          <li><code>condition.value</code>: required for every operator except <code>exists</code>.</li>
         </ul>
         <table class="ref">
           <thead><tr><th>Operator</th><th>Matches when the field value…</th></tr></thead>
@@ -117,7 +117,7 @@ import DocsSidebar from '@components/DocsSidebar.astro';
           <li>An unconditional transition for the same event is a fallback, evaluated only after every conditional transition has failed to match.</li>
         </ol>
         <p class="t-body t-muted">If nothing matches a <code>capability_succeeded</code> event, the runtime emits a structured <code>no_matching_transition</code> error event and leaves the session state unchanged. If an operator cannot be evaluated because the output value and the condition value have incompatible types, it emits <code>condition_type_error</code> and likewise retains the invoking state. Both events carry the capability output and the execution identifiers so a client can diagnose the result without re-deriving routing.</p>
-        <div class="callout"><strong>Not in scope for the manifest slice.</strong> HTTP command-dispatch and state-subscription endpoints, multi-session listing semantics, and durable execution of state-machine sessions are governed by separate specs and surfaces — see the HTTP/JSON API spec.</div>
+        <div class="callout"><strong>Not in scope for the manifest slice.</strong> HTTP command-dispatch and state-subscription endpoints, multi-session listing semantics, and durable execution of state-machine sessions are governed by separate specs and surfaces: see the HTTP/JSON API spec.</div>
       </section>
 
       <div class="src-link">

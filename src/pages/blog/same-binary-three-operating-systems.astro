@@ -25,31 +25,31 @@ const _body = `
 
       <div class="callout"><strong>Dated note (Sep 2026):</strong> Parts of this post still read as if authors must write Rust themselves. That is no longer the usual path. Prefer the Claude skill <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener"><code>traverse-capability-author</code></a> (plain English to contract to WASM to human-reviewed PR). Manual Rust to WASM remains valid under the hood / as a secondary path. See <a href="/blog/you-dont-need-rust-to-publish-a-capability.html">You do not need Rust to publish a capability</a> and <a href="/what-is-real-today.html">What is real today</a>.</div>
 
-      <p>A teammate asked me last week whether Traverse "runs on any OS." I gave the honest answer, which took about four sentences and included the word "blocked" once. They looked a little disappointed. I get it — "yes, any OS" is a much better sentence than what I actually said. It's also not true for most tools that say it, and I'd rather be the tool that says the true thing.</p>
+      <p>A teammate asked me last week whether Traverse "runs on any OS." I gave the honest answer, which took about four sentences and included the word "blocked" once. They looked a little disappointed. I get it: "yes, any OS" is a much better sentence than what I actually said. It's also not true for most tools that say it, and I'd rather be the tool that says the true thing.</p>
 
       <p>So here's the actual mechanics of what happens when the same capability runs on Windows, macOS, and Linux, and why that part of the claim is one I'll make without hedging.</p>
 
       <h2 id="what-actually-runs">What actually runs</h2>
 
-      <p>You author a capability once (usual path: plain English via traverse-capability-author; manual path still Rust to WASM). You compile it to WebAssembly. That produces a single <code>.wasm</code> file — a binary instruction format, not machine code for any particular CPU or OS. <code>traverse-runtime</code> loads that file into a Wasmtime-backed <code>WasmExecutor</code>, validates the request against the capability's contract, runs it in a sandbox, checks the output against the contract's postconditions, and writes a trace.</p>
+      <p>You author a capability once (usual path: plain English via traverse-capability-author; manual path still Rust to WASM). You compile it to WebAssembly. That produces a single <code>.wasm</code> file: a binary instruction format, not machine code for any particular CPU or OS. <code>traverse-runtime</code> loads that file into a Wasmtime-backed <code>WasmExecutor</code>, validates the request against the capability's contract, runs it in a sandbox, checks the output against the contract's postconditions, and writes a trace.</p>
 
       <p>Every step of that is identical on Windows, macOS, and Linux, because none of it touches the host OS directly. The WASM sandbox doesn't see a filesystem, a network socket, or a thread unless the contract explicitly grants it and the host wires up the import. There's no "Windows build" of your capability and no <code>#[cfg(target_os = "linux")]</code> branch hiding somewhere. It's the same file, byte for byte, on all three.</p>
 
-      <div class="callout">This is also, not coincidentally, why the sandbox exists in the first place. The moment a capability starts making raw system calls, it stops being portable — the whole reason OS-independence holds is that the boundary between "my logic" and "the host" is explicit and narrow.</div>
+      <div class="callout">This is also, not coincidentally, why the sandbox exists in the first place. The moment a capability starts making raw system calls, it stops being portable: the whole reason OS-independence holds is that the boundary between "my logic" and "the host" is explicit and narrow.</div>
 
       <h2 id="not-magic">Why this isn't a Traverse trick</h2>
 
-      <p>I want to be clear this part isn't clever engineering on our side. It's what WebAssembly is for. Any conformant WASM runtime executes a given binary the same way, by design, regardless of the host it's embedded in. Traverse's job on top of that is the governance layer — the contract, the registry, the validation, the trace — not the portability itself. If you stripped Traverse away entirely and just ran raw <code>wasmtime run capability.wasm</code> on all three operating systems, you'd already get the same execution behavior. We're not reinventing that; we're making it safe to build a real system on top of.</p>
+      <p>I want to be clear this part isn't clever engineering on our side. It's what WebAssembly is for. Any conformant WASM runtime executes a given binary the same way, by design, regardless of the host it's embedded in. Traverse's job on top of that is the governance layer (the contract, the registry, the validation, the trace) not the portability itself. If you stripped Traverse away entirely and just ran raw <code>wasmtime run capability.wasm</code> on all three operating systems, you'd already get the same execution behavior. We're not reinventing that; we're making it safe to build a real system on top of.</p>
 
       <h2 id="what-i-wont-claim">What I won't claim next to this</h2>
 
-      <p>Here's the part that made my teammate less excited. "Runs on any OS" quietly implies "runs on your phone too," and that's not fully true yet, on either mobile platform, for different reasons. Android has a working Kotlin runtime bridge with no public release. iOS <em>was</em> blocked in the sense that mattered most — no WASM engine we'd evaluated exposed the resource-control APIs a certified native embedder needs to pass App Store review — but that engine question is resolved: a production <code>wasmi</code>-based bridge (<code>WasmiHostBridgeClient</code>, backed by the released <code>TraverseSwiftHost</code> XCFramework) enforces those controls on every call, verified on a physical iPhone. What's still missing for iOS is a certified public release and a shipped reference-app integration, not the engine.</p>
+      <p>Here's the part that made my teammate less excited. "Runs on any OS" quietly implies "runs on your phone too," and that's not fully true yet, on either mobile platform, for different reasons. Android has a working Kotlin runtime bridge with no public release. iOS <em>was</em> blocked in the sense that mattered most, no WASM engine we'd evaluated exposed the resource-control APIs a certified native embedder needs to pass App Store review, but that engine question is resolved: a production <code>wasmi</code>-based bridge (<code>WasmiHostBridgeClient</code>, backed by the released <code>TraverseSwiftHost</code> XCFramework) enforces those controls on every call, verified on a physical iPhone. What's still missing for iOS is a certified public release and a shipped reference-app integration, not the engine.</p>
 
       <p>I could stop mentioning that and let "any OS" imply more than it delivers. Plenty of tools do exactly that, and most people won't check until they've already built on the assumption. I'd rather lose the cleaner sentence and keep the trust.</p>
 
       <h2 id="the-actual-claim">The claim I'll actually make</h2>
 
-      <p>Write the capability once. It runs, unmodified, on Windows, macOS, and Linux, natively, today — and in the browser, through the Web embedder SDK, with its own honestly-scoped limits. That's real, it's shipped, and I'll say it plainly. Mobile is coming, at different speeds, for reasons outside our control on one of the two platforms. The full, evidence-linked status of every target — not a rounded-up version of it — lives on the <a href="/platforms.html">Platforms page</a>, and I'd rather you read that before you build on top of any of this than find out later.</p>
+      <p>Write the capability once. It runs, unmodified, on Windows, macOS, and Linux, natively, today, and in the browser, through the Web embedder SDK, with its own honestly-scoped limits. That's real, it's shipped, and I'll say it plainly. Mobile is coming, at different speeds, for reasons outside our control on one of the two platforms. The full, evidence-linked status of every target, not a rounded-up version of it, lives on the <a href="/platforms.html">Platforms page</a>, and I'd rather you read that before you build on top of any of this than find out later.</p>
 
     </article>
 
@@ -75,7 +75,7 @@ const _body = `
 
       <div class="sidebar-card sidebar-cta">
         <div class="sidebar-title">See the real matrix</div>
-        <p>Every platform, scored against a real crate or a real blocking issue — not a roadmap.</p>
+        <p>Every platform, scored against a real crate or a real blocking issue, not a roadmap.</p>
         <a href="/platforms.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Platform status →</a>
       </div>
     </aside>
@@ -96,7 +96,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"Same binary, three operating systems: what \"write once\" actually means — Traverse Blog"}
+  title={"Same binary, three operating systems: what \"write once\" actually means | Traverse Blog"}
   description={"What actually happens when a Traverse capability runs identically on Windows, macOS, and Linux, and an honest accounting of what that claim doesn't yet cover."}
   canonical={"https://traverse-framework.com/blog/same-binary-three-operating-systems.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

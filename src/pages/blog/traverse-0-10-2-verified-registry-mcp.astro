@@ -27,7 +27,7 @@ const _body = `
       <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.10.2">Traverse v0.10.2</a> is a compatibility-preserving cut on the v0.10 line. Existing local callers keep the same Rust crate APIs and the same <code>traverse-cli</code> binary name. What changed is how hosts touch the public Registry and how MCP hosts serve from that evidence.</p>
 
       <div class="callout">
-        Short version: prepare a signed Registry release into a host-owned cache under digest keys, then validate / register / activate — and Mode B MCP — from that cache alone. No fetch-at-activate. No ambient credentials in the checked-in fixture path.
+        Short version: prepare a signed Registry release into a host-owned cache under digest keys, then validate / register / activate, and Mode B MCP, from that cache alone. No fetch-at-activate. No ambient credentials in the checked-in fixture path.
       </div>
 
       <h2 id="why">Why this cut exists</h2>
@@ -43,7 +43,7 @@ const _body = `
       <ul>
         <li><code>app validate</code>, <code>app register</code>, and <code>app activate</code> consume prepared evidence only.</li>
         <li>They do not fetch from the Registry, replace an exact version, or substitute a local component path.</li>
-        <li>Cache integrity failures stay redacted. Operators get stable lifecycle outcomes — not endpoints, credentials, headers, cache paths, or raw artifact bytes.</li>
+        <li>Cache integrity failures stay redacted. Operators get stable lifecycle outcomes, not endpoints, credentials, headers, cache paths, or raw artifact bytes.</li>
       </ul>
 
       <p>The checked-in <code>inference.evidence-normalize@1.0.1</code> signed-release fixture proves exact-version validation, registration, and local activation from prepared cache bytes with no credential or private endpoint requirement.</p>
@@ -54,7 +54,7 @@ const _body = `
 
       <ul>
         <li><strong>Mode A</strong> (spec 119): a verified-registry MCP host over host-owned, verified public metadata.</li>
-        <li><strong>Mode B</strong>: <code>traverse-mcp prepare-cache</code> builds a host-owned verified registry cache from public <code>registry_ref</code> values. <code>traverse-mcp stdio --cache &lt;dir&gt;</code> then serves discover / validate / execute / report from that cache only — no expedition checkout, no App-References materialize rewrite.</li>
+        <li><strong>Mode B</strong>: <code>traverse-mcp prepare-cache</code> builds a host-owned verified registry cache from public <code>registry_ref</code> values. <code>traverse-mcp stdio --cache &lt;dir&gt;</code> then serves discover / validate / execute / report from that cache only: no expedition checkout, no App-References materialize rewrite.</li>
       </ul>
 
       <p>Pin and verify the same versioned <code>traverse-mcp</code> binary for both modes. crates.io packages for this cut are at <code>0.10.2</code>; npm <code>traverse-embedder-web@0.10.2</code> matches.</p>
@@ -72,7 +72,7 @@ const _body = `
 
       <h2 id="upgrade">What breaks if you skip the prep step</h2>
 
-      <p>Registry-backed <code>app validate</code> / <code>register</code> / <code>activate</code> now require the prepared host-owned cache. Legacy <code>serve</code> registrations without a persisted <code>state_machine</code> need an explicit <code>app register</code> refresh — you get <code>503 app_unavailable</code> / <code>app_registration_requires_refresh</code>, not a silent 404. If you consume <code>traverse-registry</code> directly, pin <code>=0.20.0</code>.</p>
+      <p>Registry-backed <code>app validate</code> / <code>register</code> / <code>activate</code> now require the prepared host-owned cache. Legacy <code>serve</code> registrations without a persisted <code>state_machine</code> need an explicit <code>app register</code> refresh. You get <code>503 app_unavailable</code> / <code>app_registration_requires_refresh</code>, not a silent 404. If you consume <code>traverse-registry</code> directly, pin <code>=0.20.0</code>.</p>
 
       <p>Full notes: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.10.2">GitHub Release</a> · <a href="/changelog.html">site changelog</a> · Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1391">#1391</a>.</p>
 
@@ -106,7 +106,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"Traverse v0.10.2: prepare once, then run offline — Traverse Blog"}
+  title={"Traverse v0.10.2: prepare once, then run offline | Traverse Blog"}
   description={"v0.10.2 lands verified Registry preparation and Mode A/B MCP hosts so validate/register/activate and MCP can run from a host-owned cache without fetch-at-activate."}
   canonical={"https://traverse-framework.com/blog/traverse-0-10-2-verified-registry-mcp.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

@@ -12,7 +12,7 @@ ul { list-style: none; }
    navy surfaces with cream ink; light theme = cream surfaces with navy
    ink. The accent swaps value per theme (lilac on navy, coronation
    violet on cream) because Coronation Blue lacks contrast on the navy
-   field. Derived tints must use color-mix() on these tokens — never a
+   field. Derived tints must use color-mix() on these tokens, never a
    new hardcoded color. */
 :root {
   /* Surface */
@@ -70,7 +70,7 @@ ul { list-style: none; }
   --ease:    cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Light mode — White Desert surfaces, Murky Depths ink. Code surfaces
+/* Light mode. White Desert surfaces, Murky Depths ink. Code surfaces
    stay navy-ink dark in both themes so terminals and code blocks read
    identically. */
 @media (prefers-color-scheme: light) {

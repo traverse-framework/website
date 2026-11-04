@@ -3,18 +3,18 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 import DocsSidebar from '@components/DocsSidebar.astro';
 ---
 
-<SubpageLayout title="App & Package Manifests — Traverse Framework" description="Field reference for the two Traverse manifest kinds: the app manifest (app.manifest.json) that describes an app bundle, and the capability package manifest that describes one executable WASM capability." canonical="https://traverse-framework.com/docs/app-manifest.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+<SubpageLayout title="App & Package Manifests | Traverse Framework" description="Field reference for the two Traverse manifest kinds: the app manifest (app.manifest.json) that describes an app bundle, and the capability package manifest that describes one executable WASM capability." canonical="https://traverse-framework.com/docs/app-manifest.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
   <div class="docs-layout">
     <DocsSidebar active="/docs/app-manifest.html" />
     <main class="docs-content">
       <div class="section-label">Reference</div>
       <h1 class="t-h1">App &amp; package manifests</h1>
-      <p class="t-body t-muted">Traverse has two manifest kinds. An <strong>app manifest</strong> (<code>app.manifest.json</code>) describes an app bundle — its components, workflows, configuration, placement policy, and optional state machine. A <strong>capability package manifest</strong> describes a single executable WASM capability: its contract, binary, and execution constraints.</p>
+      <p class="t-body t-muted">Traverse has two manifest kinds. An <strong>app manifest</strong> (<code>app.manifest.json</code>) describes an app bundle. Its components, workflows, configuration, placement policy, and optional state machine. A <strong>capability package manifest</strong> describes a single executable WASM capability: its contract, binary, and execution constraints.</p>
       <div class="badges"><span class="badge badge-success badge-dot">v0.10.1</span><span class="badge">schema_version 1.0.0</span></div>
 
       <section class="doc-section">
         <h2 class="t-h2">App manifest</h2>
-        <p class="t-body t-muted"><code>traverse-cli app new &lt;app-id&gt;</code> scaffolds a bundle with an <code>app.manifest.json</code>, a workspace config, component and workflow directories, and a README. <code>traverse-cli app validate</code>, <code>app register</code>, and <code>app activate</code> all consume this file — see the <a href="/docs/cli-reference.html#app">CLI reference</a>.</p>
+        <p class="t-body t-muted"><code>traverse-cli app new &lt;app-id&gt;</code> scaffolds a bundle with an <code>app.manifest.json</code>, a workspace config, component and workflow directories, and a README. <code>traverse-cli app validate</code>, <code>app register</code>, and <code>app activate</code> all consume this file: see the <a href="/docs/cli-reference.html#app">CLI reference</a>.</p>
         <table class="ref">
           <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
           <tbody>
@@ -75,7 +75,7 @@ import DocsSidebar from '@components/DocsSidebar.astro';
             <tr><td><code>known_compositions[]</code></td><td>Optional advisory list of <code>workflow_id</code> / <code>workflow_version</code> pairs the package participates in. Legacy <code>workflow_refs</code> is accepted only during the schema-v1 migration window.</td></tr>
             <tr><td><code>source</code></td><td>Colocated source: <code>path</code>, <code>language</code>, and <code>entry</code> symbol.</td></tr>
             <tr><td><code>binary</code></td><td>Colocated artifact: <code>path</code>, <code>format</code> (<code>wasm</code>), <code>expected_digest</code>, and <code>abi_version</code>.</td></tr>
-            <tr><td><code>constraints</code></td><td>Explicit execution limits: <code>host_api_access</code>, <code>network_access</code>, <code>filesystem_access</code>. The current WASM path is deny-by-default — see the <a href="/docs/wasm-io-contract.html">I/O contract</a>.</td></tr>
+            <tr><td><code>constraints</code></td><td>Explicit execution limits: <code>host_api_access</code>, <code>network_access</code>, <code>filesystem_access</code>. The current WASM path is deny-by-default: see the <a href="/docs/wasm-io-contract.html">I/O contract</a>.</td></tr>
             <tr><td><code>model_dependencies[]</code></td><td>Abstract model interfaces the implementation depends on, each with an <code>interface</code> name and a <code>purpose</code>.</td></tr>
           </tbody>
         </table>

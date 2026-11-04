@@ -36,7 +36,7 @@ const _body = `
 
       <p>A host asks the runtime to run a capability. The host does not become a second Traverse. Browser, native desktop, CLI, and MCP are clients of that same contract: UI and I/O around a rule that lives in the capability. The promise is that a capability means the same thing on every host that runs it through that ABI. The language you embedded from is not supposed to fork the rule.</p>
 
-      <p>The file name <code>runtime.wasm</code> shows up because the web path really does load a WASM orchestrator. People then generalize. They picture every package — npm, crates.io, Swift, Kotlin, .NET — dropping the same bytes on disk and dlopen-ing them. That picture is tidy. It is not how v0.14.0 is built. Two published paths already diverge, on purpose, and they still share the ABI.</p>
+      <p>The file name <code>runtime.wasm</code> shows up because the web path really does load a WASM orchestrator. People then generalize. They picture every package (npm, crates.io, Swift, Kotlin, .NET) dropping the same bytes on disk and dlopen-ing them. That picture is tidy. It is not how v0.14.0 is built. Two published paths already diverge, on purpose, and they still share the ABI.</p>
 
       <h2 id="web">The web path loads a file</h2>
 
@@ -70,7 +70,7 @@ const _body = `
 
       <h2 id="cite">What to cite</h2>
 
-      <p>If you need one sentence, use <a href="/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html">does the Rust embedder use the same runtime.wasm?</a> If you need the picture — web file, Rust link, capabilities still WASM, hosts still clients — you are already on it. <a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm?</a> is the shorter product definition. Platforms is the status page. When those three disagree with a slide, trust the Q&amp;A and Platforms.</p>
+      <p>If you need one sentence, use <a href="/questions/does-the-rust-embedder-use-the-same-runtime-wasm.html">does the Rust embedder use the same runtime.wasm?</a> If you need the picture (web file, Rust link, capabilities still WASM, hosts still clients) you are already on it. <a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm?</a> is the shorter product definition. Platforms is the status page. When those three disagree with a slide, trust the Q&amp;A and Platforms.</p>
 
     </article>
 
@@ -109,7 +109,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"One shared runtime. Not one shared .wasm file on every host. — Traverse Blog"}
+  title={"One shared runtime. Not one shared .wasm file on every host. | Traverse Blog"}
   description={"One product runtime and one host ABI, two loading paths. traverse-embedder-web@0.14.0 digest-checks the bundle's runtime.wasm. traverse-embedder@0.14.0 links traverse-runtime natively. Hosts stay clients."}
   canonical={"https://traverse-framework.com/blog/one-shared-runtime-two-loading-paths.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

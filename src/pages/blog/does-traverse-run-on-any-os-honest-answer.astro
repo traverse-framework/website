@@ -10,7 +10,7 @@ const _body = `
       <span class="badge">Honesty</span>
       <span class="badge">Platforms</span>
     </div>
-    <h1 class="t-h1">"Does this work on any OS?" — the question I get the most, answered without the marketing gloss</h1>
+    <h1 class="t-h1">"Does this work on any OS?": the question I get the most, answered without the marketing gloss</h1>
     <div class="post-byline">
       <span>By <strong>Enrico Piovesan</strong></span>
       <span>5 min read</span>
@@ -23,33 +23,33 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>Some version of "does Traverse work on any OS" comes up in almost every conversation I have about this project — GitHub issues, Discord, people I meet who ask what I've been building. It's a fair question, and it deserves a real answer instead of a slide with a checkmark next to five platform logos. So here's the one I actually give.</p>
+      <p>Some version of "does Traverse work on any OS" comes up in almost every conversation I have about this project: GitHub issues, Discord, people I meet who ask what I've been building. It's a fair question, and it deserves a real answer instead of a slide with a checkmark next to five platform logos. So here's the one I actually give.</p>
 
       <h2 id="short-answer">The short answer</h2>
 
-      <p>For native desktop — Windows, macOS, Linux — yes, unreservedly. Write a capability once, compile it to WASM, and <code>traverse-runtime</code>'s Wasmtime-backed executor runs the identical binary on all three. That's the most mature, most heavily used path through the project, and I'll say "yes" to that one without an asterisk.</p>
+      <p>For native desktop (Windows, macOS, Linux) yes, unreservedly. Write a capability once, compile it to WASM, and <code>traverse-runtime</code>'s Wasmtime-backed executor runs the identical binary on all three. That's the most mature, most heavily used path through the project, and I'll say "yes" to that one without an asterisk.</p>
 
-      <p>For the browser, also yes, with a real but honest scope: the Web embedder SDK loads a bundle, verifies it, and executes it directly in the browser's native WASM host. As of the last release there's a governed path for running a single verified capability and getting a trace receipt back. What it doesn't do yet is arbitrary conditional or event-driven workflow execution in-browser — linear, directly-triggered pipelines only, for now.</p>
+      <p>For the browser, also yes, with a real but honest scope: the Web embedder SDK loads a bundle, verifies it, and executes it directly in the browser's native WASM host. As of the last release there's a governed path for running a single verified capability and getting a trace receipt back. What it doesn't do yet is arbitrary conditional or event-driven workflow execution in-browser: linear, directly-triggered pipelines only, for now.</p>
 
       <p>For mobile, the honest answer is "not yet, and here's exactly why." That's the part most cross-platform marketing skips, so let me not skip it.</p>
 
       <h2 id="why-mobile-is-different">Why mobile gets a different answer</h2>
 
-      <p>Android has a real, working runtime bridge — built on Chicory, with bundle validation and lifecycle handling in place. What's missing is the reference-app integration and a public release, both tracked as open work, not vaporware.</p>
+      <p>Android has a real, working runtime bridge: built on Chicory, with bundle validation and lifecycle handling in place. What's missing is the reference-app integration and a public release, both tracked as open work, not vaporware.</p>
 
-      <p>iOS was the one that actually stopped me from saying "any OS" cleanly, and for a while that was a real, evidence-backed blocker: a formal screen of the available WASM engines — WasmKit, WAMR, Wasmtime, Wasmer — found none of them exposing the resource-control APIs a certified native embedder needs to pass App Store review.</p>
+      <p>iOS was the one that actually stopped me from saying "any OS" cleanly, and for a while that was a real, evidence-backed blocker: a formal screen of the available WASM engines (WasmKit, WAMR, Wasmtime, Wasmer) found none of them exposing the resource-control APIs a certified native embedder needs to pass App Store review.</p>
 
       <div class="callout">
-        <strong>Update:</strong> that engine blocker is resolved. The <code>wasmi</code> feasibility spike below was adopted the next day: ADR-0014 selected the <code>wasmi</code> Apple runtime profile and ADR-0015 governed a production Swift <code>wasmi</code> C ABI. <code>packages/swift/TraverseEmbedder</code> now ships a production <code>WasmiHostBridgeClient</code> backed by the released <code>TraverseSwiftHost</code> XCFramework, enforcing host-owned memory and fuel limits on every call — verified on a physical iPhone. What's still open is a certified public release and a shipped reference-app integration, not the engine question. See <a href="/platforms.html">Platforms</a> for the current, evidence-linked status.
+        <strong>Update:</strong> that engine blocker is resolved. The <code>wasmi</code> feasibility spike below was adopted the next day: ADR-0014 selected the <code>wasmi</code> Apple runtime profile and ADR-0015 governed a production Swift <code>wasmi</code> C ABI. <code>packages/swift/TraverseEmbedder</code> now ships a production <code>WasmiHostBridgeClient</code> backed by the released <code>TraverseSwiftHost</code> XCFramework, enforcing host-owned memory and fuel limits on every call: verified on a physical iPhone. What's still open is a certified public release and a shipped reference-app integration, not the engine question. See <a href="/platforms.html">Platforms</a> for the current, evidence-linked status.
       </div>
 
-      <p>The feasibility spike itself embedded the <code>wasmi</code> interpreter directly through a Rust static library and a narrow C bridge, with the host enforcing memory and fuel limits by hand, and it ran clean on a physical iPhone. I wrote up the full technical account separately — at the time it was a foundation for a future path; it's now the production bridge described above.</p>
+      <p>The feasibility spike itself embedded the <code>wasmi</code> interpreter directly through a Rust static library and a narrow C bridge, with the host enforcing memory and fuel limits by hand, and it ran clean on a physical iPhone. I wrote up the full technical account separately: at the time it was a foundation for a future path; it's now the production bridge described above.</p>
 
       <h2 id="why-i-answer-it-this-way">Why I keep answering it this way instead of rounding up</h2>
 
-      <p>It would be easier, in a pitch, to say "runs on any OS" and let the listener assume mobile is covered. Most people wouldn't check until they'd already started building. I've been on the other end of that kind of claim from other tools — the finding-out-later part is what actually costs you time and trust, not the narrower truth up front.</p>
+      <p>It would be easier, in a pitch, to say "runs on any OS" and let the listener assume mobile is covered. Most people wouldn't check until they'd already started building. I've been on the other end of that kind of claim from other tools: the finding-out-later part is what actually costs you time and trust, not the narrower truth up front.</p>
 
-      <p>So the answer stays specific: full support for Windows, macOS, and Linux, shipped. Real support for the browser, shipped with a stated scope. Real, working, unreleased code for Android and .NET/WinUI. A production, on-device-verified <code>wasmi</code> bridge for iOS, without a certified public release yet. Anyone can go check every one of those claims against the actual crates and issues on <a href="/platforms.html">the Platforms page</a> — it's the same page I link when someone asks me this in person.</p>
+      <p>So the answer stays specific: full support for Windows, macOS, and Linux, shipped. Real support for the browser, shipped with a stated scope. Real, working, unreleased code for Android and .NET/WinUI. A production, on-device-verified <code>wasmi</code> bridge for iOS, without a certified public release yet. Anyone can go check every one of those claims against the actual crates and issues on <a href="/platforms.html">the Platforms page</a>: it's the same page I link when someone asks me this in person.</p>
 
     </article>
 
@@ -95,7 +95,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"\"Does this work on any OS?\" — the honest answer — Traverse Blog"}
+  title={"\"Does this work on any OS?\": the honest answer | Traverse Blog"}
   description={"The question I get the most, answered without the marketing gloss: full native support on Windows, macOS, and Linux, honest scope on browser, and exactly why mobile is a different story."}
   canonical={"https://traverse-framework.com/blog/does-traverse-run-on-any-os-honest-answer.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

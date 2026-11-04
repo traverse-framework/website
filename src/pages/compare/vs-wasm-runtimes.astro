@@ -6,7 +6,7 @@ const _body = `
   <div class="container">
     <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
     <h1>Traverse vs. Raw WASM Runtimes (Wasmtime, WasmEdge, Wasmer)</h1>
-    <p class="compare-hero-lead">Wasmtime, WasmEdge, and Wasmer execute WASM binaries fast and portably across operating systems. Traverse isn't a competitor to them — it's built on top of Wasmtime specifically, adding the contract, registry, and trace layer a raw runtime deliberately doesn't provide.</p>
+    <p class="compare-hero-lead">Wasmtime, WasmEdge, and Wasmer execute WASM binaries fast and portably across operating systems. Traverse isn't a competitor to them. It's built on top of Wasmtime specifically, adding the contract, registry, and trace layer a raw runtime deliberately doesn't provide.</p>
   </div>
 </section>
 
@@ -24,15 +24,15 @@ const _body = `
 
   <div class="content-section" id="what-runtimes-solve">
     <h2>What a WASM runtime solves</h2>
-    <p>Wasmtime, WasmEdge, and Wasmer all solve the same core problem: take a <code>.wasm</code> binary and execute it, fast, safely, and identically regardless of the host OS. They differ in focus — Wasmtime is the Bytecode Alliance's reference-grade, standards-first implementation; WasmEdge targets edge and cloud-native workloads with extensions for AI inference; Wasmer emphasizes broad language embedding and its own package registry. All three are genuinely excellent at running a WASM binary correctly and quickly.</p>
-    <p>None of them, by design, know or care what the binary they're running is supposed to do, what inputs are valid, or what should be true when it finishes. That's out of scope for a runtime — it's an execution engine, not a governance layer.</p>
+    <p>Wasmtime, WasmEdge, and Wasmer all solve the same core problem: take a <code>.wasm</code> binary and execute it, fast, safely, and identically regardless of the host OS. They differ in focus: Wasmtime is the Bytecode Alliance's reference-grade, standards-first implementation; WasmEdge targets edge and cloud-native workloads with extensions for AI inference; Wasmer emphasizes broad language embedding and its own package registry. All three are genuinely excellent at running a WASM binary correctly and quickly.</p>
+    <p>None of them, by design, know or care what the binary they're running is supposed to do, what inputs are valid, or what should be true when it finishes. That's out of scope for a runtime. It's an execution engine, not a governance layer.</p>
   </div>
 
   <div class="content-section" id="what-traverse-adds">
     <h2>What Traverse adds on top</h2>
-    <p>Traverse doesn't replace a WASM runtime — <code>traverse-runtime</code>'s native executor is built on Wasmtime specifically. What Traverse adds sits above that execution layer: a machine-readable contract describing a capability's inputs, outputs, preconditions, and postconditions; a registry that makes capabilities discoverable by contract rather than by hardcoded import; and a trace artifact recording what happened on every single execution — what ran, what was validated, what the result was.</p>
+    <p>Traverse doesn't replace a WASM runtime: <code>traverse-runtime</code>'s native executor is built on Wasmtime specifically. What Traverse adds sits above that execution layer: a machine-readable contract describing a capability's inputs, outputs, preconditions, and postconditions; a registry that makes capabilities discoverable by contract rather than by hardcoded import; and a trace artifact recording what happened on every single execution. What ran, what was validated, what the result was.</p>
     <p>Where Wasmtime answers "run this binary correctly," Traverse answers "was this specific execution allowed, valid, and auditable." Different layer, same underlying binary.</p>
-    <div class="highlight-callout"><strong>The distinction:</strong> a raw runtime is infrastructure. Traverse is what you'd build on top of that infrastructure if you needed enforced correctness and an audit trail — which most direct <code>wasmtime run</code> use cases don't need, and most governed business-logic systems do.</div>
+    <div class="highlight-callout"><strong>The distinction:</strong> a raw runtime is infrastructure. Traverse is what you'd build on top of that infrastructure if you needed enforced correctness and an audit trail: which most direct <code>wasmtime run</code> use cases don't need, and most governed business-logic systems do.</div>
   </div>
 
   <div class="content-section" id="key-differences">
@@ -47,7 +47,7 @@ const _body = `
         </tr>
         <tr>
           <td>Input/output validation</td>
-          <td>None — the runtime executes whatever the binary's exported functions accept</td>
+          <td>None: the runtime executes whatever the binary's exported functions accept</td>
           <td class="highlight">Enforced against a declared JSON Schema contract before and after execution</td>
         </tr>
         <tr>
@@ -57,7 +57,7 @@ const _body = `
         </tr>
         <tr>
           <td>Execution record</td>
-          <td>None built in — whatever your own code logs</td>
+          <td>None built in: whatever your own code logs</td>
           <td class="highlight">A structured trace artifact per execution: capability, version, validation results, timing</td>
         </tr>
         <tr>
@@ -82,7 +82,7 @@ const _body = `
         <ul>
           <li>You're building your own governance or plugin system from scratch</li>
           <li>You need fine-grained control over host imports and resource limits that a higher-level layer would abstract away</li>
-          <li>The workload doesn't need a contract, a registry, or a trace — just fast, sandboxed execution</li>
+          <li>The workload doesn't need a contract, a registry, or a trace, just fast, sandboxed execution</li>
         </ul>
       </div>
       <div class="when-card accent-border">
@@ -90,7 +90,7 @@ const _body = `
         <ul>
           <li>You want contract enforcement and traces without building that layer yourself on top of Wasmtime</li>
           <li>Multiple callers (an app, a backend, an AI agent) need to discover and invoke the same governed capability</li>
-          <li>A rule needs to be auditable — what ran, with what inputs, under which contract version</li>
+          <li>A rule needs to be auditable: what ran, with what inputs, under which contract version</li>
         </ul>
       </div>
     </div>
@@ -98,7 +98,7 @@ const _body = `
 
   <div class="content-section" id="verdict">
     <h2>The verdict</h2>
-    <p>This isn't really a choice between alternatives — it's a choice about which layer of the stack you're working at. If you're building infrastructure and want direct control over WASM execution, use Wasmtime, WasmEdge, or Wasmer directly; they're excellent at exactly that. If you're building a business system and want contracts, discovery, and audit trails without reimplementing that layer yourself, Traverse gives you that on top of Wasmtime rather than instead of it.</p>
+    <p>This isn't really a choice between alternatives. It's a choice about which layer of the stack you're working at. If you're building infrastructure and want direct control over WASM execution, use Wasmtime, WasmEdge, or Wasmer directly; they're excellent at exactly that. If you're building a business system and want contracts, discovery, and audit trails without reimplementing that layer yourself, Traverse gives you that on top of Wasmtime rather than instead of it.</p>
   </div>
 
   <div class="compare-nav">

@@ -11,7 +11,7 @@ test('/discover states the mechanism honestly and cannot drift back into over-cl
   const graph = await read('src/scripts/discover-graph.js');
 
   // --- What the page claims it does ---
-  assert.match(page, /Watch a goal get planned and executed — for real\./);
+  assert.match(page, /Watch a goal get planned and executed, for real\./);
   assert.match(page, /deterministic structural planner/i);
   assert.match(page, /no capability-name matching, no natural language, and no model/i);
   assert.match(page, /no backend, no simulation/i);

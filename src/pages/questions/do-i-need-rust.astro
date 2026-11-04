@@ -18,7 +18,7 @@ const jsonLd = JSON.stringify({
     name: 'Do I need to know Rust to use Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'No for the usual paths. You can author new capabilities in plain English with the official Claude skill traverse-capability-author (interview → registry check → contract → executable WASM → human-reviewed PR); under the hood that still compiles Rust to WASM. Manual authoring in the repo still expects Rust. Consuming capabilities needs no Rust — npm traverse-embedder-web for JS/TS, or traverse-cli via subprocess for Python (no Python SDK).',
+      text: 'No for the usual paths. You can author new capabilities in plain English with the official Claude skill traverse-capability-author (interview → registry check → contract → executable WASM → human-reviewed PR); under the hood that still compiles Rust to WASM. Manual authoring in the repo still expects Rust. Consuming capabilities needs no Rust: npm traverse-embedder-web for JS/TS, or traverse-cli via subprocess for Python (no Python SDK).',
     },
   }],
 });
@@ -33,15 +33,15 @@ const jsonLd = JSON.stringify({
 >
   <p>Short answer: <strong>no</strong> for the usual paths. You can author new capabilities in plain English, and you can consume existing ones without touching Rust. Rust only shows up if you choose the manual author path yourself.</p>
 
-  <h2>Author in plain English — Claude skill</h2>
+  <h2>Author in plain English: Claude skill</h2>
   <p>The official skill <code>traverse-capability-author</code> in <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">traverse-framework/claude-skills</a> is the LLM-assisted on-ramp. It interviews you one question at a time, checks the public (and any private) registry so you do not duplicate something that already exists, writes a JSON-Schema-backed contract, produces genuinely executable ABI-compliant WASM, and opens a human-reviewed PR. You describe the business rule in plain English; you do not have to write the Rust.</p>
 
   <p>Under the hood the implementation is still Rust compiled to WASM. That is what gives you determinism, sandboxing, and portability across native hosts and the browser. The skill owns that step so you do not have to.</p>
 
-  <h2>Consume — no Rust required</h2>
-  <p>If someone else already published the capability, you call it without writing Rust. JavaScript and TypeScript use the published npm package <code>traverse-embedder-web</code>. Python today shells out to <code>traverse-cli</code> with the real verb <code>capability-package execute</code> (stdlib <code>subprocess</code>) — there is no shipped Python SDK. See <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> for the example ticket.</p>
+  <h2>Consume: no Rust required</h2>
+  <p>If someone else already published the capability, you call it without writing Rust. JavaScript and TypeScript use the published npm package <code>traverse-embedder-web</code>. Python today shells out to <code>traverse-cli</code> with the real verb <code>capability-package execute</code> (stdlib <code>subprocess</code>). There is no shipped Python SDK. See <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> for the example ticket.</p>
 
-  <h2>Manual author path — Rust expected</h2>
+  <h2>Manual author path: Rust expected</h2>
   <p>If you write capabilities yourself in the repo (without the skill), that still expects Rust: implement the logic, attach the contract metadata, and compile to <code>wasm32-wasip1</code>. The expedition planning example is a good reference for that path.</p>
 
   <h2>What you need in each role</h2>

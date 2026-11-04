@@ -24,7 +24,7 @@ const _body = `
 
     <article class="post-prose">
 
-      <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">Traverse v0.12.0</a> ships Spec <code>138-governed-exact-model-execution</code> / ADR-0074: host-staged <code>model.execute</code> for WASM model packages an app has pinned by digest — never by a naked URL.</p>
+      <p><a href="https://github.com/traverse-framework/traverse/releases/tag/v0.12.0">Traverse v0.12.0</a> ships Spec <code>138-governed-exact-model-execution</code> / ADR-0074: host-staged <code>model.execute</code> for WASM model packages an app has pinned by digest, never by a naked URL.</p>
 
       <div class="callout">
         Short version: declare <code>exact_model_dependencies</code>, stage tensors through opaque refs, call Spec 137 <code>model.execute</code>, and get fail-closed pin / digest / policy checks on native and browser <code>wasm-cpu</code>. Same envelopes. No provider authority fields on the payload.
