@@ -35,8 +35,8 @@ const relatedLinks = [
   <p>In Traverse, composition can come from MCP, from a structural planner, or from a human-authored workflow. Regardless of source, execution goes through the runtime: validate inputs, authorize each capability version, run the WASM under sandbox constraints, and emit a trace of what actually ran. If a node is not allowed, the path fails closed instead of painting success.</p>
 
   <h2>What shipped in v0.10</h2>
-  <p>The v0.10 line added plan / schedule / run / promote surfaces for multi-capability workflows over MCP, with a durable, tamper-evident trace. That is governed composition on the native/MCP path. The public <a href="/discover.html">/discover</a> page is a narrower browser sibling: live registry snapshot, structural plan, unconfirmed mappings until you confirm, local execute, redacted per-node trace — still proposal-first.</p>
+  <p>The v0.10 line added plan / schedule / run / promote surfaces for multi-capability workflows over MCP, with a durable, tamper-evident trace. That is governed composition on the native/MCP path. The public <a href="/discover.html">/discover</a> page is a narrower browser sibling: live registry snapshot, structural plan, unconfirmed mappings until you confirm, local execute, redacted per-node trace. Still proposal-first.</p>
 
   <h2>What it is not</h2>
-  <p>Governed composition is not "the model is in charge." It is not a guarantee that a structural plan is semantically correct — schema shape compatibility is weaker than business intent, which is why review gates and promotion exist. And it is not a claim that every host (browser, mobile, edge) exposes the full MCP composition surface yet; check the platforms page for what is actually shipping where.</p>
+  <p>Governed composition is not "the model is in charge." It is not a guarantee that a structural plan is semantically correct: schema shape compatibility is weaker than business intent, which is why review gates and promotion exist. And it is not a claim that every host (browser, mobile, edge) exposes the full MCP composition surface yet; check the platforms page for what is actually shipping where.</p>
 </QuestionLayout>

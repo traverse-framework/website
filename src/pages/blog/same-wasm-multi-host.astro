@@ -26,7 +26,7 @@ const _body = `
 
       <p>Traverse <strong>v0.13.0</strong> is the multi-host cut. The Friday demo is not a pricing explainer and not a hand WASI shim. It is the same published <code>core.authorize@1.2.0</code> bytes deciding a treasury wire on more than one host.</p>
 
-      <p>Ops agent Atlas proposes a <strong>$2.4M</strong> wire. Role: <code>junior_analyst</code>. Action: <code>payments.transfer</code>. The pinned capability answers <code>deny</code> / <code>no_matching_rule</code>. Swap the role to <code>treasury_ops</code> with the same amount and action — <code>allow</code>, with MFA and dual-control obligations attached. The money still does not move until those obligations are satisfied. Agent proposes; runtime decides.</p>
+      <p>Ops agent Atlas proposes a <strong>$2.4M</strong> wire. Role: <code>junior_analyst</code>. Action: <code>payments.transfer</code>. The pinned capability answers <code>deny</code> / <code>no_matching_rule</code>. Swap the role to <code>treasury_ops</code> with the same amount and action: <code>allow</code>, with MFA and dual-control obligations attached. The money still does not move until those obligations are satisfied. Agent proposes; runtime decides.</p>
 
       <div class="callout">
         Short version: identical <code>authorize.wasm</code> and matching deny/allow decisions on Browser and Node. Column three is a digest + decision fingerprint for Swift / .NET / Kotlin hosts that ship in 0.13 but are not run on this Linux demo box. Discover → execute → trace.
@@ -36,7 +36,7 @@ const _body = `
 
       <figure class="post-figure">
         <img src="/assets/img/blog/same-wasm-multi-host-2026-09-25/01-landing-multi-host.webp" alt="Multi-host demo landing UI with Browser, Node, and digest fingerprint columns for core.authorize" width="1400" height="1100" loading="lazy" />
-        <figcaption>Landing: three columns — Browser, Node, and digest fingerprint — around the same <code>core.authorize@1.2.0</code> wire story.</figcaption>
+        <figcaption>Landing: three columns (Browser, Node, and digest fingerprint) around the same <code>core.authorize@1.2.0</code> wire story.</figcaption>
       </figure>
 
       <h2 id="why-it-matters">Why same-bytes matters</h2>
@@ -64,7 +64,7 @@ const _body = `
           </thead>
           <tbody>
             <tr><td>1</td><td>Browser</td><td><code>traverse-embedder-web@0.13.0</code> <code>BundleEmbedder</code> + <code>FetchBundleLoader</code> + app-owned <code>runtime/runtime.wasm</code></td></tr>
-            <tr><td>2</td><td>Node / CLI smoke</td><td>Same npm <code>BundleEmbedder</code> + <code>NodeFsBundleLoader</code> + same bundle bytes (published web embedder under Node — not a separate native CLI)</td></tr>
+            <tr><td>2</td><td>Node / CLI smoke</td><td>Same npm <code>BundleEmbedder</code> + <code>NodeFsBundleLoader</code> + same bundle bytes (published web embedder under Node, not a separate native CLI)</td></tr>
             <tr><td>3</td><td>Digest + fingerprint</td><td><code>hosts/digest-match.mjs</code> proves identical wasm sha256 + deny/allow JSON; stands in for Swift / .NET / Kotlin (not executed on this Linux box)</td></tr>
           </tbody>
         </table>
@@ -78,8 +78,8 @@ const _body = `
             <tr><th>Path</th><th>Result</th></tr>
           </thead>
           <tbody>
-            <tr><td>Cheat — <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire</td><td><code>deny</code> / <code>no_matching_rule</code></td></tr>
-            <tr><td>Legit — <code>treasury_ops</code></td><td><code>allow</code> + MFA / dual-control obligations</td></tr>
+            <tr><td>Cheat: <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire</td><td><code>deny</code> / <code>no_matching_rule</code></td></tr>
+            <tr><td>Legit: <code>treasury_ops</code></td><td><code>allow</code> + MFA / dual-control obligations</td></tr>
             <tr><td>Cross-host</td><td>Identical <code>authorize.wasm</code> digest; matching deny/allow decisions on Browser + Node</td></tr>
           </tbody>
         </table>
@@ -95,8 +95,8 @@ const _body = `
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Same WASM across hosts; agent freestyle still blocked (week of 2026-09-25)</li>
-          <li><strong>Runnable demo:</strong> not publicly cloneable yet — see <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">deny-demo Q&amp;A</a> and <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a></li>
-          <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code> — digest <code>sha256:0c318fff56a74eddfbc1ab850c25c1ba191744309984a07bd503b8cd9cb92e40</code></li>
+          <li><strong>Runnable demo:</strong> not publicly cloneable yet: see <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">deny-demo Q&amp;A</a> and <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a></li>
+          <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code>: digest <code>sha256:0c318fff56a74eddfbc1ab850c25c1ba191744309984a07bd503b8cd9cb92e40</code></li>
           <li><strong>Runtime line:</strong> Traverse <strong>v0.13.0</strong> / <code>traverse-embedder-web@0.13.0</code> via nested-wasmi <code>runtime.wasm</code></li>
           <li><strong>runtime.wasm digest:</strong> <code>sha256:a254c161d5699b19ffe6eb47d2e11e45a39363ae8b2a9ac435d54a09fb31d782</code></li>
           <li><strong>Crates:</strong> <code>traverse-runtime</code> / <code>traverse-embedder</code> / <code>traverse-mcp</code> / <code>traverse-cli-rs</code> <strong>0.13.0</strong>; <code>traverse-registry</code> <strong>0.24.0</strong></li>
@@ -105,8 +105,8 @@ const _body = `
           <li><strong>Legit outcome:</strong> <code>treasury_ops</code> → <code>allow</code> + MFA / dual-control obligations</li>
           <li><strong>Lead claim:</strong> agent proposes, runtime decides · discover → execute → trace</li>
           <li><strong>Packaging caveat:</strong> npm is <code>0.13.0</code>, but <code>releaseEvidence()</code> / <code>PACKAGE_VERSION</code> in the published dist still report <code>0.9.0</code>. UI/README pin the npm version, not the skew.</li>
-          <li><strong>Node path:</strong> published web embedder under Node — not a separate native <code>traverse-cli</code> invoke for this demo.</li>
-          <li><strong>HF:</strong> not first-class in the catalog — do not claim an HF demo.</li>
+          <li><strong>Node path:</strong> published web embedder under Node, not a separate native <code>traverse-cli</code> invoke for this demo.</li>
+          <li><strong>HF:</strong> not first-class in the catalog: do not claim an HF demo.</li>
           <li><strong>GitHub Releases “latest”:</strong> resolves to artifact-only <code>swift-host-v0.13.0</code> (xcframework). That is <strong>not</strong> the product changelog.</li>
           <li><strong>Optional discussion:</strong> <a href="https://github.com/orgs/traverse-framework/discussions/1552" target="_blank" rel="noopener">org discussion #1552</a></li>
         </ul>
@@ -161,7 +161,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title="Same WASM. Browser and Node match. Agent still can’t freestyle. — Traverse Blog"
+  title="Same WASM. Browser and Node match. Agent still can’t freestyle. | Traverse Blog"
   description="Weekly demo: identical core.authorize@1.2.0 bytes on Browser + Node deny junior_analyst $2.4M wire and allow treasury_ops with MFA/dual-control. Traverse v0.13.0 multi-host."
   canonical="https://traverse-framework.com/blog/same-wasm-multi-host.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}

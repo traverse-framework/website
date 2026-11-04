@@ -78,12 +78,12 @@ const sampleContract = `{
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>A contract is a JSON file, <code>contract.json</code>. It describes what the capability accepts, what it produces, and what conditions are expected to hold on both sides. You ship the contract together with a digest-addressed WASM artifact as part of a registry publish — never the contract alone as a side-door upload.</p>
+  <p>A contract is a JSON file, <code>contract.json</code>. It describes what the capability accepts, what it produces, and what conditions are expected to hold on both sides. You ship the contract together with a digest-addressed WASM artifact as part of a registry publish, never the contract alone as a side-door upload.</p>
 
-  <h2>Primary path — let the skill draft it</h2>
+  <h2>Primary path: let the skill draft it</h2>
   <p>For most authors, do not start by hand-writing JSON. Load <code>traverse-capability-author</code> from <a href="https://github.com/traverse-framework/claude-skills/tree/main/skills/traverse-capability-author" target="_blank" rel="noopener">traverse-framework/claude-skills</a>, answer the interview about inputs, outputs, fail-closed cases, and placement, and review the contract the skill produces alongside the executable WASM. You still own the merge. Details: <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a> and <a href="/questions/how-do-i-go-from-skill-draft-to-published-capability.html">skill draft → published</a>.</p>
 
-  <h2>Secondary path — write contract.json by hand</h2>
+  <h2>Secondary path: write contract.json by hand</h2>
   <p>If you are on the manual Rust path, the contract sits next to your implementation and both land in the registry bundle together. Under the hood that implementation is still Rust compiled to WASM. Use the structure below as a starting point, then follow the publish checklist in <a href="/questions/how-do-i-publish-a-capability-to-the-registry.html">How do I publish a capability to the Traverse registry?</a></p>
 
   <h2>Minimal contract structure</h2>
@@ -91,11 +91,11 @@ const sampleContract = `{
 
   <h2>What each field does</h2>
   <ul>
-    <li><code>id</code>, <code>namespace</code>, <code>name</code> — the identity triple used by the registry and MCP server; <code>id</code> must equal <code>namespace</code> + "." + <code>name</code></li>
-    <li><code>input_schema</code> — JSON Schema for the input object the caller must provide</li>
-    <li><code>output_schema</code> — JSON Schema for the output the WASM binary must return</li>
-    <li><code>preconditions</code> — assertions expected to hold before execution; each is an id and a description. These are documentation for now, not something the runtime evaluates before invocation</li>
-    <li><code>postconditions</code> — same structure, for the state after execution; also documentation-only rather than runtime-enforced today</li>
+    <li><code>id</code>, <code>namespace</code>, <code>name</code>: the identity triple used by the registry and MCP server; <code>id</code> must equal <code>namespace</code> + "." + <code>name</code></li>
+    <li><code>input_schema</code>: JSON Schema for the input object the caller must provide</li>
+    <li><code>output_schema</code>: JSON Schema for the output the WASM binary must return</li>
+    <li><code>preconditions</code>: assertions expected to hold before execution; each is an id and a description. These are documentation for now, not something the runtime evaluates before invocation</li>
+    <li><code>postconditions</code>: same structure, for the state after execution; also documentation-only rather than runtime-enforced today</li>
   </ul>
 
   <h2>Registering a hand-written contract</h2>
@@ -103,7 +103,7 @@ const sampleContract = `{
   <pre><code>cargo run -p traverse-cli-rs -- bundle inspect path/to/manifest.json
 cargo run -p traverse-cli-rs -- bundle register path/to/manifest.json</code></pre>
 
-  <p><code>bundle inspect</code> validates the contract's JSON structure before anything is registered — a missing required field, or an <code>id</code> that doesn't match <code>namespace.name</code>, is rejected there rather than at registration time.</p>
+  <p><code>bundle inspect</code> validates the contract's JSON structure before anything is registered: a missing required field, or an <code>id</code> that doesn't match <code>namespace.name</code>, is rejected there rather than at registration time.</p>
 
   <p>See <a href="/questions/what-are-preconditions.html">what are preconditions</a> and <a href="/questions/what-are-postconditions.html">what are postconditions</a> for more detail on writing conditions.</p>
 </QuestionLayout>

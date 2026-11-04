@@ -1,4 +1,4 @@
-/* /discover — one flow: pick a goal, discover it from the live Traverse
+/* /discover: one flow: pick a goal, discover it from the live Traverse
  * registry, plan it deterministically, review it, execute it for real.
  *
  *   goal -> fetch catalog -> digest-verified snapshot -> browserLocalPlan
@@ -17,7 +17,7 @@ const CATALOG_URL = 'https://registry.traverse-framework.com/catalog.json';
 const REGISTRY_BASE = 'https://registry.traverse-framework.com';
 const CONTRACT_SCHEMA_VERSION = '1.0.0';
 
-/* The real, certified traverse-runtime-wasm binary (Spec 1402) — the same
+/* The real, certified traverse-runtime-wasm binary (Spec 1402). The same
    nested-wasmi orchestrator every native host embeds. executeBrowserComposedWorkflow
    never fetches this itself (it's host-owned); this site ships its own copy
    under public/runtime/ and digest-verifies it before every execute, the
@@ -28,7 +28,7 @@ const CONTRACT_SCHEMA_VERSION = '1.0.0';
 const RUNTIME_WASM_URL = '/runtime/runtime.wasm';
 const RUNTIME_WASM_DIGEST = 'a254c161d5699b19ffe6eb47d2e11e45a39363ae8b2a9ac435d54a09fb31d782';
 
-/* Three committed goals — a structured Spec-113 target + starting facts each.
+/* Three committed goals: a structured Spec-113 target + starting facts each.
    No natural language: the target is an exact capability identity.
    `price` is listed (and loaded) first on purpose: it's the goal most
    reliably reaching a real success end to end, so a first-time visitor's
@@ -38,7 +38,7 @@ const GOALS = [
   {
     id: 'price',
     label: 'Price a quote',
-    blurb: 'One line item, two units at $50, a versioned pricing config with no discounts or tax — target core.calculate-price.',
+    blurb: 'One line item, two units at $50, a versioned pricing config with no discounts or tax. Target core.calculate-price.',
     kind: 'single',
     target: { capability_id: 'core.calculate-price', capability_version: '1.2.0' },
     candidate_refs: [
@@ -70,7 +70,7 @@ const GOALS = [
   {
     id: 'luhn',
     label: 'Check a card number',
-    blurb: 'Does a 16-digit number pass the Luhn checksum? Facts: one number string — target validation.validate-luhn.',
+    blurb: 'Does a 16-digit number pass the Luhn checksum? Facts: one number string. Target validation.validate-luhn.',
     kind: 'single',
     target: { capability_id: 'validation.validate-luhn', capability_version: '1.2.0' },
     candidate_refs: [
@@ -81,7 +81,7 @@ const GOALS = [
   {
     id: 'translate-denied',
     label: 'Watch the runtime refuse a model-derived step',
-    blurb: 'Facts: an English summary and its facts, target report.translate-fr-semantic. This capability is declared model_derived, not deterministic — the local runtime authorizes plan structure but declines to run it automatically. A real refusal, not a scripted one.',
+    blurb: 'Facts: an English summary and its facts, target report.translate-fr-semantic. This capability is declared model_derived, not deterministic: the local runtime authorizes plan structure but declines to run it automatically. A real refusal, not a scripted one.',
     kind: 'single',
     target: { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.0' },
     ai_capability_ids: ['report.translate-fr-semantic'],
@@ -91,15 +91,15 @@ const GOALS = [
     starting_facts: {
       summary: 'The project combines distributed browser, edge, and cloud evidence into a deterministic operational summary with 2 validated insights.',
       structured_facts: [
-        'Fact: browser — Browser adoption rose 18% week over week',
-        'Fact: edge — Edge cache hit rate held steady at 94%',
+        'Fact (browser): Browser adoption rose 18% week over week',
+        'Fact (edge): Edge cache hit rate held steady at 94%',
       ],
     },
   },
   {
     id: 'summarize-embedding',
     label: 'Summarize notes with a bundled embedding model',
-    blurb: 'From four raw status notes the planner chains report.collect-fragments (dedupe) into report.enrich-insights (derive facts) into report.summarize-semantic — a ~31 MB bundled sentence-embedding model that ranks sentences by real fixed-point cosine similarity, fetched live and digest-verified, entirely offline.',
+    blurb: 'From four raw status notes the planner chains report.collect-fragments (dedupe) into report.enrich-insights (derive facts) into report.summarize-semantic. A ~31 MB bundled sentence-embedding model that ranks sentences by real fixed-point cosine similarity, fetched live and digest-verified, entirely offline.',
     kind: 'chain',
     target: { capability_id: 'report.summarize-semantic', capability_version: '1.0.0' },
     ai_capability_ids: ['report.summarize-semantic'],
@@ -123,11 +123,11 @@ const GOALS = [
 const FAIL = {
   transport: '✗ the governed browser planner did not load. Nothing here is faked.',
   registry: '✗ could not retrieve the live registry catalog or a verified artifact (%s). Nothing here is faked.',
-  snapshot: '✗ halted — the registry snapshot could not be verified (%s). Refusing to plan over unverified metadata.',
-  plan: '✗ halted — the planner rejected the inputs (%s).',
-  exec_identity: '✗ execution halted — a reviewed node no longer matches the verified snapshot or prepared artifact (%s). Refusing to run drifted content.',
-  exec_authorization: '✗ execution halted — the local runtime declined to authorize a node (%s). This is a real governance decision, not an error.',
-  exec_invalid: '✗ execution halted — the reviewed proposal failed structural validation (%s).',
+  snapshot: '✗ halted: the registry snapshot could not be verified (%s). Refusing to plan over unverified metadata.',
+  plan: '✗ halted: the planner rejected the inputs (%s).',
+  exec_identity: '✗ execution halted: a reviewed node no longer matches the verified snapshot or prepared artifact (%s). Refusing to run drifted content.',
+  exec_authorization: '✗ execution halted: the local runtime declined to authorize a node (%s). This is a real governance decision, not an error.',
+  exec_invalid: '✗ execution halted: the reviewed proposal failed structural validation (%s).',
   exec_failed: '✗ a node returned an error during real execution (%s). Later nodes were not started. Not reporting this as a success.',
 };
 
@@ -140,7 +140,7 @@ function classifyExecError(code) {
 
 function el(id) { return document.getElementById(id); }
 /* Mirrors state on both the floating graph badge and the inline result-panel
-   status chip — the badge is easy to miss, the panel is where attention
+   status chip: the badge is easy to miss, the panel is where attention
    actually lands after clicking execute. */
 function setBadge(text, s) {
   const b = el('discover-badge');
@@ -161,19 +161,19 @@ function logLine(text, cls) {
 function failLine(kind, detail) {
   const t = detail ? FAIL[kind].replace('%s', detail) : FAIL[kind].replace(' (%s)', '');
   logLine(t, 'err');
-  setBadge('Halted — fail closed', 'failed');
+  setBadge('Halted: fail closed', 'failed');
   const p = el('discover-result');
   if (p) p.dataset.outcome = 'failed';
   return t;
 }
 
 /* Surfaces a halt reason in the result panel itself, not only the terminal
-   log — the terminal can be easy to miss, and "why did this stop?" belongs
+   log: the terminal can be easy to miss, and "why did this stop?" belongs
    next to the mappings the visitor was just looking at. */
 function renderHalted(text) {
   const trace = el('discover-trace');
   if (!trace) return;
-  trace.innerHTML = '<div class="discover-sub-h">Halted — fail closed</div>'
+  trace.innerHTML = '<div class="discover-sub-h">Halted: fail closed</div>'
     + '<p class="discover-note discover-halted-note">' + text + '</p>';
 }
 
@@ -223,7 +223,7 @@ export async function snapshotIdentity(snapshot) {
   };
 }
 
-/* Below this many bytes we skip the progress line entirely — not worth the
+/* Below this many bytes we skip the progress line entirely, not worth the
    noise for the ~50-200 KB artifacts most goals fetch. */
 const PROGRESS_THRESHOLD_BYTES = 2 * 1024 * 1024;
 function mb(n) { return (n / (1024 * 1024)).toFixed(1); }
@@ -237,14 +237,14 @@ const artifactFetcher = {
     if (!r.ok) throw new Error('HTTP ' + r.status);
 
     // content-length reflects the wire (possibly compressed) size, not the
-    // decoded byte count fetch() ultimately hands us — the two can legitimately
+    // decoded byte count fetch() ultimately hands us: the two can legitimately
     // differ, so it's only a heuristic for "is this worth a progress line",
     // never a number we assert as the real total.
     const contentLength = Number(r.headers.get('content-length')) || 0;
     if (!r.body || contentLength < PROGRESS_THRESHOLD_BYTES) return new Uint8Array(await r.arrayBuffer());
 
     const label = (m ? m[2] : u.split('/').pop());
-    const line = logLine('  ↓ ' + label + ' — 0.0 MB downloaded…', 'cmd');
+    const line = logLine('  ↓ ' + label + ', 0.0 MB downloaded…', 'cmd');
     const reader = r.body.getReader();
     const chunks = [];
     let received = 0;
@@ -256,11 +256,11 @@ const artifactFetcher = {
       received += value.byteLength;
       const now = performance.now();
       if (line && now - lastPaint > 120) {
-        line.textContent = '  ↓ ' + label + ' — ' + mb(received) + ' MB downloaded…';
+        line.textContent = '  ↓ ' + label + ': ' + mb(received) + ' MB downloaded…';
         lastPaint = now;
       }
     }
-    if (line) { line.textContent = '  ✓ ' + label + ' — ' + mb(received) + ' MB fetched'; line.className = 'discover-log-line ok'; }
+    if (line) { line.textContent = '  ✓ ' + label + ': ' + mb(received) + ' MB fetched'; line.className = 'discover-log-line ok'; }
     const out = new Uint8Array(received);
     let offset = 0;
     for (const chunk of chunks) { out.set(chunk, offset); offset += chunk.byteLength; }
@@ -279,7 +279,7 @@ async function ensureModule() {
 }
 async function ensureRuntimeWasm() {
   if (runtimeWasmBytes) return runtimeWasmBytes;
-  logLine('$ fetch ' + RUNTIME_WASM_URL + ' — the real governed runtime binary (Spec 1402)', 'cmd');
+  logLine('$ fetch ' + RUNTIME_WASM_URL + ': the real governed runtime binary (Spec 1402)', 'cmd');
   const r = await fetch(RUNTIME_WASM_URL, { cache: 'force-cache' });
   if (!r.ok) throw Object.assign(new Error('runtime.wasm unavailable: HTTP ' + r.status), { code: 'digest_drift' });
   const bytes = new Uint8Array(await r.arrayBuffer());
@@ -339,9 +339,9 @@ async function renderProposal(goal, proposal) {
   el('discover-exec').hidden = false;
   el('discover-exec').disabled = false;
   el('discover-trace').innerHTML = '';
-  setBadge('Planned — review the mappings', 'planned');
+  setBadge('Planned: review the mappings', 'planned');
   logLine('✓ plan derived structurally: '
-    + proposal.proposal.nodes.map((n) => n.capability_id).join(' → ') + ' — review, then execute', 'ok');
+    + proposal.proposal.nodes.map((n) => n.capability_id).join(' → ') + ': review, then execute', 'ok');
 }
 
 function renderNoPlan(goal) {
@@ -350,12 +350,12 @@ function renderNoPlan(goal) {
   el('discover-plan-target').textContent = goal.target.capability_id + '@' + goal.target.capability_version;
   el('discover-plan-mappings').innerHTML =
     '<li class="discover-noplan">No structural candidate. The planner found no capability whose declared '
-    + 'outputs can supply this target’s required inputs from the given facts. It does not guess from names — '
+    + 'outputs can supply this target’s required inputs from the given facts. It does not guess from names: '
     + 'so it returns nothing. This is a real outcome, not an error.</li>';
   resetGraph(el('discover-graph'));
   el('discover-exec').hidden = true;
   el('discover-trace').innerHTML = '';
-  setBadge('No plan — the goal has no structural path', 'noplan');
+  setBadge('No plan: the goal has no structural path', 'noplan');
   logLine('✓ planner returned 0 candidates for this goal + facts', 'ok');
 }
 
@@ -363,25 +363,25 @@ function renderTrace(trace, proposal) {
   const panel = el('discover-result');
   const ok = trace.terminal_state === 'succeeded';
   if (panel) panel.dataset.outcome = ok ? 'executed' : 'failed';
-  setBadge(ok ? 'Executed — real, offline, governed' : 'Run failed at a node', ok ? 'executed' : 'failed');
+  setBadge(ok ? 'Executed: real, offline, governed' : 'Run failed at a node', ok ? 'executed' : 'failed');
 
   const cards = (proposal.proposal.nodes || []).map((n) => {
     const oc = trace.node_outcomes.find((o) => o.node_id === n.node_id) || {};
     return '<a class="discover-cap-card" href="' + REGISTRY_BASE + '/#/capability/'
       + encodeURIComponent(n.capability_id.split('.')[0] + '/' + n.capability_id + '@' + n.capability_version)
       + '" target="_blank" rel="noopener"><span class="discover-cap-id">' + n.capability_id + '@' + n.capability_version
-      + '</span><span class="badge badge-' + (oc.status === 'succeeded' ? 'success' : 'err') + '">' + (oc.status || '—')
+      + '</span><span class="badge badge-' + (oc.status === 'succeeded' ? 'success' : 'err') + '">' + (oc.status || 'unknown')
       + (oc.failure_class ? ' · ' + oc.failure_class : '') + '</span></a>';
   }).join('');
 
   el('discover-trace').innerHTML =
     '<div class="discover-sub-h">Redacted per-node trace · terminal: ' + trace.terminal_state + '</div>'
     + '<div class="discover-cap-cards">' + cards + '</div>'
-    + '<p class="discover-note">Governed execution returns only per-node status and failure class — no raw '
+    + '<p class="discover-note">Governed execution returns only per-node status and failure class: no raw '
     + 'inputs, outputs, or payload bytes (Spec 1277 FR-007). Each card links to the real published contract.</p>';
 
   logLine(ok
-    ? '✓ real composed run complete — ' + trace.node_outcomes.map((o) => o.capability_id).join(' → ') + ' executed offline in your browser'
+    ? '✓ real composed run complete: ' + trace.node_outcomes.map((o) => o.capability_id).join(' → ') + ' executed offline in your browser'
     : '✗ real composed run failed at ' + (trace.node_outcomes.find((o) => o.status === 'failed') || {}).capability_id,
     ok ? 'ok' : 'err');
 }
@@ -418,7 +418,7 @@ async function doGoal(goal) {
     }
   }
 
-  logLine('$ browserLocalPlan — deterministic, structural, no name/NL/model inference', 'cmd');
+  logLine('$ browserLocalPlan: deterministic, structural, no name/NL/model inference', 'cmd');
   let res;
   try {
     res = await browserLocalPlan(

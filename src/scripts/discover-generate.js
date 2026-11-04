@@ -1,11 +1,11 @@
-/* /discover — additive real-generation panel.
+/* /discover: additive real-generation panel.
  *
  * Decision 95 (docs/decision-log.md, traverse-framework/traverse) bridges
  * Spec 045 (traverse.inference.generate) and Spec 138 (governed exact-ref
  * model.execute) so a digest-verified WASM package can satisfy generation
  * fully offline, with no Ollama daemon and no network call. This panel
  * exercises that bridge mechanism directly: it runs the real, checked-in
- * conformance fixture (fixture.responder@1.0.0 — #1454/#1455) that proves
+ * conformance fixture (fixture.responder@1.0.0, #1454/#1455) that proves
  * the bridge end-to-end, through the same ExactModelBrowserHost / Spec 138
  * model.execute path traverse-embedder-web ships and tests.
  *
@@ -15,7 +15,7 @@
  * the same real reason it always did.
  *
  * The fixture is small and deterministic on purpose (scans the prompt for
- * the byte pair "hi" and returns one of two fixed responses) — it is not a
+ * the byte pair "hi" and returns one of two fixed responses). It is not a
  * trained language model, and this module never claims otherwise.
  */
 
@@ -25,9 +25,8 @@ import {
 
 // fixtures/models/fixture-responder-1.0.0/model.wasm, checked into
 // traverse-framework/traverse (crates/traverse-runtime/tests/inference_tests.rs).
-// The exact file bytes (491 bytes, including its debug-names section) —
-// not the debug-names-stripped 340-byte variant traverse-embedder-web's own
-// unit test embeds — so the digest below matches the file's real pinned
+// The exact file bytes (491 bytes, including its debug-names section), // not the debug-names-stripped 340-byte variant traverse-embedder-web's own
+// unit test embeds, so the digest below matches the file's real pinned
 // digest in fixtures/models/fixture-responder-1.0.0/model.manifest.json.
 // Small enough to embed and audit directly rather than fetch.
 const FIXTURE_WASM_B64 = 'AGFzbQEAAAABCQFgBH9/f38BfwMCAQAFAwEAAgcaAgZtZW1vcnkCAA1tb2RlbF9leGVjdXRlAAAK9AEB8QEBB38gAUEMSQRAQX8PCyAAKAIIIQQgAEEMaiEFQQwgBGogAUsEQEF/DwtBACEIQQAhBgJAA0AgBkECaiAESw0BIAUgBmotAABB6ABGIAUgBkEBamotAABB6QBGcQRAQQEhCAwCCyAGQQFqIQYMAAsLIAhBAUYEQEHKuAIhCUEIIQoFQd64AiEJQQMhCgtBDCAKaiADSwRAQX8PCyACQQE7AQAgAkEEOgACIAJBAToAAyACIAo2AgQgAiAKNgIIQQAhBwJAA0AgByAKTw0BIAJBDGogB2ogCSAHai0AADoAACAHQQFqIQcMAAsLQQwgCmoLCyMDAEHAuAILAmhpAEHKuAILCGhpIHRoZXJlAEHeuAILA2htbQCUAQRuYW1lAmIBAAsABmluX3B0cgEGaW5fbGVuAgdvdXRfcHRyAwdvdXRfY2FwBAtwYXlsb2FkX2xlbgULcGF5bG9hZF9wdHIGAWkHAWoIB21hdGNoZWQJCHJlc3BfcHRyCghyZXNwX2xlbgMpAQAEAgtzZWFyY2hfZG9uZQMGc2VhcmNoBwljb3B5X2RvbmUIBGNvcHk=';
@@ -62,8 +61,7 @@ async function sha256Hex(bytes) {
 }
 
 /* Runs the real bridge fixture against `promptText` and returns the
-   genuinely computed result. No branch here fabricates a response —
-   the WASM guest decides, and this function only reports what it did. */
+   genuinely computed result. No branch here fabricates a response: the WASM guest decides, and this function only reports what it did. */
 export async function runResponderDemo(promptText) {
   const wasm = b64ToBytes(FIXTURE_WASM_B64);
   const manifestBytes = b64ToBytes(FIXTURE_MANIFEST_B64);
@@ -135,13 +133,13 @@ async function runDemo() {
   log.innerHTML = '';
   if (out) out.hidden = true;
   btn.disabled = true;
-  logLine(log, '$ registerPackage — verify the Ed25519 signature (test-only fixture key), manifest pin, and sha256(model.wasm)', 'cmd');
+  logLine(log, '$ registerPackage: verify the Ed25519 signature (test-only fixture key), manifest pin, and sha256(model.wasm)', 'cmd');
 
   try {
     const { digest, wasmDigest, response, placement, evidence } = await runResponderDemo(promptText);
     logLine(log, '✓ signed package verified: pin sha256:' + digest.slice(0, 16) + '…, wasm sha256:' + wasmDigest.slice(0, 16) + '…', 'ok');
     logLine(log, '$ encode prompt as a Spec 138 guest frame (ABI v1) and stage it', 'cmd');
-    logLine(log, '$ execute — wasm-cpu, offline, no network, no daemon', 'cmd');
+    logLine(log, '$ execute: wasm-cpu, offline, no network, no daemon', 'cmd');
     logLine(log, '✓ response: "' + response + '" (placement=' + placement + ')', 'ok');
     const respEl = el('discover-gen-response');
     const evEl = el('discover-gen-evidence');
@@ -149,7 +147,7 @@ async function runDemo() {
     if (evEl) evEl.textContent = JSON.stringify(evidence, null, 2);
     if (out) out.hidden = false;
   } catch (e) {
-    logLine(log, '✗ execution halted — ' + (e && e.code ? e.code : String(e && e.message || e)), 'err');
+    logLine(log, '✗ execution halted: ' + (e && e.code ? e.code : String(e && e.message || e)), 'err');
     console.error('[discover-generate]', e);
   } finally {
     btn.disabled = false;

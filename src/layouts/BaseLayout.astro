@@ -20,7 +20,7 @@ const {
   class: bodyClass,
 } = Astro.props;
 
-const fullTitle = title.includes('Traverse') ? title : `${title} — Traverse Framework`;
+const fullTitle = title.includes('Traverse') ? title : `${title} | Traverse Framework`;
 const ogImageAbs = new URL(ogImage, Astro.site).href;
 
 const siteJsonLd = JSON.stringify({

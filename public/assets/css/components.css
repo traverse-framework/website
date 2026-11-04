@@ -230,7 +230,7 @@
   color: #f2ecdf;
   tab-size: 2;
 }
-/* Syntax palette: pastel ink on the navy editor surface — Solitaire
+/* Syntax palette: pastel ink on the navy editor surface. Solitaire
    sage for identifiers/types, Elizabeth Rose for strings, salmon for
    keywords/values, Beefy Pink lilac for sections/functions. Fixed
    values by design: the editor surface does not change between themes. */

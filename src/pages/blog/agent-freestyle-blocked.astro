@@ -66,8 +66,8 @@ const _body = `
             <tr><th>Path</th><th>Result</th></tr>
           </thead>
           <tbody>
-            <tr><td>Cheat — <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire</td><td><code>deny</code> / <code>no_matching_rule</code></td></tr>
-            <tr><td>Legit — <code>treasury_ops</code></td><td><code>allow</code> + MFA / dual-control obligations</td></tr>
+            <tr><td>Cheat: <code>junior_analyst</code> + <code>payments.transfer</code> on a $2.4M wire</td><td><code>deny</code> / <code>no_matching_rule</code></td></tr>
+            <tr><td>Legit: <code>treasury_ops</code></td><td><code>allow</code> + MFA / dual-control obligations</td></tr>
             <tr><td>Malformed input</td><td>Host contract gate rejects before WASM</td></tr>
           </tbody>
         </table>
@@ -78,7 +78,7 @@ const _body = `
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Agent freestyle → blocked (week of 2026-09-18)</li>
-          <li><strong>Runnable demo:</strong> not publicly cloneable yet — see <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">deny-demo Q&amp;A</a> and <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a></li>
+          <li><strong>Runnable demo:</strong> not publicly cloneable yet: see <a href="/questions/how-do-i-run-the-agent-blocked-weekly-demo.html">deny-demo Q&amp;A</a> and <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a></li>
           <li><strong>Capability:</strong> <code>core.authorize@1.2.0</code></li>
           <li><strong>Runtime line:</strong> Traverse <strong>v0.12.0</strong> / <code>traverse-embedder-web@0.12.0</code> via nested-wasmi <code>runtime.wasm</code></li>
           <li><strong>runtime.wasm digest:</strong> <code>sha256:e8d8c04b8927becb5deab9f33da81dd1c121954993ba8b83ea71a2c37cd45e70</code> (certified 0.11.0, unchanged in 0.12.0)</li>
@@ -139,7 +139,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title="The agent freestyled a $2.4M wire. The runtime said no. — Traverse Blog"
+  title="The agent freestyled a $2.4M wire. The runtime said no. | Traverse Blog"
   description="Weekly demo: junior_analyst invents a $2.4M payments.transfer and gets deny / no_matching_rule from core.authorize@1.2.0 on real traverse-embedder-web + nested-wasmi runtime.wasm (v0.12)."
   canonical="https://traverse-framework.com/blog/agent-freestyle-blocked.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}

@@ -39,11 +39,11 @@ const _body = `
 
       <h2 id="why-it-matters">Why the pin is the product</h2>
 
-      <p>Traverse <strong>v0.14.0</strong> ships signed exact-ref model packages. Manifest schema <code>2.0.0</code>. A detached Ed25519 <code>model.sig.json</code> covers the manifest bytes. Trust roots live on the host — the app cannot add a key. Pins bind the SHA-256 of those manifest bytes and declare <code>target</code>, expected <code>rights</code>, and an optional <code>key_id</code>.</p>
+      <p>Traverse <strong>v0.14.0</strong> ships signed exact-ref model packages. Manifest schema <code>2.0.0</code>. A detached Ed25519 <code>model.sig.json</code> covers the manifest bytes. Trust roots live on the host: the app cannot add a key. Pins bind the SHA-256 of those manifest bytes and declare <code>target</code>, expected <code>rights</code>, and an optional <code>key_id</code>.</p>
 
       <p>The first trained package in this demo is <code>digits-mlp-1.0.0</code> (<code>traverse.digits-mlp@1.0.0</code>): a 64→32→10 MLP on UCI Optical Recognition of Handwritten Digits (CC BY 4.0), 96.10% held-out, as recorded with the package. One shared <code>runtime.wasm</code>. Hosts are UI + I/O, not a second runtime.</p>
 
-      <p>The Node column is that published <strong>web embedder under Node</strong> — <code>ExactModelBrowserHost</code> plus <code>registerPackage</code>. It is not a separate native Rust CLI, and it is not a different runtime.</p>
+      <p>The Node column is that published <strong>web embedder under Node</strong>: <code>ExactModelBrowserHost</code> plus <code>registerPackage</code>. It is not a separate native Rust CLI, and it is not a different runtime.</p>
 
       <h2 id="what-happened">What happened</h2>
 
@@ -91,7 +91,7 @@ const _body = `
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Signed model. Exact pin. Bit-identical hosts (week of 2026-10-02).</li>
-          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-02-signed-exact-ref" target="_blank" rel="noopener">2026-10-02-signed-exact-ref</a>. Not a public clone — <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
+          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-02-signed-exact-ref" target="_blank" rel="noopener">2026-10-02-signed-exact-ref</a>. Not a public clone: <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
           <li><strong>Product pins:</strong> tags <code>v0.14.0</code> and <code>web-v0.14.0</code> @ <code>4dac877c2fe0b28491848016747850ae31327ebc</code>. npm <code>traverse-embedder-web@0.14.0</code>.</li>
           <li><strong>Model:</strong> <code>traverse.digits-mlp@1.0.0</code>. Manifest schema <code>2.0.0</code>. Governing spec <code>138-governed-exact-model-execution</code>.</li>
           <li><strong>Manifest / pin sha256:</strong> <code>3068f3ae464fbbb43b45b089ab225a1371060a94a214c10629b4d8e402e8eadf</code></li>
@@ -153,7 +153,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title="Signed model. Exact pin. Bit-identical hosts. — Traverse Blog"
+  title="Signed model. Exact pin. Bit-identical hosts. | Traverse Blog"
   description="Weekly demo: signed digits-mlp-1.0.0 exact-ref package classifies a digit with the same bytes on Browser and Node. One WASM byte swapped fails closed. Traverse v0.14.0."
   canonical="https://traverse-framework.com/blog/signed-exact-ref-digits.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}

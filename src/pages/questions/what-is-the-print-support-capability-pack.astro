@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is the print-support capability pack in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'The print-support pack is a help-wanted capability initiative (registry#596, Announcement Discussion #1540): eight governed WASM capabilities for manufacturing print-support rules — mesh parse/write, overhang analysis, orientation scoring, fins, sway braces, export gate, bed pad. Apps-not-ready means no product shell PR; capability packs are in scope. None of the print.* capabilities are published yet. One capability per PR; skill-first authoring via traverse-capability-author is welcome. I/O today is stdin/stdout JSON.',
+      text: 'The print-support pack is a help-wanted capability initiative (registry#596, Announcement Discussion #1540): eight governed WASM capabilities for manufacturing print-support rules. Mesh parse/write, overhang analysis, orientation scoring, fins, sway braces, export gate, bed pad. Apps-not-ready means no product shell PR; capability packs are in scope. None of the print.* capabilities are published yet. One capability per PR; skill-first authoring via traverse-capability-author is welcome. I/O today is stdin/stdout JSON.',
     },
   }],
 });
@@ -31,13 +31,13 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> print-support is a <em>capability pack</em> initiative — governed WASM for print-oriented domain rules — not an app rewrite. Umbrella <a href="https://github.com/traverse-framework/registry/issues/596">registry#596</a>; Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1540">Discussion #1540</a>. None of the <code>print.*</code> capabilities are published yet.</p>
+  <p><strong>Short answer:</strong> print-support is a <em>capability pack</em> initiative, governed WASM for print-oriented domain rules, not an app rewrite. Umbrella <a href="https://github.com/traverse-framework/registry/issues/596">registry#596</a>; Announcement <a href="https://github.com/orgs/traverse-framework/discussions/1540">Discussion #1540</a>. None of the <code>print.*</code> capabilities are published yet.</p>
 
   <h2>Capabilities in the pack</h2>
   <p>Publish as separate one-capability PRs (recommended order on the umbrella):</p>
   <ul>
-    <li><a href="https://github.com/traverse-framework/registry/issues/597">#597</a> <code>print.mesh-parse</code> — STL/3MF → mesh IR</li>
-    <li><a href="https://github.com/traverse-framework/registry/issues/598">#598</a> <code>print.mesh-write</code> — mesh IR → STL/3MF</li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/597">#597</a> <code>print.mesh-parse</code>: STL/3MF → mesh IR</li>
+    <li><a href="https://github.com/traverse-framework/registry/issues/598">#598</a> <code>print.mesh-write</code>: mesh IR → STL/3MF</li>
     <li><a href="https://github.com/traverse-framework/registry/issues/599">#599</a> <code>print.overhangs-analyze</code></li>
     <li><a href="https://github.com/traverse-framework/registry/issues/600">#600</a> <code>print.orientation-score</code></li>
     <li><a href="https://github.com/traverse-framework/registry/issues/602">#602</a> <code>print.fins-generate</code></li>

@@ -32,26 +32,26 @@ const jsonLd = JSON.stringify({
 >
   <p>Most people do not need a full from-source build to try Traverse. Pick the path that matches what you are doing.</p>
 
-  <h2>Path A — Author in plain English (usual)</h2>
+  <h2>Path A: Author in plain English (usual)</h2>
   <p>Load the official Claude skill <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener"><code>traverse-capability-author</code></a>. It interviews you, checks the registry, writes the contract, produces executable WASM, and opens a human-reviewed PR. You describe the business rule; you do not install a Rust toolchain for that path. Under the hood the artifact is still Rust→WASM.</p>
   <p>Details: <a href="/questions/how-do-i-author-a-capability-in-plain-english.html">How do I author a capability in plain English?</a> and <a href="/blog/you-dont-need-rust-to-publish-a-capability.html">You don't need Rust to publish a capability</a>.</p>
 
-  <h2>Path B — Consume a published capability (no Rust)</h2>
+  <h2>Path B: Consume a published capability (no Rust)</h2>
   <ul>
     <li><strong>JavaScript / TypeScript:</strong> npm package <code>traverse-embedder-web</code> (published). See the <a href="/docs/guides/react-integration.html">React integration guide</a>.</li>
     <li><strong>Rust host:</strong> crates.io package <code>traverse-embedder</code>.</li>
-    <li><strong>AI agents:</strong> <code>traverse-mcp</code> over stdio — see <a href="/agents.html">Agents</a> and the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>.</li>
+    <li><strong>AI agents:</strong> <code>traverse-mcp</code> over stdio: see <a href="/agents.html">Agents</a> and the <a href="/docs/guides/mcp-setup.html">MCP setup guide</a>.</li>
     <li><strong>Python:</strong> no SDK. Shell out to <code>traverse-cli capability-package execute</code> (stdlib <code>subprocess</code>). See <a href="/questions/can-i-use-traverse-with-python.html">Can I use Traverse with Python?</a>.</li>
   </ul>
 
-  <h2>Path C — Build from source (contributors / manual authors)</h2>
+  <h2>Path C: Build from source (contributors / manual authors)</h2>
   <p>If you are contributing to the runtime or writing capabilities by hand (the secondary path), you build the workspace from source. There are no binary releases yet. Plan on about 10 minutes if you already have Rust.</p>
 
   <h3>Prerequisites (Path C only)</h3>
   <ul>
-    <li><strong>Rust toolchain</strong> — install via <a href="https://rustup.rs" target="_blank" rel="noopener">rustup.rs</a></li>
-    <li><strong>wasm32-wasip1 target</strong> — needed to compile capabilities to WASM on the manual path</li>
-    <li><strong>Node.js</strong> — only if you want to run the React demo</li>
+    <li><strong>Rust toolchain</strong>: install via <a href="https://rustup.rs" target="_blank" rel="noopener">rustup.rs</a></li>
+    <li><strong>wasm32-wasip1 target</strong>: needed to compile capabilities to WASM on the manual path</li>
+    <li><strong>Node.js</strong>: only if you want to run the React demo</li>
   </ul>
 
   <h3>1. Add the WASM target</h3>

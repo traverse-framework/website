@@ -11,7 +11,7 @@ const _body = `
       <span class="badge">Registry</span>
       <span class="badge">Governance</span>
     </div>
-    <h1 class="t-h1">The next help-wanted batch is business-shaped — not more string utils</h1>
+    <h1 class="t-h1">The next help-wanted batch is business-shaped, not more string utils</h1>
     <div class="post-byline">
       <span>By <strong>Enrico Piovesan</strong></span>
       <span>6 min read</span>
@@ -29,12 +29,12 @@ const _body = `
       <p>If you only ship string and JSON helpers, agents will still invent the rules that actually matter. Pricing caps. Eligibility. Authz. Consent and purpose. Risk bands. Content policy. Those are the decisions a model should <em>propose</em> and a governed capability should <em>make</em>.</p>
 
       <div class="callout">
-        Short version: the next labeled batch is registry issues <a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493</a>–<a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507</a> — business-shaped capabilities, one PR each. Examples remain the on-ramp. Apps are not the ask. Agents propose; governed capabilities decide.
+        Short version: the next labeled batch is registry issues <a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493</a>–<a href="https://github.com/traverse-framework/registry/issues/507" target="_blank" rel="noopener">#507</a>: business-shaped capabilities, one PR each. Examples remain the on-ramp. Apps are not the ask. Agents propose; governed capabilities decide.
       </div>
 
       <h2 id="why-not-utils">Why not another slugify</h2>
 
-      <p>Utility capabilities are useful. They are also the easy part. A slugify, a JSON reshape, a redaction helper that just runs NER — those are the kinds of tickets you can finish without arguing with a policy document. They teach the publish path. They do not teach the runtime what the business is allowed to do.</p>
+      <p>Utility capabilities are useful. They are also the easy part. A slugify, a JSON reshape, a redaction helper that just runs NER. Those are the kinds of tickets you can finish without arguing with a policy document. They teach the publish path. They do not teach the runtime what the business is allowed to do.</p>
 
       <p>The failure mode I actually care about is an agent that sounds confident while it re-derives a discount, an eligibility gate, or a “this output is fine to send” decision from scratch. No version. No signature. No contract. Authoritative only because it ran last. That is the opposite of what the registry is for.</p>
 
@@ -42,24 +42,24 @@ const _body = `
 
       <h2 id="what-business-shaped-means">What business-shaped means here</h2>
 
-      <p>I mean a capability whose job is a decision with a fail-closed contract: structured input in, structured decision out, no network, no host state, no “ask a model.” If the policy is invalid, you do not partially succeed. If a cap is hit, the quote does not quietly overflow. If consent does not cover the purpose, the answer is no — not a best-effort maybe.</p>
+      <p>I mean a capability whose job is a decision with a fail-closed contract: structured input in, structured decision out, no network, no host state, no “ask a model.” If the policy is invalid, you do not partially succeed. If a cap is hit, the quote does not quietly overflow. If consent does not cover the purpose, the answer is no, not a best-effort maybe.</p>
 
       <p>The open tickets. Most are unclaimed as I write this; <a href="https://github.com/traverse-framework/registry/issues/500" target="_blank" rel="noopener">#500</a> already has a taker, so skip that one unless you are the person who claimed it:</p>
 
       <ul>
-        <li><a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493 <code>core.redact-for-export</code></a> — policy-shaped PII/secret redact before export, not NER.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/494" target="_blank" rel="noopener">#494 <code>core.eligibility-check</code></a> — deterministic rule-table eligibility.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/495" target="_blank" rel="noopener">#495 <code>core.quote-with-caps</code></a> — formula pricing with hard caps.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/496" target="_blank" rel="noopener">#496 <code>core.check-declared-permission</code></a> — authz from declared roles/permissions.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/497" target="_blank" rel="noopener">#497 <code>core.risk-band</code></a> — risk score band from structured signals.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/498" target="_blank" rel="noopener">#498 <code>core.extract-to-schema</code></a> — structured extract into a fixed schema, fail closed.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/499" target="_blank" rel="noopener">#499 <code>core.content-policy-gate</code></a> — allow / deny / revise for agent output.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/500" target="_blank" rel="noopener">#500 <code>core.consent-purpose-check</code></a> — consent bound to a purpose.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/501" target="_blank" rel="noopener">#501 <code>core.ttl-expiry-decide</code></a> — retention TTL / expiry.</li>
-        <li><a href="https://github.com/traverse-framework/registry/issues/502" target="_blank" rel="noopener">#502 <code>core.idempotency-guard</code></a> — duplicate-submit / idempotency.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/493" target="_blank" rel="noopener">#493 <code>core.redact-for-export</code></a>: policy-shaped PII/secret redact before export, not NER.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/494" target="_blank" rel="noopener">#494 <code>core.eligibility-check</code></a>: deterministic rule-table eligibility.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/495" target="_blank" rel="noopener">#495 <code>core.quote-with-caps</code></a>: formula pricing with hard caps.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/496" target="_blank" rel="noopener">#496 <code>core.check-declared-permission</code></a>: authz from declared roles/permissions.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/497" target="_blank" rel="noopener">#497 <code>core.risk-band</code></a>: risk score band from structured signals.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/498" target="_blank" rel="noopener">#498 <code>core.extract-to-schema</code></a>: structured extract into a fixed schema, fail closed.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/499" target="_blank" rel="noopener">#499 <code>core.content-policy-gate</code></a>: allow / deny / revise for agent output.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/500" target="_blank" rel="noopener">#500 <code>core.consent-purpose-check</code></a>: consent bound to a purpose.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/501" target="_blank" rel="noopener">#501 <code>core.ttl-expiry-decide</code></a>: retention TTL / expiry.</li>
+        <li><a href="https://github.com/traverse-framework/registry/issues/502" target="_blank" rel="noopener">#502 <code>core.idempotency-guard</code></a>: duplicate-submit / idempotency.</li>
       </ul>
 
-      <p>Five more are marked creative — still one capability, still one PR, slightly more judgment in the contract:</p>
+      <p>Five more are marked creative: still one capability, still one PR, slightly more judgment in the contract:</p>
 
       <ul>
         <li><a href="https://github.com/traverse-framework/registry/issues/503" target="_blank" rel="noopener">#503 <code>core.dispute-triage-classify</code></a></li>
@@ -88,7 +88,7 @@ const _body = `
         <li>Run the pre-PR check the ticket names. Open the PR against <code>origin/main</code>. Wait for CI.</li>
       </ol>
 
-      <p>If you would rather learn the CLI first, do that. Python can consume today by shelling out to <code>traverse-cli capability-package execute</code> — that is a real verb, not a fake <code>capability run</code> — and <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> is the example ticket. JavaScript already has the published web embedder. Neither of those is this batch. This batch is the rules those callers should be hitting instead of re-deriving.</p>
+      <p>If you would rather learn the CLI first, do that. Python can consume today by shelling out to <code>traverse-cli capability-package execute</code> (that is a real verb, not a fake <code>capability run</code>) and <a href="https://github.com/traverse-framework/traverse/issues/1362" target="_blank" rel="noopener">traverse#1362</a> is the example ticket. JavaScript already has the published web embedder. Neither of those is this batch. This batch is the rules those callers should be hitting instead of re-deriving.</p>
 
       <div class="callout">
         I would rather merge one boring, fail-closed eligibility check than ten utilities an agent can ignore when it feels like inventing a discount. The tickets are sized for the boring ones.
@@ -98,7 +98,7 @@ const _body = `
 
       <p>Because the first door taught people how to publish. The catalog already has 83 capabilities across 31 domains. What it is short on is the kind of capability a reviewer would actually trust with money, access, or someone’s data leaving the building.</p>
 
-      <p>If you only have ten minutes: pick one issue in the #493–#507 range, read it end to end, and decide whether the contract is something you can implement without a new product. If yes, claim it. If the ask is too sharp, leave it — someone else will want that exact sharpness.</p>
+      <p>If you only have ten minutes: pick one issue in the #493–#507 range, read it end to end, and decide whether the contract is something you can implement without a new product. If yes, claim it. If the ask is too sharp, leave it: someone else will want that exact sharpness.</p>
 
     </article>
 
@@ -147,8 +147,8 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"The next help-wanted batch is business-shaped — not more string utils — Traverse Blog"}
-  description={"Why the next labeled registry tickets are eligibility, pricing caps, authz, consent, risk, and content policy — not more string/JSON utils. Agents propose; governed capabilities decide."}
+  title={"The next help-wanted batch is business-shaped, not more string utils | Traverse Blog"}
+  description={"Why the next labeled registry tickets are eligibility, pricing caps, authz, consent, risk, and content policy, not more string/JSON utils. Agents propose; governed capabilities decide."}
   canonical={"https://traverse-framework.com/blog/why-next-help-wanted-is-business-shaped.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}
 >

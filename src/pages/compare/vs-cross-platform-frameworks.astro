@@ -6,7 +6,7 @@ const _body = `
   <div class="container">
     <div class="section-label" style="margin-bottom:0.75rem">Comparison</div>
     <h1>Traverse vs. Cross-Platform App Frameworks</h1>
-    <p class="compare-hero-lead">Flutter, Electron, Tauri, React Native, and .NET MAUI solve UI portability: one codebase, one native-feeling app across operating systems. Traverse solves a layer underneath that — one governed business-logic binary that behaves identically no matter which UI framework, backend, or AI agent is calling it. They're not really competing, and you can use them together.</p>
+    <p class="compare-hero-lead">Flutter, Electron, Tauri, React Native, and .NET MAUI solve UI portability: one codebase, one native-feeling app across operating systems. Traverse solves a layer underneath that: one governed business-logic binary that behaves identically no matter which UI framework, backend, or AI agent is calling it. They're not really competing, and you can use them together.</p>
   </div>
 </section>
 
@@ -27,14 +27,14 @@ const _body = `
     <h2>What cross-platform UI frameworks solve</h2>
     <p>Flutter, Electron, Tauri, React Native, and .NET MAUI all attack the same problem from different angles: write your UI once, ship a native-feeling app on Windows, macOS, Linux, iOS, and Android without hand-building five separate front ends. Flutter and React Native compile or interpret down to native widgets. Electron and Tauri wrap a web view (Electron ships its own Chromium; Tauri uses the OS's own web renderer, which is why its binaries are smaller). .NET MAUI shares one XAML-based UI layer across desktop and mobile.</p>
     <p>All of them are genuinely good at this. It's a hard, well-understood problem, and each one has years of tooling, hot-reload workflows, and platform-specific escape hatches built up around it.</p>
-    <p>What none of them do is govern what happens once your button's <code>onPressed</code> handler fires. The business logic behind that tap — the pricing rule, the eligibility check, the discount calculation — is just more Dart, JavaScript, or C#, living inside that one app. If your backend, your web dashboard, and your AI agent need the exact same rule, you're re-implementing it in each of their languages and hoping the copies don't drift.</p>
+    <p>What none of them do is govern what happens once your button's <code>onPressed</code> handler fires. The business logic behind that tap (the pricing rule, the eligibility check, the discount calculation) is just more Dart, JavaScript, or C#, living inside that one app. If your backend, your web dashboard, and your AI agent need the exact same rule, you're re-implementing it in each of their languages and hoping the copies don't drift.</p>
   </div>
 
   <div class="content-section" id="what-traverse-solves">
     <h2>What Traverse solves</h2>
-    <p>Traverse doesn't compete for the UI layer at all — it has none. What it governs is the rule itself. You author a capability once (skill-first plain English via <code>traverse-capability-author</code>, or manual Rust→WASM) and attach a contract that declares its inputs, outputs, preconditions, and postconditions. The runtime validates all of that before and after execution, and produces a structured trace artifact every time the capability runs.</p>
-    <p>That WASM binary is device-independent: it executes locally by default, on whatever client loaded it, and the client can heuristically delegate part of the work to a server when its own context calls for it — not because someone chose "server" as a fixed deployment target ahead of time. The two shipped hosts for that binary today are native (Windows, macOS, Linux, through <code>traverse-runtime</code>'s Wasmtime-backed executor) and the browser (through the public Web embedder SDK). Android and .NET/WinUI embedders are real, working code without a public release yet. Swift/iOS has a production <code>wasmi</code>-based bridge (<code>WasmiHostBridgeClient</code>, backed by the released <code>TraverseSwiftHost</code> XCFramework) enforcing host-owned resource limits on every call, verified on device — it just doesn't have a certified public release or shipped reference-app integration yet; see <a href="/platforms.html">Platforms</a> for the evidence.</p>
-    <div class="highlight-callout"><strong>The distinction:</strong> a UI framework decides how your app looks and behaves on each OS. Traverse decides whether a specific rule inside that app is consistent, governed, and auditable everywhere it's called from — including places that have no UI at all, like a batch job or an MCP-connected AI agent.</div>
+    <p>Traverse doesn't compete for the UI layer at all. It has none. What it governs is the rule itself. You author a capability once (skill-first plain English via <code>traverse-capability-author</code>, or manual Rust→WASM) and attach a contract that declares its inputs, outputs, preconditions, and postconditions. The runtime validates all of that before and after execution, and produces a structured trace artifact every time the capability runs.</p>
+    <p>That WASM binary is device-independent: it executes locally by default, on whatever client loaded it, and the client can heuristically delegate part of the work to a server when its own context calls for it, not because someone chose "server" as a fixed deployment target ahead of time. The two shipped hosts for that binary today are native (Windows, macOS, Linux, through <code>traverse-runtime</code>'s Wasmtime-backed executor) and the browser (through the public Web embedder SDK). Android and .NET/WinUI embedders are real, working code without a public release yet. Swift/iOS has a production <code>wasmi</code>-based bridge (<code>WasmiHostBridgeClient</code>, backed by the released <code>TraverseSwiftHost</code> XCFramework) enforcing host-owned resource limits on every call, verified on device. It just doesn't have a certified public release or shipped reference-app integration yet; see <a href="/platforms.html">Platforms</a> for the evidence.</p>
+    <div class="highlight-callout"><strong>The distinction:</strong> a UI framework decides how your app looks and behaves on each OS. Traverse decides whether a specific rule inside that app is consistent, governed, and auditable everywhere it's called from, including places that have no UI at all, like a batch job or an MCP-connected AI agent.</div>
   </div>
 
   <div class="content-section" id="key-differences">
@@ -44,23 +44,23 @@ const _body = `
       <tbody>
         <tr>
           <td>Primary unit</td>
-          <td>A widget tree or DOM — the thing the user sees and touches</td>
-          <td class="highlight">A governed WASM capability — the rule the app calls into, with no UI of its own</td>
+          <td>A widget tree or DOM: the thing the user sees and touches</td>
+          <td class="highlight">A governed WASM capability: the rule the app calls into, with no UI of its own</td>
         </tr>
         <tr>
           <td>OS reach, shipped today</td>
           <td>Windows, macOS, Linux, iOS, and Android are all shipped and mature for every framework in this group</td>
-          <td class="highlight">Windows, macOS, Linux (native) and browser are shipped. Android and .NET/WinUI embedders are in progress, unreleased. Swift/iOS has a production, on-device-verified wasmi bridge without a certified public release yet — see Platforms.</td>
+          <td class="highlight">Windows, macOS, Linux (native) and browser are shipped. Android and .NET/WinUI embedders are in progress, unreleased. Swift/iOS has a production, on-device-verified wasmi bridge without a certified public release yet: see Platforms.</td>
         </tr>
         <tr>
           <td>Contract enforcement</td>
-          <td>None built in — your logic runs as written, with whatever validation you hand-code</td>
+          <td>None built in: your logic runs as written, with whatever validation you hand-code</td>
           <td class="highlight">Preconditions and postconditions are declared in a machine-readable contract and enforced by the runtime, not by convention</td>
         </tr>
         <tr>
           <td>Execution record</td>
           <td>Whatever logging you add yourself</td>
-          <td class="highlight">A structured trace artifact on every execution — capability, version, inputs validated, outputs validated, timing</td>
+          <td class="highlight">A structured trace artifact on every execution: capability, version, inputs validated, outputs validated, timing</td>
         </tr>
         <tr>
           <td>Reuse outside the app</td>
@@ -102,7 +102,7 @@ const _body = `
 
   <div class="content-section" id="together">
     <h2>Running Traverse inside a Tauri app</h2>
-    <p>Tauri is the most natural pairing here, because its backend is Rust — the same language Traverse capabilities compile from. The UI stays exactly what Tauri already gives you (a native window rendering your web frontend); a Tauri command just calls into the same governed capability your web dashboard and your AI agent call, through the public <code>traverse-embedder</code> crate.</p>
+    <p>Tauri is the most natural pairing here, because its backend is Rust: the same language Traverse capabilities compile from. The UI stays exactly what Tauri already gives you (a native window rendering your web frontend); a Tauri command just calls into the same governed capability your web dashboard and your AI agent call, through the public <code>traverse-embedder</code> crate.</p>
     <div class="code-block">
       <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">src-tauri/src/commands.rs</span></div>
       <div class="code-body"><span class="tok-key">use</span> traverse_embedder::{BundleEmbedder, EmbedderConfig, TraverseEmbedderApi};
@@ -126,20 +126,19 @@ const _body = `
 
     <span class="tok-comment">// embedder.submit() is fire-and-forget (SubmitOutcome only carries a session_id);
     // submit_and_await is a small oneshot-channel helper you write once, bridging
-    // embedder.subscribe()'s event callback to this command's return value —
-    // same bundle the web dashboard and the backend call either way.</span>
+    // embedder.subscribe()'s event callback to this command's return value: // same bundle the web dashboard and the backend call either way.</span>
     <span class="tok-fn">submit_and_await</span>(&amp;<span class="tok-key">mut</span> state.embedder, <span class="tok-str">"promotions.check-eligibility"</span>, &amp;input)
         .<span class="tok-fn">await</span>
         .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())
 }</div>
     </div>
-    <p style="margin-top:1.25rem">Tauri's frontend calls <code>check_discount_eligibility</code> like any other Tauri command — it has no idea the answer came from a governed WASM capability instead of hand-written Rust. The window renders whatever Tauri already renders. The rule underneath it is the exact same binary running in your web app and your CI pipeline.</p>
+    <p style="margin-top:1.25rem">Tauri's frontend calls <code>check_discount_eligibility</code> like any other Tauri command. It has no idea the answer came from a governed WASM capability instead of hand-written Rust. The window renders whatever Tauri already renders. The rule underneath it is the exact same binary running in your web app and your CI pipeline.</p>
   </div>
 
   <div class="content-section" id="verdict">
     <h2>The verdict</h2>
-    <p>These aren't competitors, because they're not solving the same problem. A UI framework decides how your app looks and feels on five different operating systems. Traverse decides whether one specific rule inside that app is trustworthy, auditable, and identical everywhere it runs — including the places that never had a UI to begin with.</p>
-    <p>If your app's logic is simple, lives in one place, and never needs to run outside that app, you probably don't need Traverse — the UI framework you already picked is enough. If a rule inside that app is load-bearing enough that drift between copies would actually hurt (pricing, eligibility, compliance, anything an AI agent also needs to call), that's the rule worth pulling into a governed capability, while the framework you already chose keeps doing what it's good at.</p>
+    <p>These aren't competitors, because they're not solving the same problem. A UI framework decides how your app looks and feels on five different operating systems. Traverse decides whether one specific rule inside that app is trustworthy, auditable, and identical everywhere it runs, including the places that never had a UI to begin with.</p>
+    <p>If your app's logic is simple, lives in one place, and never needs to run outside that app, you probably don't need Traverse: the UI framework you already picked is enough. If a rule inside that app is load-bearing enough that drift between copies would actually hurt (pricing, eligibility, compliance, anything an AI agent also needs to call), that's the rule worth pulling into a governed capability, while the framework you already chose keeps doing what it's good at.</p>
   </div>
 
   <div class="compare-nav">

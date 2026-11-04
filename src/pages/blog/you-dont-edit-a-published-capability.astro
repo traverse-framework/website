@@ -62,7 +62,7 @@ const _body = `
 
       <p>Once a host actually holds a revoked record, the decision is not the agent's. Hosts are clients. <code>traverse-embedder-web</code> (JS/TS), <code>traverse-embedder</code> (Rust), and <code>traverse-mcp</code> call the same <code>runtime.wasm</code>. Python has no SDK; a Python program shells out to <code>traverse-cli capability-package execute</code>. Swift, Kotlin, and .NET are published clients of that same runtime, not separate runtimes. Swift ships a wasmi xcframework on <code>swift-host-v*</code> host tags (Platforms currently lists <code>swift-host-v0.14.0-4</code>). Kotlin is <code>com.traverse-framework:traverse-embedder</code> 0.14.0 on Maven Central. .NET is <code>TraverseEmbedder</code> 0.14.0 on nuget.org. They are pre-1.0 and marked In progress. No host is Certified under Spec 529.</p>
 
-      <p>Decision 127 leaves enforcement with Traverse: the pin resolves, the signal says do not run, and the runtime decides. Refusing the run — fail closed, rather than executing a revoked artifact — is <a href="https://github.com/traverse-framework/traverse/issues/1598" target="_blank" rel="noopener">traverse#1598</a>. It is open. It is not in the v0.14.0 release. Until it ships, do not describe the runtime as already refusing a revoked pin.</p>
+      <p>Decision 127 leaves enforcement with Traverse: the pin resolves, the signal says do not run, and the runtime decides. Refusing the run (fail closed, rather than executing a revoked artifact) is <a href="https://github.com/traverse-framework/traverse/issues/1598" target="_blank" rel="noopener">traverse#1598</a>. It is open. It is not in the v0.14.0 release. Until it ships, do not describe the runtime as already refusing a revoked pin.</p>
 
       <h2 id="trace">Trace</h2>
 
@@ -122,7 +122,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"You don't edit a published capability. You mark it. — Traverse Blog"}
+  title={"You don't edit a published capability. You mark it. | Traverse Blog"}
   description={"When a registry capability version is deprecated or revoked, the contract and artifact stay. Ranges skip the marker. Exact pins in traverse-registry 0.27.0 still resolve with lifecycle status. Runtime refusal is not shipped (traverse#1598)."}
   canonical={"https://traverse-framework.com/blog/you-dont-edit-a-published-capability.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

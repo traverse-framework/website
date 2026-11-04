@@ -26,7 +26,7 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What I/O boundary do Traverse capabilities use today?"
-  description="stdin/stdout JSON through the host — no ambient filesystem. Capabilities hold non-UI logic under discover → execute → trace; hosts supply UI and I/O only."
+  description="stdin/stdout JSON through the host. No ambient filesystem. Capabilities hold non-UI logic under discover → execute → trace; hosts supply UI and I/O only."
   canonical="https://traverse-framework.com/questions/what-io-boundary-do-capabilities-use-today.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
@@ -35,7 +35,7 @@ const relatedLinks = [
   <p><strong>Short answer:</strong> capabilities talk to the outside world as <strong>stdin/stdout JSON</strong> mediated by the host. There is <strong>no ambient filesystem</strong> inside the capability today.</p>
 
   <h2>Why that shape</h2>
-  <p>Value is still <strong>discover → execute → trace</strong>. The capability owns non-UI business rules — pricing, eligibility, codecs, scorers, export gates — as a sandboxed WASM artifact with a contract. The host owns UI, session, persistence, and how bytes get into or out of that sandbox. Keeping the default I/O channel narrow is what makes the same package behave the same way on every honest host.</p>
+  <p>Value is still <strong>discover → execute → trace</strong>. The capability owns non-UI business rules (pricing, eligibility, codecs, scorers, export gates) as a sandboxed WASM artifact with a contract. The host owns UI, session, persistence, and how bytes get into or out of that sandbox. Keeping the default I/O channel narrow is what makes the same package behave the same way on every honest host.</p>
 
   <h2>What “stdin/stdout JSON” means in practice</h2>
   <p>Callers (CLI, embedder, MCP façade) stage a JSON payload the contract accepts, run the package, and read a JSON result (or a structured failure) back. Mesh bytes, tables, and other payloads ride inside that governed JSON shape (often structured IR and/or size-capped encodings). Fail closed over documented limits. The traverse repo documents the contract surface in <code>docs/wasm-io-contract.md</code>.</p>
@@ -43,10 +43,10 @@ const relatedLinks = [
   <h2>What this is not</h2>
   <ul>
     <li>Not “the capability can <code>open()</code> arbitrary paths.” Ambient WASI filesystem is <strong>not</strong> the current shipped boundary for registry capabilities.</li>
-    <li>Not “leave domain logic in the host forever.” Hosts stay thin on purpose — see <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live?</a>.</li>
+    <li>Not “leave domain logic in the host forever.” Hosts stay thin on purpose: see <a href="/questions/where-does-business-logic-live-in-traverse.html">Where does business logic live?</a>.</li>
     <li>Not a ban on declared host calls. A contract may name a specific host call the host implements; that is still host-owned I/O, not ambient OS reach from inside the guest. See <a href="/questions/can-traverse-capabilities-call-native-os-apis.html">Can capabilities call native OS APIs?</a>.</li>
   </ul>
 
   <h2>Living example</h2>
-  <p>The <a href="/questions/what-is-the-print-support-capability-pack.html">print-support capability pack</a> (registry initiative #596; none of the <code>print.*</code> capabilities published yet) uses this same stdin/stdout JSON boundary for mesh codecs, scorers, generators, and export gates. Apps are not the ask — capabilities are.</p>
+  <p>The <a href="/questions/what-is-the-print-support-capability-pack.html">print-support capability pack</a> (registry initiative #596; none of the <code>print.*</code> capabilities published yet) uses this same stdin/stdout JSON boundary for mesh codecs, scorers, generators, and export gates. Apps are not the ask: capabilities are.</p>
 </QuestionLayout>

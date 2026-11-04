@@ -3,20 +3,20 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 import DocsSidebar from '@components/DocsSidebar.astro';
 ---
 
-<SubpageLayout title="CLI Reference — Traverse Framework" description="The supported traverse-cli command surface: bundle, app, capability, event, trace, workflow, and expedition commands, with examples and expected output." canonical="https://traverse-framework.com/docs/cli-reference.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
+<SubpageLayout title="CLI Reference | Traverse Framework" description="The supported traverse-cli command surface: bundle, app, capability, event, trace, workflow, and expedition commands, with examples and expected output." canonical="https://traverse-framework.com/docs/cli-reference.html" crumbs={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs.html' }]}>
   <div class="docs-layout">
     <DocsSidebar active="/docs/cli-reference.html" />
     <main class="docs-content">
       <div class="section-label">Reference</div>
       <h1 class="t-h1">CLI reference</h1>
-      <p class="t-body t-muted">The supported <code>traverse-cli</code> command surface as of Traverse v0.10.1. The binary is the source of truth — build the workspace and pass <code>--help</code> at any level for the exact flags and an example invocation in the checkout you have.</p>
+      <p class="t-body t-muted">The supported <code>traverse-cli</code> command surface as of Traverse v0.10.1. The binary is the source of truth: build the workspace and pass <code>--help</code> at any level for the exact flags and an example invocation in the checkout you have.</p>
       <div class="badges"><span class="badge badge-success badge-dot">v0.10.1</span><span class="badge">traverse-cli</span></div>
 
       <section class="doc-section">
         <h2 class="t-h2">Start from the installed binary</h2>
 <pre><code>cargo build
 cargo run -p traverse-cli-rs -- --help</code></pre>
-        <p class="t-body t-muted">Help is available at every level — <code>traverse-cli --help</code>, family level (<code>traverse-cli bundle --help</code>), and subcommand level (<code>traverse-cli app new --help</code>). Help text is written to stderr and the process exits non-zero, consistent with the CLI's error-output behavior.</p>
+        <p class="t-body t-muted">Help is available at every level: <code>traverse-cli --help</code>, family level (<code>traverse-cli bundle --help</code>), and subcommand level (<code>traverse-cli app new --help</code>). Help text is written to stderr and the process exits non-zero, consistent with the CLI's error-output behavior.</p>
       </section>
 
       <section class="doc-section">
@@ -64,14 +64,14 @@ cargo run -p traverse-cli-rs -- --help</code></pre>
 
       <section class="doc-section">
         <h2 class="t-h2">Stable public surface</h2>
-        <p class="t-body t-muted">These families are the documented surface for the current release line — the commands a downstream developer should rely on from the terminal:</p>
+        <p class="t-body t-muted">These families are the documented surface for the current release line: the commands a downstream developer should rely on from the terminal:</p>
         <p class="t-body t-muted"><code>bundle inspect</code>, <code>bundle register</code>, <code>app new</code>, <code>app validate</code>, <code>app register</code>, <code>capability new</code>, <code>capability-package inspect</code>, <code>capability-package execute</code>, <code>event inspect</code>, <code>trace inspect</code>, <code>workflow inspect</code>, <code>expedition execute</code>.</p>
         <p class="t-body t-muted">Inspect and execute commands print structured summaries to stdout. <code>serve</code> prints a listening address and stays active. Errors go to stderr with a non-zero exit code. Paths under <code>contracts/examples/</code>, <code>workflows/examples/</code>, <code>examples/</code>, <code>scripts/ci/</code>, and <code>target/</code> are reference assets and test helpers, not a product API.</p>
       </section>
 
       <section class="doc-section">
         <h2 class="t-h2">Federation (partial, deferred by design)</h2>
-        <p class="t-body t-muted">The <code>federation</code> family implements manual multi-instance registry federation only — <code>federation peers</code> (peer listing and status), <code>federation sync</code> (manual trigger), <code>federation status</code> (peer sync summary). Automatic sync, a central coordinator, automatic conflict resolution, and a streaming sync transport do not exist. Do not build workflows that depend on them.</p>
+        <p class="t-body t-muted">The <code>federation</code> family implements manual multi-instance registry federation only: <code>federation peers</code> (peer listing and status), <code>federation sync</code> (manual trigger), <code>federation status</code> (peer sync summary). Automatic sync, a central coordinator, automatic conflict resolution, and a streaming sync transport do not exist. Do not build workflows that depend on them.</p>
       </section>
 
       <div class="src-link">

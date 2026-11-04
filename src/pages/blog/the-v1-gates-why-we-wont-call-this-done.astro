@@ -29,13 +29,13 @@ const _body = `
 
       <h2 id="ten-gates">Ten gates, not a vibe</h2>
 
-      <p>The v1.0 milestone for this project isn't a date or a feeling — it's ten explicit, named requirements, published on the roadmap, that all have to be true at the same time. A few of them: every crate actually published on crates.io, not just buildable from source. A five-platform CI stress matrix that actually exercises the cross-platform claim instead of assuming the architecture guarantees it. An MCP library surface, not just the stdio subprocess most people are using today. 100% coverage on every governed path, not just the three core crates that are gated now. Zero open P0/P1 bugs.</p>
+      <p>The v1.0 milestone for this project isn't a date or a feeling. It's ten explicit, named requirements, published on the roadmap, that all have to be true at the same time. A few of them: every crate actually published on crates.io, not just buildable from source. A five-platform CI stress matrix that actually exercises the cross-platform claim instead of assuming the architecture guarantees it. An MCP library surface, not just the stdio subprocess most people are using today. 100% coverage on every governed path, not just the three core crates that are gated now. Zero open P0/P1 bugs.</p>
 
-      <p>None of those are met as a complete set right now. Some are close. Some — the full CI matrix, specifically — are real, tracked gaps, not rounding errors.</p>
+      <p>None of those are met as a complete set right now. Some are close. Some (the full CI matrix, specifically) are real, tracked gaps, not rounding errors.</p>
 
       <h2 id="why-not-round-up">Why I don't round up</h2>
 
-      <p>The tempting move is obvious: call it 1.0 anyway, because "1.0" signals stability and stability is what gets adoption. I've watched other projects do exactly that, and I've been burned by exactly that as a user — building against a "1.0" that turned out to mean "we felt ready," not "we verified the specific things a 1.0 label is supposed to promise."</p>
+      <p>The tempting move is obvious: call it 1.0 anyway, because "1.0" signals stability and stability is what gets adoption. I've watched other projects do exactly that, and I've been burned by exactly that as a user: building against a "1.0" that turned out to mean "we felt ready," not "we verified the specific things a 1.0 label is supposed to promise."</p>
 
       <div class="callout">A version number is a claim, same as "runs on any OS" is a claim. If I'm going to hold myself to evidence for one, I have to hold myself to it for the other.</div>
 
@@ -43,7 +43,7 @@ const _body = `
 
       <h2 id="what-this-means-for-you">What this means if you're evaluating Traverse today</h2>
 
-      <p>It means v0.10.1 is real, useful, and — for its shipped scope — solid: native execution, the CLI, the MCP server, the Web embedder SDK, all functional and used in the examples on this site. It also means you should read "shipped" as "shipped for what it claims" and not assume everything you'd expect from a 1.0 project is already in place. The <a href="/roadmap.html">roadmap</a> is written to make that distinction checkable, not to be skimmed past.</p>
+      <p>It means v0.10.1 is real, useful, and, for its shipped scope, solid: native execution, the CLI, the MCP server, the Web embedder SDK, all functional and used in the examples on this site. It also means you should read "shipped" as "shipped for what it claims" and not assume everything you'd expect from a 1.0 project is already in place. The <a href="/roadmap.html">roadmap</a> is written to make that distinction checkable, not to be skimmed past.</p>
 
     </article>
 
@@ -60,7 +60,7 @@ const _body = `
       <div class="sidebar-card">
         <div class="sidebar-title">Related posts</div>
         <ul class="related-list">
-          <li><a href="/blog/does-traverse-run-on-any-os-honest-answer.html">"Does this work on any OS?" — the honest answer →</a></li>
+          <li><a href="/blog/does-traverse-run-on-any-os-honest-answer.html">"Does this work on any OS?": the honest answer →</a></li>
           <li><a href="/blog/traverse-0-10-governed-composition.html">Traverse v0.10: governed composition →</a></li>
         </ul>
       </div>
@@ -88,7 +88,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title={"The v1.0 gates: why we won't call this done until it's actually done — Traverse Blog"}
+  title={"The v1.0 gates: why we won't call this done until it's actually done | Traverse Blog"}
   description={"Traverse's v1.0 milestone is ten explicit, checkable gates, not a date or a feeling. None are met as a complete set yet, and the roadmap says exactly which ones aren't."}
   canonical={"https://traverse-framework.com/blog/the-v1-gates-why-we-wont-call-this-done.html"}
   crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog.html" }]}

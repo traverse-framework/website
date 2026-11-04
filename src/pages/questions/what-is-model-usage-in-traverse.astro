@@ -35,10 +35,10 @@ const relatedLinks = [
 
   <h2>Where to set it</h2>
   <ul>
-    <li><strong>Rust</strong> — <code>ExactModelHostConnector::model_usage</code>.</li>
-    <li><strong>Web</strong> — <code>modelUsage</code> in the <code>ExactModelBrowserHost</code> options (<code>traverse-embedder-web@0.15.0</code>).</li>
-    <li><strong>Swift</strong> — the <code>modelUsage:</code> argument of <code>ExactModelHost(pins:trustedPublicKeysHex:modelUsage:…)</code>. It has no default, so existing call sites stop compiling until you add it.</li>
-    <li><strong>Kotlin and .NET</strong> — the <code>modelUsage</code> parameter of <code>ExactModelHost</code> in Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.15.0 and nuget.org <code>TraverseEmbedder</code> 0.15.0. It is a nullable string, so pass the exact value.</li>
+    <li><strong>Rust</strong>: <code>ExactModelHostConnector::model_usage</code>.</li>
+    <li><strong>Web</strong>: <code>modelUsage</code> in the <code>ExactModelBrowserHost</code> options (<code>traverse-embedder-web@0.15.0</code>).</li>
+    <li><strong>Swift</strong>: the <code>modelUsage:</code> argument of <code>ExactModelHost(pins:trustedPublicKeysHex:modelUsage:…)</code>. It has no default, so existing call sites stop compiling until you add it.</li>
+    <li><strong>Kotlin and .NET</strong>: the <code>modelUsage</code> parameter of <code>ExactModelHost</code> in Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.15.0 and nuget.org <code>TraverseEmbedder</code> 0.15.0. It is a nullable string, so pass the exact value.</li>
   </ul>
 
   <h2>What the host does with it</h2>

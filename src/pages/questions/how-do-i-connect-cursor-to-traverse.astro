@@ -21,7 +21,7 @@ const _jsonLd = JSON.stringify({
   }],
 });
 
-const _body = `<p>Cursor launches MCP servers as stdio subprocesses, and <code>traverse-mcp</code> is a stdio server, so the wiring is a config entry. The catch on v0.15.0: <code>traverse-mcp</code> speaks its own line-delimited JSON command protocol (one object per line with a <code>command</code> field such as <code>describe_server</code>, <code>list_entrypoints</code> or <code>execute_entrypoint</code>), not the standard MCP JSON-RPC <code>tools/list</code> / <code>tools/call</code> methods. Cursor won't show Traverse tools from this config alone; you need a small translation layer in front of the binary. Contract enforcement stays inside Traverse either way — Cursor is the IDE façade, not the authority for business rules.</p>
+const _body = `<p>Cursor launches MCP servers as stdio subprocesses, and <code>traverse-mcp</code> is a stdio server, so the wiring is a config entry. The catch on v0.15.0: <code>traverse-mcp</code> speaks its own line-delimited JSON command protocol (one object per line with a <code>command</code> field such as <code>describe_server</code>, <code>list_entrypoints</code> or <code>execute_entrypoint</code>), not the standard MCP JSON-RPC <code>tools/list</code> / <code>tools/call</code> methods. Cursor won't show Traverse tools from this config alone; you need a small translation layer in front of the binary. Contract enforcement stays inside Traverse either way: Cursor is the IDE façade, not the authority for business rules.</p>
 
   <h2>Minimal Cursor config</h2>
   <p>Download the prebuilt binary from <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a> (or run <code>cargo build -p traverse-mcp</code> in a traverse checkout), then add something like this under <code>.cursor/mcp.json</code>:</p>
@@ -33,7 +33,7 @@ const _body = `<p>Cursor launches MCP servers as stdio subprocesses, and <code>t
     }
   }
 }</code></pre>
-  <p>The <code>stdio</code> argument is required. Relative paths break when Cursor's working directory is not the repo root — use an absolute path to the binary you just built.</p>
+  <p>The <code>stdio</code> argument is required. Relative paths break when Cursor's working directory is not the repo root: use an absolute path to the binary you just built.</p>
 
   <h2>What to expect</h2>
   <p>Since v0.16.0 (November 2, 2026) there is a prebuilt, checksum-pinned binary on <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.0"><code>traverse-mcp-v0.16.0</code></a>, and <code>traverse-mcp sync</code> + <code>prepare-cache</code> give you a verified Mode A cache in three commands; pass <code>"args": ["stdio", "--cache", "/absolute/path/to/traverse-cache"]</code>. Avoid the crates.io 0.15.0 binary from <code>cargo install</code>: it can't start outside a checkout (<a href="/questions/why-does-traverse-mcp-fail-with-catalog-load-failed.html">catalog_load_failed</a>, traverse#1720). Treat shapes you see in docs as illustrative unless you have verified them against the running binary and <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-stdio-server.md" target="_blank" rel="noopener">docs/mcp-stdio-server.md</a>. Local MCP is a trust-the-host setup; optional bearer-token guidance lives in the core docs if you need a tighter boundary.</p>
@@ -43,7 +43,7 @@ const _body = `<p>Cursor launches MCP servers as stdio subprocesses, and <code>t
 ---
 <QuestionLayout
   title="How do I connect Cursor to Traverse?"
-  description="Point Cursor's MCP config at a local traverse-mcp binary with args including stdio. Same governed tool surface Claude Desktop uses — contracts stay on the Traverse side."
+  description="Point Cursor's MCP config at a local traverse-mcp binary with args including stdio. Same governed tool surface Claude Desktop uses: contracts stay on the Traverse side."
   canonical="https://traverse-framework.com/questions/how-do-i-connect-cursor-to-traverse.html"
   category="AI Agents and MCP"
   relatedLinks={relatedLinks}

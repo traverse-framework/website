@@ -21,7 +21,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">The mental model</div>
       <h2>Capability in, trace out.</h2>
-      <p>Six vocabulary words cover almost everything. A <strong>Capability</strong> is a unit of business logic. A <strong>Contract</strong> declares what it needs and promises, in JSON Schema. An <strong>Event Contract</strong> does the same for things a capability publishes or consumes. A <strong>Workflow</strong> composes capabilities into a sequence. The <strong>Runtime</strong> validates a request against its contract, places it on a target, and executes it. Every execution produces a <strong>Trace</strong> — a structured, queryable record of what ran, against which contract version, with what result.</p>
+      <p>Six vocabulary words cover almost everything. A <strong>Capability</strong> is a unit of business logic. A <strong>Contract</strong> declares what it needs and promises, in JSON Schema. An <strong>Event Contract</strong> does the same for things a capability publishes or consumes. A <strong>Workflow</strong> composes capabilities into a sequence. The <strong>Runtime</strong> validates a request against its contract, places it on a target, and executes it. Every execution produces a <strong>Trace</strong>: a structured, queryable record of what ran, against which contract version, with what result.</p>
     </div>
     <div class="flow-row">
       <div class="flow-node">Contract</div>
@@ -42,7 +42,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Runtime core</div>
       <h2>What executes a capability.</h2>
-      <p>Three crates carry the actual runtime behavior — reading a contract, resolving a capability against the registry, and executing it inside a sandboxed WASM instance with enforced limits.</p>
+      <p>Three crates carry the actual runtime behavior: reading a contract, resolving a capability against the registry, and executing it inside a sandboxed WASM instance with enforced limits.</p>
     </div>
     <div class="crate-grid">
       <div class="crate-card">
@@ -50,7 +50,7 @@ const _body = `<section class="page-hero">
           <code class="crate-name">traverse-runtime</code>
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
-        <p>The core execution engine. Validates a runtime request against its contract, resolves placement, and drives execution against the correct executor — native, thread-pooled, or WASM.</p>
+        <p>The core execution engine. Validates a runtime request against its contract, resolves placement, and drives execution against the correct executor: native, thread-pooled, or WASM.</p>
       </div>
       <div class="crate-card">
         <div class="crate-card-top">
@@ -75,7 +75,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Interfaces</div>
       <h2>How you or an agent talk to it.</h2>
-      <p>Two crates expose the runtime — one for humans at a terminal, one for AI agents over the Model Context Protocol.</p>
+      <p>Two crates expose the runtime: one for humans at a terminal, one for AI agents over the Model Context Protocol.</p>
     </div>
     <div class="crate-grid">
       <div class="crate-card">
@@ -101,7 +101,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Embedding &amp; native bridges</div>
       <h2>How Traverse gets inside your app.</h2>
-      <p>Three crates in the workspace carry native embedding. This is also where the honesty matters most — status varies a lot between them. Full per-platform detail, including the four SDK packages outside this workspace, lives on <a href="/platforms.html">the Platforms page →</a></p>
+      <p>Three crates in the workspace carry native embedding. This is also where the honesty matters most: status varies a lot between them. Full per-platform detail, including the four SDK packages outside this workspace, lives on <a href="/platforms.html">the Platforms page →</a></p>
     </div>
     <div class="crate-grid">
       <div class="crate-card">
@@ -116,14 +116,14 @@ const _body = `<section class="page-hero">
           <code class="crate-name">traverse-native-bridge</code>
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
-        <p>Deterministic builder for the governed native runtime WASM bridge — the foundation layer other native embedders build on.</p>
+        <p>Deterministic builder for the governed native runtime WASM bridge: the foundation layer other native embedders build on.</p>
       </div>
       <div class="crate-card">
         <div class="crate-card-top">
           <code class="crate-name">traverse-swift-host</code>
           <span class="badge badge-accent badge-dot">In progress</span>
         </div>
-        <p>The Apple static-library host behind the production <code>wasmi</code> bridge, released as the <code>TraverseSwiftHost</code> XCFramework that the Swift embedder links. Real, resource-bounded execution verified on device — not yet a certified public release. See the detail on <a href="/platforms.html">Platforms →</a></p>
+        <p>The Apple static-library host behind the production <code>wasmi</code> bridge, released as the <code>TraverseSwiftHost</code> XCFramework that the Swift embedder links. Real, resource-bounded execution verified on device, not yet a certified public release. See the detail on <a href="/platforms.html">Platforms →</a></p>
       </div>
     </div>
   </div>
@@ -141,7 +141,7 @@ const _body = `<section class="page-hero">
           <code class="crate-name">traverse-expedition-wasm</code>
           <span class="badge badge-success badge-dot">Shipped</span>
         </div>
-        <p>The expedition planning domain compiled to <code>wasm32-wasi</code>, governed by spec 027. Six capabilities, five events, one workflow — the canonical proof that a contract can go from definition to a traced execution. See it running in <a href="/examples.html">Examples →</a></p>
+        <p>The expedition planning domain compiled to <code>wasm32-wasi</code>, governed by spec 027. Six capabilities, five events, one workflow: the canonical proof that a contract can go from definition to a traced execution. See it running in <a href="/examples.html">Examples →</a></p>
       </div>
     </div>
   </div>
@@ -152,9 +152,9 @@ const _body = `<section class="page-hero">
     <div class="two-col">
       <div>
         <span class="section-label">Governance</span>
-        <h2 class="section-title-sm">Specs keep the code honest — they are not the product.</h2>
+        <h2 class="section-title-sm">Specs keep the code honest. They are not the product.</h2>
         <p class="section-lead">Every one of the crates above is governed by at least one immutable, versioned spec. The project's own rule, stated plainly in its constitution: when code and contract disagree, the contract wins until it's formally amended. No change merges without passing <code>spec_alignment_check.sh</code> against its governing spec.</p>
-        <p class="section-lead">Approved governing specs live in the repo as an honesty layer. Roughly how they break down by area — our own bucketing for orientation, not an authoritative taxonomy or a marketing number:</p>
+        <p class="section-lead">Approved governing specs live in the repo as an honesty layer. Roughly how they break down by area: our own bucketing for orientation, not an authoritative taxonomy or a marketing number:</p>
         <ul class="spec-breakdown">
           <li><span>Runtime core / execution</span><strong>~14</strong></li>
           <li><span>Contracts &amp; registries</span><strong>~11</strong></li>
@@ -184,7 +184,7 @@ const _body = `<section class="page-hero">
             </a>
             <a href="/examples.html" class="next-link">
               <strong>Examples →</strong>
-              <span>Six real, runnable domains — not one illustrative snippet.</span>
+              <span>Six real, runnable domains, not one illustrative snippet.</span>
             </a>
             <a href="/docs/concepts.html" class="next-link">
               <strong>Docs: Concepts →</strong>
@@ -209,8 +209,8 @@ const _body = `<section class="page-hero">
 </section>`;
 ---
 <SubpageLayout
-  title={"The System — Traverse Framework"}
-  description={"How Traverse is actually built: a shared runtime.wasm, the workspace crates around it, and a governance layer that keeps the code honest — specs are hygiene, not the pitch."}
+  title={"The System | Traverse Framework"}
+  description={"How Traverse is actually built: a shared runtime.wasm, the workspace crates around it, and a governance layer that keeps the code honest. Specs are hygiene, not the pitch."}
   canonical={"https://traverse-framework.com/system.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >

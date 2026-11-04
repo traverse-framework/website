@@ -1,6 +1,6 @@
 /* The /discover graph: renders a discovered BrowserWorkflowProposal as a
  * left-to-right chain (Goal -> capability nodes) and recolours it through the
- * phases — planned / reviewed / running / succeeded / failed — from the real
+ * phases, planned / reviewed / running / succeeded / failed, from the real
  * ComposedWorkflowTrace. AntV G6 5.x (window.G6, loaded via CDN in the page).
  */
 
@@ -26,7 +26,7 @@ function palette() {
 }
 function isDark() { return document.documentElement.getAttribute('data-theme') !== 'light'; }
 
-/* The last dotted segment only — "report.summarize-semantic" -> "summarize-semantic".
+/* The last dotted segment only, "report.summarize-semantic" -> "summarize-semantic".
    Namespace and version stay visible elsewhere (mapping list, trace cards, the
    goal target); the graph is for shape at a glance, not the full identity. */
 function shortName(capabilityId) {
@@ -90,7 +90,7 @@ export function resetGraph(container) {
 /* Re-applies current styles to the already-built graph without touching
    `phase` (so an in-progress or completed run keeps its succeeded/failed
    colouring). Needed because styleFor()/edgeStyleFor() read CSS vars at
-   call time — a theme toggle or viewport resize after the graph was first
+   call time: a theme toggle or viewport resize after the graph was first
    drawn otherwise leaves stale, theme-mismatched colors baked into the
    canvas (e.g. dark-mode label text stranded on a light background). */
 function redraw() {
@@ -144,7 +144,7 @@ export async function renderPlanGraph(container, proposal, aiCapabilityIds = [])
     }
     await graph.fitView({ padding: 26 });
   } catch (e) {
-    // A graph failure must not take the run down — the receipt below is the source of truth.
+    // A graph failure must not take the run down. The receipt below is the source of truth.
     console.error('[discover-graph]', e);
   }
 }
@@ -165,7 +165,7 @@ if (typeof window !== 'undefined') {
     graph.setSize(c.clientWidth, c.clientHeight);
     redraw();
   });
-  // The theme toggle (Nav.astro) only sets documentElement[data-theme] — it
+  // The theme toggle (Nav.astro) only sets documentElement[data-theme]. It
   // dispatches no event. Watch the attribute directly so an already-drawn
   // graph repaints instead of keeping colors baked in for the prior theme.
   new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });

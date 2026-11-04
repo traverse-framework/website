@@ -24,7 +24,7 @@ const _body = `
 
     <article class="post-prose">
 
-      <p>Last week a signed model ran bit-identical on Browser and Node. This week an <strong>agent</strong> gets the same package through MCP-shaped tool calls — and tries to cheat. It tampers a WASM byte, empties the trust roots, and lies about rights. Every attempt fails closed with a stable reason. The legitimate classify still matches Browser and Node byte for byte.</p>
+      <p>Last week a signed model ran bit-identical on Browser and Node. This week an <strong>agent</strong> gets the same package through MCP-shaped tool calls, and tries to cheat. It tampers a WASM byte, empties the trust roots, and lies about rights. Every attempt fails closed with a stable reason. The legitimate classify still matches Browser and Node byte for byte.</p>
 
       <div class="callout">
         Short version: one signed <code>digits-mlp-1.0.0</code> package, one manifest pin, one shared <code>runtime.wasm</code>. Browser, Node, and an agent over MCP-shaped JSON-RPC all hit the same <code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.14.0</code>. Tamper → <code>digest_mismatch</code>. Empty trust → <code>key_untrusted</code>. Rights lie → <code>rights_mismatch</code>. The agent proposes; the runtime decides.
@@ -34,12 +34,12 @@ const _body = `
 
       <figure class="post-figure">
         <img src="/assets/img/blog/agent-mcp-exact-ref-2026-10-09/01-landing.webp" alt="Agent MCP exact-ref demo landing: agent freestyle blocked banner, Browser host, Node proof and Agent MCP transcript columns" width="1280" height="1961" loading="lazy" />
-        <figcaption>Landing: the agent-freestyle banner, then three columns — Browser host, Node proof, Agent MCP transcript — on one pin digest.</figcaption>
+        <figcaption>Landing: the agent-freestyle banner, then three columns (Browser host, Node proof, Agent MCP transcript) on one pin digest.</figcaption>
       </figure>
 
       <h2 id="the-agent">What the agent gets</h2>
 
-      <p>The agent sees MCP-shaped tools: <code>exact_model_register</code>, <code>exact_model_execute</code>, <code>exact_model_rights</code>. JSON-RPC <code>initialize</code>, then <code>tools/call</code>. Behind them is the published <code>ExactModelBrowserHost</code> running under Node — the same host and the same package bytes the Browser column uses.</p>
+      <p>The agent sees MCP-shaped tools: <code>exact_model_register</code>, <code>exact_model_execute</code>, <code>exact_model_rights</code>. JSON-RPC <code>initialize</code>, then <code>tools/call</code>. Behind them is the published <code>ExactModelBrowserHost</code> running under Node: the same host and the same package bytes the Browser column uses.</p>
 
       <p>Be precise about what that column is. It is an <strong>in-process MCP-shaped façade</strong> over the published web exact-ref host. It is <strong>not</strong> the checksum-pinned Mode A <code>traverse-mcp</code> binary. Pinning and verifying that packaged binary is the longer-term story, not this week’s proof.</p>
 
@@ -80,7 +80,7 @@ const _body = `
       <div class="facts-block" id="agent-facts">
         <ul>
           <li><strong>Theme:</strong> Agent speaks MCP. Exact pin kills the freestyle (week of 2026-10-09).</li>
-          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-09-agent-mcp-exact-ref" target="_blank" rel="noopener">2026-10-09-agent-mcp-exact-ref</a>. Not a public clone — <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
+          <li><strong>Public proof:</strong> this post and its screenshots. Runnable tree (access required, repo private): <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-10-09-agent-mcp-exact-ref" target="_blank" rel="noopener">2026-10-09-agent-mcp-exact-ref</a>. Not a public clone: <a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>.</li>
           <li><strong>Product pins:</strong> Traverse <code>v0.14.0</code> @ <code>4dac877c2fe0b28491848016747850ae31327ebc</code>. npm <code>traverse-embedder-web@0.14.0</code>.</li>
           <li><strong>Model:</strong> <code>traverse.digits-mlp@1.0.0</code> (<code>digits-mlp-1.0.0</code>). Manifest schema <code>2.0.0</code>. Governing spec <code>138-governed-exact-model-execution</code>.</li>
           <li><strong>Manifest / pin sha256:</strong> <code>3068f3ae464fbbb43b45b089ab225a1371060a94a214c10629b4d8e402e8eadf</code></li>
@@ -93,7 +93,7 @@ const _body = `
         </ul>
       </div>
 
-      <p>Same signed bytes. Three callers. The agent can ask for anything — only the exact pin runs.</p>
+      <p>Same signed bytes. Three callers. The agent can ask for anything, only the exact pin runs.</p>
 
     </article>
 
@@ -144,7 +144,7 @@ const _body = `
 `;
 ---
 <SubpageLayout
-  title="Agent speaks MCP. Exact pin kills the freestyle. — Traverse Blog"
+  title="Agent speaks MCP. Exact pin kills the freestyle. | Traverse Blog"
   description="Weekly demo: an agent calls MCP-shaped tools against the signed digits-mlp-1.0.0 exact-ref package. Browser + Node bit-identical; tamper, empty trust and rights lie fail closed. Traverse v0.14.0."
   canonical="https://traverse-framework.com/blog/agent-mcp-exact-ref.html"
   crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}

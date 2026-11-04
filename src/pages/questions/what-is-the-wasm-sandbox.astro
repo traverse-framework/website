@@ -30,12 +30,12 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p>By default, a WebAssembly module can't do anything to the outside world. No reading or writing files, no opening network sockets, no spawning threads, no calling arbitrary host functions. It takes inputs, runs pure computation over its own linear memory, and returns outputs. Anything beyond that has to be explicitly imported by the host — the module can't reach out and grab a capability the host didn't hand it.</p>
+  <p>By default, a WebAssembly module can't do anything to the outside world. No reading or writing files, no opening network sockets, no spawning threads, no calling arbitrary host functions. It takes inputs, runs pure computation over its own linear memory, and returns outputs. Anything beyond that has to be explicitly imported by the host: the module can't reach out and grab a capability the host didn't hand it.</p>
 
-  <p>In Traverse, what a capability is allowed to reach outside the sandbox is declared in its contract — things like <code>network_access</code>, <code>filesystem_access</code>, and <code>host_api_access</code>, each defaulting to denied. If a capability tries to do something its contract doesn't declare, the runtime rejects it at the boundary, not somewhere downstream after damage is done.</p>
+  <p>In Traverse, what a capability is allowed to reach outside the sandbox is declared in its contract: things like <code>network_access</code>, <code>filesystem_access</code>, and <code>host_api_access</code>, each defaulting to denied. If a capability tries to do something its contract doesn't declare, the runtime rejects it at the boundary, not somewhere downstream after damage is done.</p>
 
   <h2>Why this matters for cross-OS portability specifically</h2>
-  <p>Every one of those boundary-crossing operations — file paths, socket APIs, thread models — is exactly where OS differences usually leak into application code. A sandbox that denies all of it by default means a capability that never touches the sandbox boundary genuinely has no OS-specific behavior baked in. It's not that Traverse specially handles Windows-vs-Linux filesystem quirks; it's that a well-scoped capability never has to.</p>
+  <p>Every one of those boundary-crossing operations (file paths, socket APIs, thread models) is exactly where OS differences usually leak into application code. A sandbox that denies all of it by default means a capability that never touches the sandbox boundary genuinely has no OS-specific behavior baked in. It's not that Traverse specially handles Windows-vs-Linux filesystem quirks; it's that a well-scoped capability never has to.</p>
 
   <p>The sandbox is also a testability property, not just a security one: logic that can't produce side effects is logic you can test in isolation, without mocking a filesystem or a network. That's a separate benefit from portability, but it comes from the same design decision.</p>
 </QuestionLayout>

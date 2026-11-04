@@ -6,7 +6,7 @@ const _body = `<section class="page-hero">
     <div class="page-hero-inner">
       <span class="section-label">For AI Agents</span>
       <h1 class="t-h1">Capabilities an agent can't misuse.</h1>
-      <p class="page-hero-sub">Function calling tells an agent what a tool does. It says nothing about what has to be true before or after it runs. Traverse exposes governed capabilities over the Model Context Protocol — an agent discovers them, reads their actual contract, and every call is validated and traced.</p>
+      <p class="page-hero-sub">Function calling tells an agent what a tool does. It says nothing about what has to be true before or after it runs. Traverse exposes governed capabilities over the Model Context Protocol: an agent discovers them, reads their actual contract, and every call is validated and traced.</p>
       <div class="page-hero-badges">
         <span class="badge badge-success badge-dot">Shipped</span>
         <span class="badge">traverse-mcp</span>
@@ -21,7 +21,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Read this first</div>
       <h2>The agent freestyled. The runtime said no.</h2>
-      <p>That is the project direction. An agent proposed a $2.4M wire outside policy; Traverse denied it and left a trace. Agents propose; the runtime decides. Value is discover → execute → trace — not freestyle tool calling.</p>
+      <p>That is the project direction. An agent proposed a $2.4M wire outside policy; Traverse denied it and left a trace. Agents propose; the runtime decides. Value is discover → execute → trace, not freestyle tool calling.</p>
     </div>
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.5rem">
       <a href="/blog/agent-freestyle-blocked.html" class="btn btn-primary btn-sm">Blog: freestyle → blocked →</a>
@@ -37,7 +37,7 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Why contracts, not just function definitions</div>
       <h2>An agent that discovers a tool still doesn't know its rules.</h2>
-      <p>A JSON schema for a function's arguments tells an agent the shape of a call. It doesn't say what has to be true beforehand, what's guaranteed afterward, or what the agent should do if a precondition fails. Traverse capabilities carry that as a real contract — preconditions, postconditions, and permissions — and the runtime enforces it on every call, not just the ones a well-behaved agent happens to check first.</p>
+      <p>A JSON schema for a function's arguments tells an agent the shape of a call. It doesn't say what has to be true beforehand, what's guaranteed afterward, or what the agent should do if a precondition fails. Traverse capabilities carry that as a real contract (preconditions, postconditions, and permissions) and the runtime enforces it on every call, not just the ones a well-behaved agent happens to check first.</p>
     </div>
   </div>
 </section>
@@ -53,22 +53,22 @@ const _body = `<section class="page-hero">
       <div class="step">
         <div class="step-num active">01</div>
         <div class="t-h3" style="margin-bottom:0.4rem">Discover</div>
-        <p class="t-body-sm t-muted">List content groups and entrypoints. No credentials required — discovery is always open, even in bearer-token mode.</p>
+        <p class="t-body-sm t-muted">List content groups and entrypoints. No credentials required: discovery is always open, even in bearer-token mode.</p>
       </div>
       <div class="step">
         <div class="step-num active">02</div>
         <div class="t-h3" style="margin-bottom:0.4rem">Inspect</div>
-        <p class="t-body-sm t-muted">Read the real contract for an entrypoint — input/output schema, preconditions, postconditions — before proposing a call.</p>
+        <p class="t-body-sm t-muted">Read the real contract for an entrypoint (input/output schema, preconditions, postconditions) before proposing a call.</p>
       </div>
       <div class="step">
         <div class="step-num active">03</div>
         <div class="t-h3" style="margin-bottom:0.4rem">Execute</div>
-        <p class="t-body-sm t-muted">Call it. The runtime validates the input against the contract first — bad calls are rejected before they run, not after.</p>
+        <p class="t-body-sm t-muted">Call it. The runtime validates the input against the contract first: bad calls are rejected before they run, not after.</p>
       </div>
       <div class="step">
         <div class="step-num active">04</div>
         <div class="t-h3" style="margin-bottom:0.4rem">Trace</div>
-        <p class="t-body-sm t-muted">Every execution returns a public trace summary — a redacted, structured record of what ran and what it returned.</p>
+        <p class="t-body-sm t-muted">Every execution returns a public trace summary: a redacted, structured record of what ran and what it returned.</p>
       </div>
     </div>
   </div>
@@ -79,17 +79,17 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">The real tool list</div>
       <h2>Ten commands, one JSON envelope.</h2>
-      <p>This is the actual command set exposed by <code>traverse-mcp</code> today — not an illustrative subset.</p>
+      <p>This is the actual command set exposed by <code>traverse-mcp</code> today, not an illustrative subset.</p>
     </div>
     <div class="mcp-table-wrap">
       <table class="mcp-table">
         <tbody>
-          <tr><td><code>describe_server</code></td><td>Server identity and capabilities — the first call any agent makes.</td></tr>
+          <tr><td><code>describe_server</code></td><td>Server identity and capabilities: the first call any agent makes.</td></tr>
           <tr><td><code>list_content_groups</code></td><td>List the available content groups (the first one shipped is <code>core-runtime-example</code>).</td></tr>
-          <tr><td><code>describe_content_group</code></td><td>Detail on one content group — what capabilities, events, and workflows it holds.</td></tr>
+          <tr><td><code>describe_content_group</code></td><td>Detail on one content group. What capabilities, events, and workflows it holds.</td></tr>
           <tr><td><code>list_entrypoints</code></td><td>List the capabilities and workflows an agent can actually call.</td></tr>
           <tr><td><code>search_capabilities</code></td><td>Search the verified public registry metadata by query.</td></tr>
-          <tr><td><code>describe_entrypoint</code></td><td>The full contract for one entrypoint — schema, preconditions, postconditions.</td></tr>
+          <tr><td><code>describe_entrypoint</code></td><td>The full contract for one entrypoint: schema, preconditions, postconditions.</td></tr>
           <tr><td><code>validate_entrypoint</code></td><td>Dry-run a proposed input against the contract without executing anything.</td></tr>
           <tr><td><code>execute_entrypoint</code></td><td>Run it. Returns a public trace summary in the response.</td></tr>
           <tr><td><code>render_execution_report</code></td><td>A human- or agent-readable report of a past execution.</td></tr>
@@ -105,8 +105,8 @@ const _body = `<section class="page-hero">
     <div class="section-header">
       <div class="section-label">Building with a coding agent</div>
       <h2>A Claude Skill that checks the registry before it writes anything.</h2>
-      <p><a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">traverse-framework/claude-skills</a> hosts Claude Skills for building apps with Traverse — starting with <code>traverse-capability-author</code> (plus <code>traverse-capability-extractor</code> and <code>traverse-workflow-planner</code>), which check the registry before authoring, write a real JSON-Schema contract only when nothing fits, produce genuinely executable ABI-compliant WASM, and open a human-reviewed PR — validated against the real <code>traverse-cli</code>. It also states this platform's current limitations plainly, since a skill that overclaims what Traverse can run today is worse than no skill at all.</p>
-      <p>Before authoring anything new, check the <a href="/registry.html">Registry</a> — every published capability, browsable with real coverage and use-case data, not just a raw JSON index.</p>
+      <p><a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener">traverse-framework/claude-skills</a> hosts Claude Skills for building apps with Traverse: starting with <code>traverse-capability-author</code> (plus <code>traverse-capability-extractor</code> and <code>traverse-workflow-planner</code>), which check the registry before authoring, write a real JSON-Schema contract only when nothing fits, produce genuinely executable ABI-compliant WASM, and open a human-reviewed PR: validated against the real <code>traverse-cli</code>. It also states this platform's current limitations plainly, since a skill that overclaims what Traverse can run today is worse than no skill at all.</p>
+      <p>Before authoring anything new, check the <a href="/registry.html">Registry</a>: every published capability, browsable with real coverage and use-case data, not just a raw JSON index.</p>
       <a href="https://github.com/traverse-framework/claude-skills" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">See the skill →</a>
     </div>
   </div>
@@ -129,7 +129,7 @@ const _body = `<section class="page-hero">
             <div class="terminal-line" style="margin-top:0.5rem"><span class="terminal-out success">MCP server ready on stdio (local_trust mode)</span></div>
           </div>
         </div>
-        <p class="section-lead" style="margin-top:1.5rem">For a real, end-to-end agent session — connect, discover, inspect a contract, execute the approved <code>plan-expedition</code> workflow — follow the full walkthrough.</p>
+        <p class="section-lead" style="margin-top:1.5rem">For a real, end-to-end agent session (connect, discover, inspect a contract, execute the approved <code>plan-expedition</code> workflow) follow the full walkthrough.</p>
         <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-real-agent-exercise.md" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Read the real-agent exercise →</a>
       </div>
       <div>
@@ -140,11 +140,11 @@ const _body = `<section class="page-hero">
           <div class="checklist">
             <div class="checklist-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <span><strong style="color:var(--fg)">Stdio is the packaged bootstrap mode.</strong> <code>traverse-mcp</code> also ships as a Rust library — <code>discover_capabilities</code> and <code>execute_capability</code> are public, in-process functions (spec 042) — but the only packaged, ready-to-run entrypoint today is the stdio subprocess.</span>
+              <span><strong style="color:var(--fg)">Stdio is the packaged bootstrap mode.</strong> <code>traverse-mcp</code> also ships as a Rust library: <code>discover_capabilities</code> and <code>execute_capability</code> are public, in-process functions (spec 042), but the only packaged, ready-to-run entrypoint today is the stdio subprocess.</span>
             </div>
             <div class="checklist-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <span><strong style="color:var(--fg)">The Oct 9 exact-ref demo is not this server.</strong> That write-up is an in-process MCP-shaped JSON-RPC façade over <code>ExactModelBrowserHost</code> under Node. Mode A <code>traverse-mcp</code> is the stdio server on this page. <a href="/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html">They are not the same.</a> Checksum-pinned Mode A binaries shipped with v0.16.0; the current set is <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.1" target="_blank" rel="noopener"><code>traverse-mcp-v0.16.1</code></a> (Linux x64, Linux arm64, macOS arm64, Windows x64, with <code>SHA256SUMS</code> and provenance): download, <code>traverse-mcp sync</code>, <code>traverse-mcp prepare-cache</code> — no Rust toolchain.</span>
+              <span><strong style="color:var(--fg)">The Oct 9 exact-ref demo is not this server.</strong> That write-up is an in-process MCP-shaped JSON-RPC façade over <code>ExactModelBrowserHost</code> under Node. Mode A <code>traverse-mcp</code> is the stdio server on this page. <a href="/questions/is-the-agent-mcp-demo-the-same-as-traverse-mcp.html">They are not the same.</a> Checksum-pinned Mode A binaries shipped with v0.16.0; the current set is <a href="https://github.com/traverse-framework/traverse/releases/tag/traverse-mcp-v0.16.1" target="_blank" rel="noopener"><code>traverse-mcp-v0.16.1</code></a> (Linux x64, Linux arm64, macOS arm64, Windows x64, with <code>SHA256SUMS</code> and provenance): download, <code>traverse-mcp sync</code>, <code>traverse-mcp prepare-cache</code>: no Rust toolchain.</span>
             </div>
             <div class="checklist-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -174,8 +174,8 @@ const _body = `<section class="page-hero">
 </section>`;
 ---
 <SubpageLayout
-  title={"For AI Agents — Traverse Framework"}
-  description={"How an AI agent discovers, inspects, executes, and traces governed capabilities through the traverse-mcp stdio server — the real tool list, the real flow, the real limits."}
+  title={"For AI Agents | Traverse Framework"}
+  description={"How an AI agent discovers, inspects, executes, and traces governed capabilities through the traverse-mcp stdio server: the real tool list, the real flow, the real limits."}
   canonical={"https://traverse-framework.com/agents.html"}
   crumbs={[{ label: "Home", href: "/" }]}
 >
