@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Which hosts run signed exact-ref models in Traverse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Discover → execute → trace. One shared runtime.wasm; embedders are clients. As of Traverse v0.15.0, published exact-ref execute is native Rust, traverse-embedder-web@0.15.0, Swift ExactModelHost on swift-host-v0.15.0, Kotlin ExactModelHost in Maven Central com.traverse-framework:traverse-embedder 0.15.0, and .NET ExactModelHost in nuget.org TraverseEmbedder 0.15.0. Every host enforces model_usage. Apple hosts can opt in to a signed Core ML variant; default placement stays wasm-cpu. Governed-path iPhone evidence shipped in v0.16.0 (traverse#1630): BirdNET on one iPhone 14 Pro Max ran at p95 141 ms per 3 s clip under the policy [coreml, wasm-cpu]. It relies on manifest schema 2.3.0 (new in v0.16.0) score_transform, so v0.15.0 alone does not reproduce it. digits-mlp-1.0.0 uses a test-only key; production custody is #1567. No host is Certified.',
+      text: 'Discover → execute → trace. One shared runtime.wasm; embedders are clients. Published exact-ref execute first shipped on all five hosts in Traverse v0.15.0. As of v0.16.2 (November 4, 2026) it is native Rust (crates 0.16.2), traverse-embedder-web@0.16.2, Swift ExactModelHost on swift-host-v0.16.2, Kotlin ExactModelHost in Maven Central com.traverse-framework:traverse-embedder 0.16.2, and .NET ExactModelHost in nuget.org TraverseEmbedder 0.16.2. Since v0.16.0 the execution policy is set at registration. Every host enforces model_usage. Apple hosts can opt in to a signed Core ML variant; default placement stays wasm-cpu. Governed-path iPhone evidence shipped in v0.16.0 (traverse#1630): BirdNET on one iPhone 14 Pro Max ran at p95 141 ms per 3 s clip under the policy [coreml, wasm-cpu]. It relies on manifest schema 2.3.0 (new in v0.16.0) score_transform, so v0.15.0 alone does not reproduce it. digits-mlp-1.0.0 uses a test-only key; production custody is #1567. No host is Certified.',
     },
   }],
 });
@@ -28,21 +28,21 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Which hosts run signed exact-ref models in Traverse?"
-  description="Discover → execute → trace on one shared runtime.wasm. v0.15.0 exact-ref: native, web, Swift swift-host-v0.15.0, Kotlin and .NET 0.15.0. model_usage is required. No host is Certified."
+  description="Discover → execute → trace on one shared runtime.wasm. Exact-ref on v0.16.2: native, web, Swift swift-host-v0.16.2, Kotlin and .NET 0.16.2. model_usage is required. No host is Certified."
   canonical="https://traverse-framework.com/questions/which-hosts-run-signed-exact-ref-models.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> discover → execute → trace, on one shared <code>runtime.wasm</code>. As of <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.15.0">v0.15.0</a>, published exact-ref execute is native Rust, the web embedder, Swift, Kotlin, and .NET. Pin by digest and signature. A naked URL is not identity. No host is Certified under Spec 529.</p>
+  <p><strong>Short answer:</strong> discover → execute → trace, on one shared <code>runtime.wasm</code>. Since <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.15.0">v0.15.0</a>, published exact-ref execute is native Rust, the web embedder, Swift, Kotlin, and .NET. The current release is <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.2">v0.16.2</a>. Pin by digest and signature. A naked URL is not identity. No host is Certified under Spec 529.</p>
 
   <h2>Honest matrix (checked 14 October 2026)</h2>
   <ul>
-    <li><strong>Native Rust</strong>: <code>ExactModelHostConnector</code> in the v0.15.0 crates. <code>model_usage</code> is required.</li>
-    <li><strong>Web</strong>: published <code>traverse-embedder-web@0.15.0</code> executes exact-ref (<code>ExactModelBrowserHost</code>). Pass <code>modelUsage</code> whenever pins exist.</li>
-    <li><strong>Swift</strong>: <code>ExactModelHost</code> is in the published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.15.0"><code>swift-host-v0.15.0</code></a>. <code>Package.swift</code> at the v0.15.0 line pinned its rebuild <code>swift-host-v0.15.0-1</code> (Traverse v0.16.0 ships <code>swift-host-v0.16.0</code>; main pins it since #1769), which adds the Spec 138 guest reject codes (<a href="https://github.com/traverse-framework/traverse/pull/1695">#1695</a>). The v0.15.0 tag's <code>Package.swift</code> still pointed at <code>swift-host-v0.14.0-4</code>. Distribution is GitHub Release + SPM binary target.</li>
-    <li><strong>Kotlin</strong>: Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.15.0 includes <code>ExactModelHost</code> (<a href="https://github.com/traverse-framework/traverse/issues/1580">#1580</a>, <a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a> closed). The 0.14.0 AAR did not.</li>
-    <li><strong>.NET</strong>: nuget.org <code>TraverseEmbedder</code> 0.15.0 includes <code>ExactModelHost</code> (<a href="https://github.com/traverse-framework/traverse/issues/1602">#1602</a>, #1651 closed). The 0.14.0 package did not. Native engine RIDs in the release: <code>win-x64</code>, <code>win-arm64</code>, <code>linux-x64</code>.</li>
+    <li><strong>Native Rust</strong>: <code>ExactModelHostConnector</code> in <code>traverse-runtime</code> (0.16.2 today, since 0.15.0). <code>model_usage</code> is required.</li>
+    <li><strong>Web</strong>: published <code>traverse-embedder-web@0.16.2</code> executes exact-ref (<code>ExactModelBrowserHost</code>). Pass <code>modelUsage</code> whenever pins exist.</li>
+    <li><strong>Swift</strong>: <code>ExactModelHost</code> is in the published xcframework <a href="https://github.com/traverse-framework/traverse/releases/tag/swift-host-v0.16.2"><code>swift-host-v0.16.2</code></a> (the v0.16.2 tag's <code>Package.swift</code> pins <code>swift-host-v0.16.1</code>; main pins v0.16.2 since #1798). It first shipped on <code>swift-host-v0.15.0</code>. <code>Package.swift</code> at the v0.15.0 line pinned its rebuild <code>swift-host-v0.15.0-1</code> (Traverse v0.16.0 ships <code>swift-host-v0.16.0</code>; main pins it since #1769), which adds the Spec 138 guest reject codes (<a href="https://github.com/traverse-framework/traverse/pull/1695">#1695</a>). The v0.15.0 tag's <code>Package.swift</code> still pointed at <code>swift-host-v0.14.0-4</code>. Distribution is GitHub Release + SPM binary target.</li>
+    <li><strong>Kotlin</strong>: Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.16.2 includes <code>ExactModelHost</code> (since 0.15.0 ; <a href="https://github.com/traverse-framework/traverse/issues/1580">#1580</a>, <a href="https://github.com/traverse-framework/traverse/issues/1651">#1651</a> closed). The 0.14.0 AAR did not.</li>
+    <li><strong>.NET</strong>: nuget.org <code>TraverseEmbedder</code> 0.16.2 includes <code>ExactModelHost</code> (since 0.15.0; <a href="https://github.com/traverse-framework/traverse/issues/1602">#1602</a>, #1651 closed). The 0.14.0 package did not. Native engine RIDs in the release: <code>win-x64</code>, <code>win-arm64</code>, <code>linux-x64</code>.</li>
   </ul>
 
   <h2>Rights, ONNX, and Core ML</h2>

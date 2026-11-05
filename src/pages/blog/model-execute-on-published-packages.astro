@@ -76,16 +76,18 @@ const _body = `
       <h2 id="not-yet">What isn't true yet</h2>
 
       <ul>
-        <li><strong><code>runtime.wasm</code> isn't in a package.</strong> npm doesn't ship it, and the last <code>runtime-wasm-v*</code> release is v0.11.0. The demo fetches it from the <code>v0.16.1</code> tag and checks the digest (<a href="https://github.com/traverse-framework/traverse/issues/1784" target="_blank" rel="noopener">#1784</a>; <a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">where to get it today</a>). The test-signed model package also comes from the tag.</li>
+        <li><strong><code>runtime.wasm</code> isn't in a package.</strong> npm doesn't ship it, and the last <code>runtime-wasm-v*</code> release is v0.11.0. The demo fetches it from the <code>v0.16.1</code> tag and checks the digest (<a href="https://github.com/traverse-framework/traverse/issues/1784" target="_blank" rel="noopener">#1784</a>; <a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">where to get it today</a>). The test-signed model package also comes from the tag. <strong>Update, November 5:</strong> <code>runtime.wasm</code> now has artifact-only releases again, <a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.1" target="_blank" rel="noopener"><code>runtime-wasm-v0.16.1</code></a> and <a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.2" target="_blank" rel="noopener"><code>runtime-wasm-v0.16.2</code></a> (#1784 closed by <a href="https://github.com/traverse-framework/traverse/pull/1797" target="_blank" rel="noopener">#1797</a>). npm still doesn't ship it.</li>
         <li><strong>Native frame readback.</strong> The one-call native <code>activate_exact_model_runtime</code> gives the same output, but a caller can't read the output frame back through it. The frame check uses <code>ExactModelMediatedConnector</code> directly (<a href="https://github.com/traverse-framework/traverse/issues/1785" target="_blank" rel="noopener">#1785</a>).</li>
         <li><strong>Swift, Android and .NET</strong> have no activation API for this yet, and weren't run. <code>traverse-mcp</code>, Maven and NuGet weren't used.</li>
         <li><strong>The browser run was by hand</strong> for the committed proof. The clean runner covers it in headless Chrome.</li>
         <li><strong>No live-Registry model rights claim.</strong> Validating against live registry records is <a href="https://github.com/traverse-framework/traverse/issues/1786" target="_blank" rel="noopener">#1786</a>. No host is Certified under Spec 529.</li>
       </ul>
 
-      <h2 id="on-main">On main, not released</h2>
+      <h2 id="on-main">Shipped in v0.16.2</h2>
 
-      <p>Application manifests and CLI activation can now declare host-connector invokes. That is <a href="https://github.com/traverse-framework/traverse/issues/1772" target="_blank" rel="noopener">#1772</a>, merged November 4 via <a href="https://github.com/traverse-framework/traverse/pull/1788" target="_blank" rel="noopener">#1788</a>, on top of the published <code>traverse-registry</code> 0.31.0 invoke union. It isn't in any release yet. A v0.16.2 release PR (<a href="https://github.com/traverse-framework/traverse/pull/1793" target="_blank" rel="noopener">#1793</a>) is open as of this writing.</p>
+      <p>Application manifests and CLI activation can now declare host-connector invokes. That is <a href="https://github.com/traverse-framework/traverse/issues/1772" target="_blank" rel="noopener">#1772</a>, merged November 4 via <a href="https://github.com/traverse-framework/traverse/pull/1788" target="_blank" rel="noopener">#1788</a>, on top of the published <code>traverse-registry</code> 0.31.0 invoke union. When this post went up it was on main and not in a release.</p>
+
+      <p><strong>Update, November 5, 2026:</strong> it shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.2" target="_blank" rel="noopener">Traverse v0.16.2</a> (November 4, via <a href="https://github.com/traverse-framework/traverse/pull/1793" target="_blank" rel="noopener">#1793</a>). All six crates, npm, Maven Central and nuget.org are at 0.16.2 (<a href="/questions/can-a-traverse-application-manifest-invoke-a-host-connector.html">what a host-connector invoke looks like</a>).</p>
 
       <h2 id="reproduce">Reproduce it</h2>
 
@@ -104,8 +106,8 @@ node src/compare.mjs      # fails if the run differs from proof/comparison.json<
           <li><strong>Claim:</strong> published catalog <code>model/model.execute@1.0.0</code> (<code>5ccfa372…</code>) over signed <code>traverse.digits-onnx@1.0.0</code> (test-only key) gives identical success output, an identical 56-byte frame and six identical fail-closed cases on native (crates.io <code>traverse-runtime</code> 0.16.1), Node 24.16.0 and Chromium 152 (npm <code>traverse-embedder-web@0.16.1</code>). Native adds <code>placement_evidence</code> (Spec 1719 FR-014).</li>
           <li><strong>Evidence:</strong> traverse#1782 (<code>docs/evidence/model-execute-published-2026-11-03</code>, <code>all_identical: true</code>); clean-runner CI traverse#1783 (<code>published-model-execute-demo.yml</code>, weekly Mondays, pinned to v0.16.1); #1776 closed.</li>
           <li><strong>Web API (v0.16.1):</strong> <code>BundleEmbedder.activateMediatedConnector</code> + <code>exactModelMediatedConnector</code>, <code>submitAsync</code>; sync <code>submit</code> → <code>async_submit_required</code>.</li>
-          <li><strong>Gaps:</strong> <code>runtime.wasm</code> (<code>7a322a17…</code>) and the model package come from the v0.16.1 tag (#1784); native frame readback (#1785); no Swift/Android/.NET activation API; live-Registry rights #1786; no Spec 529 certification.</li>
-          <li><strong>Unreleased on main (Nov 4):</strong> host-connector invokes in application manifests and CLI activation (#1772 via #1788, registry 0.31.0); v0.16.2 release PR #1793 open.</li>
+          <li><strong>Gaps:</strong> the model package comes from the v0.16.1 tag; <code>runtime.wasm</code> (<code>7a322a17…</code>) came from the tag at run time and is now also on the <code>runtime-wasm-v0.16.1</code> release (#1784 closed by #1797); native frame readback (#1785); no Swift/Android/.NET activation API; live-Registry rights #1786; no Spec 529 certification.</li>
+          <li><strong>Shipped in v0.16.2 (Nov 4):</strong> host-connector invokes in CLI workspace application manifests (#1772 via #1788, registry 0.31.0).</li>
           <li><strong>Lead claim:</strong> one shared runtime; hosts are clients that answer connector calls. Discover → execute → trace.</li>
         </ul>
       </div>
@@ -120,7 +122,7 @@ node src/compare.mjs      # fails if the run differs from proof/comparison.json<
           <li><a href="#what-matched">What matched</a></li>
           <li><a href="#why">Why three hosts agree</a></li>
           <li><a href="#not-yet">What isn't true yet</a></li>
-          <li><a href="#on-main">On main, not released</a></li>
+          <li><a href="#on-main">Shipped in v0.16.2</a></li>
           <li><a href="#reproduce">Reproduce it</a></li>
           <li><a href="#facts-for-agents">Facts for agents</a></li>
         </ul>
