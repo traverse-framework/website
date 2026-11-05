@@ -31,7 +31,7 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> your capability calls a host connector through the <code>traverse_host.connector_invoke</code> import, and the published browser and Node <code>runtime.wasm</code> doesn't provide that import yet. It's a known gap in v0.15.0. v0.16.0 links the import, and v0.16.1 adds the Browser and Node activation API, so upgrade to <code>traverse-embedder-web@0.16.1</code> (tracked in <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a>, now closed). It isn't a problem with your bundle or its digest.</p>
+  <p><strong>Short answer:</strong> your capability calls a host connector through the <code>traverse_host.connector_invoke</code> import, and the published browser and Node <code>runtime.wasm</code> doesn't provide that import yet. It's a known gap in v0.15.0. v0.16.0 links the import, and v0.16.1 adds the Browser and Node activation API, so upgrade to <code>traverse-embedder-web@0.16.1</code> or later (current: 0.16.2) (tracked in <a href="https://github.com/traverse-framework/traverse/issues/1719">traverse#1719</a>, now closed). It isn't a problem with your bundle or its digest.</p>
 
   <h2>Update, November 2, 2026: partly fixed in v0.16.0</h2>
   <p><a href="https://github.com/traverse-framework/traverse/pull/1755">traverse#1755</a> is in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.0">Traverse v0.16.0</a>, released November 2, 2026 (<code>traverse-embedder-web@0.16.0</code> on npm). The Browser and Node part came in v0.16.1 (below). Upgrading? See <a href="/questions/how-do-i-upgrade-to-traverse-v0-16-0.html">How do I upgrade to Traverse v0.16.0?</a></p>
@@ -48,7 +48,7 @@ const relatedLinks = [
     <li><strong>Suspend and resume.</strong> A guest calling a connector the host answers asynchronously suspends at <code>connector_invoke</code> and resumes on the next submit, through the same Spec 104 checks. No exported symbol or bridge ABI version changed, so a host that doesn't opt in sees no difference.</li>
     <li><strong>Output filter fix.</strong> The host-private filter no longer rejects the public URLs inside a signed rights record in the top-level <code>model_evidence</code> of <code>traverse.model-runtime</code>, on native and nested.</li>
     <li><strong>Run on published packages.</strong> The published <code>model.execute@1.0.0</code> guest ran unchanged on native, Node and Chromium from the v0.16.1 packages, with identical output and six identical fail-closed reasons (<a href="/questions/does-catalog-model-execute-run-on-published-traverse-packages.html">details</a>, <a href="https://github.com/traverse-framework/traverse/pull/1782">#1782</a>).</li>
-    <li><strong>Still open:</strong> Swift, Android and .NET activation APIs aren't shipped. <code>runtime.wasm</code> still comes from the release tag, not a package (<a href="https://github.com/traverse-framework/traverse/issues/1784">#1784</a>).</li>
+    <li><strong>Still open:</strong> Swift, Android and .NET activation APIs aren't shipped. <code>runtime.wasm</code> isn't in the npm package; download it from the matching <code>runtime-wasm-vX.Y.Z</code> release, such as <code>runtime-wasm-v0.16.2</code> (<a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">details</a>).</li>
   </ul>
   <p>The rest of this page describes the 0.15.0 packages, where the import is missing entirely.</p>
 

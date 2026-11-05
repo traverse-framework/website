@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Where does BundleEmbedder get runtime.wasm?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'From your app bundle. BundleEmbedder in traverse-embedder-web loads runtime/runtime.wasm plus runtime/runtime.wasm.sha256 from the bundle, verifies the digest, and fails closed at init if the file is missing. The npm package does not ship runtime.wasm, and as of v0.16.1 no GitHub release ships it either: the last runtime-wasm-v* release is runtime-wasm-v0.11.0. Without building it yourself, fetch it from the release tag (for v0.16.1, runtime/runtime.wasm at tag v0.16.1, sha256 7a322a17e3fd58f8bd26e915dd81bad68732500dc981499bd280a6d2e6507d52) and check it against runtime/runtime-release.json at the same tag. How apps should get it is an open decision in traverse#1784.',
+      text: 'From your app bundle. BundleEmbedder in traverse-embedder-web loads runtime/runtime.wasm plus runtime/runtime.wasm.sha256 from the bundle, verifies the digest, and fails closed at init if the file is missing. The npm package does not ship runtime.wasm. Since November 4, 2026 you can download it from an artifact-only GitHub release that matches your traverse-embedder-web version: runtime-wasm-v0.16.2 (sha256 b313b5c5c11291d9e9669125a0a9a77aa42a911b15d431a73e86b17c874e298c) or runtime-wasm-v0.16.1 (sha256 7a322a17e3fd58f8bd26e915dd81bad68732500dc981499bd280a6d2e6507d52). Each release carries runtime.wasm, runtime.wasm.sha256 and runtime-release.json. traverse#1784 was closed by traverse#1797, which makes every future product tag publish runtime-wasm-vX.Y.Z before the product release. The file is also committed at runtime/runtime.wasm on each release tag.',
     },
   }],
 });
@@ -23,30 +23,33 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Where does BundleEmbedder get runtime.wasm?"
-  description="From your app bundle, digest-checked. npm traverse-embedder-web doesn't ship it, and no release has shipped it since runtime-wasm-v0.11.0, so today you take it from the release tag. Tracked in traverse#1784."
+  description="From your app bundle, digest-checked. npm traverse-embedder-web doesn't ship it. Download it from the runtime-wasm-v0.16.2 GitHub release that matches your package, and check the sha256."
   canonical="https://traverse-framework.com/questions/where-does-bundleembedder-get-runtime-wasm.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> from your app bundle. <code>BundleEmbedder</code> loads <code>runtime/runtime.wasm</code> and <code>runtime/runtime.wasm.sha256</code> from the bundle you give it, checks the digest, and fails closed at <code>init</code> if the file isn't there. The catch is where you get the file in the first place: today it comes from the git tag, not from a package or a release.</p>
+  <p><strong>Short answer:</strong> from your app bundle. <code>BundleEmbedder</code> loads <code>runtime/runtime.wasm</code> and <code>runtime/runtime.wasm.sha256</code> from the bundle you give it, checks the digest, and fails closed at <code>init</code> if the file isn't there. To get the file, download it from the <code>runtime-wasm</code> release that matches your <code>traverse-embedder-web</code> version.</p>
 
-  <h2>What ships where (v0.16.1)</h2>
+  <h2>What ships where (v0.16.2)</h2>
   <ul>
     <li><strong>npm <code>traverse-embedder-web</code></strong> doesn't include <code>runtime.wasm</code>. Its README says so: the orchestrator belongs to the app bundle.</li>
-    <li><strong>The v0.16.1 GitHub Release</strong> is notes only.</li>
-    <li><strong>The last <code>runtime-wasm-v*</code> release</strong> is <code>runtime-wasm-v0.11.0</code> (September 16, 2026). That's far too old for a v0.16.x embedder.</li>
-    <li><strong>The tag has it.</strong> <code>runtime/runtime.wasm</code> and <code>runtime/runtime-release.json</code> are committed at each release tag.</li>
+    <li><strong><a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.2"><code>runtime-wasm-v0.16.2</code></a></strong> and <strong><a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.1"><code>runtime-wasm-v0.16.1</code></a></strong> are artifact-only GitHub releases, published November 4, 2026. Each has <code>runtime.wasm</code>, <code>runtime.wasm.sha256</code> and <code>runtime-release.json</code>. They are never marked Latest.</li>
+    <li><strong>The tag still has it.</strong> <code>runtime/runtime.wasm</code> and <code>runtime/runtime-release.json</code> are committed at each release tag, with the same bytes.</li>
+    <li>Before November 4 the last <code>runtime-wasm-v*</code> release was <code>runtime-wasm-v0.11.0</code>, so v0.16.0 has no matching release. Take v0.16.0 from its tag.</li>
   </ul>
 
-  <h2>What to do today</h2>
-  <p>Take <code>runtime/runtime.wasm</code> from the tag that matches your <code>traverse-embedder-web</code> version, and check it against <code>runtime/runtime-release.json</code> from the same tag before you put it in your bundle. For v0.16.1:</p>
-  <pre><code>curl -fsSLO https://raw.githubusercontent.com/traverse-framework/traverse/v0.16.1/runtime/runtime.wasm
+  <h2>What to do</h2>
+  <p>Download the three files for your version and check the digest before you put the file in your bundle. For v0.16.2:</p>
+  <pre><code>BASE=https://github.com/traverse-framework/traverse/releases/download/runtime-wasm-v0.16.2
+curl -fsSLO $BASE/runtime.wasm
+curl -fsSLO $BASE/runtime.wasm.sha256
+curl -fsSLO $BASE/runtime-release.json
 sha256sum runtime.wasm
-# expect 7a322a17e3fd58f8bd26e915dd81bad68732500dc981499bd280a6d2e6507d52</code></pre>
-  <p><code>runtime-release.json</code> at v0.16.1 reads <code>runtime_version</code> 0.16.1, <code>bridge_version</code> 1.1.0, <code>bridge_abi_version</code> 10100, and the same sha256. Then write <code>sha256:&lt;hex&gt;</code> into <code>runtime/runtime.wasm.sha256</code> in your bundle. The published-package proof for <a href="/questions/does-catalog-model-execute-run-on-published-traverse-packages.html">catalog <code>model.execute</code></a> does exactly this, and its clean-runner CI checks the digest every run.</p>
+# expect b313b5c5c11291d9e9669125a0a9a77aa42a911b15d431a73e86b17c874e298c</code></pre>
+  <p><code>runtime-release.json</code> for v0.16.2 reads <code>runtime_version</code> 0.16.2, <code>bridge_version</code> 1.1.0, <code>bridge_abi_version</code> 10100, and the same sha256. <code>runtime.wasm.sha256</code> already holds <code>sha256:&lt;hex&gt;</code>, the form the bundle expects, so it can go straight into <code>runtime/</code>. For v0.16.1 use <code>runtime-wasm-v0.16.1</code> and expect <code>7a322a17e3fd58f8bd26e915dd81bad68732500dc981499bd280a6d2e6507d52</code>. We downloaded the v0.16.2 file on November 5 and the digest matched.</p>
   <p>Or build it yourself from the tagged source with Rust 1.95 or later. Either way you end up with one shared <code>runtime.wasm</code> that every web and Node host loads; native Rust hosts link <code>traverse-runtime</code> directly and don't need the file.</p>
 
-  <h2>What's still open</h2>
-  <p><a href="https://github.com/traverse-framework/traverse/issues/1784">traverse#1784</a> asks for a decision: publish a <code>runtime-wasm-vX.Y.Z</code> release with every product release (the release process still lists that type, but no workflow creates it), ship the file in the npm package, or document the tag as the supported source. Until that lands, treat the tag as the source and always check the digest.</p>
+  <h2>What changed</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/issues/1784">traverse#1784</a> asked how apps should get the file. <a href="https://github.com/traverse-framework/traverse/pull/1797">traverse#1797</a> closed it: every product tag now publishes <code>runtime-wasm-vX.Y.Z</code>, and the product GitHub Release waits for it (Spec 048 1.5.0, Decision 123). That wiring is on main; the v0.16.1 and v0.16.2 releases were backfilled from their tags, and the first automatic run will be the next product tag. npm still doesn't ship the file.</p>
 </QuestionLayout>

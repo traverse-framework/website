@@ -1,0 +1,77 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Can a Traverse application manifest invoke a host connector?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, since Traverse v0.16.2 (November 4, 2026). A state in an application state machine invokes exactly one of two things: a capability ({"capability_id": "...", "input_from": "..."}) or a host connector ({"host_connector": "audio.permission.request"}). traverse-cli app validate, activation and registration accept both (Spec 1773, traverse#1772). Neither, both, an empty value or an unknown invoke field fails closed with a stable diagnostic. The connector command must be declared by the app and resolves through Specs 104 and 137. A host-connector state must route all four terminal events: host_connector_succeeded, host_connector_failed, host_connector_timeout and host_connector_cancelled. Existing capability-only manifests behave as before. Limit: traverse-cli app activate only registers its built-in reference connector catalog, and traverse.audio-input is not in it yet (traverse#1791).',
+    },
+  }],
+});
+
+const capabilityInvoke = `{
+  "invoke": {
+    "capability_id": "com.example.transcribe",
+    "input_from": "host_connector_result.artifact_ref"
+  }
+}`;
+
+const connectorInvoke = `{
+  "id": "requesting_permission",
+  "invoke": { "host_connector": "audio.permission.request" },
+  "transitions": [
+    { "on": "host_connector_succeeded", "to": "ready" },
+    { "on": "host_connector_failed", "to": "error" },
+    { "on": "host_connector_cancelled", "to": "error" },
+    { "on": "host_connector_timeout", "to": "error" }
+  ]
+}`;
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-upgrade-to-traverse-v0-16-0.html', label: 'How do I upgrade to Traverse v0.16.x?' },
+  { href: '/questions/what-is-the-traverse-cli.html', label: 'What is the Traverse CLI?' },
+  { href: '/questions/does-catalog-model-execute-run-on-published-traverse-packages.html', label: 'Does catalog model.execute run on published Traverse packages?' },
+  { href: '/changelog.html', label: 'Changelog' },
+];
+---
+<QuestionLayout
+  title="Can a Traverse application manifest invoke a host connector?"
+  description="Yes, since v0.16.2. A state invokes exactly one of a capability or a host connector, and traverse-cli validates, activates and registers both. Bad invokes fail closed."
+  canonical="https://traverse-framework.com/questions/can-a-traverse-application-manifest-invoke-a-host-connector.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> yes, since <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.2">Traverse v0.16.2</a> (November 4, 2026). A state in your app's state machine can ask the host to do something, like request microphone permission, instead of running a capability. <code>traverse-cli app validate</code>, activation and registration all accept it (<a href="https://github.com/traverse-framework/traverse/issues/1772">#1772</a>, Spec 1773).</p>
+
+  <h2>The two shapes</h2>
+  <p>Every state that has <code>invoke</code> names exactly one target. A capability:</p>
+  <pre><code>{capabilityInvoke}</code></pre>
+  <p>Or a host connector. This state comes from the <code>audio-analysis</code> example app in the traverse repo at the v0.16.2 tag:</p>
+  <pre><code>{connectorInvoke}</code></pre>
+  <p>The host connector runs, and its result can feed a later capability through <code>input_from: "host_connector_result.…"</code>. The business logic still lives in the capability. The host only does the I/O.</p>
+
+  <h2>What fails closed</h2>
+  <ul>
+    <li>An invoke with neither field, both fields, an empty value or an unknown field is rejected at validation, before activation. A host connector is never quietly treated as a capability.</li>
+    <li>A host-connector state that doesn't route all four terminal events (<code>host_connector_succeeded</code>, <code>host_connector_failed</code>, <code>host_connector_timeout</code>, <code>host_connector_cancelled</code>) fails with <code>app_state_machine_missing_unhappy_routes</code>.</li>
+    <li>The connector command has to be declared by the app and resolve through Specs 104 and 137. An undeclared command, an incompatible version or a binding the host never activated fails closed.</li>
+  </ul>
+  <p>Existing capability-only manifests validate and serialize as before. v0.16.2 changes no host, guest or bridge ABI.</p>
+
+  <h2>Try it</h2>
+  <pre><code>cargo install traverse-cli-rs --version =0.16.2 --locked
+traverse-cli app validate path/to/app.manifest.json</code></pre>
+  <p>The crate is <code>traverse-cli-rs</code>; the binary is <code>traverse-cli</code>. It needs Rust 1.95 or later.</p>
+
+  <h2>What isn't there yet</h2>
+  <ul>
+    <li><code>traverse-cli app activate</code> only registers its built-in reference connector catalog. <code>traverse.audio-input</code> isn't in it yet, so the audio example can't activate from the CLI yet (<a href="https://github.com/traverse-framework/traverse/issues/1791">#1791</a>, open).</li>
+    <li>The v0.16.2 release notes scope this to <code>traverse-cli</code> workspace applications. Check your host's README before you rely on a host-connector invoke there.</li>
+  </ul>
+</QuestionLayout>
