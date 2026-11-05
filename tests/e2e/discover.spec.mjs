@@ -25,8 +25,8 @@ test('goal 1 (price a quote) auto-plans on load, then review + execute for real 
 
 // doc-approval.analyze used to trap with `execution_failed` ("wasm
 // `unreachable` instruction executed") under the v0.11/v0.12 nested
-// runtime.wasm. With the v0.13.0 certified runtime.wasm and
-// traverse-embedder-web@0.13.0 the full two-node chain executes for real.
+// runtime.wasm. Since the v0.13.0 certified runtime.wasm (and still with the
+// runtime-wasm-v0.16.2 asset) the full two-node chain executes for real.
 test('goal (doc-approval chain) plans a real two-node structural chain and executes it for real', async ({ page }) => {
   test.slow();
   await page.goto('/discover.html');
@@ -90,7 +90,7 @@ test('the translate-fr-semantic goal plans, then the local runtime genuinely ref
   await expect(page.locator('#discover-log')).toContainText('real governance decision, not an error');
 });
 
-// KNOWN ISSUE (still present at v0.13.0): report.collect-fragments
+// KNOWN ISSUE (still present with runtime-wasm-v0.16.2, Nov 5 2026): report.collect-fragments
 // fails differently from the (now fixed) unreachable-trap capabilities — it fails to
 // instantiate memory under the nested runtime.wasm's resource limiter
 // ("a resource limiter denied to allocate or grow the linear memory").

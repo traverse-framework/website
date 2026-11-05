@@ -22,11 +22,11 @@ const CONTRACT_SCHEMA_VERSION = '1.0.0';
    never fetches this itself (it's host-owned); this site ships its own copy
    under public/runtime/ and digest-verifies it before every execute, the
    same way every other artifact on this page is verified. Pin source:
-   traverse-framework/traverse runtime/runtime.wasm.sha256 at v0.13.0 (the
-   certified binary was rebuilt for v0.13.0 with a 32 MiB nested-wasmi memory
-   ceiling, #1480). */
+   traverse-framework/traverse release runtime-wasm-v0.16.2 (runtime 0.16.2,
+   bridge 1.1.0), the bytes pinned in runtime/ at tag v0.16.2. Earlier pin was
+   the v0.13.0 rebuild with a 32 MiB nested-wasmi memory ceiling (#1480). */
 const RUNTIME_WASM_URL = '/runtime/runtime.wasm';
-const RUNTIME_WASM_DIGEST = 'a254c161d5699b19ffe6eb47d2e11e45a39363ae8b2a9ac435d54a09fb31d782';
+const RUNTIME_WASM_DIGEST = 'b313b5c5c11291d9e9669125a0a9a77aa42a911b15d431a73e86b17c874e298c';
 
 /* Three committed goals: a structured Spec-113 target + starting facts each.
    No natural language: the target is an exact capability identity.
