@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What is the difference between an exact capability pin and a version range?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'A version range such as ^1.2.0 resolves to the highest active version that satisfies it and skips deprecated and revoked versions. An exact pin names one version. Under registry spec 005 and decision 127, that pin still resolves after deprecation or revocation and carries a status. Published traverse-registry 0.28.0 does both, continuing the 0.27.0 behavior (registry#632; registry#631 is closed; 0.28.0 is registry#636). Traverse v0.15.0 pins =0.28.0. v0.14.0 pinned =0.25.0, which did not return revoked records. Runtime refusal (traverse#1598) shipped in Traverse v0.16.0 (November 2, 2026).',
+      text: 'A version range such as ^1.2.0 resolves to the highest active version that satisfies it and skips deprecated and revoked versions. An exact pin names one version. Under registry spec 005 and registry decision-log entry 127 (Q11), that pin still resolves after deprecation or revocation and carries a status. Published traverse-registry 0.28.0 does both, continuing the 0.27.0 behavior (registry#632; registry#631 is closed; 0.28.0 is registry#636). Traverse v0.15.0 pins =0.28.0. v0.14.0 pinned =0.25.0, which did not return revoked records. Runtime refusal (traverse#1598) shipped in Traverse v0.16.0 (November 2, 2026).',
     },
   }],
 });
@@ -30,13 +30,13 @@ const relatedLinks = [
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> a range such as <code>^1.2.0</code> asks for the highest active version that satisfies it. An exact pin names one version string. Under registry spec 005 and decision 127, deprecation and revocation change the range result and leave the exact pin resolvable, with a status attached.</p>
+  <p><strong>Short answer:</strong> a range such as <code>^1.2.0</code> asks for the highest active version that satisfies it. An exact pin names one version string. Under registry spec 005 and registry decision-log entry 127 (Q11), deprecation and revocation change the range result and leave the exact pin resolvable, with a status attached.</p>
 
   <h2>What a range does</h2>
-  <p>Spec 005 says range resolution skips deprecated versions. Decision-log entry 127, question 11, says range resolution skips revoked versions too. Published <code>traverse-registry</code> 0.28.0 does both, as 0.27.0 did. If every match is deprecated or revoked, it errors instead of returning one. Traverse v0.15.0 pins <code>=0.28.0</code>. v0.14.0 pinned <code>=0.25.0</code>, which skips deprecated only and has no revoked type.</p>
+  <p>Spec 005 says range resolution skips deprecated versions. Registry decision-log entry 127, question 11, says range resolution skips revoked versions too. Published <code>traverse-registry</code> 0.28.0 does both, as 0.27.0 did. If every match is deprecated or revoked, it errors instead of returning one. Traverse v0.15.0 pins <code>=0.28.0</code>. v0.14.0 pinned <code>=0.25.0</code>, which skips deprecated only and has no revoked type.</p>
 
   <h2>What an exact pin does</h2>
-  <p>Spec 005 says exact-pin resolution ignores the deprecated flag and succeeds if the version exists. Decision 127 says a revoked exact pin still resolves and carries a machine-readable do-not-run signal. The runtime, not the registry, is supposed to decide whether to run it.</p>
+  <p>Spec 005 says exact-pin resolution ignores the deprecated flag and succeeds if the version exists. Registry decision-log entry 127 (Q11) says a revoked exact pin still resolves and carries a machine-readable do-not-run signal. (Not Traverse Decision 127, which is about the compatible-capability lifecycle.) The runtime, not the registry, is supposed to decide whether to run it.</p>
   <p>Since 0.27.0, exact-pin resolution returns the record with lifecycle status and, when revoked, the revocation record, so the consumer can fail closed. 0.28.0 keeps that. The fix merged as <a href="https://github.com/traverse-framework/registry/pull/632">registry#632</a>. <a href="https://github.com/traverse-framework/registry/issues/631">registry#631</a> is closed. crates.io published 0.27.0 on 8 October 2026 (tag <code>v0.27.0</code>) and 0.28.0 on 13 October 2026 (registry#636).</p>
 
   <h2>What this is not</h2>
