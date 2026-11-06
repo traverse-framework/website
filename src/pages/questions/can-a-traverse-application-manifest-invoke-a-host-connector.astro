@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Can a Traverse application manifest invoke a host connector?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Yes, since Traverse v0.16.2 (November 4, 2026). A state in an application state machine invokes exactly one of two things: a capability ({"capability_id": "...", "input_from": "..."}) or a host connector ({"host_connector": "audio.permission.request"}). traverse-cli app validate, activation and registration accept both (Spec 1773, traverse#1772). Neither, both, an empty value or an unknown invoke field fails closed with a stable diagnostic. The connector command must be declared by the app and resolves through Specs 104 and 137. A host-connector state must route all four terminal events: host_connector_succeeded, host_connector_failed, host_connector_timeout and host_connector_cancelled. Existing capability-only manifests behave as before. Limit: traverse-cli app activate only registers its built-in reference connector catalog, and traverse.audio-input is not in it yet (traverse#1791).',
+      text: 'Yes, since Traverse v0.16.2 (November 4, 2026). A state in an application state machine invokes exactly one of two things: a capability ({"capability_id": "...", "input_from": "..."}) or a host connector ({"host_connector": "audio.permission.request"}). traverse-cli app validate, activation and registration accept both (Spec 1773, traverse#1772). Neither, both, an empty value or an unknown invoke field fails closed with a stable diagnostic. The connector command must be declared by the app and resolves through Specs 104 and 137. A host-connector state must route all four terminal events: host_connector_succeeded, host_connector_failed, host_connector_timeout and host_connector_cancelled. Existing capability-only manifests behave as before. Limit on v0.16.2: traverse-cli app activate only registered its built-in reference connector catalog without traverse.audio-input (traverse#1791). That registration landed on main via #1796 (November 5, 2026) and is not yet in a tagged release.',
     },
   }],
 });
@@ -71,7 +71,7 @@ traverse-cli app validate path/to/app.manifest.json</code></pre>
 
   <h2>What isn't there yet</h2>
   <ul>
-    <li><code>traverse-cli app activate</code> only registers its built-in reference connector catalog. <code>traverse.audio-input</code> isn't in it yet, so the audio example can't activate from the CLI yet (<a href="https://github.com/traverse-framework/traverse/issues/1791">#1791</a>, open).</li>
+    <li>On v0.16.2, <code>traverse-cli app activate</code> only registered its built-in reference connector catalog, and <code>traverse.audio-input</code> was missing, so the audio example couldn't activate from the CLI. That registration landed on main via <a href="https://github.com/traverse-framework/traverse/pull/1796">#1796</a> (closing <a href="https://github.com/traverse-framework/traverse/issues/1791">#1791</a>, November 5, 2026) and is not yet in a tagged release.</li>
     <li>The v0.16.2 release notes scope this to <code>traverse-cli</code> workspace applications. Check your host's README before you rely on a host-connector invoke there.</li>
   </ul>
 </QuestionLayout>

@@ -1,0 +1,62 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What input does a runtime.wasm guest receive?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On published Traverse v0.16.2 and earlier, Swift, Kotlin and .NET RuntimeTraverseEmbedder guests receive the whole {"target_id":...,"input":...} submit envelope on stdin, not just the caller input. That is fixed on main by traverse#1800 (merged November 5, 2026, closing #1794): runtime.wasm now unwraps the published {target_id, input} form, gives the guest only the canonical input bytes (Spec 1722), and rejects a wrong target_id with target_not_found, a non-object input or blank target_id, and an extra member with ambiguous_submit. Raw web submits stay as sent unless the body holds both target_id and input. Breaking for any guest written to read the envelope; no guest in the traverse repo does. Not yet in a tagged release. A related web raw-submit bug that treated input containing "kind":"app_command" as a command is also fixed on main (#1802 via #1806), not released.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/where-does-bundleembedder-get-runtime-wasm.html', label: 'Where does BundleEmbedder get runtime.wasm?' },
+  { href: '/questions/does-catalog-model-execute-run-on-published-traverse-packages.html', label: 'Does catalog model.execute run on published Traverse packages?' },
+  { href: '/questions/does-the-same-wasm-give-byte-identical-output-on-every-host.html', label: 'Does the same WASM give byte-identical output on every host?' },
+  { href: '/questions/how-do-i-upgrade-to-traverse-v0-16-0.html', label: 'How do I upgrade to Traverse v0.16.x?' },
+];
+
+const envelopeShort = '{"target_id":...,"input":...}';
+const envelopeForm = '{"target_id": "...", "input": ...}';
+const kindAppCommand = '"kind":"app_command"';
+---
+<QuestionLayout
+  title="What input does a runtime.wasm guest receive?"
+  description="On v0.16.2 and earlier, native guests see the whole target_id/input envelope. On main (#1800) they get only the caller input. Not released yet. Here is the contract."
+  canonical="https://traverse-framework.com/questions/what-input-does-a-runtime-wasm-guest-receive.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> it depends which <code>runtime.wasm</code> you load. On the published <a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.2"><code>runtime-wasm-v0.16.2</code></a> asset (and earlier), Swift, Kotlin and .NET guests see the whole <code>{envelopeShort}</code> envelope. On main, after <a href="https://github.com/traverse-framework/traverse/pull/1800">traverse#1800</a> (November 5, 2026), they see only the caller <code>input</code>. That fix is not in a tagged release yet.</p>
+
+  <h2>What published packages do today</h2>
+  <p>Native <code>RuntimeTraverseEmbedder.submit</code> on Swift, Kotlin and .NET sends the published submit form <code>{envelopeForm}</code> into <code>runtime.wasm</code>. Through v0.16.2 the guest reads that whole object on stdin. A guest that expected only its own input had to dig under <code>input</code>, and a wrong <code>target_id</code> still ran the initialized capability (<a href="https://github.com/traverse-framework/traverse/issues/1794">#1794</a>).</p>
+  <p>Web hosts that use a raw submit (the body is the capability input, no envelope) already behaved differently: the guest got those bytes as sent, unless the body itself looked like the envelope.</p>
+
+  <h2>What main does now</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/pull/1800">#1800</a> teaches <code>runtime.wasm</code> the published envelope (Spec 071 1.2.0 FR-018, Decision 124):</p>
+  <ul>
+    <li>The guest receives only <code>input</code>, canonical under Spec 1722.</li>
+    <li>A <code>target_id</code> other than the initialized capability is rejected with <code>target_not_found</code>.</li>
+    <li>A non-object <code>input</code> or a blank <code>target_id</code> is rejected. An extra member is rejected with <code>ambiguous_submit</code>.</li>
+    <li>Raw submits stay unchanged unless the body holds both <code>target_id</code> and <code>input</code>.</li>
+  </ul>
+  <p><strong>Breaking on the next release that ships this:</strong> a guest written to read the envelope must read its input directly. No guest in the traverse repo does that.</p>
+
+  <h2>Related web fix, also unreleased</h2>
+  <p>On published web packages, a raw submit whose input JSON contains <code>{kindAppCommand}</code> still routes as a command instead of capability input (Decision 124 called that out of scope for #1800). <a href="https://github.com/traverse-framework/traverse/pull/1806">#1806</a> closed <a href="https://github.com/traverse-framework/traverse/issues/1802">#1802</a> on main so that capability input reaches the guest as sent. Same story: merged, not tagged.</p>
+
+  <h2>What to do until the next cut</h2>
+  <ul>
+    <li>Pin the published <code>runtime-wasm-v0.16.2</code> asset (sha256 <code>b313b5c5c11291d9e9669125a0a9a77aa42a911b15d431a73e86b17c874e298c</code>) and write guests that tolerate the envelope, or dig under <code>input</code>.</li>
+    <li>Or build <code>runtime.wasm</code> from main yourself and expect the unwrapped contract. Check the digest before you ship it.</li>
+    <li>Watch the next product tag: #1800 (and #1802) ride that release, and the guest contract above becomes the published one.</li>
+  </ul>
+  <p>See also <a href="/questions/where-does-bundleembedder-get-runtime-wasm.html">Where does BundleEmbedder get runtime.wasm?</a> for how to download the published asset.</p>
+</QuestionLayout>
