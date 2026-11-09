@@ -53,5 +53,5 @@ const relatedLinks = [
     <li>When the next release ships #1824, update any code that matches <code>instance_not_found</code> or <code>instance_not_running</code>, and any flow that starts a second instance.</li>
     <li>The web test double follows the same rules, so tests written against it see real runtime behavior.</li>
   </ul>
-  <p>Swift, Kotlin, and .NET switched in the same PR. The Rust <code>traverse-embedder</code> crate still keeps its own lifecycle and old codes; <a href="https://github.com/traverse-framework/traverse/issues/1823">#1823</a> and Decision 129 cover that.</p>
+  <p>Swift, Kotlin, and .NET switched in the same PR. The Rust <code>traverse-embedder</code> crate followed on November 9 in <a href="https://github.com/traverse-framework/traverse/pull/1828">#1828</a> (Decision 129): it now uses the same shared rules and returns the same codes. Like web, it is on main and not in a tagged release yet.</p>
 </QuestionLayout>
