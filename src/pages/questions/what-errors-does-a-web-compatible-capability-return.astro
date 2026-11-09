@@ -1,0 +1,57 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'What errors does a web compatible capability return?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On traverse main since #1824 (merged November 6, 2026, Decision 128), the web host passes runtime.wasm compatible-lifecycle codes through: compatible_instance_active, compatible_instance_not_active, input_not_canonicalizable, invalid_input, and platform_not_supported. instance_not_found and instance_not_running are gone, and only one instance runs per capability at a time. This is breaking for web callers that matched the old codes or started a second instance. Published traverse-embedder-web 0.16.2 still uses the old TypeScript lifecycle and codes. Not in a tagged release yet.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/who-owns-the-compatible-capability-lifecycle.html', label: 'Who owns the compatible-capability lifecycle?' },
+  { href: '/questions/what-input-does-a-runtime-wasm-guest-receive.html', label: 'What input does a runtime.wasm guest receive?' },
+  { href: '/questions/what-is-one-shared-runtime-wasm.html', label: 'What is one shared runtime.wasm?' },
+  { href: '/questions/where-does-bundleembedder-get-runtime-wasm.html', label: 'Where does BundleEmbedder get runtime.wasm?' },
+];
+---
+<QuestionLayout
+  title="What errors does a web compatible capability return?"
+  description="On Traverse main, web compatible capabilities return runtime.wasm's lifecycle codes and allow one instance at a time. Published 0.16.2 still uses the old codes."
+  canonical="https://traverse-framework.com/questions/what-errors-does-a-web-compatible-capability-return.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on Traverse main, the same codes every other host returns, because <code>runtime.wasm</code> now runs the lifecycle. That landed in <a href="https://github.com/traverse-framework/traverse/pull/1824">#1824</a> on November 6, 2026, under <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 128</a>. It is not in a published package yet.</p>
+
+  <h2>The codes on main</h2>
+  <p>Web's <code>EmbedderErrorCode</code> now passes the runtime's codes through instead of mapping them to web-only names:</p>
+  <ul>
+    <li><code>compatible_instance_active</code>: a second start while an instance is already running.</li>
+    <li><code>compatible_instance_not_active</code>: a stop or kill with no matching running instance. This replaces <code>instance_not_found</code> and <code>instance_not_running</code>.</li>
+    <li><code>input_not_canonicalizable</code>: start input that RFC 8785 (JCS) cannot represent, per Spec 1722.</li>
+    <li><code>invalid_input</code>: a start request the runtime rejects as invalid.</li>
+    <li><code>platform_not_supported</code>: the host platform is not in the capability's <code>platforms[]</code> allowlist.</li>
+  </ul>
+
+  <h2>One instance at a time</h2>
+  <p>The old web lifecycle let you start several instances of the same compatible capability. The runtime allows one running instance. A second start fails with <code>compatible_instance_active</code> until you stop or kill the first. A <code>null</code> instance id on stop or kill selects the running one.</p>
+
+  <h2>Where the start input shows up</h2>
+  <p>The public API did not grow. The host keeps the runtime's <code>canonical_input</code> for each instance and publishes start as a <code>state_changed</code> event with that text as <code>input</code>, which is where web's platform wrapper already read it. Stop and kill are <code>state_changed</code> with <code>previous_state: "started"</code>.</p>
+
+  <h2>What to do if you use web compatible mode</h2>
+  <ul>
+    <li>Published <code>traverse-embedder-web</code> 0.16.2 still runs the old TypeScript lifecycle. Nothing changes until you upgrade past it.</li>
+    <li>When the next release ships #1824, update any code that matches <code>instance_not_found</code> or <code>instance_not_running</code>, and any flow that starts a second instance.</li>
+    <li>The web test double follows the same rules, so tests written against it see real runtime behavior.</li>
+  </ul>
+  <p>Swift, Kotlin, and .NET switched in the same PR. The Rust <code>traverse-embedder</code> crate still keeps its own lifecycle and old codes; <a href="https://github.com/traverse-framework/traverse/issues/1823">#1823</a> and Decision 129 cover that.</p>
+</QuestionLayout>
