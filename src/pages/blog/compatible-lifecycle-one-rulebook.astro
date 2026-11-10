@@ -1,0 +1,196 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 10, 2026</span>
+      <span class="badge">Runtime</span>
+      <span class="badge">Compatible mode</span>
+      <span class="badge">On main</span>
+    </div>
+    <h1 class="t-h1">Five hosts, one set of rules for compatible capabilities</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>3 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Most Traverse capabilities are WASM guests. A compatible capability is not. It is a platform module that the host runs, for work that can't be a guest yet. Until last week, each host also decided the rules around it: which instance is running, whether a stop is valid, what input the module sees. Five hosts meant five answers.</p>
+
+      <div class="callout">
+        Short version: on Traverse main, one module owns the compatible lifecycle, and every host uses it. Swift, Kotlin, .NET and web call it through <code>runtime.wasm</code>. The Rust embedder links the same module from <code>traverse-contracts</code>. Same instance rule, same canonical input, same error codes. This is merged but not released. Published v0.16.2 still has the old behavior. Details below.
+      </div>
+
+      <h2 id="before">What v0.16.2 does</h2>
+
+      <ul>
+        <li><strong>Swift, Kotlin and .NET:</strong> <code>runtime.wasm</code> stubs <code>traverse_compatible_start</code>, <code>stop</code> and <code>kill</code> to return <code>-1</code>, so compatible calls fail on the real artifact.</li>
+        <li><strong>Web:</strong> <code>traverse-embedder-web</code> runs its own lifecycle in TypeScript, including the <code>platforms[]</code> check.</li>
+        <li><strong>Rust:</strong> <code>traverse-embedder</code> runs its own lifecycle too, with its own codes (<a href="https://github.com/traverse-framework/traverse/issues/1823" target="_blank" rel="noopener">#1823</a>).</li>
+      </ul>
+
+      <p>None of that is wrong on its own. Together it is drift: the same capability could be accepted on one host and refused on another.</p>
+
+      <h2 id="what-changed">What changed on main</h2>
+
+      <ul>
+        <li><strong>Decision 127</strong> (<a href="https://github.com/traverse-framework/traverse/pull/1821" target="_blank" rel="noopener">#1821</a>): the runtime owns the compatible lifecycle on every host, web included.</li>
+        <li><strong><a href="https://github.com/traverse-framework/traverse/pull/1822" target="_blank" rel="noopener">#1822</a></strong> (November 6): <code>runtime.wasm</code> implements start, stop, kill, events and shutdown cleanup. Spec 072 moves to 1.1.0. The bridge stays <code>runtime-wasm-bridge/1.1.0</code>.</li>
+        <li><strong><a href="https://github.com/traverse-framework/traverse/pull/1824" target="_blank" rel="noopener">#1824</a></strong> (November 6, Decision 128): Swift, Kotlin, .NET and web switch to it. Lifecycle changes reach callers as <code>state_changed</code> events.</li>
+        <li><strong><a href="https://github.com/traverse-framework/traverse/pull/1828" target="_blank" rel="noopener">#1828</a></strong> (November 9, Decision 129): the rules move into <code>traverse_contracts::CompatibleLifecycle</code>. <code>runtime.wasm</code> calls it, and so does the Rust embedder.</li>
+        <li><strong><a href="https://github.com/traverse-framework/traverse/pull/1829" target="_blank" rel="noopener">#1829</a></strong> (November 9): Rust <code>submit</code> takes raw JSON text, like every other host.</li>
+      </ul>
+
+      <h2 id="rules">The rules, once</h2>
+
+      <ul>
+        <li>One running instance per compatible capability. A second start fails with <code>compatible_instance_active</code>.</li>
+        <li>Instance ids look like <code>{capability_id}-compatible-{n}</code> and are never reused.</li>
+        <li>Stop or kill with no matching running instance fails with <code>compatible_instance_not_active</code>. A null id selects the running one.</li>
+        <li>The host declares its platform once at init. If it is not in the capability's <code>platforms[]</code>, start fails with <code>platform_not_supported</code>.</li>
+        <li>Start input goes through Spec 1722. The module gets the RFC 8785 bytes. Input JCS can't represent, such as a duplicate member name, fails with <code>input_not_canonicalizable</code>.</li>
+        <li>Calling <code>traverse_submit</code> on a compatible capability fails with <code>compatible_lifecycle_required</code>.</li>
+        <li>Shutdown kills the running instance and reports it.</li>
+      </ul>
+
+      <p>#1822, #1824 and #1828 each run the shared <code>canonical-input-v1</code> vectors through compatible start on the hosts they touch, including the duplicate-member case.</p>
+
+      <h2 id="why">Why this belongs in the runtime</h2>
+
+      <p>Lifecycle rules are logic, not I/O. When each host carries its own copy, each copy can drift. Traverse keeps the rules in one shared place and keeps hosts to UI and I/O. Business logic belongs in WASM capabilities. A compatible capability's own code still runs as a platform module, but the rules around it are now the same everywhere.</p>
+
+      <h2 id="breaking">What breaks when you upgrade</h2>
+
+      <ul>
+        <li><strong>Web:</strong> <code>instance_not_found</code> and <code>instance_not_running</code> become <code>compatible_instance_not_active</code>. New codes: <code>compatible_instance_active</code>, <code>input_not_canonicalizable</code>, <code>invalid_input</code>. Code that starts a second instance now gets an error. See <a href="/questions/what-errors-does-a-web-compatible-capability-return.html">what errors a web compatible capability returns</a>.</li>
+        <li><strong>Rust:</strong> <code>start_compatible</code> and <code>submit</code> take <code>&amp;str</code>. <code>EmbedderErrorCode</code> drops <code>InstanceNotFound</code> and <code>InstanceNotRunning</code> and adds the runtime's codes.</li>
+        <li><strong>Swift, Kotlin, .NET:</strong> compatible calls start working instead of failing.</li>
+      </ul>
+
+      <h2 id="not-yet">What isn't true yet</h2>
+
+      <ul>
+        <li><strong>Not released.</strong> The latest release is <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.2" target="_blank" rel="noopener">v0.16.2</a>. No published package has any of this. Wait for the next tag.</li>
+        <li><strong>No new runtime-wasm release.</strong> <code>runtime-wasm-v0.16.2</code> still has the stubs. Main pins a rebuilt <code>runtime.wasm</code> (sha256 <code>da543cbb…</code>) from #1828.</li>
+        <li><strong>No certification claim.</strong> This is conformance tests in the repo, not a Spec 529 certification.</li>
+      </ul>
+
+      <p>The CLI, if you want it, is <code>cargo install traverse-cli-rs --locked</code>. The binary is <code>traverse-cli</code>.</p>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Claim (on main, unreleased):</strong> one shared compatible lifecycle (<code>traverse_contracts::CompatibleLifecycle</code>) used by <code>runtime.wasm</code> (Swift, Kotlin, .NET, web) and by the Rust <code>traverse-embedder</code>.</li>
+          <li><strong>PRs:</strong> Decision 127 #1821; #1822 (runtime.wasm lifecycle, Spec 072 1.1.0, closes #1819); #1824 (hosts switch, Decision 128, breaking web codes, closes #1820); Decision 129 #1827; #1828 (shared module, Rust, closes #1823); #1829 (Rust submit raw JSON, closes #1826).</li>
+          <li><strong>Codes:</strong> <code>compatible_instance_active</code>, <code>compatible_instance_not_active</code>, <code>input_not_canonicalizable</code>, <code>invalid_input</code>, <code>platform_not_supported</code>, <code>compatible_lifecycle_required</code>.</li>
+          <li><strong>Published v0.16.2:</strong> runtime.wasm compatible exports return <code>-1</code>; web and Rust run their own lifecycles.</li>
+          <li><strong>Lead claim:</strong> hosts do UI and I/O; rules live in one shared place. Discover, execute, trace.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#before">What v0.16.2 does</a></li>
+          <li><a href="#what-changed">What changed on main</a></li>
+          <li><a href="#rules">The rules, once</a></li>
+          <li><a href="#why">Why this belongs in the runtime</a></li>
+          <li><a href="#breaking">What breaks when you upgrade</a></li>
+          <li><a href="#not-yet">What isn't true yet</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/who-owns-the-compatible-capability-lifecycle.html">Who owns the compatible-capability lifecycle?</a></li>
+          <li><a href="/questions/what-errors-does-a-web-compatible-capability-return.html">What errors does a web compatible capability return?</a></li>
+          <li><a href="/questions/what-is-one-shared-runtime-wasm.html">What is one shared runtime.wasm?</a></li>
+          <li><a href="/blog/traverse-0-16-0-same-input-same-output.html">Traverse v0.16.0: same input, same output</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Hosts do I/O. The rules live once.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Read the decisions and the PRs on main.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/questions/who-owns-the-compatible-capability-lifecycle.html" class="btn btn-primary">Who owns the lifecycle</a>
+      <a href="https://github.com/traverse-framework/traverse/pull/1828" class="btn btn-ghost">Read #1828</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Five hosts, one set of rules for compatible capabilities | Traverse Blog"
+  description="On Traverse main, one shared module owns the compatible-capability lifecycle for Swift, Kotlin, .NET, web and Rust: one instance rule, canonical input, the same error codes. Merged, not yet released; v0.16.2 still has the old behavior."
+  canonical="https://traverse-framework.com/blog/compatible-lifecycle-one-rulebook.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
