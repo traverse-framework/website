@@ -83,10 +83,10 @@ const GOALS = [
     label: 'Watch the runtime refuse a model-derived step',
     blurb: 'Facts: an English summary and its facts, target report.translate-fr-semantic. This capability is declared model_derived, not deterministic: the local runtime authorizes plan structure but declines to run it automatically. A real refusal, not a scripted one.',
     kind: 'single',
-    target: { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.0' },
+    target: { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.1' },
     ai_capability_ids: ['report.translate-fr-semantic'],
     candidate_refs: [
-      { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.0' },
+      { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.1' },
     ],
     starting_facts: {
       summary: 'The project combines distributed browser, edge, and cloud evidence into a deterministic operational summary with 2 validated insights.',
