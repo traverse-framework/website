@@ -200,12 +200,12 @@ test('LIVE: the translate-fr-semantic goal plans but the runtime declines to aut
   async () => {
     const { snapshot, identity, fetcher } = await liveSnapshotAndFetcher();
     const store = new MemoryRegistryCacheStore();
-    const ref = { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.0' };
+    const ref = { namespace: 'report', id: 'report.translate-fr-semantic', versionRange: '1.0.1' };
     await prepareRegistryDependency(store, snapshot, ref, fetcher);
     const deps = [await resolveRegistryDependencyOffline(store, ref)];
     const res = await browserLocalPlan(
       identity, snapshot, deps,
-      { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.0' },
+      { capability_id: 'report.translate-fr-semantic', capability_version: '1.0.1' },
       { summary: 'Two validated insights.', structured_facts: ['Fact: browser — adoption rose'] },
       'local-default', MANIFEST,
     );

@@ -81,7 +81,7 @@ test('the translate-fr-semantic goal plans, then the local runtime genuinely ref
   await expect(page.locator('#discover-badge')).toHaveText('Planned: review the mappings', { timeout: 45_000 });
 
   await page.locator('#discover-goal-select').selectOption('translate-denied');
-  await expect(page.locator('#discover-plan-target')).toHaveText('report.translate-fr-semantic@1.0.0', { timeout: 60_000 });
+  await expect(page.locator('#discover-plan-target')).toHaveText('report.translate-fr-semantic@1.0.1', { timeout: 60_000 });
   await expect(page.locator('#discover-badge')).toHaveText('Planned: review the mappings');
 
   await page.locator('#discover-exec').click();
