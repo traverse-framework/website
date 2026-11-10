@@ -1,0 +1,63 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'Does the Traverse registry check that published contracts actually parse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Yes, since November 10, 2026. Registry PR #657 (fixes registry#656, implements traverse Decision 130) adds a publish gate, validate_capability_contracts, that runs traverse_contracts::parse_contract on every active contract.json and on every one a PR adds or changes. The 25 records that used provenance.source values Spec 002 rejects (derived, registry-wave2) are deprecated, each with a superseded_by successor. Live index-v419 has 193 active records, all with a Spec 002 provenance source, and the gate reports 193 parsed, 0 errors. This is registry data, not a Traverse release; Traverse is still v0.16.2. Proving app validate on exact pins of the five rights-backfilled successors is traverse#1830, still open.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is deprecated or revoked?' },
+  { href: '/questions/does-the-registry-record-model-rights.html', label: 'Does the registry record model licenses and usage rights?' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability to the registry?' },
+  { href: '/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html', label: 'What is the difference between an exact pin and a version range?' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+];
+---
+<QuestionLayout
+  title="Does the Traverse registry check that published contracts actually parse?"
+  description="Since November 10, 2026 the registry publish gate parses every active contract with traverse-contracts. 25 unparseable records are deprecated with a named successor."
+  canonical="https://traverse-framework.com/questions/does-the-registry-check-that-published-contracts-parse.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> yes, since November 10, 2026. The registry now parses contracts with the same Rust crate Traverse uses, <code>traverse-contracts</code>, before anything publishes. Before that, it shipped records Traverse could not read.</p>
+
+  <h2>What went wrong</h2>
+  <p><a href="https://github.com/traverse-framework/registry/issues/656">registry#656</a> was found by <a href="https://github.com/traverse-framework/traverse/issues/1786">traverse#1786</a>. Published <code>traverse-contracts</code> 0.16.2 rejected some live records with <code>unknown variant `derived`</code>. Spec 002 allows four <code>provenance.source</code> values: <code>greenfield</code>, <code>brownfield-extracted</code>, <code>ai-generated</code> and <code>ai-assisted</code>. <code>index-v416</code> published two others:</p>
+  <ul>
+    <li><code>derived</code> on 19 records, including every version of <code>audio.transcribe-speech</code>, <code>audio.detect-speech-segments</code>, <code>report.translate-fr-semantic</code>, <code>text.detect-entities</code> and <code>text.redact-entities</code>.</li>
+    <li><code>registry-wave2</code> on 6 <code>commerce.*</code> and <code>identity.*</code> records, which also lacked the required <code>author</code> and <code>created_at</code>.</li>
+  </ul>
+  <p><code>traverse-cli app prepare</code> cached them, then <code>app validate</code> and <code>app register</code> failed with <code>registry_reference_requires_resolution</code>. No Traverse app could use those 25 versions.</p>
+
+  <h2>What changed</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 130</a> (traverse docs PR <a href="https://github.com/traverse-framework/traverse/pull/1831">#1831</a>) says the registry conforms to Spec 002, and Spec 002 does not change. <a href="https://github.com/traverse-framework/registry/pull/657">registry#657</a> (merged November 10) implements it:</p>
+  <ul>
+    <li><strong>Publish gate.</strong> A new bin, <code>validate_capability_contracts</code>, runs <code>traverse_contracts::parse_contract</code> on every active <code>contract.json</code> and on every one a PR adds or changes. It runs in the required <code>capability-validation</code> CI job. Spec 002 is not copied into Python.</li>
+    <li><strong>24 successors.</strong> 17 <code>derived</code> records become <code>ai-assisted</code>. 2 <code>registry-wave2</code> records become <code>ai-assisted</code> with <code>author</code> and <code>created_at</code> taken from git history. The gate found 6 more failures: 4 <code>experimental</code> records patched to <code>draft</code>, <code>audio.pcm-transform@1.1.0</code> deprecated to its existing 1.1.1, and <code>core.consent-purpose-check@1.1.0</code> adding the schema wrapper. Artifacts and behavior are unchanged.</li>
+    <li><strong>Deprecation with a pointer.</strong> 27 new <code>deprecated.json</code> files, each naming a <code>superseded_by</code> successor. The index now writes <code>superseded_by</code> into deprecated entries. Published records are not edited.</li>
+    <li><strong>Result.</strong> The gate reports 193 parsed, 0 errors.</li>
+    <li><strong>Signatures.</strong> The new versions get their <code>signature.json</code> from the post-merge <code>sign-artifacts</code> job, merged as <a href="https://github.com/traverse-framework/registry/pull/658">registry#658</a>.</li>
+  </ul>
+
+  <h2>What the live index shows</h2>
+  <p>Checked on November 10 against <a href="https://github.com/traverse-framework/registry/releases/tag/index-v419"><code>index-v419</code></a> (source commit <code>3d54b92</code>): 256 records, 193 active. Every active record declares a Spec 002 source (153 <code>greenfield</code>, 40 <code>ai-assisted</code>). All 25 <code>derived</code> or <code>registry-wave2</code> records are <code>deprecated: true</code> with a successor. For example, <code>audio.transcribe-speech@1.3.0</code> shows <code>superseded_by: "1.3.1"</code>, and <code>identity.principal-session@1.0.1</code> shows <code>superseded_by: "1.0.2"</code>. The fixes first published in <code>index-v417</code>.</p>
+  <p>This is live registry data, not a Traverse release. Traverse is still v0.16.2.</p>
+
+  <h2>What is not proven yet</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/issues/1830">traverse#1830</a> is still open. It will re-run the #1786 checks with published <code>traverse-cli</code> on exact pins of the five rights-backfilled successors (<code>audio.detect-speech-segments@1.2.1</code>, <code>audio.transcribe-speech@1.3.1</code>, <code>report.translate-fr-semantic@1.2.1</code>, <code>text.detect-entities@1.2.1</code>, <code>text.redact-entities@1.2.1</code>), including <code>app validate</code>. Until it lands, "the contract parses" is shown. "Your app validates on that pin" is not.</p>
+
+  <h2>Is LLM-assisted authoring being measured too?</h2>
+  <p>A method is fixed. No results exist yet. <a href="https://github.com/traverse-framework/registry/pull/660">registry#660</a> (merged November 10) adds <a href="https://github.com/traverse-framework/registry/blob/main/docs/llm-authoring-evaluation.md"><code>docs/llm-authoring-evaluation.md</code></a> and registry decision-log entry 138. It is a retrospective study of <code>llm-assisted</code> versions that shipped a new artifact, with a bar set before any data: n of at least 20, an escape rate of 10% or less, and every root cause now gated. Cutoff is 2026-11-10. Results come in a later PR. A controlled run is deferred to <a href="https://github.com/traverse-framework/registry/issues/659">registry#659</a>.</p>
+</QuestionLayout>
