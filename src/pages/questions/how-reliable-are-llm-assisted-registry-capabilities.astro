@@ -1,0 +1,61 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How reliable are LLM-assisted capabilities in the Traverse registry?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Not reliable enough yet to relax review. The registry measured it against a bar fixed before any data was collected (registry#660, docs/llm-authoring-evaluation.md). Results (registry#661, merged November 10, 2026): in the promotion bucket of low-risk, deterministic llm-assisted versions, 7 of 25 escaped (28%) against a bar of 10% or less. Six of the seven were contract values the registry accepted but traverse-contracts rejected, a class the new publish parse gate now catches. One was a behavior defect in text.truncate@1.0.0 on wasm32. Decision-log entry 139: no promotion, the low-risk tier stays experimental, and a controlled run (registry#659) is the next step.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/does-the-registry-check-that-published-contracts-parse.html', label: 'Does the registry check that published contracts actually parse?' },
+  { href: '/questions/what-does-human-review-mean-for-a-capability-pr.html', label: 'What does human review mean for a capability PR?' },
+  { href: '/questions/how-do-i-review-a-capability-pr-as-a-maintainer.html', label: 'How do I review a capability PR as a maintainer?' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability to the registry?' },
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is deprecated or revoked?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+];
+---
+<QuestionLayout
+  title="How reliable are LLM-assisted capabilities in the Traverse registry?"
+  description="The registry measured its LLM-assisted capabilities against a bar set in advance. 7 of 25 low-risk versions escaped (28%, bar is 10%). Review stays as it is."
+  canonical="https://traverse-framework.com/questions/how-reliable-are-llm-assisted-registry-capabilities.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> not reliable enough yet to relax review. The registry checked its own history against a bar it wrote down first. The bar was not met, so nothing about review changes.</p>
+
+  <h2>What was measured</h2>
+  <p>Many registry capabilities declare <code>authoring.method: "llm-assisted"</code>. Registry spec 023 has a low-risk tier for them that stays <code>experimental</code> until there is evidence. <a href="https://github.com/traverse-framework/registry/pull/660">registry#660</a> fixed the method in <a href="https://github.com/traverse-framework/registry/blob/main/docs/llm-authoring-evaluation.md"><code>docs/llm-authoring-evaluation.md</code></a> before any numbers were collected:</p>
+  <ul>
+    <li><strong>What counts.</strong> Each <code>llm-assisted</code> version that shipped a new artifact and merged on or before 2026-10-11, so every one had at least 30 days to fail.</li>
+    <li><strong>Escape.</strong> A version that was later fixed or deprecated for a defect in what was authored. Planned evolution and release-process failures do not count.</li>
+    <li><strong>Bar.</strong> Applies to the promotion bucket (low-risk, deterministic, no model). All three must hold: n of at least 20, an escape rate of 10% or less, and every escape's root cause now caught by a required CI gate.</li>
+  </ul>
+
+  <h2>What the results show</h2>
+  <p><a href="https://github.com/traverse-framework/registry/pull/661">registry#661</a> (merged November 10) added the results. The owner confirmed every row before totals were computed.</p>
+  <ul>
+    <li><strong>61 versions counted.</strong> Promotion 25, model-backed 8, other risk classes 16, unclassified 12.</li>
+    <li><strong>Promotion bucket: 7 of 25 escaped (28%).</strong> First-pass CI was 15 of 23 where it could be determined.</li>
+    <li><strong>Six escapes are one class.</strong> Contract values the registry's own CI accepted but Traverse's parser rejected: lifecycle <code>experimental</code>, provenance <code>derived</code>, a missing <code>schema</code> wrapper. That is <a href="https://github.com/traverse-framework/registry/issues/656">registry#656</a>, and the publish gate from <a href="https://github.com/traverse-framework/registry/pull/657">registry#657</a> now catches it.</li>
+    <li><strong>One escape is a behavior defect.</strong> <code>text.truncate@1.0.0</code> (<a href="https://github.com/traverse-framework/registry/issues/492">registry#492</a>): a schema-legal <code>max_length</code> empties the text on wasm32, where <code>usize</code> is 32 bits. Host tests run on 64 bits.</li>
+    <li><strong>Model-backed: 8 of 8 escaped.</strong> Reported separately and never part of the bar. All eight hit the same parse failures. Three also had behavior defects: <code>audio.transcribe-speech@1.0.0</code> hallucinating on non-speech (fixed in 1.1.0), and token fragmentation in <code>text.detect-entities@1.0.0</code> and <code>text.redact-entities@1.0.0</code> (fixed in 1.1.1).</li>
+  </ul>
+  <p>The study also counts gate rejections across 161 pushes on 43 publishing PRs. The largest code, <code>signature.missing</code> (59), is mostly a post-merge signing gap that has since been closed, not authored content.</p>
+
+  <h2>What was decided</h2>
+  <p>Registry decision-log entry 139: no promotion. The low-risk tier stays <code>experimental</code> and spec 023 is not amended. Missing the bar triggers the controlled run deferred in <a href="https://github.com/traverse-framework/registry/issues/659">registry#659</a>.</p>
+  <p>One correction is open. <a href="https://github.com/traverse-framework/registry/pull/667">registry#667</a> says the <code>text.truncate</code> root cause has been gated since registry#509, so the "every root cause gated" condition would be met. The bar outcome does not change, because 28% still fails the escape rate. That gate is a heuristic, and a follow-up to generalize it is <a href="https://github.com/traverse-framework/registry/issues/668">registry#668</a>.</p>
+
+  <h2>What this means if you use the registry</h2>
+  <p>Read <code>authoring.method</code> and <code>lifecycle</code> on any record you pin. An <code>llm-assisted</code> capability gets the same human review as any other, and the registry has published numbers saying why. This is registry data, not a Traverse release. Traverse is still v0.16.2.</p>
+</QuestionLayout>
