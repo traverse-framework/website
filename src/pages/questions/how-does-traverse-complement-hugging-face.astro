@@ -42,6 +42,8 @@ const relatedLinks = [
   <h2>What ships today (Track 2 demo)</h2>
   <p>The registry example <a href="https://github.com/traverse-framework/registry/tree/main/examples/hub-client-first-ner"><code>examples/hub-client-first-ner</code></a> runs <code>text.detect-entities@1.1.1</code>, Hub model <code>dslim/distilbert-NER</code> at a commit pin, in a browser tab and in Node from the <strong>same verified bytes</strong>. Contract digest, pinned-key signature check, then local inference. Text never leaves the device after the one-time artifact download from the registry mirror.</p>
 
+  <p>Version note (November 11): 1.1.1 is now deprecated because its provenance field does not parse under Spec 002. <code>text.detect-entities@1.1.2</code> is the active successor with the same behaviour and artifact (<a href="https://github.com/traverse-framework/registry/pull/657">registry#657</a>). The example still pins 1.1.1, which resolves by exact pin; moving it to 1.1.2 is tracked in <a href="https://github.com/traverse-framework/registry/issues/669">registry#669</a>. New integrations should pin 1.1.2.</p>
+
   <pre><code>$ node cli.js "Elon Musk founded SpaceX in California."
 # → PER Elon Musk · ORG SpaceX · LOC California (on-device)</code></pre>
 
