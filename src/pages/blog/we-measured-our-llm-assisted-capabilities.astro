@@ -68,13 +68,15 @@ const _body = `
 
       <p><a href="https://github.com/traverse-framework/registry/pull/670" target="_blank" rel="noopener">registry#670</a> is an open pull request, not merged. It proposes <code>cargo test --target wasm32-wasip1</code> under wasmtime for each new capability crate, failing with <code>capability.wasm32_unit_tests_failed</code>. wasip1 still has a 32-bit <code>usize</code>, and the test harness needs std. Decision-log entry 143 is in that pull request, in review. The #509 gate stays.</p>
 
+      <p><strong>Update, Nov 12:</strong> <a href="https://github.com/traverse-framework/registry/pull/670" target="_blank" rel="noopener">registry#670</a> has merged. New capability crates' unit tests now run on <code>wasm32-wasip1</code> in registry CI, generalising the #509 heuristic gate, closing <a href="https://github.com/traverse-framework/registry/issues/668" target="_blank" rel="noopener">registry#668</a>. Decision-log entry 143 is on main. The #509 gate stays. The result is unchanged: 7 of 25 escaped (28%), the bar is 10% or less, and the bar was not met. The low-risk tier stays <code>experimental</code>. Traverse is still v0.16.2.</p>
+
       <h2 id="not-yet">What isn't true yet</h2>
 
       <ul>
         <li><strong>Review does not relax.</strong> The low-risk tier stays <code>experimental</code>. Spec 023 is unchanged.</li>
         <li><strong><code>text.truncate@1.0.0</code> is still published as-is.</strong> The gate binds new contracts. <a href="https://github.com/traverse-framework/registry/issues/492" target="_blank" rel="noopener">registry#492</a> is open. No successor has shipped.</li>
         <li><strong>The controlled run has not started.</strong> <a href="https://github.com/traverse-framework/registry/issues/659" target="_blank" rel="noopener">registry#659</a> stays deferred. The owner left it there on 2026-11-10.</li>
-        <li><strong><a href="https://github.com/traverse-framework/registry/pull/670" target="_blank" rel="noopener">registry#670</a> is not merged.</strong> Entry 143 is not on main. One owner directed almost all of this history, and there is no human baseline.</li>
+        <li><strong>One owner directed almost all of this history, and there is no human baseline.</strong></li>
         <li><strong>Not a Traverse release.</strong> Traverse is still v0.16.2. Install the CLI with <code>cargo install traverse-cli-rs --locked</code>. The binary is <code>traverse-cli</code>.</li>
       </ul>
 
@@ -84,7 +86,7 @@ const _body = `
         <ul>
           <li><strong>Results:</strong> registry#660 / entry 138 method, registry#661 / #371 / entry 139 results, collected 2026-11-10 at <code>3d54b92</code>. 61 versions (promotion 25, model-backed 8, other 16, unclassified 12). Promotion 7/25 = 28% vs 10% or less. First-pass CI 15/23. Model-backed 8/8, not in the bar. No promotion. Tier stays <code>experimental</code>.</li>
           <li><strong>Correction:</strong> registry#667, merged 2026-11-12. Entry 139 result sentence corrected in place. Entry 142: criterion 3 met. #492 root cause gated since #509 / #551 (2026-09-16), <code>capability.wasm32_budget_wipe_regression</code>. Criterion 2 still fails.</li>
-          <li><strong>Open:</strong> #668 heuristic gap. #670 proposes <code>wasm32-wasip1</code> unit tests under wasmtime, entry 143, in review. #659 stays deferred. #492 unfixed. Parse gate is registry#657. Not a Traverse release (still v0.16.2).</li>
+          <li><strong>Update, Nov 12:</strong> registry#670 has merged. New capability crates' unit tests now run on <code>wasm32-wasip1</code> in registry CI, generalising the #509 heuristic gate, closing #668. Entry 143 is on main. #659 stays deferred. #492 unfixed. Parse gate is registry#657. Not a Traverse release (still v0.16.2).</li>
         </ul>
       </div>
 
