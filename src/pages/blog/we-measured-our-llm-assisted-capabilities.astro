@@ -1,0 +1,185 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 12, 2026</span>
+      <span class="badge">Registry</span>
+      <span class="badge">Evaluation</span>
+      <span class="badge">Bar not met</span>
+    </div>
+    <h1 class="t-h1">We measured our own LLM-assisted capabilities. The bar was not met.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Many registry capabilities declare <code>authoring.method: "llm-assisted"</code>. Spec 023 keeps that low-risk tier <code>experimental</code> until there is evidence. On November 10 we measured our own history against a bar we wrote down first. The bar was not met.</p>
+
+      <div class="callout">
+        Short version: 7 of 25 promotion-bucket versions escaped (28%). The bar is 10% or less. Six escapes are contracts our CI accepted and <code>traverse-contracts</code> rejected, now caught by the publish parse gate. One is <code>text.truncate@1.0.0</code> on wasm32. We had under-credited an existing gate for that defect. The escape rate still fails, so review stays. This is registry data. Traverse is still v0.16.2.
+      </div>
+
+      <h2 id="bar">The bar, before the numbers</h2>
+
+      <p><a href="https://github.com/traverse-framework/registry/pull/660" target="_blank" rel="noopener">registry#660</a> merged the method in <a href="https://github.com/traverse-framework/registry/blob/main/docs/llm-authoring-evaluation.md" target="_blank" rel="noopener"><code>docs/llm-authoring-evaluation.md</code></a> before any row existed. Decision-log entry 138 records it. The ticket is <a href="https://github.com/traverse-framework/registry/issues/371" target="_blank" rel="noopener">registry#371</a>.</p>
+
+      <p>It mines pull requests, CI, issues and deprecations. It is not a new experiment, and there is no human baseline: no contract declares <code>authoring.method: "human"</code>. A counted version is <code>llm-assisted</code>, shipped a new artifact, and merged on or before 2026-10-11, so each had at least 30 days to fail. Metadata-only republishes are out.</p>
+
+      <p>The bar covers only the promotion bucket: <code>pure_read</code>, deterministic, and not model-backed. All three must hold: at least 20 versions, an escape rate of 10% or less, and every escape's root cause now caught by a required CI gate.</p>
+
+      <p>An escape is a version later fixed or deprecated for a defect in what was authored. Wrong output on input the contract accepts counts. So does a contract consumers could not use. Planned evolution does not. The owner confirmed every row before we computed totals.</p>
+
+      <h2 id="results">What the history showed</h2>
+
+      <p><a href="https://github.com/traverse-framework/registry/pull/661" target="_blank" rel="noopener">registry#661</a> merged the results the same day, on <code>main</code> at <code>3d54b92</code>. We counted 61 versions: promotion 25, model-backed 8, other risk classes 16, unclassified 12.</p>
+
+      <p>Promotion bucket: 7 of 25 escaped, 28%. First-pass CI was 15 of 23 where we could determine it. Without the behavior escape the rate is 6 of 25, 24%, which still fails.</p>
+
+      <p>Six of the seven are one class. Our CI accepted values <code>traverse-contracts</code> rejected: lifecycle <code>experimental</code>, provenance <code>derived</code>, a missing <code>schema</code> wrapper (<a href="https://github.com/traverse-framework/registry/issues/656" target="_blank" rel="noopener">registry#656</a>). The <a href="https://github.com/traverse-framework/registry/pull/657" target="_blank" rel="noopener">registry#657</a> publish gate now parses every published contract with that crate. <a href="/questions/does-the-registry-check-that-published-contracts-parse.html">Does the registry check that published contracts actually parse?</a></p>
+
+      <p>The seventh is <code>text.truncate@1.0.0</code> (<a href="https://github.com/traverse-framework/registry/issues/492" target="_blank" rel="noopener">registry#492</a>, <a href="https://github.com/traverse-framework/registry/pull/487" target="_blank" rel="noopener">#487</a>). A schema-legal <code>max_length</code> empties the text on wasm32, where <code>usize</code> is 32 bits. Host tests are 64-bit, so they never saw it.</p>
+
+      <p>Model-backed versions sit outside the bar. All 8 of 8 escaped, all on the same parse failures. Three also had behavior defects: <code>audio.transcribe-speech@1.0.0</code> hallucinating on non-speech (fixed in 1.1.0), and token fragmentation in <code>text.detect-entities@1.0.0</code> and <code>text.redact-entities@1.0.0</code> (fixed in 1.1.1).</p>
+
+      <p>Decision-log entry 139: no promotion. The low-risk tier stays <code>experimental</code>. Spec 023 is not amended.</p>
+
+      <h2 id="correction">The correction we owed the results</h2>
+
+      <p>We first marked criterion 3 unmet. We thought no gate caught <code>text.truncate</code>. That came from the issue thread, which says host tests cannot see the bug. We did not check <code>capability_validation.py</code> for a gate added later.</p>
+
+      <p><a href="https://github.com/traverse-framework/registry/pull/667" target="_blank" rel="noopener">registry#667</a>, merged November 12, corrects the write-up. Entry 139's result sentence is corrected in place. Entry 142 records why. The gate from <a href="https://github.com/traverse-framework/registry/issues/509" target="_blank" rel="noopener">registry#509</a>, shipped in <a href="https://github.com/traverse-framework/registry/pull/551" target="_blank" rel="noopener">registry#551</a> on 2026-09-16, builds each new contract for <code>wasm32-unknown-unknown</code> and runs it under wasmtime. For an unbounded integer named like length, count, limit, size or budget, it also tries 0 and 2^32. On the 1.0.0 artifact, <code>max_length</code> 4294967296 returns empty text with <code>truncated</code> true. That fails <code>capability.wasm32_budget_wipe_regression</code>.</p>
+
+      <p>Criterion 3 is met. Criterion 2 is not. 28% is still over 10%. The decision stands.</p>
+
+      <h2 id="next">What we are hardening next</h2>
+
+      <p>The #509 gate is a heuristic. It only builds those fixtures for name-matched top-level integers, and it only flags a string that goes from non-empty to empty. A wasm32-only defect outside that shape still passes. <a href="https://github.com/traverse-framework/registry/issues/668" target="_blank" rel="noopener">registry#668</a> is open for the gap. No escape in this study went through it. We found the hole while writing the correction.</p>
+
+      <p><a href="https://github.com/traverse-framework/registry/pull/670" target="_blank" rel="noopener">registry#670</a> is an open pull request, not merged. It proposes <code>cargo test --target wasm32-wasip1</code> under wasmtime for each new capability crate, failing with <code>capability.wasm32_unit_tests_failed</code>. wasip1 still has a 32-bit <code>usize</code>, and the test harness needs std. Decision-log entry 143 is in that pull request, in review. The #509 gate stays.</p>
+
+      <h2 id="not-yet">What isn't true yet</h2>
+
+      <ul>
+        <li><strong>Review does not relax.</strong> The low-risk tier stays <code>experimental</code>. Spec 023 is unchanged.</li>
+        <li><strong><code>text.truncate@1.0.0</code> is still published as-is.</strong> The gate binds new contracts. <a href="https://github.com/traverse-framework/registry/issues/492" target="_blank" rel="noopener">registry#492</a> is open. No successor has shipped.</li>
+        <li><strong>The controlled run has not started.</strong> <a href="https://github.com/traverse-framework/registry/issues/659" target="_blank" rel="noopener">registry#659</a> stays deferred. The owner left it there on 2026-11-10.</li>
+        <li><strong><a href="https://github.com/traverse-framework/registry/pull/670" target="_blank" rel="noopener">registry#670</a> is not merged.</strong> Entry 143 is not on main. One owner directed almost all of this history, and there is no human baseline.</li>
+        <li><strong>Not a Traverse release.</strong> Traverse is still v0.16.2. Install the CLI with <code>cargo install traverse-cli-rs --locked</code>. The binary is <code>traverse-cli</code>.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Results:</strong> registry#660 / entry 138 method, registry#661 / #371 / entry 139 results, collected 2026-11-10 at <code>3d54b92</code>. 61 versions (promotion 25, model-backed 8, other 16, unclassified 12). Promotion 7/25 = 28% vs 10% or less. First-pass CI 15/23. Model-backed 8/8, not in the bar. No promotion. Tier stays <code>experimental</code>.</li>
+          <li><strong>Correction:</strong> registry#667, merged 2026-11-12. Entry 139 result sentence corrected in place. Entry 142: criterion 3 met. #492 root cause gated since #509 / #551 (2026-09-16), <code>capability.wasm32_budget_wipe_regression</code>. Criterion 2 still fails.</li>
+          <li><strong>Open:</strong> #668 heuristic gap. #670 proposes <code>wasm32-wasip1</code> unit tests under wasmtime, entry 143, in review. #659 stays deferred. #492 unfixed. Parse gate is registry#657. Not a Traverse release (still v0.16.2).</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#bar">The bar, before the numbers</a></li>
+          <li><a href="#results">What the history showed</a></li>
+          <li><a href="#correction">The correction we owed the results</a></li>
+          <li><a href="#next">What we are hardening next</a></li>
+          <li><a href="#not-yet">What isn't true yet</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-reliable-are-llm-assisted-registry-capabilities.html">How reliable are LLM-assisted registry capabilities?</a></li>
+          <li><a href="/questions/does-the-registry-check-that-published-contracts-parse.html">Does the registry check that published contracts parse?</a></li>
+          <li><a href="/questions/what-does-human-review-mean-for-a-capability-pr.html">What does human review mean for a capability PR?</a></li>
+          <li><a href="/questions/how-do-i-review-a-capability-pr-as-a-maintainer.html">How do I review a capability PR as a maintainer?</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The bar was not met. Review stays.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Read the pre-registered method, the results, and the correction.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/questions/how-reliable-are-llm-assisted-registry-capabilities.html" class="btn btn-primary">Read the Q&amp;A</a>
+      <a href="https://github.com/traverse-framework/registry/blob/main/docs/llm-authoring-evaluation.md" class="btn btn-ghost">Read the evaluation</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="We measured our own LLM-assisted capabilities. The bar was not met. | Traverse Blog"
+  description="The registry's pre-registered LLM-authoring evaluation missed its bar: 7 of 25 promotion-bucket versions escaped (28%, bar 10% or less). Criterion 3 is met after a correction (registry#667). Review does not change. Traverse is still v0.16.2."
+  canonical="https://traverse-framework.com/blog/we-measured-our-llm-assisted-capabilities.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
