@@ -17,6 +17,7 @@ const jsonLd = JSON.stringify({
 const relatedLinks = [
   { href: '/blog/you-dont-edit-a-published-capability.html', label: "You don't edit a published capability. You mark it." },
   { href: '/questions/does-the-registry-check-that-published-contracts-parse.html', label: 'Does the registry check that published contracts actually parse?' },
+  { href: '/questions/how-do-i-find-the-successor-of-a-deprecated-capability.html', label: 'How do I find the successor of a deprecated capability version?' },
   { href: '/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html', label: 'What is the difference between an exact pin and a version range?' },
   { href: '/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html', label: 'What does a status signal on an exact pin mean for a host?' },
   { href: '/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html', label: 'How should an agent react to a revoked capability during discover?' },
@@ -39,6 +40,7 @@ const relatedLinks = [
   <h2>Deprecated: the cargo-yank shape</h2>
   <p>Registry spec 005 adds a sibling <code>deprecated.json</code> next to the version's <code>contract.json</code>. The index marks the version deprecated. Range resolution (<code>^1.2.0</code> style) skips it. Exact-pin resolution ignores the flag and succeeds if the version exists. It's the same pattern most package registries use: you stop new installs from landing on a bad version without breaking anyone who already depends on it.</p>
   <p>The registry uses this to keep consumers off old fixture versions: when real logic replaces a stub, the stub is deprecated in the same PR.</p>
+  <p>When that file names a successor, the string is <code>superseded_by</code>, and the index copies it onto the deprecated entry: <a href="/questions/how-do-i-find-the-successor-of-a-deprecated-capability.html">how do I find the successor of a deprecated capability version?</a></p>
 
   <h2>Revoked: a stronger signal for rights problems</h2>
   <p>Registry spec 026 adds a sibling <code>revoked.json</code> with a <code>reason</code>, an <code>evidence_url</code> and a <code>revoked_at</code> time. It's meant for cases like a model whose rights turned out to be wrong. The index keeps the entry with <code>status: "revoked"</code>, its revocation record and its full rights record, and it must never be presented as active.</p>
