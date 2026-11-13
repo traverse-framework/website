@@ -17,6 +17,7 @@ const jsonLd = JSON.stringify({
 const relatedLinks = [
   { href: '/blog/you-dont-edit-a-published-capability.html', label: "You don't edit a published capability. You mark it." },
   { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is deprecated or revoked?' },
+  { href: '/questions/how-do-i-find-the-successor-of-a-deprecated-capability.html', label: 'How do I find the successor of a deprecated capability version?' },
   { href: '/questions/what-does-a-status-signal-on-an-exact-pin-mean-for-a-host.html', label: 'What does a status signal on an exact pin mean for a host?' },
   { href: '/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html', label: 'How should an agent react to a revoked capability during discover?' },
   { href: '/questions/what-is-contract-versioning.html', label: 'What is contract versioning in Traverse?' },
@@ -34,6 +35,7 @@ const relatedLinks = [
 
   <h2>What a range does</h2>
   <p>Spec 005 says range resolution skips deprecated versions. Registry decision-log entry 127, question 11, says range resolution skips revoked versions too. Published <code>traverse-registry</code> 0.28.0 does both, as 0.27.0 did. If every match is deprecated or revoked, it errors instead of returning one. Traverse v0.15.0 pins <code>=0.28.0</code>. v0.14.0 pinned <code>=0.25.0</code>, which skips deprecated only and has no revoked type.</p>
+  <p>A deprecated version's named replacement is <code>superseded_by</code>, which is a different fact from the highest active match a range returns: <a href="/questions/how-do-i-find-the-successor-of-a-deprecated-capability.html">how do I find the successor of a deprecated capability version?</a></p>
 
   <h2>What an exact pin does</h2>
   <p>Spec 005 says exact-pin resolution ignores the deprecated flag and succeeds if the version exists. Registry decision-log entry 127 (Q11) says a revoked exact pin still resolves and carries a machine-readable do-not-run signal. (Not Traverse Decision 127, which is about the compatible-capability lifecycle.) The runtime, not the registry, is supposed to decide whether to run it.</p>

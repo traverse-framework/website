@@ -1,0 +1,53 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I find the successor of a deprecated Traverse capability version?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Read superseded_by. It is a version string on the sibling deprecated.json, and the registry index copies that string onto the deprecated entry. Prefer that version. A range skips deprecated and revoked versions and returns the highest active match. An exact pin still resolves and returns the record with its lifecycle status. The agent proposes the successor. The runtime decides whether a pinned version runs. As of November 13, 2026 the public catalog.json marks a row deprecated and does not carry superseded_by. traverse#1848 is open: traverse-cli registry sync drops superseded_by, so registry inspect cannot name the successor.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/questions/what-happens-when-a-capability-version-is-revoked.html', label: 'What happens when a capability version is deprecated or revoked?' },
+  { href: '/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html', label: 'What is the difference between an exact pin and a version range?' },
+  { href: '/questions/does-the-registry-check-that-published-contracts-parse.html', label: 'Does the registry check that published contracts actually parse?' },
+  { href: '/questions/how-should-an-agent-react-to-a-revoked-capability-during-discover.html', label: 'How should an agent react to a revoked capability during discover?' },
+  { href: '/questions/what-does-agent-proposes-runtime-decides-mean.html', label: 'What does “the agent proposes; the runtime decides” mean?' },
+];
+---
+<QuestionLayout
+  title="How do I find the successor of a deprecated Traverse capability version?"
+  description="Read superseded_by on the sibling deprecated.json or the registry index. A range skips deprecated and revoked versions. An exact pin still resolves with lifecycle status. traverse#1848 is open: registry sync drops the field."
+  canonical="https://traverse-framework.com/questions/how-do-i-find-the-successor-of-a-deprecated-capability.html"
+  category="Contracts and Capabilities"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> read <code>superseded_by</code>. It is a version string on the sibling <code>deprecated.json</code>, and the registry index copies that string onto the deprecated entry. Prefer that version. A range skips deprecated and revoked versions. An exact pin still resolves and comes back with its lifecycle status. The agent proposes the successor. The runtime decides whether a pinned version runs.</p>
+
+  <h2>Where to look</h2>
+  <p>Registry spec 005 adds <code>deprecated.json</code> beside that version's <code>contract.json</code> and does not edit the contract. The path is <code>capabilities/&lt;namespace&gt;/&lt;id&gt;/&lt;version&gt;/deprecated.json</code>. The spec's fields are <code>deprecated</code>, <code>reason</code>, and <code>deprecated_at</code>. <a href="https://github.com/traverse-framework/registry/pull/657">registry#657</a> (merged November 10, 2026) also writes <code>superseded_by</code> on the records it deprecated. When that value is a string, <code>build_index.py</code> copies it onto the index entry. If the yank file has no <code>superseded_by</code> string, the index entry omits the field. Published contracts stay unchanged. The parse gate that led to those deprecations is <a href="/questions/does-the-registry-check-that-published-contracts-parse.html">does the registry check that published contracts actually parse?</a></p>
+  <p>Checked November 13, 2026 against published <a href="https://github.com/traverse-framework/registry/releases/tag/index-v427"><code>index-v427</code></a> (source commit <code>24a59f67</code>). That index has <code>superseded_by</code> on 32 entries. <code>report.translate-fr-semantic@1.0.0</code> is deprecated with <code>superseded_by</code> <code>1.0.1</code>, and <code>1.0.1</code> is active. <code>text.detect-entities@1.1.1</code> is deprecated with <code>superseded_by</code> <code>1.1.2</code>, and <code>1.1.2</code> is active. Each pair shares one artifact digest. The same strings are in the yank files on registry <code>main</code>. <code>text.detect-entities@1.1.0</code> also names <code>1.1.2</code>, because <code>1.1.1</code> is deprecated too. The next version number is not always the successor.</p>
+  <p>The public <a href="https://registry.traverse-framework.com/catalog.json"><code>catalog.json</code></a> marks those rows <code>deprecated: true</code>. It does not carry <code>superseded_by</code>. Checked the same day: the string does not appear on any catalog capability entry. The catalog gather script copies the deprecated flag and the contract. The successor stays on <code>deprecated.json</code> and on the index.</p>
+
+  <h2>What a range does</h2>
+  <p>Range resolution skips deprecated and revoked versions and returns the highest active version that satisfies the range. If every match is deprecated or revoked, it errors. Deprecation skip is registry spec 005. Revocation skip is registry decision-log entry 127, question 11. The resolver on registry <code>main</code> still does both (<code>resolve_synced_public_registry_range</code>). Longer write-up: <a href="/questions/what-is-the-difference-between-an-exact-pin-and-a-version-range.html">exact pin versus a version range</a>.</p>
+  <p>A range is not the same as following <code>superseded_by</code>. <code>report.translate-fr-semantic@1.0.0</code> names <code>1.0.1</code>. <code>1.1.1</code> and <code>1.2.1</code> of that capability are also active, so a range that includes all three returns <code>1.2.1</code>.</p>
+
+  <h2>What an exact pin does</h2>
+  <p>An exact pin still resolves when the version is deprecated or revoked. The record carries its lifecycle status. A revoked record also carries its revocation. The version stays in the index. That is spec 005 FR-004 and decision-log entry 127, question 11, and it is what <code>resolve_synced_public_registry_record</code> does on registry <code>main</code> as of November 13, 2026. The registry returns the record. The runtime decides whether it runs.</p>
+
+  <h2>What an agent should do</h2>
+  <p>Prefer the successor named by <code>superseded_by</code>, then check that version is active. Propose that version for new work. If you are resolving a range, propose the active version the resolver returns. Do not put a skipped deprecated version forward as if it were active. If a caller already pinned the deprecated version, report the pin and its status, and propose the successor. Do not execute the old artifact yourself. The agent proposes. The runtime decides. The boundary is <a href="/questions/what-does-agent-proposes-runtime-decides-mean.html">the agent proposes; the runtime decides</a>.</p>
+  <p>This site's <a href="/discover.html">/discover</a> translate goal was moved from <code>report.translate-fr-semantic@1.0.0</code> to <code>1.0.1</code> on November 10, 2026, after registry#657 deprecated <code>1.0.0</code>. <code>1.0.1</code> is the named successor, and it is active.</p>
+
+  <h2>What is still open</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/issues/1848">traverse#1848</a> is open. Its title is "registry sync drops superseded_by, so inspect can't name a deprecated version's successor." The issue says each deprecated registry record declares <code>superseded_by</code> in the published index (its example is <code>text.detect-entities@1.2.0</code> naming <code>1.2.1</code>, which <code>index-v427</code> still shows), but <code>traverse-cli registry sync</code> drops the field from every record, and <code>registry inspect</code> never shows it. A Traverse user sees that a version is deprecated, but not which version replaces it. The issue says no approved spec requires sync to keep <code>superseded_by</code> (Spec 055 FR-014 only covers the Spec 026 fields), so this needs a spec decision before any code. Until that lands, read <code>deprecated.json</code> or the published index. Do not expect <code>registry inspect</code> to name the successor.</p>
+</QuestionLayout>
