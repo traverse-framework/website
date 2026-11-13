@@ -1,0 +1,201 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 13, 2026</span>
+      <span class="badge">Release</span>
+      <span class="badge">Breaking</span>
+    </div>
+    <h1 class="t-h1">Traverse v0.17.1: the first product release of the v0.17 changes</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse v0.17.1 is a lockstep patch. It is the first crates.io and product release of the v0.17.0 changes. The behavior below is what v0.17.0 introduced, plus the packaging fix that lets the crates publish.</p>
+
+      <div class="callout">
+        Short version: v0.17.0 was a partial release. npm <code>traverse-embedder-web@0.17.0</code>, Swift, Kotlin, .NET, MCP and the ONNX runner published at 0.17.0, but the crates.io publish failed (<a href="https://github.com/traverse-framework/traverse/issues/1849" target="_blank" rel="noopener">#1849</a>, fixed by <a href="https://github.com/traverse-framework/traverse/pull/1850" target="_blank" rel="noopener">#1850</a>), so there were no v0.17.0 crates, no <code>runtime-wasm-v0.17.0</code> and no product release. v0.17.1 is the first crates.io and product release of those changes (<a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/releases/v0.17.1.md" target="_blank" rel="noopener">notes</a>).
+      </div>
+
+      <h2 id="partial">What v0.17.0 actually published</h2>
+
+      <p>The v0.17.0 tag went out on November 12. These artifacts published:</p>
+
+      <ul>
+        <li>npm <code>traverse-embedder-web@0.17.0</code></li>
+        <li>Swift xcframework <code>swift-host-v0.17.0</code></li>
+        <li>Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.17.0</li>
+        <li>nuget.org <code>TraverseEmbedder</code> 0.17.0</li>
+        <li>MCP binaries on <code>traverse-mcp-v0.17.0</code></li>
+        <li>ONNX runner on <code>onnx-runner-v0.17.0</code></li>
+      </ul>
+
+      <p>The crates.io publish failed. <code>traverse-contracts</code> read the audio-input connector contract with <code>include_str!</code> from outside its own directory, and <code>cargo publish</code> does not package that file. There is no <code>Traverse v0.17.0</code> GitHub release, and there is no <code>runtime-wasm-v0.17.0</code> artifact. Do not pin a crate at 0.17.0. That version was never published.</p>
+
+      <p><a href="https://github.com/traverse-framework/traverse/pull/1850" target="_blank" rel="noopener">#1850</a> embeds a byte-identical copy of the contract inside the crate, with a test that fails if the copy drifts. A new <code>crate-package</code> CI job packages and verifies every published crate on each pull request. <a href="https://github.com/traverse-framework/traverse/pull/1852" target="_blank" rel="noopener">#1852</a> then cut v0.17.1 (tracking issue <a href="https://github.com/traverse-framework/traverse/issues/1851" target="_blank" rel="noopener">#1851</a>).</p>
+
+      <h2 id="breaking">Three breaking changes</h2>
+
+      <p>Traverse is still pre-1.0, so the v0.17.0 minor bump carried breaking changes. v0.17.1 is the patch that publishes them. Most callers hit one of these three.</p>
+
+      <ol>
+        <li><strong>Rust embedder input is raw JSON text</strong> (Decision 129, <a href="https://github.com/traverse-framework/traverse/issues/1826" target="_blank" rel="noopener">#1826</a>, <a href="https://github.com/traverse-framework/traverse/issues/1823" target="_blank" rel="noopener">#1823</a>). <code>TraverseEmbedderApi::submit</code> and <code>start_compatible</code> take <code>&amp;str</code>. Input that is not JSON is rejected with <code>invalid_input</code>. Input that JCS cannot represent (a duplicate member name, a lone surrogate, an unsafe number) is rejected with <code>input_not_canonicalizable</code>, before any guest runs.</li>
+        <li><strong>One compatible lifecycle on every host</strong> (Decisions 127, 128 and 129, Spec 072 1.1.0, <a href="https://github.com/traverse-framework/traverse/issues/1819" target="_blank" rel="noopener">#1819</a>, <a href="https://github.com/traverse-framework/traverse/issues/1820" target="_blank" rel="noopener">#1820</a>, <a href="https://github.com/traverse-framework/traverse/issues/1823" target="_blank" rel="noopener">#1823</a>). <code>runtime.wasm</code> runs compatible start, stop and kill, and every host uses that copy. A capability runs one instance at a time. Instance ids are <code>{capability_id}-compatible-{n}</code>. <code>compatible_instance_not_active</code> replaces <code>instance_not_found</code> and <code>instance_not_running</code>. The started <code>state_changed</code> event's <code>input</code> is the canonical input. The November 10 note <a href="/blog/compatible-lifecycle-one-rulebook.html">Five hosts, one set of rules</a> described this on main, before a tag. This release is that tag.</li>
+        <li><strong>Guests receive only the submitted input</strong> (Decision 124, <a href="https://github.com/traverse-framework/traverse/issues/1794" target="_blank" rel="noopener">#1794</a>). On Swift, Kotlin and .NET, guests no longer get the <code>{target_id, input}</code> envelope. A <code>target_id</code> that does not match the capability is rejected.</li>
+      </ol>
+
+      <h2 id="also">What else landed with those changes</h2>
+
+      <ul>
+        <li><strong>Model calls stop mid-run</strong> on wasmtime and in the browser (Decisions 104 and 131, Spec 138 0.16.1 and 0.16.2, <a href="https://github.com/traverse-framework/traverse/issues/1582" target="_blank" rel="noopener">#1582</a>). Native wasmtime uses epoch interruption, so cancellation and deadlines stop <code>model_execute</code> and <code>model_prepare</code> mid-run. The browser host runs each package's guest in its own reused Worker (<code>modelWorker.js</code>, shipped in the npm package). Cancellation or the deadline terminates that Worker. The browser host enforces <code>maxPackageBytes</code>, <code>maxMemoryBytes</code> and <code>maxFuel</code>, and fails registration with <code>host_limit_exceeded</code>.</li>
+        <li><strong>The browser resolves Spec 045 model dependencies</strong> (Decision 95, <a href="https://github.com/traverse-framework/traverse/issues/1835" target="_blank" rel="noopener">#1835</a>). <code>resolveBrowserModelDependency</code> skips Ollama candidates on a browser placement without an HTTP probe, selects activated exact-ref pins, fails closed when none remain, and records <code>trust_class</code>.</li>
+        <li><strong>Native hosts can read the model output frame</strong> after <code>model.execute</code>, through <code>ExactModelMediatedConnector::activated()</code> (<a href="https://github.com/traverse-framework/traverse/issues/1785" target="_blank" rel="noopener">#1785</a>).</li>
+        <li><strong>Capability input arrives unchanged</strong> on Swift, Kotlin and .NET (Decision 126, <a href="https://github.com/traverse-framework/traverse/issues/1795" target="_blank" rel="noopener">#1795</a>) and on the web (Decision 125, <a href="https://github.com/traverse-framework/traverse/issues/1802" target="_blank" rel="noopener">#1802</a>).</li>
+        <li><strong><code>runtime.wasm</code> is a release asset on every cut</strong> (<code>runtime-wasm-vX.Y.Z</code>, Decision 123, <a href="https://github.com/traverse-framework/traverse/issues/1784" target="_blank" rel="noopener">#1784</a>). This cut publishes <code>runtime-wasm-v0.17.1</code>. v0.17.0 never did.</li>
+      </ul>
+
+      <h2 id="compat">Compatibility</h2>
+
+      <ul>
+        <li>A web guest trap now fails with <code>execution_failed</code> instead of a raw <code>WebAssembly.RuntimeError</code>.</li>
+        <li>Web apps whose bundler does not emit <code>modelWorker.js</code> should pass <code>createWorker</code>. With <code>createWorker: null</code>, guests run inline as before.</li>
+        <li>No host ABI, guest ABI or bridge ABI version changes. Manifest schemas are unchanged.</li>
+      </ul>
+
+      <h2 id="install">Install and upgrade</h2>
+
+      <p>Upgrade every host to 0.17.1 so the packages match. The CLI crate is <code>traverse-cli-rs</code>. The binary is <code>traverse-cli</code>. The crate named <code>traverse-cli</code> is an unrelated tool.</p>
+
+      <pre><code>cargo install traverse-cli-rs --version =0.17.1 --locked
+npm install traverse-embedder-web@0.17.1</code></pre>
+
+      <p>crates.io at 0.17.1: <code>traverse-contracts</code>, <code>traverse-runtime</code>, <code>traverse-embedder</code>, <code>traverse-registry-sync</code>, <code>traverse-mcp</code>, <code>traverse-cli-rs</code> and <code>traverse-expedition-wasm</code>. None of them exist at 0.17.0.</p>
+
+      <p><code>runtime.wasm</code> is on the <a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.17.1" target="_blank" rel="noopener"><code>runtime-wasm-v0.17.1</code></a> release, with <code>runtime.wasm.sha256</code> and <code>runtime-release.json</code>. The digest pinned for this cut is <code>f2b1bebe89e5a779604feecb3bae2be1f94c6e8f67ab628838e04553f259306d</code>. npm does not ship the file. Copy it into the app bundle and check the digest.</p>
+
+      <p>Swift, Kotlin, .NET, MCP and the ONNX runner published at 0.17.0 with the partial release, as listed above. <code>Package.swift</code> on the v0.17.1 commit still pins the <code>swift-host-v0.17.0</code> xcframework (<a href="https://github.com/traverse-framework/traverse/issues/1846" target="_blank" rel="noopener">#1846</a>, checksum <code>5df1b149f6e93c548a8425f8791bfb6bf63421d77e847d03e39f84f125d530b7</code>). Use that Swift pin. For Kotlin, .NET, MCP and the ONNX runner, pin 0.17.1 when the registry lists it, and 0.17.0 when it does not. Do not mix either version with a 0.16.x crate.</p>
+
+      <h2 id="not-claimed">What this release does not claim</h2>
+
+      <ul>
+        <li>v0.17.0 was not a product release. There is no crate 0.17.0 and no <code>runtime-wasm-v0.17.0</code>.</li>
+        <li>No host is Certified under Spec 529. Swift, Kotlin and .NET stay published and pre-1.0.</li>
+        <li>No new host ABI, guest ABI or bridge ABI. The bridge stays <code>runtime-wasm-bridge/1.1.0</code>.</li>
+        <li>This note does not rerun the weekly demos on the released bits.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Release:</strong> Traverse v0.17.1, November 13, 2026. Lockstep patch. First crates.io and product release of the v0.17.0 changes. Release PR <a href="https://github.com/traverse-framework/traverse/pull/1852" target="_blank" rel="noopener">#1852</a>, tracking issue <a href="https://github.com/traverse-framework/traverse/issues/1851" target="_blank" rel="noopener">#1851</a>. Notes: <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/releases/v0.17.1.md" target="_blank" rel="noopener">docs/releases/v0.17.1.md</a>. Product release: <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1" target="_blank" rel="noopener">Traverse v0.17.1</a>.</li>
+          <li><strong>v0.17.0 was partial:</strong> npm <code>traverse-embedder-web@0.17.0</code>, <code>swift-host-v0.17.0</code>, Maven and NuGet 0.17.0, <code>traverse-mcp-v0.17.0</code>, <code>onnx-runner-v0.17.0</code> published. crates.io failed (<a href="https://github.com/traverse-framework/traverse/issues/1849" target="_blank" rel="noopener">#1849</a>, fixed by <a href="https://github.com/traverse-framework/traverse/pull/1850" target="_blank" rel="noopener">#1850</a>). No v0.17.0 crates, no <code>runtime-wasm-v0.17.0</code>, no product release.</li>
+          <li><strong>Breaking:</strong> Rust <code>submit</code> and <code>start_compatible</code> take raw JSON <code>&amp;str</code> (Decision 129). One compatible lifecycle in <code>runtime.wasm</code> on every host (Decisions 127, 128 and 129, Spec 072 1.1.0). Guests receive only the submitted input (Decision 124). <code>compatible_instance_not_active</code> replaces <code>instance_not_found</code> and <code>instance_not_running</code>.</li>
+          <li><strong>Also:</strong> mid-run cancellation on wasmtime and in the browser Worker (Decisions 104 and 131, #1582). Browser Spec 045 resolution (#1835). Native frame readback via <code>activated()</code> (#1785). Input bytes passed through on Swift, Kotlin, .NET and web (#1795, #1802). <code>runtime-wasm-v0.17.1</code> digest <code>f2b1bebe89e5a779604feecb3bae2be1f94c6e8f67ab628838e04553f259306d</code>.</li>
+          <li><strong>Install:</strong> <code>cargo install traverse-cli-rs --version =0.17.1 --locked</code>. Binary <code>traverse-cli</code>. The crate named <code>traverse-cli</code> is an unrelated tool. npm <code>traverse-embedder-web@0.17.1</code>. Swift package pin remains <code>swift-host-v0.17.0</code> (#1846).</li>
+          <li><strong>Not claimed:</strong> crate 0.17.0, <code>runtime-wasm-v0.17.0</code>, Spec 529 certification, an ABI bump, a demo rerun on released bits.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#partial">What v0.17.0 actually published</a></li>
+          <li><a href="#breaking">Three breaking changes</a></li>
+          <li><a href="#also">What else landed with those changes</a></li>
+          <li><a href="#compat">Compatibility</a></li>
+          <li><a href="#install">Install and upgrade</a></li>
+          <li><a href="#not-claimed">What this release does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/compatible-lifecycle-one-rulebook.html">Five hosts, one set of rules for compatible capabilities</a></li>
+          <li><a href="/questions/who-owns-the-compatible-capability-lifecycle.html">Who owns the compatible-capability lifecycle?</a></li>
+          <li><a href="/questions/what-input-does-a-runtime-wasm-guest-receive.html">What input does a runtime.wasm guest receive?</a></li>
+          <li><a href="/questions/what-errors-does-a-web-compatible-capability-return.html">What errors does a web compatible capability return?</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/releases/v0.17.1.md">v0.17.1 release notes</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The v0.17 changes, on crates this time.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">v0.17.0 published some hosts and missed the crates. v0.17.1 is the product release. Read the notes, then upgrade every host.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1" class="btn btn-primary">Read the release</a>
+      <a href="/blog/compatible-lifecycle-one-rulebook.html" class="btn btn-ghost">Read the lifecycle note</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Traverse v0.17.1: the first product release of the v0.17 changes | Traverse Blog"
+  description="Traverse v0.17.1 (Nov 13, 2026) is the first crates.io and product release of the v0.17.0 changes. v0.17.0 published npm, Swift, Kotlin, .NET, MCP and the ONNX runner, then crates.io failed. Breaking: one compatible lifecycle, raw JSON Rust input, guests receive only the submitted input."
+  canonical="https://traverse-framework.com/blog/traverse-0-17-1-first-product-release.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .post-prose pre { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; margin: 0 0 1.4rem; }
+    .post-prose pre code { background: none; padding: 0; color: var(--fg); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
