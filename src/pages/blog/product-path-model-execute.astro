@@ -1,0 +1,189 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 6, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Models</span>
+      <span class="badge">v0.16.2</span>
+    </div>
+    <h1 class="t-h1">Catalog model.execute runs on the published Browser and Node path</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>3 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>On Oct 16 we shipped the catalog <code>model.execute</code> capability with a red badge. Native worked. Browser and Node needed labelled Spec 104 demo glue, because the published <code>runtime.wasm</code> could not link <code>connector_invoke</code> (<a href="https://github.com/traverse-framework/traverse/issues/1719" target="_blank" rel="noopener">traverse#1719</a>). That badge is closed on v0.16.2. This weekly demo runs the same guest through the published product path, with no glue.</p>
+
+      <div class="callout">
+        <strong>Published parts only.</strong> npm <code>traverse-embedder-web@0.16.2</code> and <code>runtime.wasm</code> from the standalone release <code>runtime-wasm-v0.16.2</code> (<code>b313b5c5…</code>). Nothing built from main. Test-only signing key, public half only. No production signing claim.
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/product-path-model-execute-2026-11-06/01-browser-and-node.webp" alt="Demo page: the Browser column (traverse-embedder-web 0.16.2 with FetchBundleLoader, in the tab) and the Node column (NodeFsBundleLoader) list the same seven results, and the cross-host truth card shows all_identical true" width="890" height="700" loading="lazy" />
+        <figcaption>One click runs Browser in the tab and Node on the server. Same seven results, <code>all_identical: true</code>.</figcaption>
+      </figure>
+
+      <h2 id="what-ran">What ran</h2>
+
+      <ul>
+        <li>The same catalog guest: <code>model/model.execute@1.0.0</code>, WASM <code>5ccfa372…4275</code>, unchanged since Oct 16.</li>
+        <li>The same signed digits ONNX package, package digest <code>a7a8aa35…01d2</code>.</li>
+        <li>The public product path: <code>BundleEmbedder.init</code>, then <code>activateMediatedConnector(...)</code>, then <code>submitAsync("model.execute", input)</code>.</li>
+      </ul>
+
+      <p>No custom Spec 104 bridge. No sync and async shim.</p>
+
+      <h2 id="results">What we saw</h2>
+
+      <p>Three runs: a real browser tab, Node, and an HTTP bundle loader under Node. All seven scenarios matched across them (<code>all_identical: true</code>).</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Scenario</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>success</code></td><td><code>status: ok</code>; the 56-byte output frame equals the signed conformance vector</td></tr>
+            <tr><td><code>connector_unavailable</code></td><td>fails closed</td></tr>
+            <tr><td><code>usage_undeclared</code></td><td>refused</td></tr>
+            <tr><td><code>key_untrusted</code></td><td>refused</td></tr>
+            <tr><td><code>pin_mismatch</code></td><td>refused</td></tr>
+            <tr><td><code>digest_mismatch</code> (tampered weights)</td><td>refused</td></tr>
+            <tr><td><code>package_revoked</code></td><td>refused</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The freestyle refusals from October still hold. The agent proposes; the runtime decides, not the host.</p>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li><strong>No native rerun this week.</strong> Native evidence is from 0.16.1 (see <a href="/blog/model-execute-on-published-packages.html">One model capability, three published hosts</a>).</li>
+        <li><strong>No Swift, Android or .NET hosts.</strong> Their mediated activation is not shipped yet.</li>
+        <li><strong>No agent or Mode A MCP</strong> over <code>model.execute</code> in this demo.</li>
+        <li><strong>Test-only signing key</strong>, public half only. Not production signing.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> weekly demo, 2026-11-06. Catalog <code>model/model.execute@1.0.0</code> on the published BundleEmbedder path (<code>activateMediatedConnector</code> + <code>submitAsync</code>), closing the Oct 16 <code>connector_invoke</code> gap (traverse#1719) for Browser and Node.</li>
+          <li><strong>Pins:</strong> Traverse v0.16.2; npm <code>traverse-embedder-web@0.16.2</code>; <code>runtime.wasm</code> <code>b313b5c5…</code> from <code>runtime-wasm-v0.16.2</code>; guest WASM <code>5ccfa372…</code>; contract <code>a96db38b…</code>.</li>
+          <li><strong>Result:</strong> Browser tab, Node and HTTP loader identical across seven scenarios; success frame equals the signed vector.</li>
+          <li><strong>Not claimed:</strong> native rerun, Swift, Android or .NET, agent MCP, production signing.</li>
+          <li><strong>Runnable tree (access required, repo private):</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-06-product-path-model-execute" target="_blank" rel="noopener">weekly-demos/2026-11-06-product-path-model-execute</a>.</li>
+          <li><strong>Lead claim:</strong> discover, execute, trace. Hosts do UI and I/O; logic lives in WASM capabilities.</li>
+        </ul>
+      </div>
+
+      <p>Public proof is this write-up and the screenshot. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-06-product-path-model-execute" target="_blank" rel="noopener"><code>weekly-demos/2026-11-06-product-path-model-execute</code></a> is for people who already have access. <code>weekly-demos</code> is still not publicly cloneable (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>).</p>
+
+      <p>Next: input and output parity across hosts on main (#1806, #1809, #1810), and agent MCP over <code>model.execute</code> once Mode A gets there.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-ran">What ran</a></li>
+          <li><a href="#results">What we saw</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/kill-switch.html">Next week: a governed model call you can actually stop</a></li>
+          <li><a href="/blog/catalog-model-execute.html">Oct 16: the demo with the red badge</a></li>
+          <li><a href="/blog/model-execute-on-published-packages.html">One model capability, three published hosts, same answer</a></li>
+          <li><a href="/questions/what-is-the-model-execute-catalog-capability.html">What is the model.execute catalog capability?</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">Same guest. Published path. No glue.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Catalog model.execute runs on published Browser and Node hosts in v0.16.2.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/blog/kill-switch.html" class="btn btn-primary">Next week's demo</a>
+      <a href="/agents.html" class="btn btn-ghost">For AI agents</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Catalog model.execute runs on the published Browser and Node path | Traverse Blog"
+  description="Weekly demo, Nov 6: catalog model.execute@1.0.0, unchanged, runs a signed ONNX digits package on the published traverse-embedder-web 0.16.2 BundleEmbedder path (activateMediatedConnector + submitAsync) with runtime-wasm-v0.16.2. Browser tab, Node and HTTP loader identical across seven scenarios. Closes the Oct 16 connector_invoke gap (traverse#1719). Test-only key; no native rerun."
+  canonical="https://traverse-framework.com/blog/product-path-model-execute.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
