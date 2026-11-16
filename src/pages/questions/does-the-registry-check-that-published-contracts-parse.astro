@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Does the Traverse registry check that published contracts actually parse?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Yes, since November 10, 2026. Registry PR #657 (fixes registry#656, implements traverse Decision 130) adds a publish gate, validate_capability_contracts, that runs traverse_contracts::parse_contract on every active contract.json and on every one a PR adds or changes. The 25 records that used provenance.source values Spec 002 rejects (derived, registry-wave2) are deprecated, each with a superseded_by successor. Live index-v419 has 193 active records, all with a Spec 002 provenance source, and the gate reports 193 parsed, 0 errors. This is registry data, not a Traverse release; Traverse is still v0.16.2. Proving app validate on exact pins of the five rights-backfilled successors is traverse#1830, still open.',
+      text: 'Yes, since November 10, 2026. Registry PR #657 (fixes registry#656, implements traverse Decision 130) adds a publish gate, validate_capability_contracts, that runs traverse_contracts::parse_contract on every active contract.json and on every one a PR adds or changes. The 25 records that used provenance.source values Spec 002 rejects (derived, registry-wave2) are deprecated, each with a superseded_by successor. Live index-v419 has 193 active records, all with a Spec 002 provenance source, and the gate reports 193 parsed, 0 errors. This is registry data, not a Traverse release. The current Traverse release is v0.17.1. Proving app validate on exact pins of the five rights-backfilled successors is traverse#1830, still open.',
     },
   }],
 });
@@ -53,7 +53,7 @@ const relatedLinks = [
 
   <h2>What the live index shows</h2>
   <p>Checked on November 10 against <a href="https://github.com/traverse-framework/registry/releases/tag/index-v419"><code>index-v419</code></a> (source commit <code>3d54b92</code>): 256 records, 193 active. Every active record declares a Spec 002 source (153 <code>greenfield</code>, 40 <code>ai-assisted</code>). All 25 <code>derived</code> or <code>registry-wave2</code> records are <code>deprecated: true</code> with a successor. For example, <code>audio.transcribe-speech@1.3.0</code> shows <code>superseded_by: "1.3.1"</code>, and <code>identity.principal-session@1.0.1</code> shows <code>superseded_by: "1.0.2"</code>. The fixes first published in <code>index-v417</code>.</p>
-  <p>This is live registry data, not a Traverse release. Traverse is still v0.16.2.</p>
+  <p>This is live registry data, not a Traverse release. The current Traverse release is v0.17.1.</p>
 
   <h2>What is not proven yet</h2>
   <p><a href="https://github.com/traverse-framework/traverse/issues/1830">traverse#1830</a> is still open. It will re-run the #1786 checks with published <code>traverse-cli</code> on exact pins of the five rights-backfilled successors (<code>audio.detect-speech-segments@1.2.1</code>, <code>audio.transcribe-speech@1.3.1</code>, <code>report.translate-fr-semantic@1.2.1</code>, <code>text.detect-entities@1.2.1</code>, <code>text.redact-entities@1.2.1</code>), including <code>app validate</code>. Until it lands, "the contract parses" is shown. "Your app validates on that pin" is not.</p>
