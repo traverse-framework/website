@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'Who owns the compatible-capability lifecycle?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'Decision 127 (accepted November 6, 2026): runtime.wasm owns the compatible-capability lifecycle on every host, including web. It owns instance ids, state validation, ordered lifecycle events, shutdown cleanup, Spec 1722 canonical start input, and the platforms[] allowlist. On traverse main, #1822 implements it in runtime.wasm and amends Spec 072 to 1.1.0, and #1824 (Decision 128) switches Swift, Kotlin, .NET, and web onto it, with a breaking change to web error codes. Under Decision 129, #1828 (merged November 9) moves the Rust traverse-embedder onto the same shared rules and codes, and #1829 makes Rust submit take raw JSON text. Published Traverse v0.16.2 still stubs traverse_compatible_start/stop/kill to return -1, and web still runs its own TypeScript lifecycle. Not in a tagged release yet.',
+      text: 'Decision 127: runtime.wasm owns the compatible-capability lifecycle on every host, including web. It owns instance ids, state validation, ordered lifecycle events, shutdown cleanup, Spec 1722 canonical start input, and the platforms[] allowlist. That behavior shipped in Traverse v0.17.1 (GitHub Release published 2026-11-16). Through v0.16.2, traverse_compatible_start/stop/kill returned -1 and web ran its own TypeScript lifecycle.',
     },
   }],
 });
@@ -24,13 +24,13 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="Who owns the compatible-capability lifecycle?"
-  description="Decision 127: runtime.wasm owns compatible start, stop, kill, events, and the platforms allowlist on every host. It is on Traverse main now; published v0.16.2 still stubs it."
+  description="Decision 127: runtime.wasm owns compatible start, stop, kill, events, and the platforms allowlist on every host. That shipped in Traverse v0.17.1. v0.16.2 still stubbed it."
   canonical="https://traverse-framework.com/questions/who-owns-the-compatible-capability-lifecycle.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> <code>runtime.wasm</code> does, on every host including web. That is <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 127</a> (accepted November 6, 2026, docs PR <a href="https://github.com/traverse-framework/traverse/pull/1821">#1821</a>). It is implemented on main for Swift, Kotlin, .NET, and web. Published packages do not do it yet.</p>
+  <p><strong>Short answer:</strong> <code>runtime.wasm</code> does, on every host including web. That is <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 127</a> (accepted November 6, 2026, docs PR <a href="https://github.com/traverse-framework/traverse/pull/1821">#1821</a>). It shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">Traverse v0.17.1</a>. Through v0.16.2, published packages did not do it.</p>
 
   <h2>What Decision 127 decided</h2>
   <p>Compatible capabilities run as platform modules, not WASM guests. Spec 072 and Decision 24 already required a runtime-owned lifecycle. Decision 127 makes the ownership rule explicit:</p>
@@ -41,8 +41,8 @@ const relatedLinks = [
     <li>The bridge stays <code>runtime-wasm-bridge/1.1.0</code>. The public embedder API does not grow, but web callers see new error codes (Decision 128), and the Rust crate's <code>start_compatible</code> and <code>submit</code> now take raw JSON text (Decision 129, breaking before 1.0).</li>
   </ul>
 
-  <h2>What published packages do today</h2>
-  <p>On <a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.2"><code>runtime-wasm-v0.16.2</code></a> (and earlier since #1422), <code>traverse_compatible_start</code>, <code>traverse_compatible_stop</code>, and <code>traverse_compatible_kill</code> return <code>-1</code> unconditionally. Swift, Kotlin, and .NET compatible calls fail on the real artifact. The web package still implements the lifecycle in TypeScript (<code>startCompatible</code> / <code>transitionCompatible</code>), including the allowlist check. That host-owned split is what Decision 127 ends.</p>
+  <h2>What v0.16.2 did</h2>
+  <p>On <a href="https://github.com/traverse-framework/traverse/releases/tag/runtime-wasm-v0.16.2"><code>runtime-wasm-v0.16.2</code></a> (and earlier since #1422), <code>traverse_compatible_start</code>, <code>traverse_compatible_stop</code>, and <code>traverse_compatible_kill</code> return <code>-1</code> unconditionally. Swift, Kotlin, and .NET compatible calls fail on that artifact. The web package at 0.16.2 implements the lifecycle in TypeScript (<code>startCompatible</code> / <code>transitionCompatible</code>), including the allowlist check. That host-owned split is what Decision 127 ends. v0.17.1 is the release that ends it.</p>
 
   <h2>What is on main</h2>
   <ul>
@@ -52,5 +52,5 @@ const relatedLinks = [
     <li><a href="https://github.com/traverse-framework/traverse/pull/1828">#1828</a> (merged November 9, closes <a href="https://github.com/traverse-framework/traverse/issues/1823">#1823</a>): Decision 129 (<a href="https://github.com/traverse-framework/traverse/pull/1827">#1827</a>). The rules now live in one shared module in <code>traverse-contracts</code>, used by both <code>runtime.wasm</code> and the Rust <code>traverse-embedder</code>. The Rust crate drops <code>InstanceNotFound</code> and <code>InstanceNotRunning</code> and returns the runtime's codes, and <code>start_compatible</code> takes raw JSON text.</li>
     <li><a href="https://github.com/traverse-framework/traverse/pull/1829">#1829</a> (merged November 9, closes <a href="https://github.com/traverse-framework/traverse/issues/1826">#1826</a>): the Rust <code>submit</code> also takes raw JSON text. Input JCS cannot represent, such as a duplicate member name, is rejected with <code>input_not_canonicalizable</code> before any guest runs.</li>
   </ul>
-  <p>None of that is in a tagged product release yet. Watch the next cut after v0.16.2 before treating compatible mode as runtime-owned on published hosts.</p>
+  <p>That shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">Traverse v0.17.1</a> (published 2026-11-16; the notes say Released 2026-11-13). Use <code>runtime-wasm-v0.17.1</code> and the 0.17.1 packages. v0.16.2 still has the stubs.</p>
 </QuestionLayout>

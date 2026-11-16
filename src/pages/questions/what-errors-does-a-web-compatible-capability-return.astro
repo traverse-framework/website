@@ -9,7 +9,7 @@ const jsonLd = JSON.stringify({
     name: 'What errors does a web compatible capability return?',
     acceptedAnswer: {
       '@type': 'Answer',
-      text: 'On traverse main since #1824 (merged November 6, 2026, Decision 128), the web host passes runtime.wasm compatible-lifecycle codes through: compatible_instance_active, compatible_instance_not_active, input_not_canonicalizable, invalid_input, and platform_not_supported. instance_not_found and instance_not_running are gone, and only one instance runs per capability at a time. This is breaking for web callers that matched the old codes or started a second instance. Published traverse-embedder-web 0.16.2 still uses the old TypeScript lifecycle and codes. Not in a tagged release yet.',
+      text: 'Since Traverse v0.17.1, the web host passes runtime.wasm compatible-lifecycle codes through: compatible_instance_active, compatible_instance_not_active, input_not_canonicalizable, invalid_input, and platform_not_supported. instance_not_found and instance_not_running are gone, and only one instance runs per capability at a time. This is breaking for web callers that matched the old codes or started a second instance. traverse-embedder-web 0.16.2 still uses the old TypeScript lifecycle and codes.',
     },
   }],
 });
@@ -24,13 +24,13 @@ const relatedLinks = [
 ---
 <QuestionLayout
   title="What errors does a web compatible capability return?"
-  description="On Traverse main, web compatible capabilities return runtime.wasm's lifecycle codes and allow one instance at a time. Published 0.16.2 still uses the old codes."
+  description="On Traverse v0.17.1, web compatible capabilities return runtime.wasm's lifecycle codes and allow one instance at a time. Published 0.16.2 still uses the old codes."
   canonical="https://traverse-framework.com/questions/what-errors-does-a-web-compatible-capability-return.html"
   category="Runtime and architecture"
   relatedLinks={relatedLinks}
   jsonLd={jsonLd}
 >
-  <p><strong>Short answer:</strong> on Traverse main, the same codes every other host returns, because <code>runtime.wasm</code> now runs the lifecycle. That landed in <a href="https://github.com/traverse-framework/traverse/pull/1824">#1824</a> on November 6, 2026, under <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 128</a>. It is not in a published package yet.</p>
+  <p><strong>Short answer:</strong> on Traverse v0.17.1, the same codes every other host returns, because <code>runtime.wasm</code> runs the lifecycle. That landed in <a href="https://github.com/traverse-framework/traverse/pull/1824">#1824</a> on November 6, 2026, under <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 128</a>, and shipped in <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">v0.17.1</a>.</p>
 
   <h2>The codes on main</h2>
   <p>Web's <code>EmbedderErrorCode</code> now passes the runtime's codes through instead of mapping them to web-only names:</p>
@@ -50,9 +50,9 @@ const relatedLinks = [
 
   <h2>What to do if you use web compatible mode</h2>
   <ul>
-    <li>Published <code>traverse-embedder-web</code> 0.16.2 still runs the old TypeScript lifecycle. Nothing changes until you upgrade past it.</li>
-    <li>When the next release ships #1824, update any code that matches <code>instance_not_found</code> or <code>instance_not_running</code>, and any flow that starts a second instance.</li>
+    <li><code>traverse-embedder-web</code> 0.16.2 still runs the old TypeScript lifecycle. v0.17.1 is the release that ships #1824.</li>
+    <li>On 0.17.1, update any code that matches <code>instance_not_found</code> or <code>instance_not_running</code>, and any flow that starts a second instance.</li>
     <li>The web test double follows the same rules, so tests written against it see real runtime behavior.</li>
   </ul>
-  <p>Swift, Kotlin, and .NET switched in the same PR. The Rust <code>traverse-embedder</code> crate followed on November 9 in <a href="https://github.com/traverse-framework/traverse/pull/1828">#1828</a> (Decision 129): it now uses the same shared rules and returns the same codes. Like web, it is on main and not in a tagged release yet.</p>
+  <p>Swift, Kotlin, and .NET switched in the same PR. The Rust <code>traverse-embedder</code> crate followed on November 9 in <a href="https://github.com/traverse-framework/traverse/pull/1828">#1828</a> (Decision 129): it uses the same shared rules and returns the same codes. Web and Rust both ship that behavior in v0.17.1.</p>
 </QuestionLayout>

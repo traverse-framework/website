@@ -4,33 +4,40 @@ import SubpageLayout from '@layouts/SubpageLayout.astro';
 // Stats are counted from the live catalog at build time so this page can't drift
 // out of sync with the registry. If the fetch fails, the build still succeeds
 // with the last-known-good snapshot below.
+// Snapshot of catalog.json on 2026-11-16 (101 capabilities, 259 versions).
 const FALLBACK = {
-  capabilities: 82,
-  versions: 185,
-  deprecated: 38,
-  namespaces: 31,
-  personas: 45,
+  capabilities: 101,
+  versions: 259,
+  deprecated: 65,
+  namespaces: 34,
+  personas: 47,
   events: 12,
   featured: [
-    { name: 'core', caps: 25, versions: 48 },
-    { name: 'report', caps: 7, versions: 10 },
+    { name: 'core', caps: 26, versions: 50 },
+    { name: 'audio', caps: 10, versions: 32 },
+    { name: 'report', caps: 7, versions: 15 },
     { name: 'validation', caps: 4, versions: 22 },
     { name: 'doc-approval', caps: 4, versions: 18 },
+    { name: 'text', caps: 4, versions: 17 },
     { name: 'commerce', caps: 4, versions: 6 },
     { name: 'support', caps: 4, versions: 4 },
     { name: 'traverse-starter', caps: 3, versions: 19 },
-    { name: 'identity', caps: 3, versions: 5 },
-    { name: 'audio', caps: 3, versions: 4 },
-    { name: 'text', caps: 3, versions: 3 },
+    { name: 'identity', caps: 3, versions: 7 },
+    { name: 'inference', caps: 3, versions: 6 },
+    { name: 'model', caps: 3, versions: 6 },
+    { name: 'artifact', caps: 3, versions: 5 },
+    { name: 'retention', caps: 2, versions: 4 },
     { name: 'review', caps: 2, versions: 4 },
     { name: 'meeting-notes', caps: 1, versions: 7 },
     { name: 'formatting', caps: 1, versions: 5 },
+    { name: 'candidate', caps: 1, versions: 3 },
+    { name: 'event', caps: 1, versions: 3 },
     { name: 'platform', caps: 1, versions: 3 },
   ],
   rest: [
-    'approval', 'artifact', 'classification', 'classifier', 'cluster', 'coverage',
-    'embedding', 'inference', 'location', 'model', 'operations', 'period',
-    'retention', 'revision', 'summary', 'uncertainty', 'visual',
+    'classification', 'classifier', 'coverage', 'location', 'period', 'revision',
+    'summary', 'uncertainty', 'visual', 'approval', 'cluster', 'embedding',
+    'operations', 'record',
   ],
 };
 
