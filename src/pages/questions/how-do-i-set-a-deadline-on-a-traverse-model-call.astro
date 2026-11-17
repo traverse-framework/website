@@ -1,0 +1,66 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I set a deadline on a Traverse model call?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Pass timeout_ms to ExactModelBrowserHost.execute on npm traverse-embedder-web@0.17.1, or put timeout_ms on the model.execute payload for ExactModelHostConnector in crates.io traverse-runtime 0.17.1. The host uses the smaller of timeout_ms and the package manifest max_execution_ms. On a browser Worker and on wasmtime, a deadline that lands during the call stops the guest and the call fails with timeout. On Node, and with createWorker: null, the host checks the deadline before the call and again after the guest returns. A guest that never returns stays running on that path. Registration can also take a per-placement preparation budget. Aborting that signal fails with cancelled and keeps nothing.',
+    },
+  }],
+});
+
+const browserSnippet = `const pending = host.execute({
+  model_ref,
+  input_ref,
+  policy_ref: "policy-1",
+  data_classification: "sensitive",
+  input_schema_ref,
+  input_schema_version: "1.0.0",
+  max_output_bytes: 4096,
+  allowed_classifications: ["sensitive"],
+  timeout_ms: 50,
+});`;
+
+const payloadSnippet = `"timeout_ms": 50`;
+
+const relatedLinks = [
+  { href: '/blog/stop-a-model-call-mid-run.html', label: 'Stop a model.execute call while it is still running' },
+  { href: '/questions/how-do-i-cancel-a-running-model-execute-call-in-traverse.html', label: 'How do I cancel a running model.execute call in Traverse?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md', label: 'Exact-ref model execution (v0.17.1 docs)' },
+  { href: '/blog/traverse-0-17-1-first-product-release.html', label: 'Traverse v0.17.1 release note' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How do I set a deadline on a Traverse model call?"
+  description="Pass timeout_ms on traverse-embedder-web@0.17.1 or on the traverse-runtime 0.17.1 model.execute payload. The host uses the smaller of that value and the manifest max_execution_ms."
+  canonical="https://traverse-framework.com/questions/how-do-i-set-a-deadline-on-a-traverse-model-call.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> pass <code>timeout_ms</code> to <code>ExactModelBrowserHost.execute</code> on npm <code>traverse-embedder-web@0.17.1</code>, or set <code>timeout_ms</code> on the <code>model.execute</code> payload for <code>ExactModelHostConnector</code> in crates.io <code>traverse-runtime</code> 0.17.1. The host uses the smaller of <code>timeout_ms</code> and the package manifest <code>max_execution_ms</code>. On a browser Worker and on wasmtime, a deadline that lands during the call stops the guest and the call fails with <code>timeout</code>. The walk-through is <a href="/blog/stop-a-model-call-mid-run.html">Stop a model.execute call while it is still running</a>.</p>
+
+  <h2>Browser</h2>
+  <p><code>host</code> is an <code>ExactModelBrowserHost</code>. The other fields are the pin, the staged input, and the policy the package was registered under.</p>
+  <pre><code>{browserSnippet}</code></pre>
+  <p>The deadline is measured from the start of the guest call. When it lands during a Worker call, the host terminates that Worker and throws <code>timeout</code> with message <code>model.execute exceeded timeout mid-run</code>. The package snapshot is dropped. A deadline that has already passed fails before the guest starts.</p>
+
+  <h2>Native wasmtime</h2>
+  <p>Put the same field on the <code>model.execute</code> payload:</p>
+  <pre><code>{payloadSnippet}</code></pre>
+  <p>A watcher thread waits for that deadline and bumps the wasmtime epoch. The guest traps at its next epoch check. The call fails with <code>timeout</code> and message <code>model.execute exceeded timeout mid-run</code>. The same deadline covers <code>model_prepare</code>. An interrupted prepare keeps no snapshot. The watcher re-reads a separate cancel flag every 5 milliseconds. Cancellation is <a href="/questions/how-do-i-cancel-a-running-model-execute-call-in-traverse.html">its own call</a>.</p>
+
+  <h2>Node, and a guest that never returns</h2>
+  <p>Node has no <code>Worker</code>. <code>createWorker: null</code> is the same path. The host checks the deadline before the call and again after the guest returns. If the guest returns late, the host discards the output and fails with <code>timeout</code>. A guest that never returns stays running. The deadline does not unblock that call.</p>
+
+  <h2>Registration</h2>
+  <p><code>registerPackage</code> takes <code>preparationBudgetMs</code>, capped by <code>maxPreparationMs</code> (default five minutes). A placement that exceeds the budget is skipped. Passing a <code>signal</code> and aborting it fails registration with <code>cancelled</code> and keeps nothing. Package size, declared memory, and declared fuel are separate ceilings: over them, registration fails with <code>model_incompatible</code> and reason <code>host_limit_exceeded</code>. The browser checks <code>maxFuel</code> at registration. It does not meter fuel during the call.</p>
+
+  <p>The rules are in <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">docs/exact-ref-model-execution.md</a> at tag v0.17.1 (Decisions 104 and 131, Spec 138 0.16.1 and 0.16.2, <a href="https://github.com/traverse-framework/traverse/issues/1582">traverse#1582</a>). Pin 0.17.1. crates.io has no <code>traverse-runtime</code> 0.17.0. No host is Certified under Spec 529.</p>
+</QuestionLayout>
