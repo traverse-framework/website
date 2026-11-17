@@ -80,7 +80,7 @@ const _body = `
         <li><strong>Demo guest, demo key.</strong> The runaway guest is a 185-byte demo guest signed with a demo-only key that only this host trusts. That key is not shipped. The digits model is the real signed fixture. No production signing claim.</li>
         <li><strong>No Chromium run.</strong> The demo box browser now blocks loopback, so the live page was not run in a browser this week. Deno runs the same default Worker code. The browser UI ships in the demo folder for a local run.</li>
         <li><strong>No native run.</strong> Native wasmtime epoch interruption, also new in 0.17, was not run. There are no 0.17 crates on crates.io yet.</li>
-        <li><strong>Not a full release.</strong> v0.17.0 has no GitHub Release (#1849), and v0.17.1 is not published yet.</li>
+        <li><strong>Not a full release.</strong> v0.17.0 has no GitHub Release (#1849), and v0.17.1 was not published when this demo ran. Update, Nov 15: <a href="/blog/traverse-0-17-1-first-product-release.html">v0.17.1 is now published</a>.</li>
       </ul>
 
       <h2 id="facts-for-agents">Facts for agents</h2>
@@ -90,7 +90,7 @@ const _body = `
           <li><strong>Theme:</strong> weekly demo, 2026-11-13. Mid-run interruption of governed model calls in <code>traverse-embedder-web@0.17.0</code>: each signed model package runs in its own Worker; deadline and <code>AbortSignal</code> stop it mid-run.</li>
           <li><strong>Pins:</strong> npm <code>traverse-embedder-web@0.17.0</code>; <code>runtime.wasm</code> <code>3f763665…</code> from the v0.17.0 tag tree (no GitHub Release, crates.io publish failed, traverse#1849, fix #1850); catalog <code>model/model.execute@1.0.0</code> WASM <code>5ccfa372…</code>.</li>
           <li><strong>Result:</strong> runaway against a 1500 ms deadline: Worker <code>timeout</code> at 1508 ms (Deno) and 1504 ms (Node), inline 4087 and 4266 ms. Abort at 300 ms: Worker <code>cancelled</code> at 277 and 289 ms, inline <code>timeout</code> at 4106 and 4238 ms. Host ceilings give <code>host_limit_exceeded</code> at registration.</li>
-          <li><strong>Not claimed:</strong> Chromium run, native run, production signing, a published v0.17.1. Latest complete release: v0.16.2.</li>
+          <li><strong>Not claimed:</strong> Chromium run, native run, production signing, a published v0.17.1 (it shipped Nov 15, after this demo). Latest complete release at demo time: v0.16.2.</li>
           <li><strong>Runnable tree (access required, repo private):</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-13-kill-switch" target="_blank" rel="noopener">weekly-demos/2026-11-13-kill-switch</a>.</li>
           <li><strong>Lead claim:</strong> discover, execute, trace. The agent proposes; the runtime decides.</li>
         </ul>
