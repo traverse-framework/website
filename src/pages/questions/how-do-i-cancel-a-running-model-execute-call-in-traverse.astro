@@ -1,0 +1,72 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I cancel a running model.execute call in Traverse?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On npm traverse-embedder-web@0.17.1, pass an AbortSignal to ExactModelBrowserHost.execute and call abort(). In a browser Worker the host terminates that Worker and the call fails with cancelled. On crates.io traverse-runtime 0.17.1, set ExactModelHostConnector.cancel to true while invoke is running. Wasmtime stops the guest at its next epoch check and the call fails with cancelled. Reset the flag to false before the next call. The connector does not clear it. On Node, and with createWorker: null, the guest runs to return and the host then reports cancelled. A guest that never returns stays running on that path. There is no traverse-runtime 0.17.0.',
+    },
+  }],
+});
+
+const browserSnippet = `import { ExactModelBrowserHost } from "traverse-embedder-web";
+
+const controller = new AbortController();
+const pending = host.execute({
+  model_ref,
+  input_ref,
+  policy_ref: "policy-1",
+  data_classification: "sensitive",
+  input_schema_ref,
+  input_schema_version: "1.0.0",
+  max_output_bytes: 4096,
+  allowed_classifications: ["sensitive"],
+  signal: controller.signal,
+});
+
+controller.abort();`;
+
+const nativeSnippet = `use std::sync::atomic::Ordering;
+
+host.cancel.store(true, Ordering::SeqCst);`;
+
+const relatedLinks = [
+  { href: '/blog/stop-a-model-call-mid-run.html', label: 'Stop a model.execute call while it is still running' },
+  { href: '/questions/how-do-i-set-a-deadline-on-a-traverse-model-call.html', label: 'How do I set a deadline on a Traverse model call?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md', label: 'Exact-ref model execution (v0.17.1 docs)' },
+  { href: '/docs.html', label: 'Docs' },
+  { href: '/blog/traverse-0-17-1-first-product-release.html', label: 'Traverse v0.17.1 release note' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+];
+---
+<QuestionLayout
+  title="How do I cancel a running model.execute call in Traverse?"
+  description="Pass an AbortSignal on traverse-embedder-web@0.17.1, or set ExactModelHostConnector.cancel on traverse-runtime 0.17.1. A browser Worker and wasmtime stop the guest during the call."
+  canonical="https://traverse-framework.com/questions/how-do-i-cancel-a-running-model-execute-call-in-traverse.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on npm <code>traverse-embedder-web@0.17.1</code>, pass an <code>AbortSignal</code> to <code>ExactModelBrowserHost.execute</code> and call <code>abort()</code>. In a browser Worker the host terminates that Worker and the call fails with <code>cancelled</code>. On crates.io <code>traverse-runtime</code> 0.17.1, set <code>ExactModelHostConnector.cancel</code> to <code>true</code> while <code>invoke</code> is running. Wasmtime stops the guest at its next epoch check. The walk-through is <a href="/blog/stop-a-model-call-mid-run.html">Stop a model.execute call while it is still running</a>.</p>
+
+  <h2>Browser</h2>
+  <p><code>host</code> is an <code>ExactModelBrowserHost</code> from <code>traverse-embedder-web@0.17.1</code>. <code>model_ref</code> and <code>input_ref</code> are the pin and the staged input you already registered.</p>
+  <pre><code>{browserSnippet}</code></pre>
+  <p>If the signal is already aborted, the published package throws <code>ExactModelError</code> with code <code>cancelled</code> and message <code>model.execute cancelled before invoke</code>. The guest does not start. If the signal aborts while the guest is in its Worker, the host terminates that Worker, drops the package snapshot, and throws <code>cancelled</code> with message <code>model.execute cancelled mid-run</code>. The next call spawns a fresh Worker.</p>
+  <p>The Worker file ships in the npm package as <code>dist/modelWorker.js</code>. Pass <code>createWorker</code> when your bundler does not emit it. The field list and the Worker rules are in <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">docs/exact-ref-model-execution.md</a> at tag v0.17.1.</p>
+
+  <h2>Native wasmtime</h2>
+  <pre><code>{nativeSnippet}</code></pre>
+  <p><code>host</code> is <code>ExactModelHostConnector</code> from <code>traverse-runtime</code> 0.17.1. The connector does not clear <code>cancel</code>. Set it back to <code>false</code> before the next call. A flag that is already set fails the call before the guest starts. A flag set during the call fails with <code>cancelled</code> and message <code>model.execute cancelled mid-run</code>.</p>
+
+  <h2>Node</h2>
+  <p>Node has no <code>Worker</code>, and <code>createWorker: null</code> is the same path. The guest runs on the calling thread. The host checks the signal before the call and again after the guest returns, then reports <code>cancelled</code>. A guest that never returns stays running.</p>
+
+  <h2>Which release</h2>
+  <p>This is Decisions 104 and 131, Spec 138 0.16.1 and 0.16.2, <a href="https://github.com/traverse-framework/traverse/issues/1582">traverse#1582</a>, in the v0.17.0 changes. v0.17.1 is the product release. npm <code>traverse-embedder-web@0.17.0</code> already has the browser Worker. crates.io has no <code>traverse-runtime</code> 0.17.0, so the wasmtime path starts at 0.17.1. Swift, Kotlin, and .NET already stop <code>wasmi</code> guests between fuel slices. That API is older than this release. No host is Certified under Spec 529.</p>
+</QuestionLayout>

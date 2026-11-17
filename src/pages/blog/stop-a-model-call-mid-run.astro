@@ -1,0 +1,216 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 17, 2026</span>
+      <span class="badge">Models</span>
+      <span class="badge">v0.17.1</span>
+    </div>
+    <h1 class="t-h1">Stop a model.execute call while it is still running</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Traverse v0.17.1 can stop <code>model_execute</code> and <code>model_prepare</code> while the guest is still running. On native wasmtime the host bumps the engine epoch. In the browser it terminates that package's Worker. The call then fails with <code>cancelled</code> or <code>timeout</code>.</p>
+
+      <div class="callout">
+        Short version: pass an <code>AbortSignal</code> or <code>timeout_ms</code> to <code>ExactModelBrowserHost.execute</code> on npm <code>traverse-embedder-web@0.17.1</code>, or set <code>ExactModelHostConnector.cancel</code> and <code>timeout_ms</code> on crates.io <code>traverse-runtime</code> 0.17.1. A browser Worker and wasmtime stop the guest during the call. Node checks the signal and the deadline before the call and again after the guest returns. There is no <code>traverse-runtime</code> 0.17.0.
+      </div>
+
+      <h2 id="browser">Cancel from the browser</h2>
+
+      <p><code>ExactModelBrowserHost</code> is exported from <code>traverse-embedder-web@0.17.1</code>. <code>execute</code> takes <code>signal</code> and <code>timeout_ms</code>. Abort the signal from the caller that started the call.</p>
+
+      <pre><code>import { ExactModelBrowserHost } from "traverse-embedder-web";
+
+const controller = new AbortController();
+const host = new ExactModelBrowserHost(pins, {
+  trustedPublicKeysHex,
+  modelUsage: "non_commercial",
+  maxPackageBytes: 32 * 1024 * 1024,
+  maxMemoryBytes: 64 * 1024 * 1024,
+  maxFuel: 1_000_000,
+});
+
+const pending = host.execute({
+  model_ref,
+  input_ref,
+  policy_ref: "policy-1",
+  data_classification: "sensitive",
+  input_schema_ref,
+  input_schema_version: "1.0.0",
+  max_output_bytes: 4096,
+  allowed_classifications: ["sensitive"],
+  timeout_ms: 50,
+  signal: controller.signal,
+});
+
+controller.abort();</code></pre>
+
+      <p><code>pins</code>, <code>trustedPublicKeysHex</code>, <code>model_ref</code>, <code>input_ref</code>, and <code>input_schema_ref</code> are the pin and the staged input you already registered. The field names are the published <code>execute</code> arguments.</p>
+
+      <p>Three outcomes, from the v0.17.1 package:</p>
+
+      <ul>
+        <li>If the signal is already aborted, <code>execute</code> throws <code>ExactModelError</code> with code <code>cancelled</code> and message <code>model.execute cancelled before invoke</code>. The guest does not start. That path was run against the published npm package.</li>
+        <li>If the signal aborts while the guest is running in its Worker, the host terminates that Worker and throws <code>cancelled</code> with message <code>model.execute cancelled mid-run</code>. The package snapshot is dropped. The next call spawns a fresh Worker, which compiles and prepares again.</li>
+        <li><code>timeout_ms</code> is a deadline measured from the start of the guest call. The host uses the smaller of <code>timeout_ms</code> and the manifest <code>max_execution_ms</code>. When that deadline lands during a Worker call, the same termination throws <code>timeout</code> with message <code>model.execute exceeded timeout mid-run</code>.</li>
+      </ul>
+
+      <p>The default Worker is <code>modelWorker.js</code>, shipped in the npm package at <code>dist/modelWorker.js</code>. The host loads it with <code>new Worker(new URL("./modelWorker.js", import.meta.url), { type: "module" })</code>. The <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md" target="_blank" rel="noopener">exact-ref model docs</a> say Vite and webpack 5 bundle that file. If your bundler does not emit it, pass <code>createWorker</code>:</p>
+
+      <pre><code>createWorker: () => new Worker(workerUrl, { type: "module" })</code></pre>
+
+      <h2 id="node">What Node does</h2>
+
+      <p><code>createWorker: null</code> runs the guest on the calling thread. Node has no <code>Worker</code>, so the default host takes that path. The host checks the signal and the deadline before the call and again after the guest returns. A guest that never returns stays running. If the guest returns after the deadline, the host discards the output and fails the call with <code>timeout</code>.</p>
+
+      <h2 id="wasmtime">Cancel on native wasmtime</h2>
+
+      <p><code>ExactModelHostConnector</code> in crates.io <code>traverse-runtime</code> 0.17.1 keeps a public <code>cancel</code> flag. The connector does not clear it. Set it while <code>invoke</code> is running, and set it back to <code>false</code> before the next call.</p>
+
+      <pre><code>use std::sync::atomic::Ordering;
+
+host.cancel.store(true, Ordering::SeqCst);</code></pre>
+
+      <p>The <code>model.execute</code> payload takes <code>timeout_ms</code>. The host uses the smaller of that value and the manifest <code>max_execution_ms</code>.</p>
+
+      <pre><code>"timeout_ms": 50</code></pre>
+
+      <p>On wasmtime, a watcher thread re-reads <code>cancel</code> every 5 milliseconds and waits for the deadline. When either fires, it bumps the engine epoch. The guest traps at its next epoch check. The call fails with <code>cancelled</code> or <code>timeout</code>. The messages are <code>model.execute cancelled mid-run</code> and <code>model.execute exceeded timeout mid-run</code>. This covers <code>model_execute</code> and <code>model_prepare</code>. An interrupted prepare keeps no snapshot. A flag that is already set, or a deadline that has already passed, fails before the guest starts.</p>
+
+      <p>On wasmtime before this change, <code>model_prepare</code> ran to the end and stored a snapshot, and <code>model_execute</code> was checked only after the guest returned. <code>wasmi</code> already stopped between fuel slices. Swift, Kotlin, and .NET use that <code>wasmi</code> path. v0.17.1 does not add a new cancel API on those hosts.</p>
+
+      <h2 id="ceilings">Registration ceilings</h2>
+
+      <p>The same browser options cap the package. Registration fails with code <code>model_incompatible</code> and reason <code>host_limit_exceeded</code> when the manifest plus wasm bytes, or the declared <code>max_memory_bytes</code>, <code>max_fuel</code>, or <code>max_prepare_fuel</code>, exceed <code>maxPackageBytes</code>, <code>maxMemoryBytes</code>, or <code>maxFuel</code>. The browser does not meter fuel during the call. <code>maxFuel</code> is checked at registration. The defaults are 256 MiB, 1 GiB, and 50,000,000,000.</p>
+
+      <p><code>registerPackage</code> also takes a <code>signal</code>. Aborting during placement preparation fails with <code>cancelled</code> and keeps nothing.</p>
+
+      <h2 id="pin">Which package</h2>
+
+      <p>The behavior landed in the v0.17.0 changes (Decisions 104 and 131, Spec 138 0.16.1 and 0.16.2, <a href="https://github.com/traverse-framework/traverse/issues/1582" target="_blank" rel="noopener">#1582</a>). v0.17.1 is the product release of those changes. npm <code>traverse-embedder-web@0.17.0</code> already contains the browser Worker. crates.io has <code>traverse-runtime</code> 0.17.1 and does not have 0.17.0, so the wasmtime path starts at 0.17.1. Pin 0.17.1 on the host you call. The release story is <a href="/blog/traverse-0-17-1-first-product-release.html">Traverse v0.17.1</a>.</p>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li>No host is Certified under Spec 529.</li>
+        <li>This note does not run a signed model package. The check against the published npm package is the already-aborted <code>execute</code> path.</li>
+        <li>Swift, Kotlin, and .NET already interrupted <code>wasmi</code> guests between fuel slices. That path is older than v0.17.1.</li>
+        <li>A Node call, or <code>createWorker: null</code>, does not terminate a guest that is still inside <code>model_execute</code>.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>What shipped:</strong> mid-run stop of <code>model_execute</code> and <code>model_prepare</code> on wasmtime (epoch interruption) and in the browser (Worker termination). Decisions 104 and 131, Spec 138 0.16.1 and 0.16.2, traverse#1582. First product release is v0.17.1 (notes Released 2026-11-13; GitHub release published November 15, 2026, Mountain time).</li>
+          <li><strong>Browser:</strong> <code>ExactModelBrowserHost.execute({ signal, timeout_ms })</code> on npm <code>traverse-embedder-web@0.17.1</code>. Worker file <code>dist/modelWorker.js</code>. Codes <code>cancelled</code> and <code>timeout</code>. <code>timeout_ms</code> is capped by the manifest <code>max_execution_ms</code>. <code>createWorker: null</code> and Node check before and after only.</li>
+          <li><strong>Native:</strong> <code>ExactModelHostConnector.cancel</code> (<code>Arc&lt;AtomicBool&gt;</code>, caller clears it) and payload <code>timeout_ms</code> on crates.io <code>traverse-runtime</code> 0.17.1. Watcher poll is 5 ms. An interrupted prepare keeps no snapshot. No crate 0.17.0 (crates.io returns 404).</li>
+          <li><strong>Ceilings:</strong> <code>maxPackageBytes</code>, <code>maxMemoryBytes</code>, <code>maxFuel</code>. Registration failure is <code>model_incompatible</code> / <code>host_limit_exceeded</code>. Browser <code>maxFuel</code> is a registration check. The browser does not meter fuel during the call.</li>
+          <li><strong>Checked:</strong> <code>execute</code> on <code>traverse-embedder-web@0.17.1</code> with an already-aborted signal throws <code>cancelled</code> / <code>model.execute cancelled before invoke</code>. Mid-run Worker termination and the wasmtime looper test were read from the v0.17.1 sources, not rerun here.</li>
+          <li><strong>Docs:</strong> <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md" target="_blank" rel="noopener">docs/exact-ref-model-execution.md</a> at tag v0.17.1, section "Engines, host ceilings, and interruption". Notes: <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/releases/v0.17.1.md" target="_blank" rel="noopener">v0.17.1</a> and <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/releases/v0.17.0.md" target="_blank" rel="noopener">v0.17.0</a>. Changelog sections v0.17.0 and v0.17.1.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#browser">Cancel from the browser</a></li>
+          <li><a href="#node">What Node does</a></li>
+          <li><a href="#wasmtime">Cancel on native wasmtime</a></li>
+          <li><a href="#ceilings">Registration ceilings</a></li>
+          <li><a href="#pin">Which package</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-do-i-cancel-a-running-model-execute-call-in-traverse.html">How do I cancel a running model.execute call in Traverse?</a></li>
+          <li><a href="/questions/how-do-i-set-a-deadline-on-a-traverse-model-call.html">How do I set a deadline on a Traverse model call?</a></li>
+          <li><a href="/blog/traverse-0-17-1-first-product-release.html">Traverse v0.17.1: the first product release of the v0.17 changes</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">Exact-ref model execution</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">A running model call can stop.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Pass a signal or a deadline on traverse-embedder-web 0.17.1, or set the cancel flag on traverse-runtime 0.17.1. A browser Worker and wasmtime stop the guest during the call.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md" class="btn btn-primary">Read the model docs</a>
+      <a href="/blog/traverse-0-17-1-first-product-release.html" class="btn btn-ghost">Read the v0.17.1 note</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="Stop a model.execute call while it is still running | Traverse Blog"
+  description="On Traverse v0.17.1, abort a browser model Worker or set the wasmtime cancel flag and the guest stops during model_execute. Node checks the deadline before and after the call. Pin traverse-embedder-web@0.17.1 and traverse-runtime 0.17.1."
+  canonical="https://traverse-framework.com/blog/stop-a-model-call-mid-run.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .post-prose pre { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; margin: 0 0 1.4rem; }
+    .post-prose pre code { background: none; padding: 0; color: var(--fg); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
