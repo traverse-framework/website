@@ -1,0 +1,192 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 13, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Models</span>
+      <span class="badge">v0.17.0</span>
+    </div>
+    <h1 class="t-h1">A governed model call you can actually stop</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>3 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Agents and apps will call models. Some of those calls will go rogue: bad input, a bad package, a runaway loop. Checking the timeout after the guest finishes is not a kill switch.</p>
+
+      <p>On Traverse v0.17.0, the web embedder runs each signed model package in its own Worker. The manifest deadline and <code>AbortSignal</code> stop the guest mid-run, and the next call gets a fresh guest. This week's demo puts a runaway guest next to the old inline path and times both.</p>
+
+      <div class="callout">
+        <strong>Read this first.</strong> v0.17.0 was tagged on Nov 12 but never became a GitHub Release: its crates.io publish failed (<a href="https://github.com/traverse-framework/traverse/issues/1849" target="_blank" rel="noopener">traverse#1849</a>, fixed in <a href="https://github.com/traverse-framework/traverse/pull/1850" target="_blank" rel="noopener">#1850</a>). npm <code>traverse-embedder-web@0.17.0</code> is published. There is no <code>runtime-wasm-v0.17.0</code> asset, so this demo pins <code>runtime.wasm</code> from the v0.17.0 tag tree (<code>3f763665…</code>). v0.17.1 is not published yet. The latest complete release is <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.16.2" target="_blank" rel="noopener">v0.16.2</a>.
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/kill-switch-2026-11-13/01-worker-vs-inline.webp" alt="Report page: runaway guest against a 1500 ms deadline stops at 1508 ms in a Worker and runs to 4087 ms inline; an abort at 300 ms cancels at 277 ms in a Worker and times out at 4106 ms inline; longest host-thread stall per host; scenario table for Deno and Node, Worker and inline" width="1024" height="566" loading="lazy" />
+        <figcaption>Static report rendered from the proof JSON. Worker on the left, the old inline path on the right.</figcaption>
+      </figure>
+
+      <h2 id="what-ran">What ran</h2>
+
+      <ul>
+        <li>npm <code>traverse-embedder-web@0.17.0</code> on the published product path: <code>BundleEmbedder.activateMediatedConnector(...)</code> and <code>submitAsync</code>.</li>
+        <li>The same catalog guest as Nov 6: <code>model/model.execute@1.0.0</code>, WASM <code>5ccfa372…4275</code>.</li>
+        <li>Deno 2.9.8, running the package's default web Worker unmodified (the browser path), and Node 22 with <code>worker_threads</code>.</li>
+        <li>Two guests: the real signed digits model (an ONNX model from Hugging Face, test-only key) and a 185-byte runaway guest made for this demo.</li>
+      </ul>
+
+      <h2 id="numbers">The numbers</h2>
+
+      <p>From <code>proof/compare.json</code>, Worker against the old inline path (<code>createWorker: null</code>):</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Scenario</th><th>Deno Worker</th><th>Node Worker</th><th>Deno inline</th><th>Node inline</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Runaway, 1500 ms deadline</td><td><code>timeout</code> 1508 ms</td><td><code>timeout</code> 1504 ms</td><td><code>timeout</code> 4087 ms</td><td><code>timeout</code> 4266 ms</td></tr>
+            <tr><td>Abort at 300 ms</td><td><code>cancelled</code> 277 ms</td><td><code>cancelled</code> 289 ms</td><td><code>timeout</code> 4106 ms</td><td><code>timeout</code> 4238 ms</td></tr>
+            <tr><td>Longest host-thread stall</td><td>134 ms</td><td>180 ms</td><td>4110 ms</td><td>4265 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Inline, the guest runs to the end and only then gets marked <code>timeout</code>. The abort never fires, because the thread is busy. In a Worker, the host stops the guest on time.</p>
+
+      <ul>
+        <li><strong>Host ceilings.</strong> <code>maxPackageBytes</code>, <code>maxMemoryBytes</code> and <code>maxFuel</code> refuse an oversize package at registration with <code>host_limit_exceeded</code>, before one guest instruction runs.</li>
+        <li><strong>Fresh guest after a kill.</strong> The next call succeeds (<code>after_kill_ok</code>).</li>
+        <li><strong>Same answers.</strong> The digits model gives the signed conformance frame under the Worker. <code>worker_hosts_identical: true</code> and <code>frames_identical_all_hosts: true</code>.</li>
+        <li><strong>Resolver.</strong> The Spec 045 browser resolver skips <code>ollama.local.generate</code> without an HTTP probe and picks the signed exact-ref pin (<code>trust_class: verified_signed_package</code>).</li>
+      </ul>
+
+      <p>The agent proposes; the runtime decides. Now the runtime can also stop a call it already started.</p>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li><strong>Demo guest, demo key.</strong> The runaway guest is a 185-byte demo guest signed with a demo-only key that only this host trusts. That key is not shipped. The digits model is the real signed fixture. No production signing claim.</li>
+        <li><strong>No Chromium run.</strong> The demo box browser now blocks loopback, so the live page was not run in a browser this week. Deno runs the same default Worker code. The browser UI ships in the demo folder for a local run.</li>
+        <li><strong>No native run.</strong> Native wasmtime epoch interruption, also new in 0.17, was not run. There are no 0.17 crates on crates.io yet.</li>
+        <li><strong>Not a full release.</strong> v0.17.0 has no GitHub Release (#1849), and v0.17.1 was not published when this demo ran. Update, Nov 15: <a href="/blog/traverse-0-17-1-first-product-release.html">v0.17.1 is now published</a>.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> weekly demo, 2026-11-13. Mid-run interruption of governed model calls in <code>traverse-embedder-web@0.17.0</code>: each signed model package runs in its own Worker; deadline and <code>AbortSignal</code> stop it mid-run.</li>
+          <li><strong>Pins:</strong> npm <code>traverse-embedder-web@0.17.0</code>; <code>runtime.wasm</code> <code>3f763665…</code> from the v0.17.0 tag tree (no GitHub Release, crates.io publish failed, traverse#1849, fix #1850); catalog <code>model/model.execute@1.0.0</code> WASM <code>5ccfa372…</code>.</li>
+          <li><strong>Result:</strong> runaway against a 1500 ms deadline: Worker <code>timeout</code> at 1508 ms (Deno) and 1504 ms (Node), inline 4087 and 4266 ms. Abort at 300 ms: Worker <code>cancelled</code> at 277 and 289 ms, inline <code>timeout</code> at 4106 and 4238 ms. Host ceilings give <code>host_limit_exceeded</code> at registration.</li>
+          <li><strong>Not claimed:</strong> Chromium run, native run, production signing, a published v0.17.1 (it shipped Nov 15, after this demo). Latest complete release at demo time: v0.16.2.</li>
+          <li><strong>Runnable tree (access required, repo private):</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-13-kill-switch" target="_blank" rel="noopener">weekly-demos/2026-11-13-kill-switch</a>.</li>
+          <li><strong>Lead claim:</strong> discover, execute, trace. The agent proposes; the runtime decides.</li>
+        </ul>
+      </div>
+
+      <p>Public proof is this write-up and the screenshot. The runnable folder <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-13-kill-switch" target="_blank" rel="noopener"><code>weekly-demos/2026-11-13-kill-switch</code></a> is for people who already have access. <code>weekly-demos</code> is still not publicly cloneable (<a href="https://github.com/traverse-framework/.github/issues/30" target="_blank" rel="noopener">.github#30</a>).</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-ran">What ran</a></li>
+          <li><a href="#numbers">The numbers</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/blog/product-path-model-execute.html">Last week: model.execute on the published Browser and Node path</a></li>
+          <li><a href="/blog/model-execute-on-published-packages.html">One model capability, three published hosts, same answer</a></li>
+          <li><a href="/what-is-real-today.html">What ships today</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">A kill switch, not a timeout check.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Each signed model package runs in its own Worker. The deadline and the cancel stop it mid-run.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/blog/product-path-model-execute.html" class="btn btn-primary">Last week's demo</a>
+      <a href="/agents.html" class="btn btn-ghost">For AI agents</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="A governed model call you can actually stop | Traverse Blog"
+  description="Weekly demo, Nov 13: traverse-embedder-web 0.17.0 runs each signed model package in its own Worker. A runaway guest stops at the 1500 ms deadline (1508 ms) or on cancel (277 ms), where the old inline path ran to about 4.1 s. Host ceilings refuse oversize packages. Deno and Node; runtime.wasm from the v0.17.0 tag tree (no GitHub Release, traverse#1849). No Chromium or native run."
+  canonical="https://traverse-framework.com/blog/kill-switch.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
