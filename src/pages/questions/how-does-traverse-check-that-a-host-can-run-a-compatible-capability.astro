@@ -1,0 +1,56 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does Traverse check that a host can run a compatible capability?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On Traverse v0.17.1, runtime.wasm starts a compatible capability only when the host platform string is in the capability platforms list. The init header carries execution_mode compatible, a non-empty platforms list, and host_platform. A miss fails with platform_not_supported, status -1, and emits no event. The same check lives in traverse_contracts::CompatibleLifecycle, which the Rust embedder uses too. The web embedder sends config.platform, or the string web when that field is omitted. v0.16.2 still returns -1 from the compatible exports without running this check.',
+    },
+  }],
+});
+
+const headerSnippet = `{
+  "execution_mode": "compatible",
+  "platforms": ["ios", "android"],
+  "host_platform": "web"
+}`;
+
+const relatedLinks = [
+  { href: '/questions/who-owns-the-compatible-capability-lifecycle.html', label: 'Who owns the compatible-capability lifecycle?' },
+  { href: '/questions/what-errors-does-a-web-compatible-capability-return.html', label: 'What errors does a web compatible capability return?' },
+  { href: '/questions/how-does-the-same-signed-model-package-run-on-every-traverse-host.html', label: 'How does the same signed model package run on every Traverse host?' },
+  { href: '/blog/compatible-lifecycle-one-rulebook.html', label: 'Five hosts, one set of rules for compatible capabilities' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/072-native-bridge-compatible-lifecycle/spec.md', label: 'Spec 072 (v0.17.1)' },
+  { href: '/blog/traverse-0-17-1-first-product-release.html', label: 'Traverse v0.17.1 release note' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How does Traverse check that a host can run a compatible capability?"
+  description="On v0.17.1, runtime.wasm starts a compatible capability only when host_platform is in platforms. A miss fails with platform_not_supported and emits no event."
+  canonical="https://traverse-framework.com/questions/how-does-traverse-check-that-a-host-can-run-a-compatible-capability.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">Traverse v0.17.1</a>, <code>runtime.wasm</code> starts a compatible capability only when the host's platform string is in that capability's <code>platforms</code> list. A miss fails with <code>platform_not_supported</code> and does not start an instance. Who owns the rest of the lifecycle is <a href="/questions/who-owns-the-compatible-capability-lifecycle.html">its own page</a>.</p>
+
+  <h2>What the host sends at init</h2>
+  <p>Spec 072 1.1.0 (FR-010) says a compatible <code>traverse_init</code> header declares <code>execution_mode</code> <code>compatible</code>, a non-empty <code>platforms</code> list, and the host's <code>host_platform</code>. It carries no artifact bytes. The bridge stays <code>runtime-wasm-bridge/1.1.0</code>. Any other <code>execution_mode</code> than <code>wasm</code>, <code>compatible</code>, or absent fails init.</p>
+  <p>On npm <code>traverse-embedder-web@0.17.1</code>, a component manifest with <code>execution_mode</code> <code>compatible</code> and an empty <code>platforms</code> list fails to load. The message says the manifest declares <code>execution_mode 'compatible'</code> but no platforms. <code>BundleEmbedder</code> then passes <code>config.platform</code>, or the string <code>web</code> when that field is omitted, as <code>host_platform</code>. One <code>runtime.wasm</code> is started per compatible capability so the runtime can enforce the list.</p>
+
+  <h2>The start check</h2>
+  <p>The rules live in <code>traverse_contracts::CompatibleLifecycle</code>. <code>runtime.wasm</code> and the Rust <code>traverse-embedder</code> both use that module, so every host follows one copy (Decisions 127 and 129). <code>start</code> canonicalizes the input first. Input that RFC 8785 cannot represent fails with <code>input_not_canonicalizable</code>. Then the host platform must be one of <code>platforms</code>. A miss returns <code>platform_not_supported</code>. Spec 072 FR-011: that failure is <code>invalid_state</code>, status <code>-1</code>, and it emits no event.</p>
+  <p>Init sends these fields. In the shared module's check, <code>platforms</code> <code>ios</code> and <code>android</code> accept <code>host_platform</code> <code>ios</code> and reject <code>web</code>:</p>
+  <pre><code>{headerSnippet}</code></pre>
+  <p>With <code>host_platform</code> <code>ios</code>, start is allowed. The instance id is <code>{"{capability_id}-compatible-{n}"}</code>, and <code>n</code> is never reused in that initialization. A second start while one instance is running fails with <code>compatible_instance_active</code>. The other codes are on <a href="/questions/what-errors-does-a-web-compatible-capability-return.html">what errors a web compatible capability returns</a>.</p>
+
+  <h2>Which release</h2>
+  <p>This check shipped with the v0.17.0 changes, and v0.17.1 is the product release of those changes. Use <code>runtime-wasm-v0.17.1</code> and the 0.17.1 packages. On <code>runtime-wasm-v0.16.2</code>, <code>traverse_compatible_start</code>, <code>traverse_compatible_stop</code>, and <code>traverse_compatible_kill</code> return <code>-1</code> on every call, so that artifact does not run this allowlist. No host is Certified under Spec 529.</p>
+  <p>A signed model package has a different host check: schema, guest ABI, and <code>wasm-cpu</code> output. That one is <a href="/questions/how-does-the-same-signed-model-package-run-on-every-traverse-host.html">how the same signed model package runs on every host</a>. The lifecycle contract is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/072-native-bridge-compatible-lifecycle/spec.md">Spec 072</a> at tag v0.17.1, and the release note is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/releases/v0.17.1.md">docs/releases/v0.17.1.md</a>.</p>
+</QuestionLayout>

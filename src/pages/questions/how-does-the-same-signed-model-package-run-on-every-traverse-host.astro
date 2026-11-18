@@ -1,0 +1,69 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does the same signed model package run on every Traverse host?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Register the same three files on each host: model.manifest.json, model.wasm, and model.sig.json. The pin is the SHA-256 of the exact manifest bytes. On wasm-cpu, a host that supports that schema and ABI returns the same output bytes for the same frame. Traverse v0.17.1 is the product release that ships this on the published hosts. Core ML on Apple uses the variant tolerance instead of byte equality. No host is Certified under Spec 529.',
+    },
+  }],
+});
+
+const conformanceSnippet = `cargo +1.95.0 install traverse-cli-rs \\
+  --version =0.17.1 --locked
+
+traverse-cli model conformance check \\
+  out/digits \\
+  out/digits/conformance.json \\
+  --trusted-key <public-key-hex>`;
+
+const relatedLinks = [
+  { href: '/questions/how-do-i-verify-a-traverse-model-package-signature.html', label: 'How do I verify a Traverse model package signature before I run it?' },
+  { href: '/questions/which-hosts-run-signed-exact-ref-models.html', label: 'Which hosts run signed exact-ref models?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/model-packaging-guide.md', label: 'Model packaging guide (v0.17.1)' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md', label: 'Exact-ref model execution (v0.17.1 docs)' },
+  { href: '/blog/traverse-0-17-1-first-product-release.html', label: 'Traverse v0.17.1 release note' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How does the same signed model package run on every Traverse host?"
+  description="Register the same three signed files on each host. The pin is the manifest SHA-256. On wasm-cpu the output bytes match. Core ML uses the variant tolerance."
+  canonical="https://traverse-framework.com/questions/how-does-the-same-signed-model-package-run-on-every-traverse-host.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> register the same three files on each host. The pin is the SHA-256 of the exact <code>model.manifest.json</code> bytes. On <code>wasm-cpu</code>, a host that supports that schema and ABI returns the same output bytes for the same frame. <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">Traverse v0.17.1</a> is the product release that ships those hosts together.</p>
+
+  <h2>The three files</h2>
+  <p>A Spec 138 package is a directory:</p>
+  <ul>
+    <li><code>model.manifest.json</code> holds identity, <code>wasm_digest</code>, the ABI, schemas, rights, the target, and limits.</li>
+    <li><code>model.wasm</code> is an import-free guest. It exports <code>memory</code> and <code>model_execute</code>.</li>
+    <li><code>model.sig.json</code> is a detached Ed25519 signature over the exact manifest bytes. Its fields are <code>alg</code> (<code>ed25519</code>), <code>key_id</code>, and <code>signature</code>.</li>
+  </ul>
+  <p>One hash binds identity, rights, and limits, and through <code>wasm_digest</code> the guest. The runtime resolves that pin only. It does not download a model, follow a version range, or swap in another file during execute.</p>
+
+  <h2>Register, then call</h2>
+  <p>The app declares the pin. The host admits the three files with <code>register_package</code> or <code>registerPackage</code>. Trust keys stay on the host. Registration checks the signature, the trusted key, the digest against exactly one pin, the schema, the rights, the target, and the WASM digest. Every later execute re-hashes the cached bytes. Verification is local SHA-256 plus Ed25519. After registration, validation and execution make no network calls. How to check the signature first is <a href="/questions/how-do-i-verify-a-traverse-model-package-signature.html">its own page</a>.</p>
+
+  <h2>Same frame, same wasm-cpu bytes</h2>
+  <p>The packaging guide at tag v0.17.1 says every host gives byte-identical <code>wasm-cpu</code> output for the same package and frame. <code>model conformance check</code> is the check reviewers run: every case runs on <code>wasmtime</code> and <code>wasmi</code> and must match. Native <code>ExactModelHostConnector</code> and browser <code>ExactModelBrowserHost</code> do that for the checked-in conformance vector. The digits conformance vector is also byte-identical on Swift.</p>
+  <p>The CLI crate is <code>traverse-cli-rs</code>. The binary is <code>traverse-cli</code>. Rust 1.95 or newer. The v0.17.1 README is the install line. The packaging guide at that tag still shows <code>--version =0.16.0</code> in its install block.</p>
+  <pre><code>{conformanceSnippet}</code></pre>
+  <p>A Core ML variant on Apple is a separate placement. Registration runs that variant's conformance vector under the variant's tolerance. Without <code>placements</code>, the call stays on <code>wasm-cpu</code>.</p>
+
+  <h2>Reading the frame on native</h2>
+  <p>v0.17.1 lets a native host read the output frame after <code>model.execute</code>. <code>ExactModelMediatedConnector::activated()</code> activates a shared connector, and <code>with_host_mut</code> reads the bytes behind <code>output_ref</code>. That is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/CHANGELOG.md">CHANGELOG</a> entry #1785 in the v0.17.1 tree. <code>activate_exact_model_runtime</code> is unchanged.</p>
+
+  <h2>Which published host</h2>
+  <p>The v0.17.1 README says <code>ExactModelHost</code> ships in every embedder as of 0.15.0. The packaging guide's host table says ABI v3, schema <code>2.2.0</code>, which is what <code>package-onnx</code> emits, needs 0.15.0 or later (Swift: <code>swift-host-v0.15.0</code> or later). The product packages for this release are crates.io <code>traverse-runtime</code> 0.17.1, npm <code>traverse-embedder-web@0.17.1</code>, Maven Central <code>com.traverse-framework:traverse-embedder</code> 0.17.1, and nuget.org <code>TraverseEmbedder</code> 0.17.1. The same README lists the iOS and macOS binary as <code>swift-host-v0.17.0</code>. No host is Certified under Spec 529.</p>
+  <p>The rules are in <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/model-packaging-guide.md">docs/model-packaging-guide.md</a> and <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">docs/exact-ref-model-execution.md</a> at tag v0.17.1. The host list is the <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/README.md">v0.17.1 README</a>.</p>
+</QuestionLayout>
