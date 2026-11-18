@@ -1,0 +1,74 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does Traverse choose a model dependency in the browser?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On npm traverse-embedder-web@0.17.1, call resolveBrowserModelDependency with the Spec 045 dependency, a request whose requested_placement is browser, and the activated pins. Every ollama.local.generate candidate is rejected as model_provider_unavailable with no HTTP probe. An activated exact-ref.wasm-cpu pin is selected with trust_class verified_signed_package. If none remain, failure_code is model_dependency_unsatisfied and trust_class is absent. The call chooses a pin. It does not run the model. exactRefPinFromSelected returns model_id and version for ExactModelBrowserHost.',
+    },
+  }],
+});
+
+const snippet = `import {
+  resolveBrowserModelDependency,
+  exactRefPinFromSelected,
+} from "traverse-embedder-web";
+
+const { resolution, trust_class } = resolveBrowserModelDependency(
+  dependency,
+  {
+    phase: "execution",
+    requested_interface_id: "traverse.inference.generate",
+    requested_placement: "browser",
+  },
+  pins.map((pin) => [pin.model_id, pin.version]),
+);
+
+const selected = exactRefPinFromSelected(resolution.selected, candidate);`;
+
+const relatedLinks = [
+  { href: '/blog/browser-skips-ollama-picks-signed-pin.html', label: 'The browser skips Ollama and picks a signed model pin' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/045-governed-model-dependency-resolution/spec.md', label: 'Spec 045 (v0.17.1)' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/packages/web/TraverseEmbedder/README.md', label: 'traverse-embedder-web README (v0.17.1)' },
+  { href: '/docs.html', label: 'Docs' },
+  { href: '/blog/traverse-0-17-1-first-product-release.html', label: 'Traverse v0.17.1 release note' },
+  { href: '/questions/what-is-exact-ref-model-execution.html', label: 'What is exact-ref model execution?' },
+];
+---
+<QuestionLayout
+  title="How does Traverse choose a model dependency in the browser?"
+  description="Call resolveBrowserModelDependency on traverse-embedder-web@0.17.1. Ollama is skipped with no HTTP probe. An activated exact-ref pin is selected, or the call fails closed."
+  canonical="https://traverse-framework.com/questions/how-does-traverse-choose-a-model-dependency-in-the-browser.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on npm <code>traverse-embedder-web@0.17.1</code>, call <code>resolveBrowserModelDependency</code> with the Spec 045 dependency, a request whose <code>requested_placement</code> is <code>browser</code>, and the activated pins. Every <code>ollama.local.generate</code> candidate is <code>model_provider_unavailable</code>, with no HTTP probe. An activated <code>exact-ref.wasm-cpu</code> pin is selected with <code>trust_class</code> <code>verified_signed_package</code>. If none remain, <code>failure_code</code> is <code>model_dependency_unsatisfied</code>. The walk-through is <a href="/blog/browser-skips-ollama-picks-signed-pin.html">The browser skips Ollama and picks a signed model pin</a>.</p>
+
+  <h2>The call</h2>
+  <p><code>dependency</code> is the Spec 045 declaration (<code>interface_id</code>, <code>version_range</code>, <code>selection_policy</code>, <code>required_capabilities</code>, <code>minimum_context_window</code>, <code>candidates</code>). <code>pins</code> are the activated Spec 044 pins. <code>candidate</code> is the selected exact-ref entry from that list.</p>
+  <pre><code>{snippet}</code></pre>
+  <p>That shape is the one in the v0.17.1 web embedder README. On the published <code>@0.17.1</code> package, a list whose Ollama candidate has priority 40 and whose activated exact-ref pin has priority 10 selects the pin. <code>exactRefPinFromSelected</code> returns <code>model_id</code> and <code>version</code> for <code>ExactModelBrowserHost</code>.</p>
+
+  <h2>What is rejected</h2>
+  <p>The probe rejects <code>ollama.local.generate</code> before placement. The reason is <code>ollama.local.generate is unavailable in the browser</code>, including when <code>placement_target</code> is <code>local</code>. A missing <code>exact_ref_model_id</code> or <code>exact_ref_version</code> string is <code>model_candidate_config_invalid</code>. A pin that is not in the activated list is <code>model_provider_unavailable</code>, reason <code>referenced exact_model_dependencies pin has no activated traverse.model-runtime binding</code>. Any other provider id is <code>model_candidate_config_invalid</code>.</p>
+  <p>After that, Spec 045 FR-006 still applies: interface, placement, minimum context window, then priority. A context window below <code>minimum_context_window</code> is <code>model_context_window_insufficient</code>. A priority tie keeps the earlier candidate. The v0.17.0 changelog says this heuristic order matches the Rust runtime.</p>
+
+  <h2>When it fails closed</h2>
+  <p>An Ollama-only list, or a list whose exact-ref pin was never activated, returns no <code>selected</code> candidate, <code>failure_code</code> <code>model_dependency_unsatisfied</code>, and no <code>trust_class</code>. Each candidate keeps its rejection code and reason. <code>trustClassForProvider</code> would map a selected Ollama candidate to <code>local_unverified_daemon</code>. This probe never selects one.</p>
+
+  <h2>Which release</h2>
+  <p>This is Decision 95, <a href="https://github.com/traverse-framework/traverse/issues/1835">traverse#1835</a>, pull request <a href="https://github.com/traverse-framework/traverse/pull/1843">#1843</a>, in the v0.17.0 changes. npm <code>traverse-embedder-web@0.17.0</code> and <code>@0.17.1</code> both export the function, and <code>dist/modelDependencyResolution.js</code> is the same bytes in both. v0.17.1 is the product release. The call does not run <code>model.execute</code> and does not check a signature. No host is Certified under Spec 529. Spec text: <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/045-governed-model-dependency-resolution/spec.md">Spec 045</a> at tag v0.17.1.</p>
+  <style is:global>
+    .q-layout { grid-template-columns: minmax(0, 1fr) 280px; }
+    @media (max-width: 800px) { .q-layout { grid-template-columns: minmax(0, 1fr); } }
+    .q-main, .q-body { min-width: 0; }
+    .q-body pre { overflow-x: auto; max-width: 100%; }
+    .q-body code { overflow-wrap: anywhere; }
+  </style>
+</QuestionLayout>
