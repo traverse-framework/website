@@ -1,0 +1,73 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I verify a Traverse model package signature before I run it?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Run traverse-cli model verify on the package directory with the Ed25519 public key you trust, before any host registers the package. The command checks the detached model.sig.json signature, the key, the manifest, the rights, and the WASM digest. It exits non-zero on failure. In Traverse v0.17.1, TRAVERSE_MODEL_SIGNING_KEYS is empty and keys/model-signing has no public key file. digits-mlp-1.0.0 in that tag uses the test-only key. Pass only a key you intend the host to trust.',
+    },
+  }],
+});
+
+const installSnippet = `cargo +1.95.0 install traverse-cli-rs \\
+  --version =0.17.1 --locked`;
+
+const verifySnippet = `traverse-cli model verify out/digits \\
+  --trusted-key <public-key-hex> \\
+  --model-usage commercial \\
+  --json`;
+
+const relatedLinks = [
+  { href: '/questions/how-does-the-same-signed-model-package-run-on-every-traverse-host.html', label: 'How does the same signed model package run on every Traverse host?' },
+  { href: '/questions/is-production-model-signing-ready.html', label: 'Is production model signing ready?' },
+  { href: '/questions/how-do-hosts-trust-signed-models.html', label: 'How do hosts trust signed models?' },
+  { href: '/questions/how-do-i-verify-a-signed-capability-artifact.html', label: 'How do I verify a signed capability artifact?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/model-packaging-guide.md', label: 'Model packaging guide (v0.17.1)' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/model-signing-key-runbook.md', label: 'Model-signing key runbook (v0.17.1)' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How do I verify a Traverse model package signature before I run it?"
+  description="Run traverse-cli model verify with the public key you trust. v0.17.1 ships an empty production key list. The test-only digits-mlp key is not a production trust root."
+  canonical="https://traverse-framework.com/questions/how-do-i-verify-a-traverse-model-package-signature.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> run <code>traverse-cli model verify</code> on the package directory with the Ed25519 public key you trust, before any host calls <code>register_package</code> or <code>registerPackage</code>. A bad signature, digest, or key exits non-zero. The host repeats those checks at registration and refuses the same package.</p>
+
+  <h2>Install the CLI</h2>
+  <p>The crate is <code>traverse-cli-rs</code>. The binary is <code>traverse-cli</code>. It needs Rust 1.95 or newer. The crate named <code>traverse-cli</code> on crates.io is a different tool.</p>
+  <pre><code>{installSnippet}</code></pre>
+  <p>That line is the <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/README.md">v0.17.1 README</a>. The packaging guide at the same tag still shows <code>--version =0.16.0</code> in its install block.</p>
+
+  <h2>Verify the package</h2>
+  <p><code>out/digits</code> is the directory that holds <code>model.manifest.json</code>, <code>model.wasm</code>, and <code>model.sig.json</code>. <code>model.sig.json</code> is a detached Ed25519 signature over the exact manifest bytes.</p>
+  <pre><code>{verifySnippet}</code></pre>
+  <p>The command checks the signature, the trusted key, the manifest and rights (including <code>rights.derivation</code>), the WASM digest, the target, the host ceilings you pass, and that the guest imports nothing. Success prints <code>ok</code>, the identity, the digest, <code>imports</code>, and the verified <code>rights_record</code>.</p>
+  <p>Pass <code>--model-usage commercial</code> or <code>--model-usage non_commercial</code> so the check matches the app. Without the flag, <code>verification_usage</code> stays <code>non_commercial</code> and <code>effective_usage</code> is null, which is why a <code>prohibited</code> package can still verify. <code>--require-model-usage</code> with no <code>--model-usage</code> reproduces <code>usage_undeclared</code>. A value such as <code>research</code> fails. With <code>--json</code>, flag and usage errors print a JSON object on stdout with <code>error.code</code> <code>usage_error</code> and exit 5.</p>
+
+  <h2>Failures worth knowing</h2>
+  <ul>
+    <li><code>signature_invalid</code>: the manifest bytes changed after signing. Sign again.</li>
+    <li><code>key_untrusted</code>: the public key is not one you passed. Hosts must trust that same key.</li>
+    <li><code>digest_mismatch</code>: <code>model.wasm</code> does not match <code>wasm_digest</code>. Update the manifest, then sign again.</li>
+    <li><code>rights_incomplete</code> or <code>rights_inconsistent</code>: a rights field is empty, or <code>commercial_use</code> is more permissive than the derivation source.</li>
+    <li><code>manifest_invalid</code>: unknown fields, an unsupported schema or ABI, or a guest that imports anything.</li>
+    <li><code>host_limit_exceeded</code>: declared limits are above the ceilings you passed with <code>--max-package-bytes</code>, <code>--max-memory-bytes</code>, or <code>--max-fuel</code>.</li>
+  </ul>
+
+  <h2>What the host does next</h2>
+  <p>Registration verifies the signature, the trusted key, that the manifest digest equals exactly one pin, the schema, the rights, the target, and the WASM digest. Each execute re-hashes the cached bytes against the pin. There is no download during execute. Trust lists live on the host (<code>TrustedModelKeys</code> on Rust, <code>trustedPublicKeysHex</code> on web and Swift). An app manifest cannot add a key.</p>
+
+  <h2>Production keys in v0.17.1</h2>
+  <p>At tag v0.17.1, <code>TRAVERSE_MODEL_SIGNING_KEYS</code> is an empty list in <code>traverse-runtime</code> and in <code>traverse-embedder-web</code>. <code>keys/model-signing/</code> contains the README and no <code>.pub</code> file. Hosts trust only keys you pass. There is no default trust and no network lookup. <code>digits-mlp-1.0.0</code> in that tag is signed with the test-only key. Keep that key out of a production trust list.</p>
+  <p>The production procedure is written down: one dedicated Ed25519 key, separate from the registry capability key, held as <code>MODEL_SIGNING_KEY_HEX</code> in the <code>model-signing</code> GitHub Environment, with public keys committed under <code>keys/model-signing/</code> and mirrored into <code>TRAVERSE_MODEL_SIGNING_KEYS</code>. That is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/adr/0080-model-signing-key-management.md">ADR-0080</a> and the <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/model-signing-key-runbook.md">model-signing key runbook</a>. The v0.17.1 tree does not contain that public key. Status of the program: <a href="/questions/is-production-model-signing-ready.html">Is production model signing ready?</a></p>
+  <p>A registry capability uses a sibling <code>signature.json</code>. That check is <a href="/questions/how-do-i-verify-a-signed-capability-artifact.html">How do I verify a signed capability artifact?</a> The model command reference is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/cli-reference.md">docs/cli-reference.md</a> and the worked example is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/model-packaging-guide.md">docs/model-packaging-guide.md</a>, both at tag v0.17.1.</p>
+</QuestionLayout>
