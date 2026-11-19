@@ -1,0 +1,222 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 19, 2026</span>
+      <span class="badge">Models</span>
+      <span class="badge">v0.17.1</span>
+    </div>
+    <h1 class="t-h1">The browser skips Ollama and picks a signed model pin</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>A browser app that lists a local Ollama model next to a signed package can otherwise wait on a daemon the page cannot reach, or hand the call to a model the browser cannot run. On npm <code>traverse-embedder-web@0.17.1</code>, <code>resolveBrowserModelDependency</code> skips every <code>ollama.local.generate</code> candidate with no HTTP probe, selects an activated <code>exact-ref.wasm-cpu</code> pin, and fails closed when none remain.</p>
+
+      <div class="callout">
+        Short version: pass the Spec 045 dependency, a request with <code>requested_placement</code> <code>browser</code>, and the activated pins. Ollama is recorded as <code>model_provider_unavailable</code>. An activated exact-ref pin comes back as <code>verified_signed_package</code>. If none remain, the code is <code>model_dependency_unsatisfied</code> and there is no <code>trust_class</code>. The call chooses a pin. It does not run the model.
+      </div>
+
+      <h2 id="call">The call</h2>
+
+      <p><code>resolveBrowserModelDependency</code> is an export of npm <code>traverse-embedder-web@0.17.1</code>. The third argument is the activated pins, each a model id and a version. The dependency is the Spec 045 declaration.</p>
+
+      <pre><code>import {
+  resolveBrowserModelDependency,
+  exactRefPinFromSelected,
+} from "traverse-embedder-web";
+
+const dependency = {
+  interface_id: "traverse.inference.generate",
+  version_range: "&gt;=2.0.0",
+  selection_policy: { strategy: "priority", allow_fallback: true },
+  required_capabilities: [],
+  minimum_context_window: 1024,
+  candidates: [
+    {
+      candidate_id: "ollama-high",
+      provider_capability_id: "traverse.inference.generate",
+      provider_implementation_id: "ollama.local.generate",
+      model_identifier: "llama3.2:3b",
+      placement_target: "browser",
+      priority: 40,
+      metadata: { model_context_window: 8192 },
+    },
+    {
+      candidate_id: "exact-ref-browser",
+      provider_capability_id: "traverse.inference.generate",
+      provider_implementation_id: "exact-ref.wasm-cpu",
+      model_identifier: "fixture.echo@1.0.0",
+      placement_target: "browser",
+      priority: 10,
+      metadata: {
+        exact_ref_model_id: "fixture.echo",
+        exact_ref_version: "1.0.0",
+        model_context_window: 8192,
+      },
+    },
+  ],
+};
+
+const { resolution, trust_class } = resolveBrowserModelDependency(
+  dependency,
+  {
+    phase: "execution",
+    requested_interface_id: "traverse.inference.generate",
+    requested_placement: "browser",
+  },
+  [["fixture.echo", "1.0.0"]],
+);
+
+const pin = exactRefPinFromSelected(
+  resolution.selected,
+  dependency.candidates[1],
+);</code></pre>
+
+      <p>On the published package, that list selects <code>exact-ref-browser</code> even though Ollama has priority 40 and the pin has priority 10. <code>trust_class</code> is <code>verified_signed_package</code>. The reason is <code>selected highest-priority passing candidate</code>. <code>pin</code> is model id <code>fixture.echo</code> and version <code>1.0.0</code>. Those names are the package-test fixtures. The call does not contact them.</p>
+
+      <h2 id="probe">What the probe rejects</h2>
+
+      <p><code>BrowserModelAvailabilityProbe</code> rejects <code>ollama.local.generate</code> before it looks at placement. The code is <code>model_provider_unavailable</code> and the reason is <code>ollama.local.generate is unavailable in the browser</code>, including when <code>placement_target</code> is <code>local</code>. There is no HTTP request. Spec 045 FR-006a already requires that skip. Decision 95 (<a href="https://github.com/traverse-framework/traverse/issues/1835" target="_blank" rel="noopener">#1835</a>, <a href="https://github.com/traverse-framework/traverse/pull/1843" target="_blank" rel="noopener">#1843</a>) is the browser copy.</p>
+
+      <p>An <code>exact-ref.wasm-cpu</code> candidate is ready only when <code>exact_ref_model_id</code> and <code>exact_ref_version</code> are strings and that pair is activated. A missing string is <code>model_candidate_config_invalid</code> (<code>exact-ref candidate is missing exact_ref_model_id metadata</code> on the published package). An unactivated pair is <code>model_provider_unavailable</code>, reason <code>referenced exact_model_dependencies pin has no activated traverse.model-runtime binding</code>. Any other provider id is <code>model_candidate_config_invalid</code>.</p>
+
+      <h2 id="order">How a passing candidate is chosen</h2>
+
+      <p>After the probe, Spec 045 FR-006 still applies, and the v0.17.0 changelog says that order matches the Rust runtime: interface, then placement, then minimum context window, then priority. <code>provider_capability_id</code> must match the request and the dependency. <code>placement_target</code> must match <code>requested_placement</code>. A window below <code>minimum_context_window</code> is <code>model_context_window_insufficient</code>. On the published package, 128 against a minimum of 1024 is rejected with <code>model context window 128 is below required 1024</code>, and a later candidate that passes is selected.</p>
+
+      <p>Passing candidates sort by priority, highest first. A tie keeps the earlier entry. The reason is <code>selected by priority tie using manifest order</code>. A selected exact-ref pin sets <code>trust_class</code> to <code>verified_signed_package</code> (FR-012a). <code>trustClassForProvider</code> maps Ollama to <code>local_unverified_daemon</code>, but this probe never selects that id, so the result does not carry that class.</p>
+
+      <h2 id="closed">When nothing remains</h2>
+
+      <p>If no candidate passes, <code>selected</code> is absent, <code>failure_code</code> is <code>model_dependency_unsatisfied</code>, and <code>trust_class</code> is absent. Each candidate still has its rejection code and reason. The evidence also records phase, interface, and requested placement. An Ollama-only list ends there. So does a list whose exact-ref pin was never activated.</p>
+
+      <p>Running the pin is <code>ExactModelBrowserHost</code> under Spec 138. <code>registerPackage</code> still checks the signature. Stopping a call that is already running is a <a href="/blog/stop-a-model-call-mid-run.html">separate note</a>.</p>
+
+      <h2 id="package">Which package</h2>
+
+      <p>The function is in the v0.17.0 changes. npm <code>traverse-embedder-web@0.17.0</code> and <code>@0.17.1</code> both export it, and <code>dist/modelDependencyResolution.js</code> is the same bytes in both tarballs. v0.17.1 is the product release. The cases in this note were run on <code>@0.17.1</code>. The web embedder README at tag v0.17.1 documents the same imports. The release story is <a href="/blog/traverse-0-17-1-first-product-release.html">Traverse v0.17.1</a>.</p>
+
+      <pre><code>npm install traverse-embedder-web@0.17.1</code></pre>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li>No host is Certified under Spec 529.</li>
+        <li>The browser does not probe Ollama, and it does not add an Ollama provider. Spec 045 still describes Ollama as the first local provider on hosts that can reach it.</li>
+        <li>The call does not execute <code>model.execute</code>.</li>
+        <li><code>local_unverified_daemon</code> is the FR-012a class for a selected Ollama candidate. This probe does not select one.</li>
+        <li>No host ABI change. The v0.17.0 changelog calls the TypeScript API additive.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>What shipped:</strong> <code>resolveBrowserModelDependency</code> in npm <code>traverse-embedder-web</code> (Decision 95, #1835, #1843). Skips <code>ollama.local.generate</code> with no HTTP probe, selects an activated <code>exact-ref.wasm-cpu</code> pin, fails closed with <code>model_dependency_unsatisfied</code>, and sets <code>trust_class</code> <code>verified_signed_package</code>.</li>
+          <li><strong>Packages:</strong> the export is in npm <code>@0.17.0</code> and <code>@0.17.1</code>. <code>dist/modelDependencyResolution.js</code> matches between those tarballs. v0.17.1 is the product release. Cases in this note were run on <code>@0.17.1</code>.</li>
+          <li><strong>Docs:</strong> <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/045-governed-model-dependency-resolution/spec.md" target="_blank" rel="noopener">Spec 045</a> at tag v0.17.1 (FR-006, FR-006a, FR-007, FR-012a), changelog v0.17.0, and the web embedder README. Not claimed: model execution, an Ollama probe, <code>local_unverified_daemon</code> from this probe, Spec 529 certification, an ABI bump.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#call">The call</a></li>
+          <li><a href="#probe">What the probe rejects</a></li>
+          <li><a href="#order">How a passing candidate is chosen</a></li>
+          <li><a href="#closed">When nothing remains</a></li>
+          <li><a href="#package">Which package</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-does-traverse-choose-a-model-dependency-in-the-browser.html">How does Traverse choose a model dependency in the browser?</a></li>
+          <li><a href="/blog/traverse-0-17-1-first-product-release.html">Traverse v0.17.1: the first product release of the v0.17 changes</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/045-governed-model-dependency-resolution/spec.md">Spec 045 at v0.17.1</a></li>
+          <li><a href="/blog/stop-a-model-call-mid-run.html">Stop a model.execute call while it is still running</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The page picks a pin it can run.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Pass the candidate list and the activated pins on traverse-embedder-web 0.17.1. Ollama is skipped. An activated exact-ref pin is selected. If none remain, the call returns model_dependency_unsatisfied.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/specs/045-governed-model-dependency-resolution/spec.md" class="btn btn-primary">Read Spec 045</a>
+      <a href="/blog/traverse-0-17-1-first-product-release.html" class="btn btn-ghost">Read the v0.17.1 note</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="The browser skips Ollama and picks a signed model pin | Traverse Blog"
+  description="On traverse-embedder-web 0.17.1, resolveBrowserModelDependency skips ollama.local.generate with no HTTP probe, selects an activated exact-ref.wasm-cpu pin, and fails closed with model_dependency_unsatisfied when none remain."
+  canonical="https://traverse-framework.com/blog/browser-skips-ollama-picks-signed-pin.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; min-width: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); overflow-wrap: anywhere; }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .post-prose pre { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; min-width: 0; margin: 0 0 1.4rem; }
+    .post-prose pre code { background: none; padding: 0; color: var(--fg); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
