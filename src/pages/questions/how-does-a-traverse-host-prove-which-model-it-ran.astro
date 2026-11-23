@@ -1,0 +1,70 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does a Traverse host prove which model it ran?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On Traverse v0.17.1, a successful exact-ref model.execute returns model_evidence, the verified rights record, after the host re-hashes the cached manifest and guest. The digest is the SHA-256 of the exact model.manifest.json. The same record is on the result and on trace.model_evidence in npm traverse-embedder-web@0.17.1. modelRightsRecord(digest) can show revoked without running the guest. A revoked execute fails with package_revoked and returns no record. This record shipped in v0.15.0 (Spec 138 0.8.0, Decision 107). It is not a signature over the output bytes, and no host is Certified under Spec 529.',
+    },
+  }],
+});
+
+const callSnippet = `const result = await host.execute({
+  model_ref,
+  input_ref: inputRef,
+  policy_ref: "policy-1",
+  data_classification: "public",
+  input_schema_ref,
+  input_schema_version: "1.0.0",
+  max_output_bytes: 4096,
+  allowed_classifications: ["public"],
+});
+
+const ran = result.model_evidence;
+const same = result.trace.model_evidence;`;
+
+const relatedLinks = [
+  { href: '/blog/host-result-names-the-model-it-ran.html', label: 'The host result names the model it ran' },
+  { href: '/questions/what-is-model-usage-in-traverse.html', label: 'What is model_usage?' },
+  { href: '/questions/what-happens-when-a-host-marks-a-model-package-revoked.html', label: 'What happens when a host marks a model package revoked?' },
+  { href: '/questions/how-do-i-read-the-model-output-frame-on-a-native-traverse-host.html', label: 'How do I read the model output frame on a native Traverse host?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md', label: 'Exact-ref model execution (v0.17.1)' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/contracts/connectors/traverse.model-runtime/schemas/model-rights-record-1.0.0.json', label: 'model-rights-record-1.0.0 (v0.17.1)' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How does a Traverse host prove which model it ran?"
+  description="On v0.17.1 a successful exact-ref call returns model_evidence after the host re-hashes the cached package. The digest is the manifest SHA-256. A revoked call fails with package_revoked."
+  canonical="https://traverse-framework.com/questions/how-does-a-traverse-host-prove-which-model-it-ran.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">Traverse v0.17.1</a>, a successful exact-ref <code>model.execute</code> returns <code>model_evidence</code> after the host re-hashes the cached manifest and the guest. <code>digest</code> is the SHA-256 of the exact <code>model.manifest.json</code>. A revoked package fails with <code>package_revoked</code> and does not return that record. The walk-through is <a href="/blog/host-result-names-the-model-it-ran.html">The host result names the model it ran</a>.</p>
+
+  <h2>What you read</h2>
+  <p>On npm <code>traverse-embedder-web@0.17.1</code>, <code>ExactModelBrowserHost.execute</code> puts the record on the result and on <code>trace.model_evidence</code>. The published source builds both from the admitted package. <code>model_id</code> and <code>version</code> come from the manifest. <code>digest</code> is the pin that matched the re-hashed cache. If the cached manifest or guest no longer matches, the reason is <code>digest_mismatch</code> and the message is <code>cached model package bytes no longer match the pinned digest</code>.</p>
+  <pre><code>{callSnippet}</code></pre>
+  <p>Required fields, schema <code>model-rights-record-1.0.0</code>: <code>model_id</code>, <code>version</code>, <code>digest</code> (64 lowercase hex characters), <code>rights</code>, <code>status</code> (<code>active</code>, <code>deprecated</code>, or <code>revoked</code>), and <code>effective_usage</code> (<code>commercial</code> or <code>non_commercial</code>). <code>rights</code> is the signed license, attribution, redistribution, <code>commercial_use</code>, and <code>source_url</code>. <code>source_url</code> does not identify the package. <code>status_reason</code> is optional. The web host sets it only when the status map has an entry. With no entry, <code>status</code> is <code>active</code>.</p>
+  <p><code>trace.usage</code> is <code>input_bytes</code>, <code>output_bytes</code>, and <code>duration_ms</code>. That is not <code>effective_usage</code>. <code>effective_usage</code> is <code>commercial</code> when the host was constructed with <code>hostRequiresCommercial</code>, and otherwise the app <code>modelUsage</code>.</p>
+
+  <h2>Without running the guest</h2>
+  <p><code>modelRightsRecord(digest)</code> returns the record for a package already registered, including <code>status: revoked</code>. It returns <code>undefined</code> if that digest was never admitted, and if the host has no <code>modelUsage</code>. <code>modelRights(digest)</code> returns only the signed rights. The exact-ref doc names the same query as <code>model_rights_record(digest)</code>, and names <code>modelEvidence</code> on Swift and Kotlin <code>ExactModelExecution</code>.</p>
+
+  <h2>What a failure carries</h2>
+  <p>Rights failures carry <code>error.detail</code> (<code>model-rights-denial-detail-1.0.0</code>): <code>field</code>, <code>expected</code>, <code>actual</code>, and, once a package is known, <code>model_id</code>, <code>version</code>, <code>digest</code>, and optional <code>effective_usage</code>. The reasons are <code>rights_incomplete</code>, <code>rights_mismatch</code>, <code>rights_policy_denied</code>, <code>rights_inconsistent</code>, <code>package_revoked</code>, and <code>usage_undeclared</code>. On the web host, <code>package_revoked</code> is code <code>model_unavailable</code>. <code>rights_policy_denied</code> is code <code>model_incompatible</code>. A <code>model_ref</code> that matches no pin is <code>pin_mismatch</code> with no <code>detail</code>.</p>
+  <p>The record is not a signature over the output bytes. Reading those bytes is <a href="/questions/how-do-i-read-the-model-output-frame-on-a-native-traverse-host.html">a separate step</a>. Replacing the model is <a href="/questions/how-do-i-publish-a-new-version-of-a-signed-traverse-model.html">a new pin</a>. No host is Certified under Spec 529. At tag v0.17.1, <code>TRAVERSE_MODEL_SIGNING_KEYS</code> is empty. The contract is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">docs/exact-ref-model-execution.md</a> and <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/packages/web/TraverseEmbedder/src/exactModel.ts">exactModel.ts</a> at that tag.</p>
+</QuestionLayout>
+
+<style is:global>
+  .q-layout, .q-main, .q-body { min-width: 0; }
+  .q-body { overflow-wrap: anywhere; }
+  .q-body pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; margin: 0 0 1.25rem; }
+  .q-body pre code { background: none; padding: 0; white-space: pre; }
+</style>

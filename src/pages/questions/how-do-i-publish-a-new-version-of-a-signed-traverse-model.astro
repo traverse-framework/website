@@ -1,0 +1,60 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I publish a new version of a signed Traverse model?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A new signed Traverse model is a new manifest, a new signature, and a new digest. The pin is the SHA-256 of the exact model.manifest.json bytes. The runtime does not follow a version range or substitute another file during execute. The app pin list must include the new digest or registration fails with pin_mismatch. The old pin still names the old bytes. The host replaces its package status map to flag the old digest as deprecated, which still runs, or revoked, which fails with package_revoked. Traverse does not distribute that map. Verify the new directory with traverse-cli model verify before a host registers it.',
+    },
+  }],
+});
+
+const statusSnippet = `host.setPackageStatus({
+  [oldDigest]: { status: "deprecated", reason: "replaced" },
+});`;
+
+const relatedLinks = [
+  { href: '/blog/host-result-names-the-model-it-ran.html', label: 'The host result names the model it ran' },
+  { href: '/questions/how-does-a-traverse-host-prove-which-model-it-ran.html', label: 'How does a Traverse host prove which model it ran?' },
+  { href: '/questions/what-happens-when-a-host-marks-a-model-package-revoked.html', label: 'What happens when a host marks a model package revoked?' },
+  { href: '/questions/how-do-i-verify-a-traverse-model-package-signature.html', label: 'How do I verify a Traverse model package signature before I run it?' },
+  { href: '/questions/how-does-the-same-signed-model-package-run-on-every-traverse-host.html', label: 'How does the same signed model package run on every Traverse host?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md', label: 'Exact-ref model execution (v0.17.1)' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How do I publish a new version of a signed Traverse model?"
+  description="A new signed Traverse model is a new manifest digest. The old pin still names the old bytes. The host status map flags or blocks that digest. The runtime does not substitute files."
+  canonical="https://traverse-framework.com/questions/how-do-i-publish-a-new-version-of-a-signed-traverse-model.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> ship a new package. The pin is the SHA-256 of the exact <code>model.manifest.json</code> bytes, so a new manifest is a new pin. The runtime does not follow a version range and does not swap in another file during execute. The old pin still names the old bytes until the host marks that digest revoked.</p>
+
+  <h2>What has to change</h2>
+  <p>On <a href="https://github.com/traverse-framework/traverse/releases/tag/v0.17.1">Traverse v0.17.1</a>, registration admits a package only when the manifest digest equals exactly one pin. On npm <code>traverse-embedder-web@0.17.1</code>, a digest that matches no pin throws <code>model_unavailable</code> / <code>pin_mismatch</code> with message <code>signed package digest does not match an exact_model_dependencies pin</code>. The app <code>exact_model_dependencies</code> list has to name the new <code>model_id</code>, <code>version</code>, and <code>digest</code>. An app manifest cannot add a trusted signing key.</p>
+  <p>Changing weights changes the guest, <code>wasm_digest</code>, the manifest bytes, the signature, and the pin. Verify the new directory with <code>traverse-cli model verify</code> before any host registers it. The CLI crate is <code>traverse-cli-rs</code> and the binary is <code>traverse-cli</code>. The flags and the empty production key list are <a href="/questions/how-do-i-verify-a-traverse-model-package-signature.html">on the verify page</a>.</p>
+
+  <h2>What you do with the old pin</h2>
+  <p>The host owns the package status map. <code>set_package_status</code> replaces that map. On the web host, <code>setPackageStatus</code> replaces it too, and the new map is what the next <code>registerPackage</code> or <code>execute</code> sees. Pass every digest you still want listed. A call that passes only the old digest drops the other entries.</p>
+  <pre><code>{statusSnippet}</code></pre>
+  <p><code>deprecated</code> still runs. The successful <code>model_evidence.status</code> is <code>deprecated</code>, and the web host includes <code>status_reason</code> from the map entry. <code>revoked</code> fails the next call with <code>package_revoked</code> and does not return a success record. The effect of each status is <a href="/questions/what-happens-when-a-host-marks-a-model-package-revoked.html">its own page</a>. Traverse does not distribute the map, and nothing checks it over the network.</p>
+  <p>A status change drops that package's guest ABI v3 snapshot. The next call prepares again. That is the exact-ref doc at tag v0.17.1: snapshots are dropped on a package status change, on a failed digest re-check, and on <code>shutdown()</code>.</p>
+
+  <h2>What this does not do</h2>
+  <p>Publishing a new file under the old path does not retarget an existing pin. More than one pin with the same <code>model_id</code> and <code>version</code> fails registration with <code>pin_ambiguous</code> (<code>more than one exact_model_dependencies pin names this model id and version</code> on the web host). This is host status for a signed model package. It is not registry revocation of a capability. No host is Certified under Spec 529. The rules are <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">docs/exact-ref-model-execution.md</a> at tag v0.17.1.</p>
+</QuestionLayout>
+
+<style is:global>
+  .q-layout, .q-main, .q-body { min-width: 0; }
+  .q-body { overflow-wrap: anywhere; }
+  .q-body pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; margin: 0 0 1.25rem; }
+  .q-body pre code { background: none; padding: 0; white-space: pre; }
+</style>

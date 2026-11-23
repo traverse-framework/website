@@ -1,0 +1,203 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 24, 2026</span>
+      <span class="badge">Models</span>
+      <span class="badge">v0.17.1</span>
+    </div>
+    <h1 class="t-h1">The host result names the model it ran</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>5 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>A name written next to a model call does not tell you which signed package the host executed. On Traverse v0.17.1, a successful exact-ref call returns <code>model_evidence</code>, the verified rights record for the package the host admitted, after it re-hashes the cached manifest and the guest.</p>
+
+      <div class="callout">
+        Short version: <code>result.model_evidence.digest</code> is the SHA-256 of the exact <code>model.manifest.json</code> the host re-checked. The same record sits on <code>result.trace.model_evidence</code>. <code>modelRightsRecord(digest)</code> returns it without running the guest, and that query can show <code>revoked</code>. A revoked execute throws <code>package_revoked</code> and returns no record. The record has been on successful calls since v0.15.0 (Spec 138 0.8.0, Decision 107). v0.17.1 is the package you install today.
+      </div>
+
+      <h2 id="call">The call</h2>
+
+      <p><code>ExactModelBrowserHost</code> is the browser and Node host in npm <code>traverse-embedder-web@0.17.1</code>. <code>registerPackage</code> admits the three signed files under a <code>policy_ref</code>. <code>execute</code> then takes a <code>model_ref</code> that must match one pin. The input ref comes from <code>host.io.stageModelInput</code> and is consumed once.</p>
+
+      <pre><code>import { ExactModelBrowserHost } from "traverse-embedder-web";
+
+const host = new ExactModelBrowserHost(pins, {
+  trustedPublicKeysHex,
+  modelUsage: "non_commercial",
+});
+
+await host.registerPackage(manifestBytes, wasm, signatureBytes, {
+  policy_ref: "policy-1",
+});
+
+const inputRef = host.io.stageModelInput(frame, 4096);
+const result = await host.execute({
+  model_ref,
+  input_ref: inputRef,
+  policy_ref: "policy-1",
+  data_classification: "public",
+  input_schema_ref,
+  input_schema_version: "1.0.0",
+  max_output_bytes: 4096,
+  allowed_classifications: ["public"],
+});
+
+const ran = result.model_evidence;</code></pre>
+
+      <p><code>pins</code>, the three package files, <code>frame</code>, <code>model_ref</code>, and <code>input_schema_ref</code> are the caller's. <code>model_ref</code> is <code>model_id</code>, <code>version</code>, and <code>digest</code>. <code>data_classification</code> must be one of <code>allowed_classifications</code>, or the call throws <code>policy_denied</code> (<code>data_classification denied by policy</code>) before it looks at the package. <code>policy_ref</code> must be the one passed to <code>registerPackage</code>, or the reason is <code>placement_unavailable</code>.</p>
+
+      <h2 id="record">What the record holds</h2>
+
+      <p>On the published web host, a success builds <code>model_ref</code> and <code>model_evidence</code> from the admitted package, not from the strings the caller sent. Before that, it hashes the cached manifest bytes and the cached guest. If either hash misses the pin, the reason is <code>digest_mismatch</code> and the message is <code>cached model package bytes no longer match the pinned digest</code>. The snapshot for that digest is dropped.</p>
+
+      <p>The record is schema <code>model-rights-record-1.0.0</code>. Required fields are <code>model_id</code>, <code>version</code>, <code>digest</code>, <code>rights</code>, <code>status</code>, and <code>effective_usage</code>. <code>digest</code> is 64 lowercase hex characters, the SHA-256 of the exact manifest, with no <code>sha256:</code> prefix. <code>rights</code> is the signed object: <code>license_id</code>, <code>attribution</code>, <code>redistribution</code>, <code>commercial_use</code> (<code>allowed</code>, <code>restricted</code>, or <code>prohibited</code>), <code>source_url</code>, and an optional <code>derivation</code>. <code>source_url</code> is informational. Identity is the digest.</p>
+
+      <p><code>status</code> is <code>active</code> when the host status map has no entry. A <code>deprecated</code> entry still runs, and the record's <code>status</code> is <code>deprecated</code>. The web host adds <code>status_reason</code> only when that map has an entry. <code>effective_usage</code> is <code>commercial</code> when the host was built with <code>hostRequiresCommercial</code>, and otherwise the app <code>modelUsage</code>. The same object is assigned to <code>result.model_evidence</code> and <code>result.trace.model_evidence</code>. The trace also carries <code>model_id</code>, <code>version</code>, <code>digest</code>, <code>placement</code> (<code>wasm-cpu</code> on this host), <code>data_classification</code>, and <code>usage</code> with <code>input_bytes</code>, <code>output_bytes</code>, and <code>duration_ms</code>. That <code>usage</code> object is byte counts and a duration. It is not <code>effective_usage</code>.</p>
+
+      <p>The exact-ref doc at tag v0.17.1 says every successful <code>model.execute</code> carries this record on the host result and on the Spec 137 dispatch document. It names <code>model_rights_record(digest)</code> for the query, <code>modelEvidence</code> on Swift <code>ExactModelExecution</code>, and <code>modelEvidence</code> on Kotlin <code>ExactModelExecution</code>. The web names above are the published <code>exactModel.ts</code> at that tag.</p>
+
+      <h2 id="fails">When the call fails</h2>
+
+      <p>A revoked package never becomes a successful record. The web host throws <code>ExactModelError</code> with code <code>model_unavailable</code>, reason <code>package_revoked</code>, and message <code>the host package status map marks this package revoked</code>. <code>detail</code> is the denial record: <code>field</code> <code>status</code>, <code>expected</code> <code>active|deprecated</code>, <code>actual</code> <code>revoked</code>, plus <code>model_id</code>, <code>version</code>, <code>digest</code>, and <code>effective_usage</code>.</p>
+
+      <p>A commercial effective usage against <code>commercial_use: prohibited</code> is code <code>model_incompatible</code>, reason <code>rights_policy_denied</code>, message <code>package commercial_use is not permitted for the effective model_usage</code>. <code>detail.field</code> is <code>rights.commercial_use</code>, <code>expected</code> is <code>allowed|restricted</code>, and <code>actual</code> is <code>prohibited</code>. Missing <code>modelUsage</code> on a host that has pins is <code>usage_undeclared</code>, <code>detail.field</code> <code>model_usage</code>, <code>actual</code> <code>undeclared</code>. The schema <code>model-rights-denial-detail-1.0.0</code> is the shared shape for <code>rights_incomplete</code>, <code>rights_mismatch</code>, <code>rights_policy_denied</code>, <code>rights_inconsistent</code>, <code>package_revoked</code>, and <code>usage_undeclared</code>. Identity fields are filled once a package is known.</p>
+
+      <p>A <code>model_ref</code> that matches no pin is <code>model_unavailable</code> / <code>pin_mismatch</code> (<code>model_ref does not match an exact_model_dependencies pin</code>) and carries no <code>detail</code>. That miss happens before a package is known.</p>
+
+      <h2 id="query">Asking without running the model</h2>
+
+      <p><code>host.modelRightsRecord(digest)</code> returns the same record for a package already admitted, including <code>status: revoked</code>. It does not run the guest. It returns <code>undefined</code> when that digest is not registered, and when the host was built without <code>modelUsage</code>. <code>host.modelRights(digest)</code> returns only the signed <code>rights</code> object.</p>
+
+      <p>The output bytes are a different read. On this host they sit behind <code>result.output_ref</code>. On a native mediated call, keeping the connector is <a href="/questions/how-do-i-read-the-model-output-frame-on-a-native-traverse-host.html">its own page</a>. A new model file is a new pin, not an edit of this digest. That is <a href="/questions/how-do-i-publish-a-new-version-of-a-signed-traverse-model.html">how you publish a new version</a>.</p>
+
+      <h2 id="package">Which package</h2>
+
+      <p>The field names in this note are npm <code>traverse-embedder-web@0.17.1</code>, which is built from <code>packages/web/TraverseEmbedder/src/exactModel.ts</code> at tag v0.17.1. The rules are older than that tag: Spec 138 0.8.0, Decision 107, shipped in v0.15.0. v0.17.1 is the product release you install. The schema and the exact-ref doc at that tag are the cross-host contract. The release story is <a href="/blog/traverse-0-17-1-first-product-release.html">Traverse v0.17.1</a>.</p>
+
+      <pre><code>npm install traverse-embedder-web@0.17.1</code></pre>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li>The record is not a signature over the output bytes. It is the pin, the signed rights, the host status, and the effective usage, written after the cached bytes are re-hashed.</li>
+        <li>A successful record never has <code>status: revoked</code>. The host map is the caller's. Traverse does not ship that map and does not fetch it.</li>
+        <li>No host is Certified under Spec 529.</li>
+        <li>At tag v0.17.1, <code>TRAVERSE_MODEL_SIGNING_KEYS</code> is empty. <code>digits-mlp-1.0.0</code> in that tag uses the test-only key. Pass only a key you intend the host to trust.</li>
+        <li>This is not the Embedded Trace API (<code>traceList</code> / <code>traceGet</code>). That projection does not carry this rights record.</li>
+        <li>Catalog <code>model.execute</code> can return the host record through the guest. The filter story is <a href="/questions/why-does-model-execute-return-unauthorized-output.html">unauthorized_output</a>.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>What you can check today:</strong> on npm <code>traverse-embedder-web@0.17.1</code>, <code>ExactModelBrowserHost.execute</code> returns <code>model_evidence</code> and copies it onto <code>trace.model_evidence</code> after re-hashing the cached manifest and guest. <code>digest</code> is the manifest SHA-256. <code>modelRightsRecord</code> can show <code>revoked</code> without a run. A revoked execute is <code>model_unavailable</code> / <code>package_revoked</code>.</li>
+          <li><strong>Since when:</strong> Spec 138 0.8.0, Decision 107, in the product since v0.15.0. v0.17.1 is the current product release. Source: <code>exactModel.ts</code> at tag v0.17.1, schema <code>model-rights-record-1.0.0</code>, <code>docs/exact-ref-model-execution.md</code>.</li>
+          <li><strong>Not claimed:</strong> a signature over the output, a fetched revocation list, Spec 529 certification, a production signing key in the v0.17.1 tree, or the Embedded Trace API.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#call">The call</a></li>
+          <li><a href="#record">What the record holds</a></li>
+          <li><a href="#fails">When the call fails</a></li>
+          <li><a href="#query">Asking without running the model</a></li>
+          <li><a href="#package">Which package</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-does-a-traverse-host-prove-which-model-it-ran.html">How does a Traverse host prove which model it ran?</a></li>
+          <li><a href="/questions/how-do-i-read-the-model-output-frame-on-a-native-traverse-host.html">How do I read the model output frame on a native Traverse host?</a></li>
+          <li><a href="/questions/how-do-i-publish-a-new-version-of-a-signed-traverse-model.html">How do I publish a new version of a signed Traverse model?</a></li>
+          <li><a href="/blog/traverse-0-17-1-first-product-release.html">Traverse v0.17.1: the first product release of the v0.17 changes</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/exact-ref-model-execution.md">Exact-ref model execution at v0.17.1</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/discover.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Try /discover</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The result names the pin that ran.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Read model_evidence on traverse-embedder-web 0.17.1. The digest is the manifest the host re-hashed. A revoked package fails closed and does not return that record.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/contracts/connectors/traverse.model-runtime/schemas/model-rights-record-1.0.0.json" class="btn btn-primary">Read the rights record</a>
+      <a href="/blog/traverse-0-17-1-first-product-release.html" class="btn btn-ghost">Read the v0.17.1 note</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="The host result names the model it ran | Traverse Blog"
+  description="On traverse-embedder-web 0.17.1, a successful exact-ref call returns model_evidence after the host re-hashes the cached manifest and guest. The digest is the pin. A revoked package fails with package_revoked."
+  canonical="https://traverse-framework.com/blog/host-result-names-the-model-it-ran.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; min-width: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); overflow-wrap: anywhere; }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .post-prose pre { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; min-width: 0; margin: 0 0 1.4rem; }
+    .post-prose pre code { background: none; padding: 0; color: var(--fg); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>

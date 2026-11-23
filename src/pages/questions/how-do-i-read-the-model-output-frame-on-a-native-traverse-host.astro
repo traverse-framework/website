@@ -1,0 +1,72 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I read the model output frame on a native Traverse host?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On crates.io traverse-runtime 0.17.1, keep the mediated connector in an Arc and activate it with ExactModelMediatedConnector::activated(). After model.execute, read the bytes behind output_ref with with_host_mut and host.io.read_model_output. activate_exact_model_runtime still takes the host by value, so the caller cannot read the frame through that function. This is changelog entry #1785, pull request #1809. On npm traverse-embedder-web@0.17.1 the host object stays with the caller, and host.io.readModelOutput reads result.output_ref. Swift, Android, and .NET do not ship this mediated activation API in v0.17.1.',
+    },
+  }],
+});
+
+const nativeSnippet = `use std::sync::Arc;
+use traverse_runtime::ExactModelMediatedConnector;
+
+let connector = Arc::new(ExactModelMediatedConnector::new(host));
+let context = MediatedConnectorContext {
+    declared_requirements: /* from the capability contract */,
+    activated_connectors: vec![connector.activated()],
+};
+let output = executor
+    .run_bytes_with_mediated_connectors(&wasm, &input, "cap", context)?;
+let output_ref = output.value["output_ref"].as_str().ok_or("no output_ref")?;
+let frame = connector
+    .with_host_mut(|host| host.io.read_model_output(output_ref, max_bytes))??;`;
+
+const webSnippet = `const bytes = host.io.readModelOutput(result.output_ref, maxBytes);`;
+
+const relatedLinks = [
+  { href: '/blog/host-result-names-the-model-it-ran.html', label: 'The host result names the model it ran' },
+  { href: '/questions/how-does-a-traverse-host-prove-which-model-it-ran.html', label: 'How does a Traverse host prove which model it ran?' },
+  { href: '/questions/does-catalog-model-execute-run-on-published-traverse-packages.html', label: 'Does catalog model.execute run on published Traverse packages?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/host-connector-command-dispatch.md', label: 'Host connector command dispatch (v0.17.1)' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/CHANGELOG.md', label: 'CHANGELOG at v0.17.1' },
+  { href: '/blog/traverse-0-17-1-first-product-release.html', label: 'Traverse v0.17.1 release note' },
+  { href: '/docs.html', label: 'Docs' },
+];
+---
+<QuestionLayout
+  title="How do I read the model output frame on a native Traverse host?"
+  description="On traverse-runtime 0.17.1, ExactModelMediatedConnector::activated() keeps the connector so you can read output_ref after model.execute. activate_exact_model_runtime still consumes the host."
+  canonical="https://traverse-framework.com/questions/how-do-i-read-the-model-output-frame-on-a-native-traverse-host.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on crates.io <code>traverse-runtime</code> 0.17.1, keep <code>ExactModelMediatedConnector</code> in an <code>Arc</code> and activate it with <code>activated()</code>. After the run, <code>with_host_mut</code> reads the bytes behind <code>output_ref</code>. <code>activate_exact_model_runtime</code> still takes the host by value, so that call does not leave you a handle.</p>
+
+  <h2>The mediated path</h2>
+  <p>This is the Spec 104 binding, where a guest calls <code>connector_invoke</code> and the host answers. The v0.17.1 changelog entry <a href="https://github.com/traverse-framework/traverse/issues/1785">#1785</a> (pull request <a href="https://github.com/traverse-framework/traverse/pull/1809">#1809</a>) adds <code>activated()</code> and <code>activated_version()</code>. The snippet below is the one in <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/host-connector-command-dispatch.md">docs/host-connector-command-dispatch.md</a> at that tag. <code>declared_requirements</code> comes from the capability contract. <code>max_bytes</code> is the caller's ceiling.</p>
+  <pre><code>{nativeSnippet}</code></pre>
+  <p><code>activate_exact_model_runtime</code> is unchanged. It is still the function that takes the host. Use <code>activated()</code> when the caller has to read the frame afterward. <code>activated_version(version)</code> activates at an explicit connector version.</p>
+
+  <h2>On the browser and Node host</h2>
+  <p>npm <code>traverse-embedder-web@0.17.1</code> does not use <code>activated()</code>. <code>ExactModelBrowserHost</code> stays with the caller. A successful <code>execute</code> returns <code>output_ref</code>, and <code>host.io.readModelOutput</code> reads it. The ref is opaque. In that package the store mints ids of the form <code>output-</code> plus a counter. A missing ref throws <code>ExactModelError</code> code <code>unavailable</code>, message <code>output_ref missing or expired</code>. A frame longer than the ceiling you pass throws code <code>input_limit_exceeded</code>, message <code>output exceeds read ceiling</code>. The read does not delete the stored bytes. <code>input_ref</code> is the one that is single-use.</p>
+  <pre><code>{webSnippet}</code></pre>
+  <p>Which model produced the frame is <code>result.model_evidence</code>, not the byte length. That record is <a href="/questions/how-does-a-traverse-host-prove-which-model-it-ran.html">its own page</a>.</p>
+
+  <h2>What this does not cover</h2>
+  <p>The v0.17.1 dispatch doc says Swift, Android, and .NET activation APIs for this mediated binding are not shipped. Those embedders do ship <code>ExactModelHost</code> for direct execute. This page is the mediated frame read on <code>traverse-runtime</code> 0.17.1, plus the web <code>readModelOutput</code> call. No host is Certified under Spec 529.</p>
+</QuestionLayout>
+
+<style is:global>
+  .q-layout, .q-main, .q-body { min-width: 0; }
+  .q-body { overflow-wrap: anywhere; }
+  .q-body pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; margin: 0 0 1.25rem; }
+  .q-body pre code { background: none; padding: 0; white-space: pre; }
+</style>
