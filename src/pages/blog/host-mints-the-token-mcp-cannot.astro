@@ -1,0 +1,178 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">November 26, 2026</span>
+      <span class="badge">Agents</span>
+      <span class="badge">On main</span>
+    </div>
+    <h1 class="t-h1">The host is supposed to mint the token. MCP cannot.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>4 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>Letting an AI agent run a real workflow is scary because the agent could approve its own plan.</p>
+
+      <p>On Traverse main, the rule that forbids that is written, and it is not in v0.17.1. <a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 136</a> (2026-11-17, <a href="https://github.com/traverse-framework/traverse/pull/1897">#1897</a>) says the agent turns a goal into a structured target and reads candidate plans, and that no MCP tool approves. <a href="https://github.com/traverse-framework/traverse/blob/main/specs/109-runtime-workflow-proposals/spec.md">Spec 109</a> 1.1.0 and <a href="https://github.com/traverse-framework/traverse/blob/main/specs/113-declarative-workflow-planning/spec.md">Spec 113</a> 1.2.0 (2026-11-20, <a href="https://github.com/traverse-framework/traverse/pull/1930">#1930</a>) record it. <a href="https://github.com/traverse-framework/traverse/issues/1896">#1896</a> closed on 2026-11-23 citing that pull request. Those amended specs ship in the next release. At tag v0.17.1 they are still 0.1.0 and 0.2.0. The stdio server on this main does not add a plan command or an approve command.</p>
+
+      <div class="callout">
+        Short version: Spec 109 FR-006b names a local CLI prompt as the first surface that may mint a signed, single-use token after a person confirms. A local page is deferred. No prompt in the tree mints one. <code>docs/workflow-proposal-lifecycle.md</code> says this repo verifies tokens and does not issue them. The denials below come from <code>execute_proposal_via_mcp</code>, which is not a stdio command and is already in v0.17.1. Q&amp;A: <a href="/questions/how-does-a-human-approve-an-ai-agents-plan-in-traverse.html">How does a human approve an AI agent's plan in Traverse?</a>
+      </div>
+
+      <h2 id="planner">What the planner accepts</h2>
+
+      <p><code>plan_workflow</code> (<code>crates/traverse-mcp/src/tools/workflow_plan.rs</code>) takes a <code>PlanTarget</code> and <code>starting_facts</code>. The target is a capability id and version, or an event type. Spec 113 FR-001 forbids an open-ended goal. Every candidate sets <code>mapping_unconfirmed</code> to true. The function does not submit or execute. It returns at most 5 candidates, each at most 8 nodes, and sets <code>plan_search_truncated</code> past that bound. The wire format in <a href="https://github.com/traverse-framework/traverse/blob/main/docs/workflow-proposal-lifecycle.md"><code>docs/workflow-proposal-lifecycle.md</code></a> is:</p>
+
+      <pre><code>{
+  "kind": "workflow_proposal",
+  "schema_version": "1.0.0",
+  "proposal_id": "proposal-001",
+  "workspace_id": "workspace-001",
+  "app_manifest": { "app_id": "...", "app_version": "1.0.0", "manifest_digest": "sha256:..." },
+  "nodes": [
+    { "node_id": "a", "capability_id": "content.comments.create-comment-draft", "capability_version": "1.0.0", "artifact_digest": "sha256:..." }
+  ],
+  "edges": [ { "from_node_id": "a", "to_node_id": "b" } ],
+  "mappings": [
+    { "source": { "kind": "initial_input" }, "source_path": "/comment_text", "target_node_id": "a", "target_path": "/comment_text" }
+  ],
+  "initial_input": { "comment_text": "hello", "resource_id": "r1" }
+}</code></pre>
+
+      <p><code>proposal_digest</code> is <code>1.0.0:sha256:&lt;hex&gt;</code> over canonical JSON. <code>proposal_snapshot_digest</code> folds in the manifest, registry, binding, policy, and budget digests. A token is checked against both.</p>
+
+      <h2 id="stdio">What an MCP client can send</h2>
+
+      <p><code>SUPPORTING_COMMANDS</code> in <code>stdio_server.rs</code> is <code>describe_server</code>, <code>list_content_groups</code>, <code>describe_content_group</code>, <code>list_entrypoints</code>, <code>search_capabilities</code>, <code>describe_entrypoint</code>, <code>validate_entrypoint</code>, <code>execute_entrypoint</code>, <code>render_execution_report</code>, and <code>shutdown</code>. <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-stdio-server.md"><code>docs/mcp-stdio-server.md</code></a> omits <code>search_capabilities</code>. None is <code>approve</code>. A line from the server's own examples:</p>
+
+      <pre><code>{"command":"describe_entrypoint","entrypoint_kind":"workflow","id":"expedition.planning.plan-expedition","version":"1.0.0"}</code></pre>
+
+      <p><code>tools/proposals.rs</code> also has <code>validate_proposal</code>, <code>submit_proposal</code>, <code>authorization_state</code>, <code>execute_proposal_via_mcp</code>, <code>observe_proposal</code>, and <code>export_proposal</code>. The lifecycle doc says they are not wired into <code>stdio_server.rs</code>. #1896 asked for that wiring. The close comment points at the spec pull request only.</p>
+
+      <h2 id="fails">What fails closed</h2>
+
+      <p>For a proposal that is not automatic-eligible, <code>execute_proposal_via_mcp</code> returns <code>Denied</code> and does not throw. A missing token is:</p>
+
+      <pre><code>{"kind":"denied","code":"approval_token_required","message":"this proposal requires a verified approval token"}</code></pre>
+
+      <p>A wrong <code>proposal_digest</code> is <code>proposal_digest_mismatch</code> (<code>token is not bound to this exact proposal digest</code>). A wrong <code>snapshot_digest</code> is <code>snapshot_digest_mismatch</code> (<code>token is not bound to the current pinned snapshot digest</code>). A second call after <code>max_use_count</code> is spent is <code>use_count_exhausted</code> (<code>token has reached its maximum use count</code>). The test <code>execute_proposal_via_mcp_denies_when_the_approval_token_use_count_is_already_exhausted</code> signs a token with <code>max_use_count: 1</code>. The repo has no host signer. Spec 109 FR-006b says the host mints one use. The verifier still reads <code>max_use_count</code> from the token. <code>ApprovalTokenStore</code> is in memory, so a restart forgets the count. The 2026-11-20 note on #1896 asked for a ledger that survives restart. This store is not that ledger. The same function also returns <code>malformed</code>, <code>algorithm_not_allowed</code>, <code>unknown_key_id</code>, <code>signature_verification_failed</code>, <code>issuer_mismatch</code>, <code>audience_mismatch</code>, <code>expired</code>, <code>workspace_mismatch</code>, <code>revoked</code>, and <code>store_unavailable</code>. Documented claims are <code>jti</code>, <code>iss</code>, <code>aud</code>, <code>sub</code>, <code>workspace_id</code>, both digests, <code>permitted_effects</code>, <code>permitted_connectors</code>, <code>max_use_count</code>, and <code>exp</code>.</p>
+
+      <h2 id="remainder">A failed step</h2>
+
+      <p>Spec 113 FR-009 and FR-010 say a remainder replan takes only bounded, schema-validated output references bound to the completed step's trace digest. The host resolves the values. Raw secrets and unrestricted prior outputs do not enter MCP or the planner. The failed capability version is excluded, and the new plan needs a new token. A missing, tampered, expired, unbound, or schema-invalid reference must fail closed. The spec names no <code>snake_case</code> code for that. <code>plan_workflow</code> does not exclude a version and does not check a trace digest. It plans from the <code>starting_facts</code> the caller passes.</p>
+
+      <h2 id="main">Read it on main</h2>
+
+      <p>Main at <code>5615562</code> (2026-11-23) has the amended specs, Decision 136, and the ADR-0043 note. v0.17.1 (published 2026-11-16) does not. <code>cargo run -p traverse-mcp -- stdio</code> from that main still answers the command list above. Installing the v0.17.1 crates does not bring Spec 109 1.1.0.</p>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>What you can check today:</strong> on main, Spec 109 1.1.0 FR-006b and FR-006c say no MCP command mints or approves, and a local CLI prompt is the first host surface. Stdio commands are the <code>SUPPORTING_COMMANDS</code> list. <code>execute_proposal_via_mcp</code> denies with <code>approval_token_required</code>, <code>proposal_digest_mismatch</code>, <code>snapshot_digest_mismatch</code>, and <code>use_count_exhausted</code>.</li>
+          <li><strong>Since when:</strong> Decision 136 on 2026-11-17 (#1897). Spec text approved 2026-11-20 (#1930). Issue #1896 closed 2026-11-23. Not in v0.17.1. The verifier and <code>plan_workflow</code> predate that tag.</li>
+          <li><strong>Not claimed:</strong> a working stdio plan or approve command, a host that mints the token, a remainder replan in <code>plan_workflow</code>, or a replay ledger that survives process restart.</li>
+        </ul>
+      </div>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#planner">What the planner accepts</a></li>
+          <li><a href="#stdio">What an MCP client can send</a></li>
+          <li><a href="#fails">What fails closed</a></li>
+          <li><a href="#remainder">A failed step</a></li>
+          <li><a href="#main">Read it on main</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-does-a-human-approve-an-ai-agents-plan-in-traverse.html">How does a human approve an AI agent's plan in Traverse?</a></li>
+          <li><a href="/questions/how-does-the-mcp-server-work.html">How does the Traverse MCP server work?</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/main/specs/109-runtime-workflow-proposals/spec.md">Spec 109 on main</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/blob/main/specs/113-declarative-workflow-planning/spec.md">Spec 113 on main</a></li>
+          <li><a href="https://github.com/traverse-framework/traverse/issues/1896">Issue #1896</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/questions/how-does-a-human-approve-an-ai-agents-plan-in-traverse.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the approval Q&amp;A</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The agent does not approve its own plan.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Spec 109 1.1.0 on main says a local CLI prompt mints the token. The stdio server has no approve command. v0.17.1 does not include that spec text.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/traverse/blob/main/specs/109-runtime-workflow-proposals/spec.md" class="btn btn-primary">Read Spec 109</a>
+      <a href="/questions/how-does-a-human-approve-an-ai-agents-plan-in-traverse.html" class="btn btn-ghost">Read the Q&amp;A</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="The host is supposed to mint the token. MCP cannot. | Traverse Blog"
+  description="On main, Spec 109 1.1.0 says a local CLI prompt mints a single-use approval token and no MCP command can. That prompt is not in the tree. Stdio has no approve command. Not in v0.17.1."
+  canonical="https://traverse-framework.com/blog/host-mints-the-token-mcp-cannot.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; min-width: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); overflow-wrap: anywhere; }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .post-prose pre { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; min-width: 0; margin: 0 0 1.4rem; }
+    .post-prose pre code { background: none; padding: 0; color: var(--fg); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
