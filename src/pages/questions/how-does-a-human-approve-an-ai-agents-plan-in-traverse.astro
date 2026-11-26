@@ -1,0 +1,65 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: "How does a human approve an AI agent's plan in Traverse?",
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'On Traverse main, Spec 109 1.1.0 says a local CLI prompt mints a signed single-use approval token after a person confirms, and no MCP command can mint or approve one. A local page is deferred. That prompt is not in the tree, and the stdio server has no approve command. execute_proposal_via_mcp, a Rust function already in v0.17.1, denies a missing token with approval_token_required, a wrong proposal digest with proposal_digest_mismatch, a wrong snapshot digest with snapshot_digest_mismatch, and a spent max_use_count with use_count_exhausted. This spec text is not in v0.17.1. It ships in the next release.',
+    },
+  }],
+});
+
+const denialSnippet = `{"kind":"denied","code":"approval_token_required","message":"this proposal requires a verified approval token"}`;
+
+const commandSnippet = `{"command":"describe_entrypoint","entrypoint_kind":"workflow","id":"expedition.planning.plan-expedition","version":"1.0.0"}`;
+
+const relatedLinks = [
+  { href: '/blog/host-mints-the-token-mcp-cannot.html', label: 'The host is supposed to mint the token. MCP cannot.' },
+  { href: '/questions/how-does-the-mcp-server-work.html', label: 'How does the Traverse MCP server work?' },
+  { href: '/questions/what-does-agent-proposes-runtime-decides-mean.html', label: 'What does "the agent proposes; the runtime decides" mean?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/main/specs/109-runtime-workflow-proposals/spec.md', label: 'Spec 109 on main' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/main/specs/113-declarative-workflow-planning/spec.md', label: 'Spec 113 on main' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/main/docs/workflow-proposal-lifecycle.md', label: 'Workflow proposal lifecycle (main)' },
+  { href: 'https://github.com/traverse-framework/traverse/issues/1896', label: 'Issue #1896' },
+];
+---
+<QuestionLayout
+  title="How does a human approve an AI agent's plan in Traverse?"
+  description="On main, Spec 109 1.1.0 says a local CLI prompt mints the approval token and no MCP command can. That prompt is not in the tree. A missing token is approval_token_required. Not in v0.17.1."
+  canonical="https://traverse-framework.com/questions/how-does-a-human-approve-an-ai-agents-plan-in-traverse.html"
+  category="Runtime and architecture"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p><strong>Short answer:</strong> on <a href="https://github.com/traverse-framework/traverse">Traverse main</a>, <a href="https://github.com/traverse-framework/traverse/blob/main/specs/109-runtime-workflow-proposals/spec.md">Spec 109</a> 1.1.0 says a person confirms a proposal on a local CLI prompt, and that prompt is what mints a signed, single-use token. No MCP command can mint or approve one. That prompt is not in the source tree, and the stdio server has no approve command. The spec text is not in v0.17.1. It ships in the next release. The walk-through is <a href="/blog/host-mints-the-token-mcp-cannot.html">The host is supposed to mint the token. MCP cannot.</a></p>
+
+  <h2>What the rule says</h2>
+  <p><a href="https://github.com/traverse-framework/traverse/blob/main/docs/decision-log.md">Decision 136</a> (accepted 2026-11-17, <a href="https://github.com/traverse-framework/traverse/pull/1897">#1897</a>) says the agent turns a goal into a structured target. The deterministic planner builds the candidates. The agent does not invent edges or field mappings. A person confirms the target, selects the plan, and clears <code>mapping_unconfirmed</code>. Approval is out of band. <a href="https://github.com/traverse-framework/traverse/pull/1930">#1930</a> approved Spec 109 1.1.0 and <a href="https://github.com/traverse-framework/traverse/blob/main/specs/113-declarative-workflow-planning/spec.md">Spec 113</a> 1.2.0 on 2026-11-20. <a href="https://github.com/traverse-framework/traverse/issues/1896">Issue #1896</a> closed on 2026-11-23 citing that pull request. At tag v0.17.1 those specs are still 0.1.0 and 0.2.0.</p>
+  <p>Spec 109 FR-006b names a local CLI prompt as the first surface. A local page is deferred and must use the same token contract if it is added later. FR-006c says the host checks the signature, both digests, scope, expiry, and permitted authority, then records the nonce as consumed, before any authorized side effect. <code>docs/workflow-proposal-lifecycle.md</code> on the same main says this repo verifies tokens and does not issue them. There is no CLI prompt in the tree that signs one.</p>
+
+  <h2>What the planner takes</h2>
+  <p><code>plan_workflow</code> in <code>crates/traverse-mcp/src/tools/workflow_plan.rs</code> takes a <code>PlanTarget</code> (a capability id and version, or an event type) and <code>starting_facts</code>. Spec 113 FR-001 forbids a natural-language goal. Every candidate has <code>mapping_unconfirmed: true</code>. The function does not submit or execute. It stops at 5 candidates and 8 nodes and sets <code>plan_search_truncated</code> past that bound. Those functions are not stdio commands. The commands an MCP client can send are in <code>SUPPORTING_COMMANDS</code>:</p>
+  <pre><code>{commandSnippet}</code></pre>
+  <p>The full list is <code>describe_server</code>, <code>list_content_groups</code>, <code>describe_content_group</code>, <code>list_entrypoints</code>, <code>search_capabilities</code>, <code>describe_entrypoint</code>, <code>validate_entrypoint</code>, <code>execute_entrypoint</code>, <code>render_execution_report</code>, and <code>shutdown</code>. <a href="https://github.com/traverse-framework/traverse/blob/main/docs/mcp-stdio-server.md"><code>docs/mcp-stdio-server.md</code></a> omits <code>search_capabilities</code>. None of them approves a plan.</p>
+
+  <h2>What a refusal looks like</h2>
+  <p><code>execute_proposal_via_mcp</code> returns <code>Denied</code> for a proposal that is not automatic-eligible. A missing token is:</p>
+  <pre><code>{denialSnippet}</code></pre>
+  <p>A token bound to a different proposal is <code>proposal_digest_mismatch</code> (<code>token is not bound to this exact proposal digest</code>). A different snapshot is <code>snapshot_digest_mismatch</code> (<code>token is not bound to the current pinned snapshot digest</code>). A second call after <code>max_use_count</code> is spent is <code>use_count_exhausted</code> (<code>token has reached its maximum use count</code>). The test that shows one use sets <code>max_use_count</code> to 1 and signs the token in the test. The verifier does not force that count to 1, and <code>ApprovalTokenStore</code> forgets the count when the process exits. The same checks are in the v0.17.1 tag. They are not the new spec text.</p>
+  <p>A token is also checked for <code>iss</code>, <code>aud</code>, <code>workspace_id</code>, <code>exp</code>, <code>kid</code>, and the Ed25519 signature (<code>alg</code> must be <code>EdDSA</code>). The other codes are <code>malformed</code>, <code>algorithm_not_allowed</code>, <code>unknown_key_id</code>, <code>signature_verification_failed</code>, <code>issuer_mismatch</code>, <code>audience_mismatch</code>, <code>expired</code>, <code>workspace_mismatch</code>, <code>revoked</code>, and <code>store_unavailable</code>.</p>
+
+  <h2>After a step fails</h2>
+  <p>Spec 113 FR-009 and FR-010 say a remainder replan takes bounded, schema-validated output references bound to the completed step's trace digest. The host resolves the values locally. Raw prior output does not enter the planner. The failed capability version is excluded, and execution needs a new token. <code>plan_workflow</code> does not implement that exclusion or that binding. The spec does not name a stable code for a bad reference.</p>
+</QuestionLayout>
+
+<style is:global>
+  .q-layout, .q-main, .q-body { min-width: 0; }
+  .q-body { overflow-wrap: anywhere; }
+  .q-body pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; margin: 0 0 1.25rem; }
+  .q-body pre code { background: none; padding: 0; white-space: pre; }
+</style>
