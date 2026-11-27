@@ -1,0 +1,210 @@
+---
+import SubpageLayout from '@layouts/SubpageLayout.astro';
+
+const _body = `
+<section class="post-hero">
+  <div class="container">
+    <div class="post-hero-meta">
+      <a href="/blog.html" class="section-label" style="text-decoration:none">Blog</a>
+      <span class="post-date">December 1, 2026</span>
+      <span class="badge">Demo</span>
+      <span class="badge">Models</span>
+      <span class="badge">v0.17.1</span>
+    </div>
+    <h1 class="t-h1">The model misread the cheque. The money did not move.</h1>
+    <div class="post-byline">
+      <span>By <strong>Enrico Piovesan</strong></span>
+      <span>3 min read</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="post-layout">
+
+    <article class="post-prose">
+
+      <p>A mobile cheque deposit goes wrong when the model misreads one digit and nobody notices.</p>
+
+      <p>In this week's demo the model read a $25 cheque as $19.00: it took the 2 for a 1 at 53.7%, and the 5 for a 9 at 88.0%. A confidence policy with a floor of 950 per mille marked both reads unsure, and the chain held the deposit for a human. The model alone would have deposited $19.00. A clean $740 cheque, with every digit read at 99.9%, was deposited.</p>
+
+      <div class="callout">
+        <strong>Four catalog capabilities, one governed chain.</strong> <code>model/model.execute@1.0.0</code> runs the signed digits package, <code>classification/classification.outcome-resolve@1.1.0</code> checks each read, <code>core/core.authorize@1.2.0</code> allows or holds the deposit, and <code>formatting/formatting.format-currency@1.2.0</code> formats the amount. Node 22, Deno, and headless Chromium produced the same results. Native <code>traverse-mcp</code> 0.17.1 ran the policy steps with matching digests. One command: <code>./run.sh</code>.
+      </div>
+
+      <figure class="post-figure">
+        <img src="/assets/img/blog/handwritten-cheque-2026-11-27/01-hero.webp" alt="Demo report: a $740 cheque deposited after every digit was read at 99.9 percent confidence, and a $25 cheque held for a human after the model read it as $19" width="1280" height="623" loading="lazy" />
+        <figcaption>The $740 cheque is deposited. The $25 cheque is held, because the model read it as $19.</figcaption>
+      </figure>
+
+      <h2 id="what-ran">What ran</h2>
+
+      <p>The four capabilities ran as one chain on Traverse v0.17.1 (npm <code>traverse-embedder-web@0.17.1</code>, <code>runtime.wasm</code> <code>f2b1bebe…</code> from <code>runtime-wasm-v0.17.1</code>).</p>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Step</th><th>Catalog capability</th><th>Job</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><code>model/model.execute@1.0.0</code></td><td>runs the signed digits ONNX package once per digit</td></tr>
+            <tr><td>2</td><td><code>classification/classification.outcome-resolve@1.1.0</code></td><td>marks each read confident or unsure (floor 950 per mille)</td></tr>
+            <tr><td>3</td><td><code>core/core.authorize@1.2.0</code></td><td>allows or holds the deposit</td></tr>
+            <tr><td>4</td><td><code>formatting/formatting.format-currency@1.2.0</code></td><td>formats the amount the customer sees</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>Cheque</th><th>Model reads</th><th>Confidence policy</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>$740</td><td>7, 4, 0 at 99.9% each</td><td>all confident</td><td>Deposited $740.00 CAD, with a <code>retain_cheque_image</code> obligation</td></tr>
+            <tr><td>$25</td><td>1 at 53.7%, 9 at 88.0%</td><td>both unsure</td><td>Held for human review. The model alone would have deposited $19.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The interesting misread is the 5 taken as a 9 at 88%. That is below the 950 per mille floor, so the policy, not the model, decides what happens next.</p>
+
+      <h2 id="hosts">Same answers on every host</h2>
+
+      <p>Node 22, Deno 2.9.8, and headless Chromium ran all 14 steps with identical results. Every model output frame matched the signed reference outputs. Native <code>traverse-mcp</code> 0.17.1 ran the 9 policy steps with the same input and output digests. All 4 capability WASM digests match the catalog. One command runs it: <code>./run.sh</code>.</p>
+
+      <h2 id="freestyle">Freestyle fails closed</h2>
+
+      <div class="verify-table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr><th>An agent tries to</th><th>What happens</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>add <code>override: true</code> to skip review</td><td>blocked: <code>invalid_input</code> on the web hosts, <code>execution_failed</code> on native. Both refuse the extra field</td></tr>
+            <tr><td>call a <code>cheque.force-deposit</code> capability that is not in the bundle</td><td>blocked: <code>target_not_found</code> or <code>not_found</code></td></tr>
+            <tr><td>swap the signed model for an unpinned one</td><td>blocked: <code>pin_mismatch</code></td></tr>
+            <tr><td>deposit from another credit union</td><td>blocked: <code>matched_deny_rule</code> <code>tenant-isolation</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="not-claimed">What this does not claim</h2>
+
+      <ul>
+        <li><strong>Not a scanned cheque.</strong> The digits are real handwritten UCI digits (Optical Recognition of Handwritten Digits, CC BY 4.0) from the signed conformance vector. A "cheque" here is a sequence of those images.</li>
+        <li><strong>Native MCP skips the model step.</strong> <code>model.execute</code> there fails with <code>missing_required_connector</code>. The policy steps use scores decoded from the signed reference output frames, the same frames the web hosts must match.</li>
+        <li><strong>Small host glue remains.</strong> Digit slicing and a softmax over the model's 10 logits live in host code, not in a catalog capability.</li>
+        <li><strong>No deposit amount limit</strong> in this demo.</li>
+        <li><strong>Test-only signing key</strong>, public half only. Not a production signing claim.</li>
+      </ul>
+
+      <h2 id="facts-for-agents">Facts for agents</h2>
+
+      <div class="facts-block" id="agent-facts">
+        <ul>
+          <li><strong>Theme:</strong> weekly demo, 2026-11-27. Composition: four catalog capabilities run as one governed chain so a model misread does not move money.</li>
+          <li><strong>Pins:</strong> Traverse v0.17.1; npm <code>traverse-embedder-web@0.17.1</code>; <code>runtime.wasm</code> <code>f2b1bebe…</code> from <code>runtime-wasm-v0.17.1</code>; <code>model/model.execute@1.0.0</code>, <code>classification/classification.outcome-resolve@1.1.0</code>, <code>core/core.authorize@1.2.0</code>, <code>formatting/formatting.format-currency@1.2.0</code>; signed model <code>traverse.digits-onnx@1.0.0</code>.</li>
+          <li><strong>Result:</strong> $740 deposited (digits at 99.9%). $25 held: model read 1 at 53.7% and 9 at 88.0%, floor 950 per mille, would have deposited $19.00. Identical on Node, Deno, and headless Chromium (14 steps). Native <code>traverse-mcp</code> 0.17.1 matches all 9 policy-step digests. Freestyle attempts fail closed.</li>
+          <li><strong>Not claimed:</strong> a scanned cheque, a native model step, a catalog softmax or digit-slicer, a deposit amount limit, production signing.</li>
+          <li><strong>Runnable tree (public):</strong> <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-27-handwritten-cheque" target="_blank" rel="noopener">weekly-demos/2026-11-27-handwritten-cheque</a>. Run with <code>./run.sh</code>.</li>
+          <li><strong>Lead claim:</strong> discover, execute, trace. The agent proposes; the runtime decides.</li>
+        </ul>
+      </div>
+
+      <p>The runnable folder is public: <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-27-handwritten-cheque" target="_blank" rel="noopener"><code>weekly-demos/2026-11-27-handwritten-cheque</code></a>.</p>
+
+    </article>
+
+    <aside class="post-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">In this post</div>
+        <ul class="toc-list">
+          <li><a href="#what-ran">What ran</a></li>
+          <li><a href="#hosts">Same answers on every host</a></li>
+          <li><a href="#freestyle">Freestyle fails closed</a></li>
+          <li><a href="#not-claimed">What this does not claim</a></li>
+          <li><a href="#facts-for-agents">Facts for agents</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Related</div>
+        <ul class="related-list">
+          <li><a href="/questions/how-does-traverse-stop-an-ai-model-misread-from-moving-money.html">How does Traverse stop an AI model misread from moving money?</a></li>
+          <li><a href="/blog/kill-switch.html">A governed model call you can actually stop</a></li>
+          <li><a href="/blog/product-path-model-execute.html">Catalog model.execute on the published path</a></li>
+          <li><a href="/questions/what-is-the-model-execute-catalog-capability.html">What is the model.execute catalog capability?</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card sidebar-cta">
+        <div class="sidebar-title">Value loop</div>
+        <p>Discover a governed capability, execute known behavior, produce a trace. The agent proposes; the runtime decides.</p>
+        <a href="/questions/how-does-traverse-stop-an-ai-model-misread-from-moving-money.html" class="btn btn-primary btn-sm" style="width:100%;text-align:center;display:block">Read the Q&amp;A</a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<section class="cta-band">
+  <div class="container" style="text-align:center">
+    <h2 class="t-h2" style="margin-bottom:0.75rem">The model can be wrong. The deposit should not be.</h2>
+    <p class="t-body t-muted" style="margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">Four catalog capabilities, one governed chain, the same answer on every host that ran it.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-27-handwritten-cheque" class="btn btn-primary">Run the weekly demo</a>
+      <a href="/agents.html" class="btn btn-ghost">For AI agents</a>
+    </div>
+  </div>
+</section>
+`;
+---
+<SubpageLayout
+  title="The model misread the cheque. The money did not move. | Traverse Blog"
+  description="Weekly demo, Dec 1: a mobile cheque deposit goes wrong when the model misreads one digit and nobody notices. On a $25 cheque the model read $19.00 (2 as 1 at 53.7%, 5 as 9 at 88.0%). The chain marked it unsure (floor 950 per mille) and held it for a human. A $740 cheque was deposited. Four catalog capabilities, same results on Node, Deno, and Chromium; native traverse-mcp 0.17.1 matched the policy-step digests. Freestyle attempts fail closed."
+  canonical="https://traverse-framework.com/blog/handwritten-cheque.html"
+  crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog.html' }]}
+>
+  <style is:global slot="head">.post-hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .post-date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+    .post-hero h1 { max-width: 760px; margin-bottom: 1.5rem; }
+    .post-byline { display: flex; align-items: center; gap: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--fg-muted); flex-wrap: wrap; }
+    .post-byline strong { color: var(--fg); font-weight: 500; }
+    .post-layout { display: grid; grid-template-columns: 1fr 280px; gap: 4rem; padding: 3.5rem 0 5rem; align-items: start; }
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; gap: 2.5rem; } .post-sidebar { order: -1; } }
+    .post-prose { max-width: 680px; font-family: var(--font-body); font-size: 1rem; line-height: 1.75; color: var(--fg); }
+    .post-prose p { margin: 0 0 1.4rem; }
+    .post-prose h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--fg); }
+    .post-prose ol, .post-prose ul { margin: 0 0 1.4rem 1.25rem; }
+    .post-prose li { margin-bottom: 0.5rem; }
+    .post-prose a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent-dim); }
+    .post-prose a:hover { text-decoration-color: var(--accent); }
+    .post-prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent); }
+    .callout { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.75rem 0; font-size: 0.92rem; color: var(--fg-muted); line-height: 1.6; }
+    .post-figure { margin: 1.75rem 0; }
+    .post-figure img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .post-figure figcaption { margin-top: 0.65rem; font-size: 0.82rem; color: var(--fg-muted); line-height: 1.5; }
+    .verify-table-wrap { overflow-x: auto; margin: 1.75rem 0; border: 1px solid var(--border); border-radius: 10px; }
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .verify-table th { text-align: left; padding: 0.7rem 1rem; background: var(--bg-elevated); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .verify-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
+    .verify-table tr:last-child td { border-bottom: none; }
+    .verify-table td:first-child { color: var(--fg); font-weight: 500; }
+    .facts-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; margin: 1.25rem 0 1.75rem; }
+    .facts-block ul { margin: 0; padding-left: 1.1rem; }
+    .facts-block li { margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--fg-muted); line-height: 1.55; }
+    .facts-block li strong { color: var(--fg); font-weight: 600; }
+    .post-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .sidebar-title { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); margin-bottom: 0.9rem; }
+    .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .toc-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; display: block; padding: 0.2rem 0.6rem; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .toc-list a:hover { color: var(--fg); border-left-color: var(--accent); }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    .related-list a { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); text-decoration: none; line-height: 1.4; }
+    .related-list a:hover { color: var(--accent); }
+    .sidebar-cta { background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card)); border-color: var(--accent-dim); }
+    .sidebar-cta p { font-family: var(--font-body); font-size: 0.83rem; color: var(--fg-muted); margin: 0 0 1rem; line-height: 1.55; }</style>
+  <Fragment set:html={_body} />
+</SubpageLayout>
