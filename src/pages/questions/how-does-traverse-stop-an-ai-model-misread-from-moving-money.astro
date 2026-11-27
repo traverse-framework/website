@@ -1,0 +1,53 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How does Traverse stop an AI model misread from moving money?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'A weekly demo on Traverse v0.17.1 runs four catalog capabilities as one governed chain: model/model.execute@1.0.0 reads each handwritten digit, classification/classification.outcome-resolve@1.1.0 marks the read confident or unsure under a 950 per mille floor, core/core.authorize@1.2.0 allows or holds the deposit, and formatting/formatting.format-currency@1.2.0 formats the amount. On a $25 cheque the model read $19.00 (2 as 1 at 53.7%, 5 as 9 at 88.0%). The chain marked both reads unsure and held the deposit for a human. A $740 cheque with every digit at 99.9% was deposited. Node 22, Deno, and headless Chromium produced the same results. Native traverse-mcp 0.17.1 ran the policy steps with matching digests. Freestyle attempts (override, a fake deposit capability, a swapped model, a cross-tenant agent) fail closed. The digits are real handwritten UCI digits, not a scanned cheque.',
+    },
+  }],
+});
+
+const relatedLinks = [
+  { href: '/blog/handwritten-cheque.html', label: 'The model misread the cheque. The money did not move.' },
+  { href: 'https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-27-handwritten-cheque', label: 'Weekly demo folder (public)' },
+  { href: '/questions/what-is-the-model-execute-catalog-capability.html', label: 'What is the model.execute catalog capability?' },
+  { href: '/questions/what-does-agent-proposes-runtime-decides-mean.html', label: 'What does the agent proposes, the runtime decides mean?' },
+];
+---
+<QuestionLayout
+  title="How does Traverse stop an AI model misread from moving money?"
+  description="In the Nov 27 weekly demo, a $25 cheque the model read as $19.00 was held for a human. Four catalog capabilities ran as one governed chain on Traverse v0.17.1."
+  canonical="https://traverse-framework.com/questions/how-does-traverse-stop-an-ai-model-misread-from-moving-money.html"
+  category="Use cases"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>A mobile cheque deposit goes wrong when the model misreads one digit and nobody notices. Traverse can put a confidence policy and an authorization step in the same governed chain as the model, so a weak or wrong read is held instead of deposited.</p>
+
+  <p>The 2026-11-27 weekly demo runs that chain on Traverse v0.17.1.</p>
+
+  <h2>What the chain did</h2>
+  <ul>
+    <li><code>model/model.execute@1.0.0</code> ran the signed digits package once per digit.</li>
+    <li><code>classification/classification.outcome-resolve@1.1.0</code> marked each read confident or unsure under a 950 per mille floor.</li>
+    <li><code>core/core.authorize@1.2.0</code> allowed or held the deposit.</li>
+    <li><code>formatting/formatting.format-currency@1.2.0</code> formatted the amount the customer sees.</li>
+  </ul>
+  <p>On a $25 cheque the model read a 2 as a 1 at 53.7% and a 5 as a 9 at 88.0%. Both reads were unsure, and the deposit was held for a human. The model alone would have deposited $19.00. A $740 cheque, with every digit read at 99.9%, was deposited with a <code>retain_cheque_image</code> obligation.</p>
+
+  <h2>Same answers, and freestyle fails closed</h2>
+  <p>Node 22, Deno 2.9.8, and headless Chromium ran all 14 steps with identical results. Native <code>traverse-mcp</code> 0.17.1 ran the 9 policy steps with matching digests. An agent that added <code>override: true</code>, called a fake <code>cheque.force-deposit</code> capability, swapped the signed model, or came from another tenant was refused.</p>
+
+  <h2>What this does not claim</h2>
+  <p>The digits are real handwritten UCI digits, not a scanned cheque. The native MCP host uses signed reference scores for the model step. Small host glue remains (softmax and digit slicing). This demo has no deposit amount limit. The signed package uses a test-only key.</p>
+
+  <h2>Where to read next</h2>
+  <p>The write-up is <a href="/blog/handwritten-cheque.html">The model misread the cheque. The money did not move.</a> The runnable folder is public: <a href="https://github.com/traverse-framework/weekly-demos/tree/main/2026-11-27-handwritten-cheque">weekly-demos/2026-11-27-handwritten-cheque</a>. One command runs it: <code>./run.sh</code>.</p>
+</QuestionLayout>
