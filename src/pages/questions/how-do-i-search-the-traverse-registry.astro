@@ -1,0 +1,68 @@
+---
+import QuestionLayout from '@layouts/QuestionLayout.astro';
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{
+    '@type': 'Question',
+    name: 'How do I search the Traverse registry before I write a capability?',
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: 'Search the public registry before you write a capability, so you can reuse a rule that already has a contract, a version, and a signature. Install crates.io package traverse-cli-rs 0.17.1 (binary traverse-cli, rustc 1.95 or newer) with rustup toolchain install 1.95.0 and cargo +1.95.0 install traverse-cli-rs --version =0.17.1 --locked. The crates.io crate named traverse-cli is an unrelated Solidity tool. Sync the index with traverse-cli registry sync --workspace local-default --json, then search it with traverse-cli registry search price --workspace local-default --json. Sync and search read a local workspace copy. Search does not contact the network. Licensing and status filters are declarative metadata.',
+    },
+  }],
+});
+
+const installSnippet = `rustup toolchain install 1.95.0
+cargo +1.95.0 install traverse-cli-rs --version =0.17.1 --locked`;
+
+const syncSnippet = `traverse-cli registry sync --workspace local-default --json`;
+
+const searchSnippet = `traverse-cli registry search price --workspace local-default --json
+traverse-cli registry search price --workspace local-default --commercial-use allowed --json
+traverse-cli registry list --workspace local-default --json
+traverse-cli registry inspect audio-event-gate --workspace local-default --json`;
+
+const relatedLinks = [
+  { href: '/questions/what-is-the-traverse-cli.html', label: 'What is the Traverse CLI?' },
+  { href: '/questions/what-is-the-capability-registry.html', label: 'What is the capability registry?' },
+  { href: '/questions/how-do-i-publish-a-capability-to-the-registry.html', label: 'How do I publish a capability?' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/getting-started.md', label: 'Getting started (v0.17.1)' },
+  { href: 'https://github.com/traverse-framework/traverse/blob/v0.17.1/examples/applications/registry-consumer/README.md', label: 'Registry consumer example' },
+];
+---
+<QuestionLayout
+  title="How do I search the Traverse registry before I write a capability?"
+  description="Search the public Traverse registry from the CLI before you write a new capability. Sync the index locally with traverse-cli-rs 0.17.1, then search it."
+  canonical="https://traverse-framework.com/questions/how-do-i-search-the-traverse-registry.html"
+  category="Getting started"
+  relatedLinks={relatedLinks}
+  jsonLd={jsonLd}
+>
+  <p>Search the public registry before you write a capability. A published record already has a contract, a version, and a signature, which is the point of checking the catalog first.</p>
+
+  <h2>Install the CLI</h2>
+  <p>The CLI on crates.io is <code>traverse-cli-rs</code> 0.17.1 (published 2026-11-16). The binary name is <code>traverse-cli</code>. It needs rustc 1.95 or newer. The v0.17.1 README install is:</p>
+  <pre><code>{installSnippet}</code></pre>
+  <p>The crates.io crate named <code>traverse-cli</code> is an unrelated Solidity tool (command-line analysis, visualization, and test generation). Install <code>traverse-cli-rs</code>.</p>
+
+  <h2>Sync the index</h2>
+  <p><code>registry sync</code> fetches the latest public index from <code>traverse-framework/registry</code> and stores it in a local workspace. Runtime execution reads that local copy. It does not call the registry live. Sync requires <code>--workspace</code> and <code>--json</code>. <code>local-default</code> is the workspace id in the v0.17.1 README examples.</p>
+  <pre><code>{syncSnippet}</code></pre>
+
+  <h2>Search the local index</h2>
+  <p><code>registry search</code> matches a case-insensitive substring against capability namespace and id fields in that local index. It does not fetch contracts, and it does not contact the network. <code>registry list</code> is the same local read. <code>registry inspect</code> prints each synced version's lifecycle status (<code>active</code>, <code>deprecated</code>, or <code>revoked</code>) and the model rights record. A field the publisher did not declare prints as <code>not stated</code>.</p>
+  <pre><code>{searchSnippet}</code></pre>
+  <p><code>--commercial-use</code>, <code>--redistribution</code>, <code>--status</code>, and <code>--model-commercial-use</code> filter that local index. The values <code>allowed</code>, <code>forbidden</code>, <code>conditional</code>, and <code>unknown</code> are declarative metadata (registry specs 025 and 026). Search requires a query and <code>--workspace</code>.</p>
+
+  <h2>Where to read next</h2>
+  <p>The command list is in the <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/README.md">v0.17.1 README</a>. The first local walk-through is <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/docs/getting-started.md">docs/getting-started.md</a>. The <a href="https://github.com/traverse-framework/traverse/blob/v0.17.1/examples/applications/registry-consumer/README.md">registry-consumer example</a> starts with the same sync, then validates an app built from published capabilities.</p>
+</QuestionLayout>
+
+<style is:global>
+  .q-layout, .q-main, .q-body { min-width: 0; }
+  .q-body { overflow-wrap: anywhere; }
+  .q-body pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; max-width: 100%; margin: 0 0 1.25rem; }
+  .q-body pre code { background: none; padding: 0; white-space: pre; }
+</style>
